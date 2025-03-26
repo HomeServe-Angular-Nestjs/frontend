@@ -1,0 +1,142 @@
+<div class="signup-container" [ngClass]="config.type + '-theme'">
+
+    <!-- Background image with overlay -->
+    <div class="absolute inset-0 z-0">
+        <img [src]="config.backgroundImage" class="w-full h-full object-cover opacity-20" alt="background" />
+    </div>
+
+    <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-20 relative z-10">
+        <!-- Left side content -->
+        <div class="md:w-1/2 text-center md:text-left mb-8 md:mb-0">
+            <h1 class="text-4xl font-bold title-text mb-4 font-poppins">
+                {{config.title}}
+            </h1>
+            <h2 class="text-3xl font-bold title-text mb-4 font-poppins">
+                {{config.subtitle}}
+            </h2>
+            <p class="text-lg description-text mb-8 font-inter">
+                {{config.description}}
+            </p>
+
+            <!-- Feature grid -->
+            <div class="grid grid-cols-2 gap-6 max-w-md mx-auto md:mx-0">
+                <div *ngFor="let feature of config.features"
+                    class="bg-white/80 p-6 rounded-lg shadow-sm backdrop-blur-sm feature-card">
+                    <i [class]="feature.icon" class="text-3xl feature-icon mb-1"></i>
+                    <h3 class="text-lg font-semibold feature-title mb-2 font-poppins">
+                        {{feature.title}}
+                    </h3>
+                    <p class="text-sm feature-description font-inter">
+                        {{feature.description}}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Why choose us? -->
+            <div class="mt-8 p-4 rounded-lg border why-choose-us" *ngIf="config?.whyChooseUs">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-2xl why-choose-us-icon"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-medium why-choose-us-title font-poppins">{{config.whyChooseUs?.title}}
+                        </h4>
+                        <p class="text-sm why-choose-us-description font-inter">
+                            {{config.whyChooseUs?.description}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right side signup form -->
+        <div class="md:w-1/2 max-w-md w-full">
+            <div class="bg-white/95 backdrop-blur-lg p-8 rounded-xl shadow-2xl">
+                <div class="flex items-center justify-center mb-6">
+                    <svg width="30" height="24" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M13.7549 5.98438C13.8486 5.89062 13.9893 5.84375 14.1299 5.84375C14.2236 5.84375 14.3643 5.89062 14.458 5.98438L23.1299 13.0625V20.75C23.1299 21.1719 22.7549 21.5 22.3799 21.5H17.083C16.708 21.5 16.333 21.1719 16.333 20.75V16.25C16.333 15.875 16.0049 15.5 15.583 15.5H12.583C12.208 15.5 11.833 15.875 11.833 16.25V20.75C11.833 21.1719 11.5049 21.5 11.1299 21.5H5.87988C5.45801 21.5 5.12988 21.1719 5.12988 20.75V13.1094L13.7549 5.98438ZM27.3955 10.8125C27.5361 10.9062 27.6299 11.0938 27.6299 11.2344C27.6299 11.375 27.583 11.5156 27.4893 11.6094L26.2705 13.0625C26.1768 13.2031 26.0361 13.25 25.8486 13.25C25.708 13.25 25.5674 13.2031 25.4736 13.1094L14.458 4.0625C14.3643 3.96875 14.2236 3.92188 14.1299 3.92188C13.9893 3.92188 13.8486 3.96875 13.7549 4.0625L2.73926 13.1094C2.64551 13.2031 2.50488 13.25 2.36426 13.25C2.17676 13.25 2.03613 13.2031 1.94238 13.0625L0.723633 11.6094C0.676758 11.5156 0.583008 11.375 0.583008 11.2344C0.583008 11.0938 0.676758 10.9062 0.817383 10.8125L12.6768 1.01562C13.0518 0.734375 13.5674 0.546875 14.1299 0.546875C14.6455 0.546875 15.1611 0.734375 15.5361 1.01562L19.7549 4.48438V1.10938C19.7549 0.78125 19.9893 0.546875 20.3174 0.546875H22.9424C23.2236 0.546875 23.5049 0.78125 23.5049 1.10938V7.57812L27.3955 10.8125Z"
+                            [attr.fill]="config.logoColor" />
+                    </svg>
+                    <span class="title-text text-2xl font-medium">HomeServe</span>
+                </div>
+                <h2 class="text-xl font-medium text-center mb-6" style="color: var(--secondary-color)">
+                    Create Your Account
+                </h2>
+
+                <!-- Form Email -->
+                <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                        <input formControlName="email" type="email" id="email" placeholder="Enter your email" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:text-sm form-input" />
+                    </div>
+                    <button type="submit"
+                        class="w-full text-white py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 submit-button">
+                        Get Started
+                    </button>
+                </form>
+
+                <div class="mt-6" *ngIf="config.socialAuth?.google || config.socialAuth?.facebook">
+                    <div class=" relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 space-y-3">
+                        <button *ngIf="config.socialAuth?.google"
+                            class="w-full flex justify-center items-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="26" height="26"
+                                viewBox="0 0 48 48">
+                                <path fill="#fbc02d"
+                                    d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12	s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20	s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z">
+                                </path>
+                                <path fill="#e53935"
+                                    d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039	l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z">
+                                </path>
+                                <path fill="#4caf50"
+                                    d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36	c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z">
+                                </path>
+                                <path fill="#1565c0"
+                                    d="M43.611,20.083L43.595,20L42,20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571	c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z">
+                                </path>
+                            </svg>
+                            <span>Sign up with Google</span>
+                        </button>
+                        <button *ngIf="config.socialAuth.facebook"
+                            class="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                            <img src="assets/images/facebook-icon.png" alt="Facebook" class="w-5 h-5 mr-2" />
+                            Sign up with Facebook
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center text-sm text-gray-600">
+                    Already have an account?
+                    <a href="#" class="font-medium login transition-colors duration-200">Log
+                        In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trust indicators at the bottom -->
+    <div class="absolute bottom-4 left-0 right-0 flex justify-center space-x-8 text-sm text-gray-600">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle text-indigo-500 mr-2"></i>
+            <span>Trusted by 10,000+ customers</span>
+        </div>
+        <div class="flex items-center">
+            <i class="fas fa-lock text-indigo-500 mr-2"></i>
+            <span>Secure & encrypted</span>
+        </div>
+        <div class="flex items-center">
+            <i class="fas fa-headset text-indigo-500 mr-2"></i>
+            <span>24/7 customer support</span>
+        </div>
+    </div>
+</div>

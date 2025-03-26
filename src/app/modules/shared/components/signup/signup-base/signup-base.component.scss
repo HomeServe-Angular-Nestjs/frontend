@@ -1,0 +1,94 @@
+.signup-container {
+  @apply min-h-screen flex items-center justify-center relative;
+
+  &.customer-theme {
+    --primary-color: #ffffff;
+    --secondary-color: #4f46e5;
+    --feature-icon-color: #4f46e5;
+    --title-color: #312e81;
+    --description-color: #374151;
+    --why-choose-us-bg: #eef2ff;
+    --why-choose-us-border: #e0e7ff;
+    --submit-button-hover: #4338ca;
+    --login-link-color: #4f46e5;
+    --trust-indicator-color: #4f46e5;
+    --gradient: linear-gradient(to bottom right, #e0f2fe, #c7d2fe);
+
+    background: var(--gradient);
+  }
+
+  &.provider-theme {
+    --primary-color: #ffffff;
+    --secondary-color: #16a34a;
+    --title-color: #14532d;
+    --description-color: #047857;
+    --why-choose-us-bg: #d1fae5;
+    --why-choose-us-border: #a7f3d0;
+    --submit-button-bg: #059669;
+    --submit-button-hover: #047857;
+    --login-link-color: #059669;
+    --trust-indicator-color: #059669;
+    --gradient: linear-gradient(to bottom right, #ccfbf1, #99f6e4);
+
+    background: var(--gradient);
+  }
+
+  .title-text {
+    color: var(--title-color);
+  }
+
+  .description-text {
+    color: var(--description-color);
+  }
+
+  .feature-icon {
+    color: var(--secondary-color);
+  }
+
+  .feature-title {
+    color: var(--title-color);
+  }
+
+  .feature-description {
+    color: var(--description-color);
+  }
+
+  .why-choose-us {
+    background-color: var(--why-choose-us-bg);
+    border-color: var(--why-choose-us-border);
+  }
+
+  .why-choose-us-icon {
+    color: var(--secondary-color);
+  }
+
+  .why-choose-us-title {
+    color: var(--title-color);
+  }
+
+  .why-choose-us-description {
+    color: var(--description-color);
+  }
+
+  .form-input:focus {
+    --ring-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .submit-button {
+    background-color: var(--secondary-color);
+    &:hover {
+      background-color: var(--submit-button-hover);
+    }
+    &:focus {
+      --ring-color: var(--primary-color);
+    }
+  }
+
+  .login {
+    color: var(--secondary-color);
+    &:hover {
+      color: var(--title-color);
+    }
+  }
+}
