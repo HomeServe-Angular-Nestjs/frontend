@@ -65,15 +65,29 @@
                 </h2>
 
                 <!-- Form Email -->
-                <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
-                    <div>
+                <form [formGroup]="form" (ngSubmit)="submitForm()" class="space-y-4">
+                    <div *ngIf="currentStep() === 1">
                         <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
                         <input formControlName="email" type="email" id="email" placeholder="Enter your email" required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:text-sm form-input" />
                     </div>
+                    <ng-container *ngIf="currentStep() === 3">
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                            <input formControlName="username" type="text" id="username"
+                                placeholder="Enter your username" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:text-sm form-input" />
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input formControlName="password" type="text" id="password"
+                                placeholder="Enter your password" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:text-sm form-input" />
+                        </div>
+                    </ng-container>
                     <button type="submit"
                         class="w-full text-white py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 submit-button">
-                        Get Started
+                        {{currentStep() === 1 ? 'Get Started' : 'Continue'}}
                     </button>
                 </form>
 
@@ -140,3 +154,5 @@
         </div>
     </div>
 </div>
+
+<app-otp (code)="verifyOtp($event)" (resendOTP)="resendOtp()" [email]="email" *ngIf="currentStep() === 2"></app-otp>

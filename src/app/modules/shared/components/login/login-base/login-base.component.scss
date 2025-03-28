@@ -1,0 +1,54 @@
+.login-container {
+  @apply min-h-screen flex items-center justify-center relative;
+
+  &.customer-theme {
+    --primary-color: #4f46e5;
+    --secondary-color: #4f46e5;
+    --title-color: #312e81;
+    --subtitle-color: #374151;
+    --gradient: linear-gradient(to bottom right, #e0f2fe, #c7d2fe);
+
+    background: var(--gradient);
+  }
+
+  &.provider-theme {
+    --primary-color: #16a34a;
+    --secondary-color: #16a34a;
+    --title-color: #14532d;
+    --subtitle-color: #047857;
+    --gradient: linear-gradient(to bottom right, #ccfbf1, #99f6e4);
+
+    background: var(--gradient);
+  }
+
+  .title-text {
+    color: var(--title-color);
+  }
+
+  .subtitle-text {
+    color: var(--subtitle-color);
+  }
+
+  .form-input:focus {
+    --ring-color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+  }
+
+  .submit-button {
+    background-color: var(--secondary-color);
+
+    &:hover {
+      background-color: var(--primary-color);
+      opacity: 0.9;
+    }
+  }
+
+  .login-link {
+    color: var(--secondary-color);
+
+    &:hover {
+      color: var(--title-color);
+    }
+  }
+}

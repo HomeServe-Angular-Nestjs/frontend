@@ -2,3 +2,53 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import "notyf/notyf.min.css";
+
+// Custom icon styling
+.notyf-icon {
+  font-size: 18px;
+  margin-right: 10px;
+  font-weight: bold;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: blue;
+}
+
+// Customize notification appearance
+.notyf__toast {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notyf-success {
+  --notyf-background: #4caf50;
+}
+
+.notyf-error {
+  --notyf-background: #fff3f3;
+  border-left: 4px solid #f44336;
+  color: #5f2120;
+  padding: 0 10px;
+  max-width: 800px;
+
+  .notyf-icon-error {
+    color: #f44336;
+    font-size: 20px;
+    margin-right: 12px;
+    align-self: flex-start; 
+  }
+
+  .notyf__message {
+    line-height: 1.4;
+    font-size: 14px;
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

@@ -34,7 +34,7 @@ export const SIGNUP_CONFIGS: {
         subtitle: 'Your Trusted Home Service Partner',
         description: 'Experience hassle-free home services with verified professionals and transparent pricing',
         logoColor: '#312e81',
-        backgroundImage: 'assets/images/bg-signup.jpg',
+        backgroundImage: 'assets/images/bg-auth.jpg',
         features: [
             {
                 icon: 'fas fa-certificate',
@@ -77,7 +77,7 @@ export const SIGNUP_CONFIGS: {
         subtitle: 'Grow Your Business With Us',
         description: 'Connect with customers looking for your services and grow your business',
         logoColor: '#14532D',
-        backgroundImage: 'assets/images/bg-signup.jpg',
+        backgroundImage: 'assets/images/bg-auth.jpg',
         features: [
             {
                 icon: 'fas fa-users',
