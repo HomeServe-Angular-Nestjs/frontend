@@ -36,13 +36,23 @@
                         <input formControlName="email" type="email" placeholder="Enter your email" required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm form-input" />
                     </div>
+
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input formControlName="password" type="password" placeholder="Enter your password" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm form-input" />
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <input [type]="hidePassword ? 'password' : 'text'" formControlName="password" id="password"
+                                placeholder="Enter your password" required
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm form-input pr-10" />
+                            <button type="button" (click)="togglePasswordVisibility()"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
+                                <i [class]="hidePassword ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+                            </button>
+                        </div>
                     </div>
+
                     <div class="flex items-center justify-end">
-                        <a href="#" class="text-sm font-medium login-link">Forgot password?</a>
+                        <p class="text-sm font-medium login-link cursor-pointer" (click)="toggleForgotPassword()">Forgot
+                            password?</p>
                     </div>
                     <button type="submit"
                         class="w-full text-white py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 submit-button">
@@ -103,3 +113,5 @@
         </div>
     </div>
 </div>
+
+<app-email-input *ngIf="forgotPassword" [userType]="type"></app-email-input>

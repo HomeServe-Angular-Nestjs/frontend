@@ -10,7 +10,7 @@ import { SignupAuthService } from "../../../../../core/services/signup-auth.serv
     imports: [CommonModule, FormsModule]
 })
 export class OtpComponent implements OnDestroy, OnInit {
-    @Input({ required: true }) email!: string;
+    @Input() email!: string;
     @Output() code = new EventEmitter<string>();
     @Output() resendOTP = new EventEmitter<void>();
     otpDigits = ['', '', '', ''];

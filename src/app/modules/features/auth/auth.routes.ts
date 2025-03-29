@@ -30,5 +30,10 @@ export const authRoutes: Routes = [
                     .then(c => c.ProviderLoginComponent)
             }
         ]
+    },
+    {
+        path: 'verify_email',
+        loadComponent: () => import('../../shared/UI/forms/change_password/change_password.component')
+            .then(c => c.ChangePasswordComponent)
     }
 ]
