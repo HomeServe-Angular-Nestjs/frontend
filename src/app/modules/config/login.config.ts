@@ -1,5 +1,7 @@
+import { UserType } from "../shared/models/user.model";
+
 export interface ILoginConfig {
-    type: 'customer' | 'provider';
+    type: UserType;
     title: string;
     subtitle: string;
     backgroundImage: string;

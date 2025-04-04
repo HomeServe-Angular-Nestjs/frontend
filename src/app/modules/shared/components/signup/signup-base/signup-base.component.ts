@@ -3,7 +3,7 @@ import { ISignupConfig } from "../../../../config/signup.config";
 import { CommonModule } from "@angular/common";
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
 import { SignupAuthService } from "../../../../../core/services/signup-auth.service";
-import { Router } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { AlertService } from "../../../../../core/services/public/alert.service";
 import { OtpComponent } from "../../../UI/forms/otp/otp.component";
 import { IUser } from "../../../models/user.model";
@@ -13,7 +13,7 @@ import { IUser } from "../../../models/user.model";
     templateUrl: './signup-base.component.html',
     styleUrl: './signup-base.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, ReactiveFormsModule, OtpComponent]
+    imports: [CommonModule, ReactiveFormsModule, OtpComponent, RouterLink]
 })
 export class SignupBaseComponent {
     private signupAuthService = inject(SignupAuthService);
@@ -84,6 +84,10 @@ export class SignupBaseComponent {
             }
 
             this.signupAuthService.completeOtp(user).subscribe({
+                next: () => {
+                    const url: string = this.config.type === 'customer' ? 'login' : `${this.config.type}/login`;
+                    this.router.navigate([url]);
+                },
                 error: (err) => console.log(err)
             });
         }
@@ -99,6 +103,13 @@ export class SignupBaseComponent {
                     console.log(err);
                 }
             },
+        });
+    }
+
+    resendOtp() {
+        this.signupAuthService.initiateSignup(this.email, this.config.type).subscribe({
+            next: () => this.alert.showToast('Otp resented', 'success'),
+            error: (err) => console.error(err.error)
         });
     }
 
@@ -127,12 +138,5 @@ export class SignupBaseComponent {
             return true;
         }
         return false;
-    }
-
-    resendOtp() {
-        this.signupAuthService.initiateSignup(this.email, this.config.type).subscribe({
-            next: () => this.alert.showToast('Otp resented', 'success'),
-            error: (err) => console.error(err.error)
-        });
     }
 }

@@ -15,7 +15,7 @@ export class OtpComponent implements OnDestroy, OnInit {
     @Output() resendOTP = new EventEmitter<void>();
     otpDigits = ['', '', '', ''];
     canResend = false;
-    countdown = signal(10);
+    countdown = signal(60);
 
     private destroy$ = new Subject<void>();
     private timerSubscription!: Subscription;

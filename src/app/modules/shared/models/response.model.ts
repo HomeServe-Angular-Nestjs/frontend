@@ -7,3 +7,9 @@ export interface IVerifyTokenResponse {
     id: string;
     type: UserType
 }
+
+export interface IResponse {
+    success: boolean,
+    message: string,
+    data?: any
+}

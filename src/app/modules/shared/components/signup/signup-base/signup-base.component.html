@@ -131,7 +131,8 @@
 
                 <div class="mt-6 text-center text-sm text-gray-600">
                     Already have an account?
-                    <a href="#" class="font-medium login transition-colors duration-200">Log
+                    <a [routerLink]="config.type === 'customer' ? '/login' : '/provider/login'"
+                        class="font-medium login transition-colors duration-200">Log
                         In</a>
                 </div>
             </div>
