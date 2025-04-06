@@ -7,7 +7,7 @@ export const providerRoutes: Routes = [
         children: [
             {
                 path: 'homepage',
-                loadComponent: () => import('../../shared/components/provider-homepage/provider-homepage.component')
+                loadComponent: () => import('../../shared/components/provider/provider-homepage/provider-homepage.component')
                     .then(c => c.ProviderHomepageComponent),
                 canActivate: [authGuard]
             }

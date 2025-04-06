@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 import { SIGNUP_CONFIGS } from "../../config/signup.config";
 import { SignupBaseComponent } from "../../shared/components/signup/signup-base/signup-base.component";
-import { ThemeService } from "../../../core/services/public/theme.service";
 
 @Component({
     selector: 'app-customer-signup',
@@ -12,8 +11,4 @@ import { ThemeService } from "../../../core/services/public/theme.service";
 })
 export class CustomerSignupComponent {
     config = SIGNUP_CONFIGS.customer;
-
-    // constructor(private themeService: ThemeService) {
-    //     this.themeService.setTheme('customer');
-    // }
 }   

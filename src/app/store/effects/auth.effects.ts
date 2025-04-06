@@ -21,9 +21,9 @@ export const authEffects = {
                 loginService.authCredentials(user).pipe(
                     map(() => authActions.loginSuccess({ user })),
                     tap(() => {
-                         
-                        const url = user.type === 'customer' ? 'homepage' : 'provider/homepage';
-                        router.navigate([url])
+                        const url = user.type === 'customer' ? 'homepage' :
+                            user.type === 'provider' ? 'provider/homepage' : 'admin/homepage';
+                        router.navigate([url]);
                     }),
                     catchError((error: HttpErrorResponse) => {
                         console.error('[Login Effect] API Error:', error);

@@ -7,7 +7,7 @@ export const customerRoutes: Routes = [
         children: [
             {
                 path: 'homepage',
-                loadComponent: () => import('../../shared/components/customer-homepage/homepage.component')
+                loadComponent: () => import('../../shared/components/customer/customer-homepage/homepage.component')
                     .then(c => c.CustomerHomepageComponent),
                 canActivate: [authGuard]
             }

@@ -1,6 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { AuthStateService } from './core/services/auth-state.service';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { authActions } from './store/actions/auth.actions';
+import { UserType } from './modules/shared/models/user.model';
 
 @Component({
   selector: 'app-root',
@@ -10,9 +13,23 @@ import { AuthStateService } from './core/services/auth-state.service';
 })
 export class AppComponent implements OnInit {
   title = 'HomeServe';
-  private authStateService = inject(AuthStateService);
+  private router = inject(Router);
+  private store = inject(Store);
 
   ngOnInit(): void {
-    this.authStateService.initializeAuthState();
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      const url = event.urlAfterRedirects.split('/');
+      let userType: UserType = 'customer';
+
+      if (url.includes('provider')) {
+        userType = 'provider';
+      } else if (url.includes('admin')) {
+        userType = 'admin';
+      }
+
+      this.store.dispatch(authActions.setUserType({ userType }));
+    });
   }
 }

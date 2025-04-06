@@ -20,7 +20,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             return next(modifiedReq).pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (err.status === 401) {
-                        router.navigate(['/login']);
+                        // console.log(err)
+                        // router.navigate(['/login']);
                     } else if (err.status === 403) {
                         router.navigate(['access_denied']);
                     }

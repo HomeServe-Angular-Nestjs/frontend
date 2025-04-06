@@ -13,3 +13,19 @@ export interface IResponse {
     message: string,
     data?: any
 }
+
+export interface ResponseInterface<T = any> {
+    success: boolean;
+    message: string;
+    data?: T;
+    error?: {
+        code?: string;
+        details?: any;
+        stack?: string;
+    } | null;
+    meta?: {
+        timestamp: string; //* ISO format
+        requestId?: string;
+        duration?: number; //* in ms
+    };
+}

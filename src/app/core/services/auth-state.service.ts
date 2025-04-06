@@ -11,6 +11,8 @@ export class AuthStateService {
     private router = inject(Router);
 
     initializeAuthState() {
+
+        
         this.route.queryParams.subscribe(params => {
             const email = params['email'];
             const type = params['type'];

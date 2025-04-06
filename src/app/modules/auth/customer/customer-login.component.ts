@@ -1,9 +1,7 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { LoginBaseComponent } from "../../shared/components/login/login-base/login-base.component";
 import { LOGIN_CONFIGS } from "../../config/login.config";
-import { ThemeService } from "../../../core/services/public/theme.service";
 import { Store } from "@ngrx/store";
-import { authActions } from "../../../store/actions/auth.actions";
 
 @Component({
     selector: 'app-customer-login',
@@ -12,16 +10,6 @@ import { authActions } from "../../../store/actions/auth.actions";
     `,
     imports: [LoginBaseComponent],
 })
-export class CustomerLoginComponent implements OnInit{
-    private store = inject(Store);
-
+export class CustomerLoginComponent {
     config = LOGIN_CONFIGS.customer;
-
-    // constructor(private themeService: ThemeService) {
-    //     this.themeService.setTheme('customer');
-    // }
-
-    ngOnInit(): void {
-        this.store.dispatch(authActions.setUserType({ userType: this.config.type }))
-    }
 }

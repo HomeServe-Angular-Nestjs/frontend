@@ -11,8 +11,6 @@ export const authActions = {
 
     googleLogin: createAction('[Auth] Google Login', props<{ userType: UserType }>()),
 
-    // googleLoginSuccess: createAction('[Auth] Google Login', props<{ user: IUser }>()),
-
     setUserType: createAction('[Auth] Set User Type', props<{ userType: UserType }>()),
 
     logout: createAction('[Auth] Logout'),

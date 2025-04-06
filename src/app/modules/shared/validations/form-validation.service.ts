@@ -7,7 +7,7 @@ import { AbstractControl } from "@angular/forms";
 export class ValidateForm {
     private notyf = inject(NotificationService);
 
-    messages = MESSAGES_ENV;
+    private messages = MESSAGES_ENV;
 
     hasValidationErrors(control: AbstractControl | null, fieldName: string): boolean {
         console.log(control?.errors)

@@ -8,6 +8,7 @@ import { provideEffects } from '@ngrx/effects';
 import { authFeature } from './store/feature/auth.feature';
 import { authEffects } from './store/effects/auth.effects';
 import { metaReducers } from './store/reducers/meta.reducer';
+import { responseInterceptor } from './core/interceptors/response.interceptor';
 
 
 
@@ -16,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([authInterceptor])
+      withInterceptors([authInterceptor, responseInterceptor])
     ),
     provideStore(
       { [authFeature.name]: authFeature.reducer },

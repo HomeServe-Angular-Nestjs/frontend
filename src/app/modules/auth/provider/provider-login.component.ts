@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 import { LoginBaseComponent } from "../../shared/components/login/login-base/login-base.component";
 import { LOGIN_CONFIGS } from "../../config/login.config";
-import { ThemeService } from "../../../core/services/public/theme.service";
 
 @Component({
     selector: 'app-provider-login',
@@ -12,8 +11,4 @@ import { ThemeService } from "../../../core/services/public/theme.service";
 })
 export class ProviderLoginComponent {
     config = LOGIN_CONFIGS.provider;
-
-    constructor(private themeService: ThemeService) {
-        this.themeService.setTheme('customer');
-    }
 }

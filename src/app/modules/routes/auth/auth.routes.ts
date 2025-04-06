@@ -44,4 +44,14 @@ export const authRoutes: Routes = [
             verifyEmailRoute
         ]
     },
+    {
+        path: 'admin',
+        children: [
+            {
+                path: 'login',
+                loadComponent: () => import('../../auth/admin/login/admin.component')
+                    .then(c => c.AdminLoginPageComponent)
+            }
+        ]
+    }
 ]

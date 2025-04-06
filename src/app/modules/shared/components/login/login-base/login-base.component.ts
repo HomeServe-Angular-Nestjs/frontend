@@ -22,9 +22,7 @@ import { Store } from "@ngrx/store";
 export class LoginBaseComponent {
     private fb = inject(FormBuilder);
     private store = inject(Store);
-    private loginService = inject(LoginAuthService);
     private notyf = inject(NotificationService);
-    private router = inject(Router);
 
     @Input({ required: true }) config!: ILoginConfig;
     regexp = REGEXP_ENV;
