@@ -12,7 +12,8 @@
         </div>
 
         <h1 class="font-light text-2xl text-center text-gray-800">Admin Panel</h1>
-        <span class="text-gray-500 text-sm font-light text-center">Sign in to your account</span>
+        <span class="text-gray-500 text-sm font-light text-center">{{!fPassword ? 'Sign in to your account' : `Enter
+            your mobile number`}}</span>
     </div>
 
     <!-- Message Display -->
@@ -29,8 +30,8 @@
 
 
     <!-- Form -->
-    <form [formGroup]="form" class="space-y-4" (submit)="formSubmit()">
-        <div>
+    <form *ngIf="!fPassword" [formGroup]="form" class="space-y-4" (submit)="formSubmit()">
+        <div *ngIf="!fPassword">
             <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <div class="relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -46,7 +47,7 @@
             </div>
         </div>
 
-        <div>
+        <div *ngIf="!fPassword">
             <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <div class="relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -63,12 +64,33 @@
         </div>
 
         <div class="flex items-center justify-end">
-            <a href="#" class="text-sm font-medium text-[#686767] hover:text-[#454444]">Forgot password?</a>
+            <button type="button" (click)="forgotPassword()"
+                class="text-sm font-medium text-[#686767] hover:text-[#454444]">Forgot
+                password?</button>
         </div>
 
         <button type="submit"
             class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#171717] hover:bg-[#171717] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Sign in
+            {{!fPassword ? 'Sign In' : 'Send OTP'}}
         </button>
     </form>
+
+    <!-- <form *ngIf="fPassword" [formGroup]="phoneForm" class="flex flex-col gap-4">
+        <div class="relative flex items-center gap-2">
+            <ngx-intl-tel-input [cssClass]="'custom-phone-input w-full p-2 border rounded focus:outline-none'"
+                [preferredCountries]="['in']" [enablePlaceholder]="true" formControlName="phone">
+            </ngx-intl-tel-input>
+        </div>
+        <button type="submit"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#171717] hover:bg-[#171717] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Send OTP
+        </button>
+    </form> -->
+
+    <div type="button" *ngIf="fPassword" class="flex justify-center mt-8 items-center gap-1">
+        <button (click)="forgotPassword()"
+            class="hover:bg-gray-200 rounded-full transition-all ease-linear delay-100 cursor-pointer">
+            <i class=" fa fa-arrow-left p-3 "></i>
+        </button>
+    </div>
 </div>

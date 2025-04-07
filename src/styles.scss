@@ -35,7 +35,7 @@
     color: #f44336;
     font-size: 20px;
     margin-right: 12px;
-    align-self: flex-start; 
+    align-self: flex-start;
   }
 
   .notyf__message {
@@ -51,4 +51,52 @@ body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/** For the Phone number **/
+/* Ensure the intl-tel-input container is flex and aligned */
+.iti {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Style the flag container (country selector) */
+.iti__flag-container {
+  flex-shrink: 0; /* Prevent it from shrinking */
+  padding: 0.7rem; /* Match Tailwind's p-2 */
+  border: 1px solid #d1d5db; /* Tailwind's border-gray-300 */
+  border-right: none; /* Remove right border to blend with input */
+  border-radius: 0.375rem 0 0 0.375rem; /* Tailwind's rounded, left side only */
+  background-color: #f9fafb; /* Tailwind's bg-gray-50 */
+}
+
+/* Style the input to align with the flag container */
+.custom-phone-input {
+  flex-grow: 1; /* Take up remaining space */
+  border-radius: 0 0.375rem 0.375rem 0; /* Rounded on right side only */
+  border-left: none; /* Remove left border to blend with flag */
+  border: 1px solid #d1d5db; /* Tailwind's border-gray-300 */
+  padding: 0.4rem;
+  width: 280px;
+}
+
+/* Adjust dropdown styling (optional) */
+.iti__country-list {
+  border: 1px solid #d1d5db; /* Tailwind's border-gray-300 */
+  border-radius: 0.375rem; /* Tailwind's rounded */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Tailwind's shadow-md */
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

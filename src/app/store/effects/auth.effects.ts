@@ -22,7 +22,7 @@ export const authEffects = {
                     map(() => authActions.loginSuccess({ user })),
                     tap(() => {
                         const url = user.type === 'customer' ? 'homepage' :
-                            user.type === 'provider' ? 'provider/homepage' : 'admin/homepage';
+                            user.type === 'provider' ? 'provider/homepage' : 'admin/dashboard';
                         router.navigate([url]);
                     }),
                     catchError((error: HttpErrorResponse) => {

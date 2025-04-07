@@ -3,11 +3,18 @@ import { Routes } from "@angular/router";
 export const adminRoute: Routes = [
     {
         path: 'admin',
+        loadComponent: () => import('../../auth/admin/homepage/admin-homepage.component').then(c => c.AdminHomepageComponent),
         children: [
+            // {
+            //     path: '', redirectTo: 'dashboard', pathMatch: 'prefix'
+            // },
             {
-                path: 'homepage',
-                loadComponent: () => import('../../auth/admin/homepage/admin-homepage.component')
-                    .then(c => c.AdminHomepageComponent)
+                path: 'dashboard',
+                loadComponent: () => import('../../shared/components/admin/dashboard/admin-dashboard.component').then(c => c.AdminDashboardComponent)
+            },
+            {
+                path: 'users',
+                loadComponent: () => import('../../shared/components/admin/users/user-management.component').then(c => c.UserManagementComponent)
             }
         ]
     }

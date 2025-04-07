@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+// import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
+import { Store } from '@ngrx/store';
 import { REGEXP_ENV } from '../../../../../environments/regex.environments';
 import { MESSAGES_ENV } from '../../../../../environments/messages.environments';
-import { CommonModule } from '@angular/common';
-import { Store } from '@ngrx/store';
 import { IUser } from '../../../models/user.model';
 import { authActions } from '../../../../../store/actions/auth.actions';
 
@@ -22,11 +23,16 @@ export class AdminLoginComponent {
   private regexp = REGEXP_ENV;
   private messages = MESSAGES_ENV;
   errorMessage: string = '';
+  fPassword = false;
 
   form: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.pattern(this.regexp.password)]]
+    password: ['', [Validators.required, Validators.pattern(this.regexp.password)]],
   });
+
+  // phoneForm: FormGroup = this.fb.group({
+  //   phone: ['', [Validators.required]]
+  // })
 
   formSubmit() {
     const controls = {
@@ -49,6 +55,10 @@ export class AdminLoginComponent {
       this.store.dispatch(authActions.login({ user }));
     }
 
+  }
+
+  forgotPassword() {
+    this.fPassword = !this.fPassword;
   }
 
   private hasValidationErrors(control: AbstractControl | null, fieldName: string): boolean {

@@ -1,0 +1,42 @@
+<div class="w-60 h-screen bg-[#75DFA0] text-black border-r border-[#A1A1A1] overflow-y-auto no-scrollbar">
+    <!-- Logo Section -->
+    <div class="pb-3 pt-4 bg-[#D9F9E3] flex items-center flex-col">
+        <div class="flex items-center">
+            <svg width="28" height="22" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M13.7549 5.98438C13.8486 5.89062 13.9893 5.84375 14.1299 5.84375C14.2236 5.84375 14.3643 5.89062 14.458 5.98438L23.1299 13.0625V20.75C23.1299 21.1719 22.7549 21.5 22.3799 21.5H17.083C16.708 21.5 16.333 21.1719 16.333 20.75V16.25C16.333 15.875 16.0049 15.5 15.583 15.5H12.583C12.208 15.5 11.833 15.875 11.833 16.25V20.75C11.833 21.1719 11.5049 21.5 11.1299 21.5H5.87988C5.45801 21.5 5.12988 21.1719 5.12988 20.75V13.1094L13.7549 5.98438ZM27.3955 10.8125C27.5361 10.9062 27.6299 11.0938 27.6299 11.2344C27.6299 11.375 27.583 11.5156 27.4893 11.6094L26.2705 13.0625C26.1768 13.2031 26.0361 13.25 25.8486 13.25C25.708 13.25 25.5674 13.2031 25.4736 13.1094L14.458 4.0625C14.3643 3.96875 14.2236 3.92188 14.1299 3.92188C13.9893 3.92188 13.8486 3.96875 13.7549 4.0625L2.73926 13.1094C2.64551 13.2031 2.50488 13.25 2.36426 13.25C2.17676 13.25 2.03613 13.2031 1.94238 13.0625L0.723633 11.6094C0.676758 11.5156 0.583008 11.375 0.583008 11.2344C0.583008 11.0938 0.676758 10.9062 0.817383 10.8125L12.6768 1.01562C13.0518 0.734375 13.5674 0.546875 14.1299 0.546875C14.6455 0.546875 15.1611 0.734375 15.5361 1.01562L19.7549 4.48438V1.10938C19.7549 0.78125 19.9893 0.546875 20.3174 0.546875H22.9424C23.2236 0.546875 23.5049 0.78125 23.5049 1.10938V7.57812L27.3955 10.8125Z"
+                    fill="#26343A" />
+            </svg>
+            <span class="text-[#26343A] text-xl font-medium">HomeServe</span>
+        </div>
+        <div class="text-center text-gray-600 text-sm">Admin Panel</div>
+    </div>
+
+    <!-- Menu Items -->
+    <div class="flex flex-col space-y-2 pt-10 px-2">
+        <ng-container *ngFor="let item of menuItems">
+            <!-- Parent Menu Item -->
+            <div class="flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer hover:bg-[#A1A1A1] transition-colors"
+                [ngClass]="{'border-b border-[#A1A1A1]': !item.active}"
+                (click)="item.subItems ? item.active = !item.active : null">
+                <div class="flex items-center text-[#26343A]">
+                    <i class="fas {{item.icon}} mr-3 text-sm"></i>
+                    <span>{{item.name}}</span>
+                </div>
+                <i *ngIf="item.subItems" class="fas fa-chevron-down text-xs transition-transform"
+                    [ngClass]="{'transform rotate-180': item.active}"></i>
+            </div>
+
+            <!-- Sub Items -->
+            <div *ngIf="item.subItems && item.active" class="ml-8 mt-1 mb-2"
+                [ngClass]="{'border-b border-[#A1A1A1]': item.active}">
+                <div *ngFor="let subItem of item.subItems"
+                    class="flex items-center py-2 px-3 rounded-lg cursor-pointer text-[#26343A] hover:bg-[#A1A1A1] transition-colors"
+                    [ngClass]="{'bg-blue-600': isActive(subItem.route)}" (click)="navigateTo(subItem.route)">
+
+                    <span>{{subItem.name}}</span>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>
