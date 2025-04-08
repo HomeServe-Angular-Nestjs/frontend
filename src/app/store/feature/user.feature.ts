@@ -20,12 +20,15 @@ export const userFeature = createFeature({
             error: null
         })),
 
-        on(userActions.fetchCustomersSuccess, (state, { customers }) => ({
-            ...state,
-            loading: false,
-            customers: customerAdaptor.setAll(customers, state.customers),
-            error: null
-        })),
+        on(userActions.fetchCustomersSuccess, (state, { customers }) => {
+            console.log('setting customers: ', customers)
+            return {
+                ...state,
+                loading: false,
+                customers: customerAdaptor.setAll(customers, state.customers),
+                error: null
+            }
+        }),
 
         on(userActions.fetchProviderFailure, (state, { error }) => ({
             ...state,
@@ -56,6 +59,18 @@ export const userFeature = createFeature({
             ...state,
             loading: true,
             error: null,
+        })),
+
+        on(userActions.fetchUsersSuccess, (state, { customers, providers }) => ({
+            ...state,
+            customers: customerAdaptor.setAll(customers, state.customers),
+            providers: providerAdaptor.setAll(providers, state.providers),
+            error: null
+        })),
+
+        on(userActions.fetchUsersFailure, (state, { error }) => ({
+            ...state,
+            error
         }))
     )
 });

@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { ICustomer, IProvider } from "../../store/models/user.model";
-import { forkJoin, Observable } from "rxjs";
+import { forkJoin, Observable, tap } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class UserManagementService {

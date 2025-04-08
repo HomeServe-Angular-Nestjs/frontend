@@ -36,34 +36,35 @@ type Expertise = {
 };
 
 export interface IBaseUser {
-    id: string;
-    fullName?: string;
+    fullname?: string;
     email: string;
     username: string;
-    password: string;
+    password?: string;
     phone?: string;
     avatar?: string;
     googleId?: string;
     isActive: boolean
     isBlocked: boolean;
     isDeleted: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface ICustomer extends IBaseUser {
-    locations: Coordinates[];
-    savedProviders: string[];
+    id: string;
+    locations?: Coordinates[];
+    savedProviders?: string[];
 }
 
 export interface IProvider extends IBaseUser {
-    bio: string;
-    Expertise: Expertise[];
-    additionalSkills: string[];
-    languages: string[];
-    location: Address;
-    workImages: string[];
-    awards: string[];
+    id: string;
+    bio?: string;
+    Expertise?: Expertise[];
+    additionalSkills?: string[];
+    languages?: string[];
+    location?: Address;
+    workImages?: string[];
+    awards?: string[];
     isCertified: boolean;
     verification: Verification;
     schedules: string[];
@@ -75,4 +76,19 @@ export interface IUserState {
     providers: EntityState<IProvider>;
     loading: boolean;
     error: string | null;
+}
+
+
+export type UsersType = ICustomer[] | IProvider[];
+
+export interface UsersViewModel {
+    customerTable: {
+        columns: string[];
+        rows: any[];
+
+    },
+    providerTable: {
+        columns: string[];
+        rows: any[];
+    }
 }

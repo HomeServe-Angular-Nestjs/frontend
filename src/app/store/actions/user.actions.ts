@@ -11,4 +11,8 @@ export const userActions = {
     fetchProviderFailure: createAction('[User] Fetch Provider Failure', props<{ error: string }>()),
 
     fetchUsers: createAction('[User] Fetch Both Customer & Provider'),
+    fetchUsersSuccess: createAction('[User] Fetch Both Customer & Provider Success',
+        props<{ customers: ICustomer[], providers: IProvider[] }>()
+    ),
+    fetchUsersFailure: createAction('[User] Fetch Both Customer & Provider', props<{ error: string }>()),
 }

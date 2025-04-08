@@ -16,21 +16,15 @@ export const userEffects = {
             ofType(userActions.fetchUsers),
             switchMap(() =>
                 userService.getUsers().pipe(
-                    map((response) => {
-                        userActions.fetchCustomersSuccess({ customers: response.customers });
-                        userActions.fetchProvidersSuccess({ providers: response.providers });
-                    }),
+                    map((response) => userActions.fetchUsersSuccess({ customers: response.customers, providers: response.providers })),
                     catchError((error: HttpErrorResponse) => {
                         console.log('[Fetch Users Effect] API Error: ', error);
                         const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
                         notyf.error(errorMessage);
-                        return of(
-                            userActions.fetchCustomerFailure({ error: errorMessage }),
-                            userActions.fetchProviderFailure({ error: errorMessage })
-                        )
+                        return of(userActions.fetchUsersFailure({ error: errorMessage }));
                     })
                 )
             )
         );
-    }, { functional: true, dispatch: false })
+    }, { functional: true })
 }

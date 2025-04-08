@@ -1,1 +1,7 @@
-<app-table></app-table>
+<ng-container *ngIf="vm$ | async as vm">
+    <app-table *ngIf="vm.customerTable.rows.length" [tableData]="vm.customerTable">
+    </app-table>
+
+    <app-table *ngIf="vm.providerTable.rows.length" [tableData]="vm.providerTable">
+    </app-table>
+</ng-container>

@@ -10,3 +10,4 @@ export const providerAdaptor = createEntityAdapter<IProvider>({
     selectId: (provider) => provider.id,
     sortComparer: (a, b) => a.username.localeCompare(b.username)
 });
+    
