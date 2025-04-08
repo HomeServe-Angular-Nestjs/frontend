@@ -1,6 +1,6 @@
-<div class="w-60 h-screen bg-[#75DFA0] text-black border-r border-[#A1A1A1] overflow-y-auto no-scrollbar">
+<div class="w-60 h-screen bg-[#1E293B] text-black border-r border-[#A1A1A1] overflow-y-auto no-scrollbar">
     <!-- Logo Section -->
-    <div class="pb-3 pt-4 bg-[#D9F9E3] flex items-center flex-col">
+    <div class="pb-3 pt-4 bg-[#ffffff] flex items-center flex-col">
         <div class="flex items-center">
             <svg width="28" height="22" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -16,10 +16,10 @@
     <div class="flex flex-col space-y-2 pt-10 px-2">
         <ng-container *ngFor="let item of menuItems">
             <!-- Parent Menu Item -->
-            <div class="flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer hover:bg-[#A1A1A1] transition-colors"
+            <div class="flex items-center justify-between py-3 cursor-pointer hover:bg-[#2563EB]  hover:rounded-md px-2 transition-colors"
                 [ngClass]="{'border-b border-[#A1A1A1]': !item.active}"
                 (click)="item.subItems ? item.active = !item.active : null">
-                <div class="flex items-center text-[#26343A]">
+                <div class="flex items-center text-[#F9FAFB]">
                     <i class="fas {{item.icon}} mr-3 text-sm"></i>
                     <span>{{item.name}}</span>
                 </div>
@@ -31,7 +31,7 @@
             <div *ngIf="item.subItems && item.active" class="ml-8 mt-1 mb-2"
                 [ngClass]="{'border-b border-[#A1A1A1]': item.active}">
                 <div *ngFor="let subItem of item.subItems"
-                    class="flex items-center py-2 px-3 rounded-lg cursor-pointer text-[#26343A] hover:bg-[#A1A1A1] transition-colors"
+                    class="flex items-center py-2 px-3 rounded-lg cursor-pointer text-[#F9FAFB] hover:bg-[#A1A1A1] transition-colors"
                     [ngClass]="{'bg-blue-600': isActive(subItem.route)}" (click)="navigateTo(subItem.route)">
 
                     <span>{{subItem.name}}</span>

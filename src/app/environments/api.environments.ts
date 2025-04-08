@@ -3,5 +3,7 @@ export const API_ENV = {
     signupAuth: `${domainName}/signup`,
     loginAuth: `${domainName}/login`,
     auth: `${domainName}/auth`,
-    admin: `${domainName}/admin`
+    admin: `${domainName}/admin`,
+    customer: `${domainName}`,
+    provider: `${domainName}/provider`
 }

@@ -1,13 +1,13 @@
-<div class="min-w-screen min-h-screen flex bg-[#D9F9E3]">
-    <div class="fixed h-full">
+<div class="min-w-screen min-h-screen flex bg-[#ffffff]">
+    <div class="fixed h-full z-50">
         <app-admin-sidebar></app-admin-sidebar>
     </div>
-    <div class="ml-72 w-full flex flex-col">
-        <div class="sticky top-0 z-10">
+    <div class="ml-72 w-full flex flex-col px-6" >
+        <div class="sticky top-10 z-10">
             <app-admin-header></app-admin-header>
         </div>
 
-        <div>
+        <div class="mt-20">
             <router-outlet></router-outlet>
         </div>
     </div>

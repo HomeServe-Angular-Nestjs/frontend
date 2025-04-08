@@ -1,5 +1,30 @@
-<!-- <table class="w-full bg-red-500">
-    <thead *ngFor="let columns of tableData.columns" class="">
-        <th>{{columns}}</th>
+<table class="w-full table-auto border border-[#E5E5E5]">
+    <thead class="bg-[#FAFAFA] border border-[#E5E5E5]">
+        <tr>
+            <th *ngFor="let column of tableData.columns"
+                class="border px-4 py-2 capitalize text-[#64748B] text-sm text-center">
+                {{ column | uppercase}}
+            </th>
+        </tr>
     </thead>
-</table> -->
+    <tbody>
+        <tr *ngFor="let row of tableData.rows">
+            <td *ngFor="let column of tableData.columns" class="border px-4 py-2 text-center text-[#4B5563]">
+                <ng-container *ngIf="column !== 'actions'; else actionsBlock">
+                    <!-- <ng-container *ngIf="column === 'joined'">
+                        {{ row[column] | changeDateFormat: 'MMMM d, y' }}
+                    </ng-container> -->
+                    {{ row[column] || '_'}}
+                </ng-container>
+                <ng-template #actionsBlock>
+                    <ng-container *ngFor="let action of row.actions" class="">
+                        <button class="mx-2" [title]="action.toolTip"
+                            (click)="actionTriggered.emit({actions: action, row})">
+                            <i class=" fa" [ngClass]="action.icon + ' ' + action.styles"></i>
+                        </button>
+                    </ng-container>
+                </ng-template>
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -78,7 +78,6 @@ export interface IUserState {
     error: string | null;
 }
 
-
 export type UsersType = ICustomer[] | IProvider[];
 
 export interface UsersViewModel {
@@ -92,3 +91,5 @@ export interface UsersViewModel {
         rows: any[];
     }
 }
+
+export type UserUpdationType = Partial<ICustomer> | Partial<IProvider>;
