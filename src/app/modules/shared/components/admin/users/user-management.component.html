@@ -1,9 +1,15 @@
-<ng-container *ngIf="vm$ | async as vm">
+<div class="mb-6 shadow-md">
+    <app-filters (roleChanged)="onRoleChange($event)"></app-filters>
+</div>
+
+<!-- <ng-container *ngIf="vm$ | async as vm">
     <app-table *ngIf="vm.customerTable.rows.length" [tableData]="vm.customerTable"
         (actionTriggered)="onActionFromTable($event, 'customer')">
-    </app-table>
-
-
-    <!-- <app-table *ngIf="vm.providerTable.rows.length" [tableData]="vm.providerTable">
     </app-table> -->
+<!-- <app-table *ngIf="vm.providerTable.rows.length" [tableData]="vm.providerTable">
+    </app-table> -->
+<!-- </ng-container> -->
+
+<ng-container *ngIf="filteredData$ | async as data">
+    <app-table [tableData]="data.tableData"></app-table>
 </ng-container>

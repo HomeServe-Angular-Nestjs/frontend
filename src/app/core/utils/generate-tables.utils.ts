@@ -10,7 +10,7 @@ export const createUserTable = (users: (ICustomer | IProvider)[]) => {
             email: user.email,
             contact: user.phone,
             status: user.isActive ? 'Active' : 'Blocked',
-            joined: user.createdAt,
+            joined: new Date(user.createdAt).toLocaleString(),
             actions: [
                 {
                     id: user.id,
