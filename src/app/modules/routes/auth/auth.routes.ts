@@ -50,7 +50,8 @@ export const authRoutes: Routes = [
             {
                 path: 'login',
                 loadComponent: () => import('../../auth/admin/login/admin.component')
-                    .then(c => c.AdminLoginPageComponent)
+                    .then(c => c.AdminLoginPageComponent),
+                canActivate: [GuestGuard]
             }
         ]
     }

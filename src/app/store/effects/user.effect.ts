@@ -42,7 +42,7 @@ export const userEffects = {
                     catchError((error) => {
                         console.log('[Fetch Users Effect] API Error: ', error);
                         const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
-                        notyf.error(errorMessage);
+                        // notyf.error(errorMessage);
                         return of(customerActions.updateCustomerFailure({ error: errorMessage }));
                     })
                 )
