@@ -9,10 +9,8 @@ export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionRedu
             {
                 auth: {
                     serialize: (state: AuthState) => ({
-                        user: state.user ? {
-                            email: state.user.email,
-                            type: state.user.type
-                        } : null,
+                        email: state.user ? state.user.email : null,
+                        type: state.type,
                         status: state.status
                     }),
                     deserialize: (json) => json,

@@ -1,16 +1,17 @@
 import { Routes } from "@angular/router";
-import { authGuard } from "../../../core/guards/auth.guard";
+import { AuthGuard } from "../../../core/guards/auth.guard";
 
 export const customerRoutes: Routes = [
     {
         path: '',
+        canActivate: [AuthGuard],
+        data: { role: 'customer' },
         children: [
             {
                 path: 'homepage',
                 loadComponent: () => import('../../shared/components/customer/customer-homepage/homepage.component')
                     .then(c => c.CustomerHomepageComponent),
-                canActivate: [authGuard]
             }
-        ]
-    }
+        ],
+    },
 ]

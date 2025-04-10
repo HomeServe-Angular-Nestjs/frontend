@@ -12,9 +12,7 @@ import { UserType } from './modules/shared/models/user.model';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  title = 'HomeServe';
-  private router = inject(Router);
-  private store = inject(Store);
+  constructor(private router: Router, private store: Store) { }
 
   ngOnInit(): void {
     this.router.events.pipe(
@@ -30,6 +28,7 @@ export class AppComponent implements OnInit {
       }
 
       this.store.dispatch(authActions.setUserType({ userType }));
+
     });
   }
 }
