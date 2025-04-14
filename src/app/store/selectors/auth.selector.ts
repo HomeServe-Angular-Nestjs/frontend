@@ -11,7 +11,7 @@ export const selectCheckStatus = createSelector(
 
 export const selectAuthUser = createSelector(
     selectAuthState,
-    (state: AuthState) => state.user
+    (state: AuthState) => state.email
 );
 
 export const selectAuthError = createSelector(

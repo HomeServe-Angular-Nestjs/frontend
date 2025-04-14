@@ -1,8 +1,8 @@
-import { Component, inject } from "@angular/core";
-import { LoginBaseComponent } from "../../shared/components/login/login-base/login-base.component";
-import { LOGIN_CONFIGS } from "../../config/login.config";
+import { Component } from "@angular/core";
+import { LoginBaseComponent } from "../../../shared/components/login/login-base/login-base.component";
+import { LOGIN_CONFIGS } from "../../../config/login.config";
 import { Store } from "@ngrx/store";
-import { authActions } from "../../../store/actions/auth.actions";
+import { authActions } from "../../../../store/actions/auth.actions";
 
 @Component({
     selector: 'app-customer-login',

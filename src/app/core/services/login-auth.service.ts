@@ -1,10 +1,11 @@
 import { inject, Injectable } from "@angular/core";
-import { IUser } from "../../modules/shared/models/user.model";
+import { IUser, UserType } from "../../modules/shared/models/user.model";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { API_ENV } from "../../environments/api.environments";
 import { catchError, map, Observable, tap, throwError } from "rxjs";
 import { IResponse, IVerifyTokenResponse } from "../../modules/shared/models/response.model";
 import { Store } from "@ngrx/store";
+import { AuthState } from "../../store/models/auth.model";
 
 
 @Injectable({ providedIn: "root" })
@@ -22,7 +23,7 @@ export class LoginAuthService {
     }
 
     forgotPassword(user: IUser) {
-        return this.http.post(`${this.apiUrl}/forgot_password`, user);
+        return this.http.post(`${this.apiUrl}/forgot_password`, user, { withCredentials: true });
     }
 
     verifyToken(token: string) {
@@ -37,4 +38,7 @@ export class LoginAuthService {
         return this.http.get<IResponse>(`${this.apiUrl}/google/init?type=${type}`);
     }
 
+    logout(userType: UserType) {
+        return this.http.post(`${this.apiUrl}/logout`, { userType }, { withCredentials: true });
+    }
 }

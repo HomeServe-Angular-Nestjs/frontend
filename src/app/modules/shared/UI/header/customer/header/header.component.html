@@ -1,0 +1,175 @@
+<header class="bg-white shadow-sm fixed w-full top-0 z-50 border-b border-gray-100 backdrop-blur-sm bg-opacity-90">
+  <div class="px-6 mx-auto  py-3">
+    <div class="flex items-center justify-between">
+      <!-- Logo - Enhanced with hover effects -->
+      <div class="flex items-center">
+        <a href="/"
+          class="flex items-center group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-l">
+          <div class="flex items-center justify-center">
+            <svg width="28" height="22" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg"
+              class="transition-transform group-hover:rotate-12">
+              <path
+                d="M13.7549 5.98438C13.8486 5.89062 13.9893 5.84375 14.1299 5.84375C14.2236 5.84375 14.3643 5.89062 14.458 5.98438L23.1299 13.0625V20.75C23.1299 21.1719 22.7549 21.5 22.3799 21.5H17.083C16.708 21.5 16.333 21.1719 16.333 20.75V16.25C16.333 15.875 16.0049 15.5 15.583 15.5H12.583C12.208 15.5 11.833 15.875 11.833 16.25V20.75C11.833 21.1719 11.5049 21.5 11.1299 21.5H5.87988C5.45801 21.5 5.12988 21.1719 5.12988 20.75V13.1094L13.7549 5.98438ZM27.3955 10.8125C27.5361 10.9062 27.6299 11.0938 27.6299 11.2344C27.6299 11.375 27.583 11.5156 27.4893 11.6094L26.2705 13.0625C26.1768 13.2031 26.0361 13.25 25.8486 13.25C25.708 13.25 25.5674 13.2031 25.4736 13.1094L14.458 4.0625C14.3643 3.96875 14.2236 3.92188 14.1299 3.92188C13.9893 3.92188 13.8486 3.96875 13.7549 4.0625L2.73926 13.1094C2.64551 13.2031 2.50488 13.25 2.36426 13.25C2.17676 13.25 2.03613 13.2031 1.94238 13.0625L0.723633 11.6094C0.676758 11.5156 0.583008 11.375 0.583008 11.2344C0.583008 11.0938 0.676758 10.9062 0.817383 10.8125L12.6768 1.01562C13.0518 0.734375 13.5674 0.546875 14.1299 0.546875C14.6455 0.546875 15.1611 0.734375 15.5361 1.01562L19.7549 4.48438V1.10938C19.7549 0.78125 19.9893 0.546875 20.3174 0.546875H22.9424C23.2236 0.546875 23.5049 0.78125 23.5049 1.10938V7.57812L27.3955 10.8125Z"
+                class="fill-blue-600 group-hover:fill-blue-700 transition-colors" />
+            </svg>
+            <span
+              class="title-text text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent ml-2">HomeServe</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Search Bars - Enhanced with floating labels -->
+      <div class="flex-1 max-w-2xl mx-8 hidden md:block">
+        <div class="flex gap-4">
+          <!-- Services Search -->
+          <div class="relative flex-1 group">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i class="fas fa-search text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+            </div>
+            <input type="text" id="service-search"
+              class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition-all outline-none peer"
+              placeholder=" " />
+            <label for="service-search"
+              class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-10 pointer-events-none">
+              Search services
+            </label>
+          </div>
+
+          <!-- Location Search -->
+          <div class="relative flex-1 group">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i class="fas fa-map-marker-alt text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+            </div>
+            <input type="text" id="location-search"
+              class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition-all outline-none peer"
+              placeholder=" " />
+            <label for="location-search"
+              class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-10 pointer-events-none">
+              Your location
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Actions - Enhanced with dropdown menu -->
+      <div class="flex items-center space-x-4">
+        <!-- Mobile Menu Button - Animated Hamburger -->
+        <button class="md:hidden text-gray-600 hover:text-blue-600 focus:outline-none p-2 -mr-1" aria-label="Menu">
+          <div class="space-y-1.5">
+            <span
+              class="block w-6 h-0.5 bg-current transition-transform origin-center group-[.is-open]:rotate-45 group-[.is-open]:translate-y-1.5"></span>
+            <span class="block w-6 h-0.5 bg-current opacity-100 transition-opacity group-[.is-open]:opacity-0"></span>
+            <span
+              class="block w-6 h-0.5 bg-current transition-transform origin-center group-[.is-open]:-rotate-45 group-[.is-open]:-translate-y-1.5"></span>
+          </div>
+        </button>
+
+        <!-- Desktop Actions -->
+        <div class="hidden md:flex items-center space-x-5">
+          <!-- Cart with dropdown -->
+          <div class="relative group">
+            <button
+              class="relative p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300">
+              <i class="fas fa-shopping-cart text-xl text-gray-600 hover:text-blue-600 transition-colors"></i>
+              <!-- want animation? put 'animate-pulse' in the below span class -->
+              <span
+                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            </button>
+            <div x-show="open" x-transition
+              class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50 hidden">
+              <div class="px-4 py-3 border-b border-gray-100">
+                <h3 class="font-medium text-gray-900">Your Cart</h3>
+              </div>
+              <div class="px-4 py-6 text-center">
+                <i class="fas fa-shopping-cart text-3xl text-gray-300 mb-2"></i>
+                <p class="text-gray-500">Your cart is empty</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notifications with dropdown -->
+          <div class="relative group">
+            <button
+              class="relative p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300">
+              <i class="fas fa-bell text-xl text-gray-600 hover:text-blue-600 transition-colors"></i>
+              <!-- want animation? put 'animate-bounce' in the below span class -->
+              <span
+                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div x-show="open" x-transition
+              class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50 hidden">
+              <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-medium text-gray-900">Notifications</h3>
+                <button class="text-sm text-blue-600 hover:text-blue-800">Mark all as read</button>
+              </div>
+              <div class="max-h-96 overflow-y-auto">
+                <!-- Notification items would go here -->
+                <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0">
+                  <p class="text-sm text-gray-700">New service request received</p>
+                  <p class="text-xs text-gray-500 mt-1">2 minutes ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile dropdown -->
+          <div class="relative">
+            <button
+              class="flex items-center space-x-1 focus:outline-none group rounded-full p-1 hover:bg-gray-100 transition-colors">
+              <div class="relative">
+                <img src="" alt="User profile"
+                  class="h-9 w-9 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all">
+                <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+              </div>
+              <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform duration-200 transform group-hover:text-blue-600"
+                :class="{'rotate-180': open}"></i>
+            </button>
+
+            <div x-show="open" x-transition
+              class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-50 hidden">
+              <div class="px-4 py-3 border-b border-gray-100">
+                <p class="text-sm font-medium text-gray-900">John Doe</p>
+                <p class="text-xs text-gray-500">john example.com</p>
+              </div>
+              <div class="py-1">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Settings</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Messages</a>
+              </div>
+              <div class="py-1 border-t border-gray-100">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Sign out</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Search - Enhanced with animation -->
+    <!-- <div x-data="{ showMobileSearch: false }" class="mt-3 md:hidden">
+      <button @click="showMobileSearch = !showMobileSearch"
+        class="w-full flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg text-gray-500 hover:text-blue-600 transition-colors">
+        <span>Search services...</span>
+        <i class="fas fa-search"></i>
+      </button>
+      
+      <div x-show="showMobileSearch" x-transition
+        class="mt-2 space-y-3">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <i class="fas fa-search text-gray-400"></i>
+          </div>
+          <input type="text" placeholder="Search services..."
+            class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-300 focus:border-blue-300">
+        </div>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <i class="fas fa-map-marker-alt text-gray-400"></i>
+          </div>
+          <input type="text" placeholder="Location..."
+            class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-300 focus:border-blue-300">
+        </div>
+      </div>
+    </div>-->
+  </div>
+</header>

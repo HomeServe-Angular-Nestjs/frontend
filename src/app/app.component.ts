@@ -4,6 +4,7 @@ import { filter } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { authActions } from './store/actions/auth.actions';
 import { UserType } from './modules/shared/models/user.model';
+import { LoginAuthService } from './core/services/login-auth.service';
 
 @Component({
   selector: 'app-root',

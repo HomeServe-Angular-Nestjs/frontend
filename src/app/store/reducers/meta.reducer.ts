@@ -1,6 +1,5 @@
 import { ActionReducer, MetaReducer } from "@ngrx/store";
 import { localStorageSync } from 'ngrx-store-localstorage';
-import { authFeature } from "../feature/auth.feature";
 import { AuthState } from "../models/auth.model";
 
 export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionReducer<any> {
@@ -9,7 +8,7 @@ export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionRedu
             {
                 auth: {
                     serialize: (state: AuthState) => ({
-                        email: state.user ? state.user.email : null,
+                        email: state.email || null,
                         type: state.type,
                         status: state.status
                     }),

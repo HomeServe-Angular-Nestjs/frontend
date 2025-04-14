@@ -1,8 +1,8 @@
 import { Component } from "@angular/core";
-import { SIGNUP_CONFIGS } from "../../config/signup.config";
-import { SignupBaseComponent } from "../../shared/components/signup/signup-base/signup-base.component";
+import { SIGNUP_CONFIGS } from "../../../config/signup.config";
+import { SignupBaseComponent } from "../../../shared/components/signup/signup-base/signup-base.component";
 import { Store } from "@ngrx/store";
-import { authActions } from "../../../store/actions/auth.actions";
+import { authActions } from "../../../../store/actions/auth.actions";
 
 @Component({
     selector: 'app-customer-signup',

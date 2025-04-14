@@ -3,7 +3,7 @@ import { authActions } from "../actions/auth.actions";
 import { AuthState } from "../models/auth.model";
 
 export const initialState: AuthState = {
-    user: null,
+    email: null,
     status: 'pending',
     error: null,
     type: null,
@@ -22,10 +22,10 @@ export const authFeature = createFeature({
         })),
 
         // When login succeeds
-        on(authActions.loginSuccess, (state, { user }): AuthState => ({
+        on(authActions.loginSuccess, (state, { email }): AuthState => ({
             ...state,
             status: 'authenticated',
-            user
+            email
         })),
 
         // When login fails
@@ -33,7 +33,7 @@ export const authFeature = createFeature({
             ...state,
             status: 'error',
             error,
-            user: null,
+            email: null,
         })),
 
         // When Initiating Google Login
@@ -41,16 +41,6 @@ export const authFeature = createFeature({
             ...state,
             type: userType
         })),
-
-        // // When google Login Succeeds
-        // on(authActions.googleLoginSuccess, (state, { user }): AuthState => {
-        //     console.log('Reducer called: googleLoginSuccess', user);
-        //     return {
-        //         ...state,
-        //         user,
-        //         status: 'authenticated'
-        //     }
-        // }),
 
         on(authActions.setUserType, (state, { userType }): AuthState => ({
             ...state,

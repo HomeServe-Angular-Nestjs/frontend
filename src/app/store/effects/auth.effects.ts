@@ -19,7 +19,7 @@ export const authEffects = {
             ofType(authActions.login),
             switchMap(({ user }) =>
                 loginService.authCredentials(user).pipe(
-                    map(() => authActions.loginSuccess({ user })),
+                    map(() => authActions.loginSuccess({ email: user.email })),
                     tap(() => {
                         const url = user.type === 'customer' ? 'homepage' :
                             user.type === 'provider' ? 'provider/homepage' : 'admin/dashboard';

@@ -13,13 +13,13 @@ export const authRoutes: Routes = [
         children: [
             {
                 path: 'signup',
-                loadComponent: () => import('../../auth/customer/customer-signup.component')
+                loadComponent: () => import('../../auth/customer/signup-page/customer-signup.component')
                     .then(c => c.CustomerSignupComponent),
                 canActivate: [GuestGuard]
             },
             {
                 path: 'login',
-                loadComponent: () => import('../../auth/customer/customer-login.component')
+                loadComponent: () => import('../../auth/customer/login-page/customer-login.component')
                     .then(c => c.CustomerLoginComponent),
                 canActivate: [GuestGuard]
             },

@@ -1,6 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { LoginAuthService } from '../../../../../core/services/login-auth.service';
+import { Store } from '@ngrx/store';
+import { authActions } from '../../../../../store/actions/auth.actions';
+import { AuthState } from '../../../../../store/models/auth.model';
+import { loginNavigation } from '../../../../../core/utils/navigation.utils';
+import { UserType } from '../../../models/user.model';
 
 @Component({
   selector: 'app-admin-sidebar',
@@ -10,6 +16,8 @@ import { Router } from '@angular/router';
 })
 export class AdminSidebarComponent {
   private router = inject(Router);
+  private loginService = inject(LoginAuthService);
+  private store = inject(Store);
 
   menuItems = [
     {
@@ -76,6 +84,30 @@ export class AdminSidebarComponent {
       queryParams: 'subset',
       fragment: 'ignored',
       matrixParams: 'ignored'
+    });
+  }
+
+  logout() {
+    const storage = localStorage.getItem('auth');
+    if (!storage) {
+      return;
+    }
+    console.log(storage);
+    const parsedStorage = JSON.parse(storage) as AuthState;
+    if (!parsedStorage.type) {
+      return;
+    }
+    console.log(parsedStorage.type);
+    this.loginService.logout(parsedStorage.type).subscribe({
+      next: () => {
+        this.store.dispatch(authActions.logout());
+        // localStorage.removeItem('auth');
+        const url = loginNavigation(parsedStorage.type as UserType);
+        this.router.navigate([url]);
+      },
+      error: (err) => {
+        console.error('[ERROR] Logout: ', err);
+      }
     });
   }
 }
