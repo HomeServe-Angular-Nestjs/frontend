@@ -47,7 +47,6 @@ export class EmailInputComponent {
         if (control?.errors) {
             Object.keys(control.errors).forEach((key) => {
                 if (this.messages['errorMessages'][fieldName]?.[key]) {
-                    // this.alert.showToast(this.messages['errorMessages'][fieldName][key], 'error');
                     this.notyf.error(this.messages['errorMessages'][fieldName][key]);
                 }
             });

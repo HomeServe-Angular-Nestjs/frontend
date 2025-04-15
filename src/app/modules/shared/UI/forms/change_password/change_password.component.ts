@@ -1,14 +1,13 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { ActivatedRoute, RouterLink } from "@angular/router";
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ProgressBarComponent } from "../../loading-Animations/progress-bar/progress-bar.component";
-import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { HttpClient } from "@angular/common/http";
 import { LoginAuthService } from "../../../../../core/services/login-auth.service";
 import { REGEXP_ENV } from "../../../../../environments/regex.environments";
 import { MESSAGES_ENV } from "../../../../../environments/messages.environments";
-import { ValidateForm } from "../../../validations/form-validation.service";
 import { IUser } from "../../../models/user.model";
+import { NotificationService } from "../../../../../core/services/public/notification.service";
 
 
 @Component({
@@ -18,14 +17,12 @@ import { IUser } from "../../../models/user.model";
 })
 export class ChangePasswordComponent implements OnInit {
     private route = inject(ActivatedRoute);
-    private http = inject(HttpClient);
-    private router = inject(Router);
     private loginService = inject(LoginAuthService);
     private fb = inject(FormBuilder);
-
-    private validateForm = inject(ValidateForm);
+    private notyf = inject(NotificationService);
 
     regexp = REGEXP_ENV;
+    messages = MESSAGES_ENV;
     verificationState: 'verified' | 'loading' | 'error' | 'done' = 'loading';
     errorMessage = '';
     user!: IUser;
@@ -71,8 +68,8 @@ export class ChangePasswordComponent implements OnInit {
             confirmPassword: this.form.get('confirmPassword'),
         }
 
-        const hasErrors = this.validateForm.hasValidationErrors(controls.password, 'password') ||
-            this.validateForm.hasValidationErrors(controls.confirmPassword, 'confirmPassword');
+        const hasErrors = this.hasValidationErrors(controls.password, 'password') ||
+            this.hasValidationErrors(controls.confirmPassword, 'confirmPassword');
         if (hasErrors) return;
 
         this.user['password'] = controls.password?.value;
@@ -99,4 +96,15 @@ export class ChangePasswordComponent implements OnInit {
         return password === confirmPassword ? null : { mismatch: true };
     }
 
+    private hasValidationErrors(control: AbstractControl | null, fieldName: string): boolean {
+        if (control?.errors) {
+            Object.keys(control.errors).forEach((key) => {
+                if (this.messages['errorMessages'][fieldName]?.[key]) {
+                    this.notyf.error(this.messages['errorMessages'][fieldName][key]);
+                }
+            });
+            return true;
+        }
+        return false;
+    }
 }
