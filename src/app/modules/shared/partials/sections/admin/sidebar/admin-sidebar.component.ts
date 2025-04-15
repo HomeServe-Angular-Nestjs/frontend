@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { LoginAuthService } from '../../../../../core/services/login-auth.service';
 import { Store } from '@ngrx/store';
-import { authActions } from '../../../../../store/actions/auth.actions';
-import { AuthState } from '../../../../../store/models/auth.model';
-import { loginNavigation } from '../../../../../core/utils/navigation.utils';
-import { UserType } from '../../../models/user.model';
+import { LoginAuthService } from '../../../../../../core/services/login-auth.service';
+import { AuthState } from '../../../../../../store/models/auth.model';
+import { authActions } from '../../../../../../store/actions/auth.actions';
+import { UserType } from '../../../../models/user.model';
+import { loginNavigation } from '../../../../../../core/utils/navigation.utils';
 
 @Component({
   selector: 'app-admin-sidebar',
