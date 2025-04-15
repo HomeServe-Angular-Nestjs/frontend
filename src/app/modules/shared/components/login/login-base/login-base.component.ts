@@ -1,14 +1,13 @@
-import { Component, inject, Input, OnInit, Output } from "@angular/core";
+import { Component, inject, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ILoginConfig } from "../../../../config/login.config";
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { REGEXP_ENV } from "../../../../../environments/regex.environments";
 import { MESSAGES_ENV } from "../../../../../environments/messages.environments";
 import { IUser, UserType } from "../../../models/user.model";
-import { LoginAuthService } from "../../../../../core/services/login-auth.service";
 import { NotificationService } from "../../../../../core/services/public/notification.service";
-import { EmailInputComponent } from "../../../UI/forms/email-input/email-input.component";
-import { Router, RouterLink } from "@angular/router";
+import { EmailInputComponent } from "../../../partials/forms/email-input/email-input.component";
+import { RouterLink } from "@angular/router";
 import { API_ENV } from "../../../../../environments/api.environments";
 import { authActions } from "../../../../../store/actions/auth.actions";
 import { Store } from "@ngrx/store";

@@ -1,14 +1,15 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { TableComponent } from "../../../UI/tables/table.component";
+import { TableComponent } from "../../../partials/tables/table.component";
 import { customerActions, userActions } from '../../../../../store/actions/user.actions';
-import { BehaviorSubject, combineLatest, filter, map, Observable, startWith } from 'rxjs';
-import { ICustomer, IProvider, UsersViewModel } from '../../../../../store/models/user.model';
+import { BehaviorSubject, combineLatest, map, Observable, startWith } from 'rxjs';
+import { ICustomer, IProvider } from '../../../../../store/models/user.model';
 import { selectAllCustomers, selectAllProviders } from '../../../../../store/selectors/user.selector';
 import { createUserTable } from '../../../../../core/utils/generate-tables.utils';
 import { TableAction, TableRow } from '../../../../../store/models/table.model';
-import { FiltersComponent } from "../../../UI/filters/filters.component";
+import { FiltersComponent } from "../../../partials/filters/filters.component";
+
 @Component({
   selector: 'app-user-management',
   templateUrl: './user-management.component.html',

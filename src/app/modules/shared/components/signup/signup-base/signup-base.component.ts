@@ -5,7 +5,7 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validator
 import { SignupAuthService } from "../../../../../core/services/signup-auth.service";
 import { Router, RouterLink } from "@angular/router";
 import { AlertService } from "../../../../../core/services/public/alert.service";
-import { OtpComponent } from "../../../UI/forms/otp/otp.component";
+import { OtpComponent } from "../../../partials/forms/otp/otp.component";
 import { IUser } from "../../../models/user.model";
 
 @Component({

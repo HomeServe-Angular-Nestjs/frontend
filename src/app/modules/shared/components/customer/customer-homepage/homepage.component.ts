@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CustomerHeaderComponent } from '../../../UI/header/customer/header/header.component';
+import { CustomerHeaderComponent } from '../../../partials/header/customer/header/header.component';
 
 @Component({
   selector: 'app-customer-homepage',
