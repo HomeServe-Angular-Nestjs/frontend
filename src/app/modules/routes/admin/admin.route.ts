@@ -4,7 +4,7 @@ import { AuthGuard } from "../../../core/guards/auth.guard";
 export const adminRoute: Routes = [
     {
         path: 'admin',
-        loadComponent: () => import('../../auth/admin/homepage/admin-homepage.component').then(c => c.AdminHomepageComponent),
+        loadComponent: () => import('../../pages/admin/homepage/admin-homepage.component').then(c => c.AdminHomepageComponent),
         children: [
             // {
             //     path: '', redirectTo: 'dashboard', pathMatch: 'prefix'

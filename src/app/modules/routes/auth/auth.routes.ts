@@ -13,13 +13,13 @@ export const authRoutes: Routes = [
         children: [
             {
                 path: 'signup',
-                loadComponent: () => import('../../auth/customer/signup-page/customer-signup.component')
+                loadComponent: () => import('../../pages/customer/signup-page/customer-signup.component')
                     .then(c => c.CustomerSignupComponent),
                 canActivate: [GuestGuard]
             },
             {
                 path: 'login',
-                loadComponent: () => import('../../auth/customer/login-page/customer-login.component')
+                loadComponent: () => import('../../pages/customer/login-page/customer-login.component')
                     .then(c => c.CustomerLoginComponent),
                 canActivate: [GuestGuard]
             },
@@ -31,13 +31,13 @@ export const authRoutes: Routes = [
         children: [
             {
                 path: 'signup',
-                loadComponent: () => import('../../auth/provider/provider-signup.component')
+                loadComponent: () => import('../../pages/provider/provider-signup.component')
                     .then(c => c.ProviderSignupComponent),
                 canActivate: [GuestGuard]
             },
             {
                 path: 'login',
-                loadComponent: () => import('../../auth/provider/provider-login.component')
+                loadComponent: () => import('../../pages/provider/provider-login.component')
                     .then(c => c.ProviderLoginComponent),
                 canActivate: [GuestGuard]
             },
@@ -49,7 +49,7 @@ export const authRoutes: Routes = [
         children: [
             {
                 path: 'login',
-                loadComponent: () => import('../../auth/admin/login/admin.component')
+                loadComponent: () => import('../../pages/admin/login/admin.component')
                     .then(c => c.AdminLoginPageComponent),
                 canActivate: [GuestGuard]
             }

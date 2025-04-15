@@ -1,6 +1,6 @@
 import { Routes } from "@angular/router";
 import { AuthGuard } from "../../../core/guards/auth.guard";
-import { CustomerLayoutPageComponent } from "../../auth/customer/layout/customer-layout-page.component";
+import { CustomerLayoutPageComponent } from "../../pages/customer/layout/customer-layout-page.component";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
 
 export const customerRoutes: Routes = [
