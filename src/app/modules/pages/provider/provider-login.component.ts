@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
-import { LoginBaseComponent } from "../../shared/components/login/login-base/login-base.component";
 import { LOGIN_CONFIGS } from "../../config/login.config";
+import { LoginBaseComponent } from "../../shared/components/auth/login-base/login-base.component";
 
 @Component({
     selector: 'app-provider-login',
