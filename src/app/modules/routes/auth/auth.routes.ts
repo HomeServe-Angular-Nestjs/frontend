@@ -3,7 +3,7 @@ import { GuestGuard } from "../../../core/guards/guest.guard";
 
 const verifyEmailRoute = {
     path: 'verify_email',
-    loadComponent: () => import('../../shared/partials/forms/change_password/change_password.component')
+    loadComponent: () => import('../../shared/partials/auth/change_password/change_password.component')
         .then(c => c.ChangePasswordComponent)
 };
 

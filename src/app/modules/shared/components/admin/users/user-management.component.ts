@@ -1,14 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { TableComponent } from "../../../partials/tables/table.component";
 import { customerActions, userActions } from '../../../../../store/actions/user.actions';
 import { BehaviorSubject, combineLatest, map, Observable, startWith } from 'rxjs';
 import { ICustomer, IProvider } from '../../../../../store/models/user.model';
 import { selectAllCustomers, selectAllProviders } from '../../../../../store/selectors/user.selector';
 import { createUserTable } from '../../../../../core/utils/generate-tables.utils';
 import { TableAction, TableRow } from '../../../../../store/models/table.model';
-import { FiltersComponent } from "../../../partials/filters/filters.component";
+import { TableComponent } from '../../../partials/shared/tables/table.component';
+import { FiltersComponent } from '../../../partials/shared/filters/filters.component';
 
 @Component({
   selector: 'app-user-management',

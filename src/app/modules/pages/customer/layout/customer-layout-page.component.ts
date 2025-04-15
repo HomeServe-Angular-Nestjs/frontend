@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CustomerHeaderComponent } from "../../../shared/partials/header/customer/header/header.component";
 import { RouterOutlet } from '@angular/router';
+import { CustomerHeaderComponent } from '../../../shared/partials/sections/customer/header/header.component';
 
 @Component({
   selector: 'app-customer-landing-page',

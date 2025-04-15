@@ -1,9 +1,6 @@
 import { Component, Input, OnChanges, Output, SimpleChanges, EventEmitter } from '@angular/core';
-import { AsyncPipe, CommonModule } from '@angular/common';
-import { ICustomer, IProvider, UsersViewModel } from '../../../../store/models/user.model';
-import { TableAction, TableData, TableRow } from '../../../../store/models/table.model';
-import { UserType } from '../../models/user.model';
-// import { ChangeDateFormatPipe } from '../../../../core/pipes/change-date-format.pipe';
+import { CommonModule } from '@angular/common';
+import { TableData } from '../../../../../store/models/table.model';
 
 @Component({
   selector: 'app-table',
