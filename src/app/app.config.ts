@@ -12,6 +12,8 @@ import { provideAnimations } from '@angular/platform-browser/animations'
 import { userFeature } from './store/feature/user.feature';
 import { userEffects } from './store/effects/user.effect';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { offeredServiceFeature } from './store/feature/offeredServices.feature';
+import { offeredServiceEffects } from './store/effects/offeredServices.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,9 +23,10 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore({
       [authFeature.name]: authFeature.reducer,
-      [userFeature.name]: userFeature.reducer
+      [userFeature.name]: userFeature.reducer,
+      [offeredServiceFeature.name]: offeredServiceFeature.reducer,
     }, { metaReducers }),
-    provideEffects(authEffects, userEffects),
+    provideEffects(authEffects, userEffects, offeredServiceEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: true, autoPause: true })
   ]
 };

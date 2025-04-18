@@ -3,9 +3,10 @@ import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { catchError, Observable, throwError } from "rxjs";
 import { NotificationService } from "./public/notification.service";
+import { IOfferedService } from "../../store/models/offeredService.model";
 
 @Injectable({ providedIn: 'root' })
-export class ServiceManagementService {
+export class OfferedServicesService {
     private http = inject(HttpClient);
     private notyf = inject(NotificationService);
 
@@ -29,5 +30,9 @@ export class ServiceManagementService {
                 return throwError(() => new Error(errorMessage));
             })
         );
+    }
+
+    fetchOfferedServices(): Observable<IOfferedService[]> {
+        return this.http.get<IOfferedService[]>(`${this.apiUrl}/offered_services`);
     }
 }

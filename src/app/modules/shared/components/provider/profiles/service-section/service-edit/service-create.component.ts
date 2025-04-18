@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ServiceManagementService } from '../../../../../../../core/services/service-management.service';
+import { OfferedServicesService } from '../../../../../../../core/services/service-management.service';
 import { NotificationService } from '../../../../../../../core/services/public/notification.service';
 import { MESSAGES_ENV } from '../../../../../../../environments/messages.environments';
 import { getValidationMessage } from '../../../../../../../core/utils/form-validation.utils';
@@ -26,7 +26,7 @@ export interface SubService {
 })
 export class ServiceCreateComponent {
   private fb = inject(FormBuilder);
-  private handleService = inject(ServiceManagementService);
+  private serviceOfferedService = inject(OfferedServicesService);
   private notyf = inject(NotificationService);
 
   serviceImagePreview?: string;
@@ -130,7 +130,7 @@ export class ServiceCreateComponent {
       }
     });
 
-    this.handleService.sendFormData(formData).subscribe({
+    this.serviceOfferedService.sendFormData(formData).subscribe({
       next: (res) => console.log(res),
       error: (err) => console.error(err)
     });
