@@ -1,0 +1,25 @@
+<div class="bg-white">
+    <div class="px-8 py-4">
+        <!-- Breadcrumb
+        <div class="flex items-center text-sm mb-4">
+            <a href="#" class="text-gray-500 hover:text-gray-700">Account</a>
+            <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+            <span class="text-gray-900 font-medium">Profile</span>
+        </div> -->
+
+        <!-- Profile Section Navigation -->
+        <div class="flex items-center space-x-6">
+            <ng-container *ngFor="let item of crumbs">
+                <a [href]="item.route" class="px-3 py-2 text-sm font-medium border-transparent " [ngClass]="{
+                        'text-[#16A34A] border-b-2 border-[#16A34A] ': item.active,
+                        'text-gray-500 hover:text-gray-700 border-b-2 hover:border-gray-300':!item.active
+                    }">
+                    <i [class]="'fas' + item.icon +'mr-2'"></i>
+                    <p>{{item.name}}</p>
+                </a>
+            </ng-container>
+
+
+        </div>
+    </div>
+</div>
