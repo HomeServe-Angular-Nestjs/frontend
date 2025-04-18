@@ -31,7 +31,8 @@ export const userFeature = createFeature({
 
         on(userActions.fetchUsersFailure, (state, { error }) => ({
             ...state,
-            error
+            error,
+            loading: false
         }))
     )
 });

@@ -18,7 +18,7 @@ export const userEffects = {
                 userService.getUsers().pipe(
                     map((response) => userActions.fetchUsersSuccess({ customers: response.customers, providers: response.providers })),
                     catchError((error: HttpErrorResponse) => {
-                        console.log('[Fetch Users Effect] API Error: ', error);
+                        console.error('[Fetch Users Effect] API Error: ', error);
                         const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
                         notyf.error(errorMessage);
                         return of(userActions.fetchUsersFailure({ error: errorMessage }));
