@@ -36,6 +36,7 @@ type Expertise = {
 };
 
 export interface IBaseUser {
+    id: string;
     fullname?: string;
     email: string;
     username: string;
@@ -51,13 +52,11 @@ export interface IBaseUser {
 }
 
 export interface ICustomer extends IBaseUser {
-    id: string;
     locations?: Coordinates[];
     savedProviders?: string[];
 }
 
 export interface IProvider extends IBaseUser {
-    id: string;
     bio?: string;
     Expertise?: Expertise[];
     additionalSkills?: string[];
