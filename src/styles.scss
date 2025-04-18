@@ -5,14 +5,6 @@
 
 @import "notyf/notyf.min.css";
 
-// Custom icon styling
-.notyf-icon {
-  font-size: 18px;
-  margin-right: 10px;
-  font-weight: bold;
-  font-family: system-ui, -apple-system, sans-serif;
-  color: blue;
-}
 
 // Customize notification appearance
 .notyf__toast {
@@ -22,6 +14,22 @@
 
 .notyf-success {
   --notyf-background: #4caf50;
+  border-left: 4px solid green;
+  color: rgb(2, 73, 2);
+  padding: 0 10px;
+  max-width: 800px;
+
+  .notyf-icon-success {
+    font-size: 20px;
+    margin-right: 12px;
+    align-self: flex-start;
+    color: green;
+  }
+
+  .notyf__message {
+    line-height: 1.4;
+    font-size: 14px;
+  }
 }
 
 .notyf-error {

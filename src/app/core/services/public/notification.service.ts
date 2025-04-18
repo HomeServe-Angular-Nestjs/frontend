@@ -11,23 +11,24 @@ export class NotificationService {
         types: [
             {
                 type: 'success',
-                background: '#ffff',
+                background: '#FFF3F3',
                 className: 'notyf-success',
+                dismissible: false,
                 icon: {
-                    className: 'notyf-icon',
+                    className: 'notyf-icon-success',
                     tagName: 'div',
                     text: '✓'
                 }
             },
             {
                 type: 'error',
-                background: '#FFF3F3',  
+                background: '#FFF3F3',
                 className: 'notyf-error',
-                dismissible: false,     
+                dismissible: false,
                 icon: {
-                    className: 'notyf-icon-error', 
+                    className: 'notyf-icon-error',
                     tagName: 'div',
-                    text: '⚠️'  
+                    text: '⚠️'
                 }
             }
         ]
