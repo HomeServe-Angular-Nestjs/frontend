@@ -27,5 +27,26 @@ export const offeredServiceEffects = {
             )
         );
     }, { functional: true }),
-    
+
+    updateOfferedService$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const serviceOfferedService = inject(OfferedServicesService);
+        const notyf = inject(NotificationService);
+
+        return actions$.pipe(
+            ofType(offeredServiceActions.updateOfferedService),
+            switchMap(({ updateData }) =>
+                serviceOfferedService.updateService(updateData).pipe(
+                    map((response) => offeredServiceActions.updateOfferedServiceSuccess({ updatedService: response })),
+                    catchError((error) => {
+                        console.error('[Update Offered Service Effect] API Error: ', error);
+                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
+                        notyf.error(errorMessage);
+                        return of(offeredServiceActions.updateOfferedServiceFailure({ error: errorMessage }));
+                    })
+                )
+            )
+        );
+    }, { functional: true })
+
 }

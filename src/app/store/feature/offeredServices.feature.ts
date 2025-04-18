@@ -32,5 +32,40 @@ export const offeredServiceFeature = createFeature({
             error,
             loading: false,
         })),
+
+        on(offeredServiceActions.updateOfferedService, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        on(offeredServiceActions.updateOfferedServiceSuccess, (state, { updatedService }) => {
+            if (!updatedService) {
+                return {
+                    ...state,
+                    loading: false,
+                    error: 'No updated service data received.'
+                };
+            }
+
+            return {
+                ...state,
+                offeredServices: offeredServiceAdaptor.updateOne(
+                    {
+                        id: updatedService.id,
+                        changes: updatedService
+                    },
+                    state.offeredServices
+                ),
+                loading: false,
+                error: null
+            }
+        }),
+
+        on(offeredServiceActions.updateOfferedServiceFailure, (state, { error }) => ({
+            ...state,
+            error,
+            loading: false
+        })),
     )
 })

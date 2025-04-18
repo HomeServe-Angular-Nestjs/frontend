@@ -1,0 +1,114 @@
+<div class="space-y-4">
+    <!-- Service Item 1 -->
+    <div *ngFor="let service of offeredServices" class="bg-white rounded-xl shadow-sm border border-gray-100">
+
+        <!-- Service Header -->
+        <div class="p-6 border-b">
+            <div class="flex items-center justify-between">
+                <!-- Left: Service Info -->
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-[#16A34A] bg-opacity-10 rounded-xl flex items-center justify-center">
+                        <img [src]="service.image" alt="service-image" class="object-cover">
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-medium text-gray-900 text-lg">{{service.title}}</h3>
+                            <span
+                                class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-xs font-medium text-[#16A34A]">
+                                <i class="fas fa-check-circle text-xs" aria-hidden="true"></i>
+                                Verified
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-500">{{service.desc}}</p>
+                    </div>
+                </div>
+                <!-- Right: Actions -->
+                <div class="flex items-center gap-4">
+                    <button class="text-gray-600 hover:text-[#16A34A] p-2 rounded-lg hover:bg-gray-50"
+                        aria-label="Edit main service">
+                        <i class="fas fa-edit" aria-hidden="true"></i>
+                    </button>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" [checked]="service.isActive"
+                            (change)="updateService({id: service.id, isActive:!service.isActive})">
+                        <div
+                            class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#16A34A]">
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-services Section -->
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-sm font-medium text-gray-700">Sub-services (3)</h4>
+                <button class="text-sm text-[#16A34A] hover:text-green-700 font-medium">
+                    <i class="fas fa-plus-circle mr-1" aria-hidden="true"></i>Add Sub-service
+                </button>
+            </div>
+
+            <!-- Sub-services Table -->
+            <div class="overflow-hidden border border-gray-100 rounded-lg">
+                <table class="min-w-full divide-y divide-gray-100">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Service
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                Description
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Price
+                            </th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        <!-- Sub-service Row -->
+                        <tr *ngFor="let subService of service.subService">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-tools text-gray-500" aria-hidden="true"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900">{{subService.title}}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm text-gray-500">{{subService.desc}}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <span class="text-sm font-medium text-[#16A34A]">${{subService.price}}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex justify-center">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" [checked]="subService.isActive">
+                                        <div
+                                            class="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#16A34A]">
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="p-1.5 text-gray-400 hover:text-[#16A34A]"
+                                        aria-label="Edit sub-service">
+                                        <i class="fas fa-edit" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="p-1.5 text-gray-400 hover:text-red-500"
+                                        aria-label="Remove sub-service">
+                                        <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

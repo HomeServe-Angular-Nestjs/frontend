@@ -35,4 +35,8 @@ export class OfferedServicesService {
     fetchOfferedServices(): Observable<IOfferedService[]> {
         return this.http.get<IOfferedService[]>(`${this.apiUrl}/offered_services`);
     }
+
+    updateService(updateData: Partial<IOfferedService>): Observable<IOfferedService> {
+        return this.http.patch<IOfferedService>(`${this.apiUrl}/offered_services`, updateData);
+    }
 }

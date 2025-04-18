@@ -210,7 +210,8 @@
                                 </div>
                             </div>
 
-                            <button (click)="removeSubService(i)" class="ml-4 text-gray-400 hover:text-red-500 transition-colors p-1">
+                            <button (click)="removeSubService(i)"
+                                class="ml-4 text-gray-400 hover:text-red-500 transition-colors p-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                     fill="currentColor">
                                     <path fill-rule="evenodd"
@@ -225,10 +226,10 @@
 
             <!-- Action Buttons -->
             <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                <button
+                <a 
                     class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
                     Cancel
-                </button>
+                </a>
                 <button (click)="onSubmit()"
                     class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-sm hover:shadow-md">
                     Save Service
