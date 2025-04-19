@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CustomerHeroSectionComponent } from '../../../partials/sections/customer/hero-section/customer-hero-section.component';
-import { CustomerServiceOverviewComponent } from '../../../partials/sections/customer/service-overview/customer-service-overview.component';
+import { CustomerHeroSectionComponent } from '../../../shared/components/customer/hero-section/customer-hero-section.component';
+import { CustomerServiceOverviewComponent } from '../../../shared/components/customer/service-overview/customer-service-overview.component';
 
 @Component({
   selector: 'app-customer-landing-page',

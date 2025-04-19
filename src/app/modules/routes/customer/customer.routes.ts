@@ -12,12 +12,12 @@ export const customerRoutes: Routes = [
             {
                 path: 'landing_page',
                 pathMatch: 'full',
-                loadComponent: () => import('../../shared/components/customer/landing-page/customer-landing-page.component')
+                loadComponent: () => import('../../pages/customer/landing-page/customer-landing-page.component')
                     .then(c => c.CustomerLandingPageComponent)
             },
             {
                 path: 'homepage',
-                loadComponent: () => import('../../shared/components/customer/customer-homepage/homepage.component')
+                loadComponent: () => import('../../pages/customer/customer-homepage/homepage.component')
                     .then(c => c.CustomerHomepageComponent),
                 canActivate: [ProfileAuthGuard, AuthGuard,],
             }
