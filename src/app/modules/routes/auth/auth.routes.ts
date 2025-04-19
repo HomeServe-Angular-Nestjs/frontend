@@ -31,13 +31,13 @@ export const authRoutes: Routes = [
         children: [
             {
                 path: 'signup',
-                loadComponent: () => import('../../pages/provider/provider-signup.component')
+                loadComponent: () => import('../../pages/provider/signup/provider-signup.component')
                     .then(c => c.ProviderSignupComponent),
                 canActivate: [GuestGuard]
             },
             {
                 path: 'login',
-                loadComponent: () => import('../../pages/provider/provider-login.component')
+                loadComponent: () => import('../../pages/provider/login/provider-login.component')
                     .then(c => c.ProviderLoginComponent),
                 canActivate: [GuestGuard]
             },
