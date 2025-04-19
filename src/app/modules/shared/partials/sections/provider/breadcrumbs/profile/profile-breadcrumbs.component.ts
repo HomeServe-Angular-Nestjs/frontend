@@ -1,10 +1,11 @@
 import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
+import { RouterLink } from "@angular/router";
 
 @Component({
     selector: 'app-profile-breadcrumbs',
     templateUrl: './profile-breadcrumbs.component.html',
-    imports: [CommonModule]
+    imports: [CommonModule, RouterLink]
 })
 export class ProfileBreadcrumbsComponent {
 
@@ -13,7 +14,7 @@ export class ProfileBreadcrumbsComponent {
             name: 'Profile Overview',
             icon: 'fa-user-circle',
             active: true,
-            route: ''
+            route: 'overview'
         },
         {
             name: 'About Section',
@@ -25,7 +26,7 @@ export class ProfileBreadcrumbsComponent {
             name: 'Service Offered',
             icon: 'fa-tools',
             active: false,
-            route: 'provider/profiles/service_offered'
+            route: 'service_offered'
         },
         {
             name: 'Work Scheduled',

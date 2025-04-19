@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-provider-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './provider-sidebar.component.html',
   // styleUrl: './provider-sidebar.component.scss',
 })
@@ -16,7 +17,7 @@ export class ProviderSidebarComponent {
         {
           name: 'Dashboard',
           icon: 'fas fa-tachometer-alt',
-          route: '',
+          route: 'dashboard',
           active: true
         },
         {
@@ -56,7 +57,7 @@ export class ProviderSidebarComponent {
         {
           name: 'Profile',
           icon: 'fas fa-user-circle',
-          route: 'provider/profiles',
+          route: 'profiles',
           active: false
         },
         {
