@@ -2,6 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
 import { FormsModule } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { userActions } from '../../../../store/actions/user.actions';
+import { Observable } from 'rxjs';
+import { IProvider } from '../../../../store/models/user.model';
+import { selectAllProviders, selectProviderEntities } from '../../../../store/selectors/user.selector';
+import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 
 interface Provider {
   id: number;
@@ -22,15 +28,23 @@ interface Provider {
 @Component({
   selector: 'app-customer-view-providers',
   standalone: true,
-  imports: [CommonModule, CustomerBreadcrumbsComponent,FormsModule],
+  imports: [CommonModule, CustomerBreadcrumbsComponent, FormsModule, CustomerProviderViewCardComponent],
   templateUrl: './customer-view-providers.component.html',
 })
 export class CustomerViewProvidersComponent {
+  readonly providers$!: Observable<IProvider[]>;
+
+  constructor(private store: Store) {
+    this.store.dispatch(userActions.fetchProviders());
+    this.providers$ = this.store.select(selectAllProviders);
+  }
+
   searchQuery = '';
   certifiedOnly = true;
   ratingFilter = 0;
   priceFilter = 'all';
   sortOption = 'rating';
+
 
   providers: Provider[] = [
     {
@@ -173,15 +187,6 @@ export class CustomerViewProvidersComponent {
     this.filterProviders();
   }
 
-  toggleFavorite(provider: Provider) {
-    provider.isFavorite = !provider.isFavorite;
-  }
-
-  viewProvider(provider: Provider) {
-    // Implement navigation to provider details
-    console.log('Viewing provider:', provider.name);
-  }
-
   resetFilters() {
     this.searchQuery = '';
     this.certifiedOnly = true;
@@ -190,4 +195,5 @@ export class CustomerViewProvidersComponent {
     this.sortOption = 'rating';
     this.filterProviders();
   }
+  
 }
