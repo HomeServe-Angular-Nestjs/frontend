@@ -1,0 +1,113 @@
+<section class="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-gray-50 to-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- Left Side - Service Categories -->
+            <div class="w-full md:w-1/2">
+                <h1 class="text-2xl font-bold text-gray-900 mb-6">
+                    What Service Do You Need Today?
+                </h1>
+
+                <!-- Service Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div *ngFor="let service of services"
+                        class="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1">
+                        <div
+                            class="bg-indigo-50 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-indigo-100 transition-colors">
+                            <i [class]="'fas ' + service.icon + ' text-xl text-indigo-600'"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-1 text-gray-800">{{ service.title }}</h3>
+                        <p class="text-gray-600 text-sm">{{ service.description }}</p>
+                    </div>
+                </div>
+
+                <!-- Service Finder Card -->
+                <div class="mt-6">
+                    <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+                        <!-- Changed from p-6 to p-5 -->
+                        <h2 class="text-md font-bold text-gray-800 mb-3">Find the Right Professional</h2>
+                        <!-- Changed from text-lg to text-md, mb-4 to mb-3 -->
+
+                        <div class="flex flex-col md:flex-row gap-4"> <!-- Changed from gap-6 to gap-4 -->
+                            <div class="flex-1">
+                                <label for="service" class="block text-gray-700 text-sm font-medium mb-2">Service
+                                    Type</label> <!-- Added text-sm, mb-3 to mb-2 -->
+                                <div class="relative">
+                                    <i
+                                        class="fas fa-tools absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                                    <!-- Added text-sm -->
+                                    <select id="service"
+                                        class="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white transition-all text-sm">
+                                        <!-- Changed pl-10 to pl-9, py-3 to py-2.5, added text-sm -->
+                                        <option value="" disabled selected>Select a service</option>
+                                        <option value="cleaning">Cleaning Services</option>
+                                        <option value="plumbing">Plumbing</option>
+                                        <option value="electrical">Electrical</option>
+                                        <option value="painting">Painting</option>
+                                    </select>
+                                    <i
+                                        class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                                    <!-- Added text-sm -->
+                                </div>
+                            </div>
+
+                            <div class="flex-1">
+                                <label for="location" class="block text-gray-700 text-sm font-medium mb-2">Your
+                                    Location</label> <!-- Added text-sm, mb-3 to mb-2 -->
+                                <div class="relative">
+                                    <i
+                                        class="fas fa-map-marker-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                                    <!-- Added text-sm -->
+                                    <input type="text" id="location" placeholder="Enter your address"
+                                        class="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" />
+                                    <!-- Changed pl-10 to pl-9, py-3 to py-2.5, added text-sm -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            class="mt-4 w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-colors duration-300 shadow-md hover:shadow-lg text-sm">
+                            <!-- Changed mt-6 to mt-4, py-3 to py-2.5, added text-sm -->
+                            Find Services Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Image Carousel -->
+            <div class="w-full md:w-1/2">
+                <div class="relative h-full min-h-[400px] rounded-xl overflow-hidden shadow-xl">
+                    <!-- Changed to h-full with min-height -->
+                    <div class="absolute inset-0">
+                        <!-- Image Slider -->
+                        <div class="relative h-full" #carousel>
+                            <img *ngFor="let image of images; let i = index" [src]="image.src" [alt]="image.alt"
+                                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+                                [class.opacity-0]="currentSlide !== i" [class.opacity-100]="currentSlide === i" />
+                        </div>
+                        <!-- Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+                            <div class="absolute bottom-8 left-8 right-8 text-white">
+                                <h2 class="text-4xl font-bold mb-4">
+                                    Quality Home Services
+                                </h2>
+                                <p class="text-lg opacity-90">Trusted professionals for all your home needs</p>
+                                <button
+                                    class="mt-6 px-6 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                                    Learn More
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Navigation Dots -->
+                        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3">
+                            <button *ngFor="let image of images; let i = index"
+                                class="w-3 h-3 rounded-full bg-white transition-opacity duration-300"
+                                [class.opacity-100]="currentSlide === i" [class.opacity-50]="currentSlide !== i"
+                                (click)="goToSlide(i)" [attr.aria-label]="'Go to slide ' + (i + 1)">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

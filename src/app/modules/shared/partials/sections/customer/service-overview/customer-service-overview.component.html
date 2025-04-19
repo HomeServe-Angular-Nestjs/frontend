@@ -1,35 +1,58 @@
-<section class="py-16 bg-gray-50">
-    <div class="container mx-auto px-4">
+<section class="py-16 bg-gradient-to-b from-gray-50 to-gray-100">
+    <div class="container mx-auto px-4 max-w-7xl">
         <!-- Section Heading -->
-        <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
-            Popular Services
-        </h2>
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                Popular Services
+            </h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Discover our most requested professional services for your home
+            </p>
+        </div>
 
         <!-- Services Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <!-- Service Card -->
             <div *ngFor="let service of services"
-                class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <!-- Image Part -->
-                <div class="h-40 bg-blue-100 flex items-center justify-center">
-                    <img [src]="service.image" [alt]="service.title" class="h-16 w-16 object-contain" />
+                class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
+                <!-- Image Container -->
+                <div class="h-48 overflow-hidden">
+                    <img [src]="service.image" [alt]="service.title"
+                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 </div>
 
                 <!-- Details Part -->
                 <div class="p-6">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">
                         {{ service.title }}
                     </h3>
-                    <p class="text-gray-600">{{ service.description }}</p>
+                    <p class="text-gray-600 mb-4">{{ service.description }}</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <a href="" class="flex items-center">
+                            <span>more</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- View All Button -->
-        <div class="text-center mt-10">
+        <div class="text-center mt-16">
             <button
-                class="px-6 py-3 bg-white border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors duration-300">
+                class="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg">
                 View All Services
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block ml-2" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
+                        clip-rule="evenodd" />
+                </svg>
             </button>
         </div>
     </div>

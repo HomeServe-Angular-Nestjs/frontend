@@ -11,24 +11,24 @@ import { CommonModule } from '@angular/common';
 export class CustomerServiceOverviewComponent {
   services = [
     {
-      title: 'Home Cleaning',
-      description: 'Professional cleaning services for your home',
-      image: 'https://img.icons8.com/color/96/cleaning-a-surface.png',
+      image: 'assets/images/cleaning-service.jpg',
+      title: 'Professional Cleaning',
+      description: 'Thorough home cleaning with eco-friendly products'
     },
     {
-      title: 'Plumbing',
-      description: 'Expert plumbing repair and installation',
-      image: 'https://img.icons8.com/color/96/plunger.png',
+      image: 'assets/images/plumbing-service.jpg',
+      title: 'Plumbing Solutions',
+      description: '24/7 emergency plumbing repairs and installations'
     },
     {
-      title: 'Electrical',
-      description: 'Professional electrical services',
-      image: 'https://img.icons8.com/color/96/electrical.png',
+      image: 'assets/images/electrician-service.jpg',
+      title: 'Electrical Services',
+      description: 'Certified electricians for all your wiring needs'
     },
     {
-      title: 'Painting',
-      description: 'Quality painting services for your home',
-      image: 'https://img.icons8.com/color/96/paint-brush.png',
-    },
+      image: 'assets/images/painting-service.jpg',
+      title: 'Painting Services',
+      description: 'Interior and exterior painting with premium materials'
+    }
   ];
 }
