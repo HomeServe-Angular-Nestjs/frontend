@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { OfferedServicesService } from '../../../../../../../core/services/service-management.service';
-import { NotificationService } from '../../../../../../../core/services/public/notification.service';
-import { getValidationMessage } from '../../../../../../../core/utils/form-validation.utils';
+import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
+import { NotificationService } from '../../../../../../core/services/public/notification.service';
+import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
 import { RouterLink } from '@angular/router';
 
 export interface SubService {

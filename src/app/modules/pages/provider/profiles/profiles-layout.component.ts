@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProfileBreadcrumbsComponent } from "../../../../partials/sections/provider/breadcrumbs/profile/profile-breadcrumbs.component";
+import { ProfileBreadcrumbsComponent } from "../../../shared/partials/sections/provider/breadcrumbs/profile/profile-breadcrumbs.component";
 import { RouterOutlet } from '@angular/router';
 
 @Component({

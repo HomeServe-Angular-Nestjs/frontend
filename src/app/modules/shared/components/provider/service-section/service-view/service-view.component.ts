@@ -2,11 +2,11 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { offeredServiceActions } from '../../../../../../../store/actions/offeredService.action';
-import { ServiceListViewComponent } from '../../../../../partials/sections/provider/service-list-view/service-list-view.component';
-import { selectAllOfferedServices, selectOfferedServiceById } from '../../../../../../../store/selectors/offeredService.selector';
+import { offeredServiceActions } from '../../../../../../store/actions/offeredService.action';
+import { ServiceListViewComponent } from '../../../../partials/sections/provider/service-list-view/service-list-view.component';
+import { selectAllOfferedServices } from '../../../../../../store/selectors/offeredService.selector';
 import { Observable } from 'rxjs';
-import { IOfferedService } from '../../../../../../../store/models/offeredService.model';
+import { IOfferedService } from '../../../../../../store/models/offeredService.model';
 
 @Component({
   selector: 'app-service-view',
