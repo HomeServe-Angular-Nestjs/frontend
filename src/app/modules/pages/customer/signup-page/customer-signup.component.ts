@@ -6,7 +6,7 @@ import { SignupBaseComponent } from "../../../shared/components/auth/signup-base
 @Component({
     selector: 'app-customer-signup',
     template: `
-    <app-signup-base [config]="config"></app-signup-base>
+        <app-signup-base [config]="config"></app-signup-base>
     `,
     imports: [SignupBaseComponent]
 })
