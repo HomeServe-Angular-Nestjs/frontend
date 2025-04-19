@@ -77,6 +77,18 @@ export interface IUserState {
     error: string | null;
 }
 
+export interface ICustomerState {
+    customers: EntityState<ICustomer>;
+    loading: boolean;
+    error: string | null;
+}
+
+// export interface IProviderState {
+//     providers: EntityState<IProvider>;
+//     loading: boolean;
+//     error: string | null;
+// }
+
 export type UsersType = ICustomer[] | IProvider[];
 
 export interface UsersViewModel {

@@ -1,6 +1,6 @@
 import { createFeature, createReducer, on } from "@ngrx/store";
-import { customerActions, providerActions, userActions } from "../actions/user.actions";
-import { IUserState } from "../models/user.model";
+import { customerActions, userActions } from "../actions/user.actions";
+import { ICustomerState, IUserState } from "../models/user.model";
 import { customerAdaptor, providerAdaptor } from "../entities/user.entities";
 
 export const initialUserState: IUserState = {
@@ -9,6 +9,12 @@ export const initialUserState: IUserState = {
     loading: false,
     error: null
 }
+
+export const initialCustomerState: ICustomerState = {
+    customers: customerAdaptor.getInitialState(),
+    loading: false,
+    error: null,
+};
 
 
 export const userFeature = createFeature({
@@ -33,14 +39,34 @@ export const userFeature = createFeature({
             ...state,
             error,
             loading: false
-        }))
+        })),
+
+
+        on(userActions.fetchProviders, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        on(userActions.fetchProvidersSuccess, (state, { providers }) => ({
+            ...state,
+            loading: false,
+            providers: providerAdaptor.setAll(providers, state.providers),
+            error: null
+        })),
+
+        on(userActions.fetchProviderFailure, (state, { error }) => ({
+            ...state,
+            error,
+            loading: false
+        })),
     )
 });
 
 export const customerFeature = createFeature({
     name: 'customers',
     reducer: createReducer(
-        initialUserState,
+        initialCustomerState,
 
         on(customerActions.fetchCustomers, (state) => ({
             ...state,
@@ -75,32 +101,6 @@ export const customerFeature = createFeature({
                 { id: customer.id, changes: customer },
                 state.customers
             )
-        })),
-    )
-});
-
-export const providerFeature = createFeature({
-    name: 'providers',
-    reducer: createReducer(
-        initialUserState,
-
-        on(providerActions.fetchProviders, (state) => ({
-            ...state,
-            loading: true,
-            error: null
-        })),
-
-        on(providerActions.fetchProvidersSuccess, (state, { providers }) => ({
-            ...state,
-            loading: false,
-            providers: providerAdaptor.setAll(providers, state.providers),
-            error: null
-        })),
-
-        on(providerActions.fetchProviderFailure, (state, { error }) => ({
-            ...state,
-            error,
-            loading: false
         })),
     )
 });
