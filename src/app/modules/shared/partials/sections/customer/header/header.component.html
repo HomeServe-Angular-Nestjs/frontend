@@ -52,9 +52,10 @@
       </div>
 
       <!-- User Actions - Enhanced with dropdown menu -->
-      <div class="flex items-center space-x-4">
-        <!-- Mobile Menu Button - Animated Hamburger -->
-        <button class="md:hidden text-gray-600 hover:text-blue-600 focus:outline-none p-2 -mr-1" aria-label="Menu">
+      <ng-container *ngIf="userStatus$ | async as userStatus">
+        <div class="flex items-center space-x-4">
+          <!-- Mobile Menu Button - Animated Hamburger -->
+          <!-- <button class="md:hidden text-gray-600 hover:text-blue-600 focus:outline-none p-2 -mr-1" aria-label="Menu">
           <div class="space-y-1.5">
             <span
               class="block w-6 h-0.5 bg-current transition-transform origin-center group-[.is-open]:rotate-45 group-[.is-open]:translate-y-1.5"></span>
@@ -62,91 +63,106 @@
             <span
               class="block w-6 h-0.5 bg-current transition-transform origin-center group-[.is-open]:-rotate-45 group-[.is-open]:-translate-y-1.5"></span>
           </div>
-        </button>
+        </button> -->
 
-        <!-- Desktop Actions -->
-        <div class="hidden md:flex items-center space-x-5">
-          <!-- Cart with dropdown -->
-          <div class="relative group">
-            <button
-              class="relative p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300">
-              <i class="fas fa-shopping-cart text-xl text-gray-600 hover:text-blue-600 transition-colors"></i>
-              <!-- want animation? put 'animate-pulse' in the below span class -->
-              <span
-                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
-            </button>
-            <div x-show="open" x-transition
-              class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50 hidden">
-              <div class="px-4 py-3 border-b border-gray-100">
-                <h3 class="font-medium text-gray-900">Your Cart</h3>
-              </div>
-              <div class="px-4 py-6 text-center">
-                <i class="fas fa-shopping-cart text-3xl text-gray-300 mb-2"></i>
-                <p class="text-gray-500">Your cart is empty</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Notifications with dropdown -->
-          <div class="relative group">
-            <button
-              class="relative p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300">
-              <i class="fas fa-bell text-xl text-gray-600 hover:text-blue-600 transition-colors"></i>
-              <!-- want animation? put 'animate-bounce' in the below span class -->
-              <span
-                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-            </button>
-            <div x-show="open" x-transition
-              class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50 hidden">
-              <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-medium text-gray-900">Notifications</h3>
-                <button class="text-sm text-blue-600 hover:text-blue-800">Mark all as read</button>
-              </div>
-              <div class="max-h-96 overflow-y-auto">
-                <!-- Notification items would go here -->
-                <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0">
-                  <p class="text-sm text-gray-700">New service request received</p>
-                  <p class="text-xs text-gray-500 mt-1">2 minutes ago</p>
+          <!-- Desktop Actions -->
+          <div *ngIf="userStatus === 'authenticated'; else elseBlock" class="md:flex items-center space-x-5">
+            <!-- Cart with dropdown -->
+            <div class="relative group">
+              <button
+                class="relative p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <i class="fas fa-shopping-cart text-xl text-gray-600 hover:text-blue-600 transition-colors"></i>
+                <!-- want animation? put 'animate-pulse' in the below span class -->
+                <span
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+              </button>
+              <div x-show="open" x-transition
+                class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50 hidden">
+                <div class="px-4 py-3 border-b border-gray-100">
+                  <h3 class="font-medium text-gray-900">Your Cart</h3>
+                </div>
+                <div class="px-4 py-6 text-center">
+                  <i class="fas fa-shopping-cart text-3xl text-gray-300 mb-2"></i>
+                  <p class="text-gray-500">Your cart is empty</p>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Profile dropdown -->
-          <div class="relative">
-            <button
-              class="flex items-center space-x-1 focus:outline-none group rounded-full p-1 hover:bg-gray-100 transition-colors">
-              <div class="relative">
-                <img src="" alt="User profile"
-                  class="h-9 w-9 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all">
-                <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
-              </div>
-              <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform duration-200 transform group-hover:text-blue-600"
-                :class="{'rotate-180': open}"></i>
-            </button>
-
-            <div x-show="open" x-transition
-              class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-50 hidden">
-              <div class="px-4 py-3 border-b border-gray-100">
-                <p class="text-sm font-medium text-gray-900">John Doe</p>
-                <p class="text-xs text-gray-500">john example.com</p>
-              </div>
-              <div class="py-1">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Settings</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Messages</a>
-              </div>
-              <div class="py-1 border-t border-gray-100">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Sign out</a>
+            <!-- Notifications with dropdown -->
+            <div class="relative group">
+              <button
+                class="relative p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <i class="fas fa-bell text-xl text-gray-600 hover:text-blue-600 transition-colors"></i>
+                <!-- want animation? put 'animate-bounce' in the below span class -->
+                <span
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+              </button>
+              <div x-show="open" x-transition
+                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50 hidden">
+                <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                  <h3 class="font-medium text-gray-900">Notifications</h3>
+                  <button class="text-sm text-blue-600 hover:text-blue-800">Mark all as read</button>
+                </div>
+                <div class="max-h-96 overflow-y-auto">
+                  <!-- Notification items would go here -->
+                  <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0">
+                    <p class="text-sm text-gray-700">New service request received</p>
+                    <p class="text-xs text-gray-500 mt-1">2 minutes ago</p>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <!-- Profile dropdown -->
+            <div class="relative group">
+              <button class="flex items-center space-x-1 focus:outline-none group rounded-full p-1 ">
+                <div class="relative">
+                  <img src="" alt="User profile"
+                    class="h-9 w-9 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all">
+                  <span
+                    class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                </div>
+                <i
+                  class="fas fa-chevron-down text-gray-500 text-xs transition-transform duration-200 transform group-hover:rotate-180 group-hover:text-blue-600"></i>
+              </button>
+
+              <!-- DROPDOWN -->
+              <div
+                class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-50 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
+                <div class="px-4 py-3 border-b border-gray-100">
+                  <p class="text-sm font-medium text-gray-900">John Doe</p>
+                  <p class="text-xs text-gray-500">johnExample.com</p>
+                </div>
+                <div class="py-1">
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Settings</a>
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Messages</a>
+                </div>
+                <div class="py-1 border-t border-gray-100">
+                  <button (click)="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Log
+                    out</button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
+      </ng-container>
+      <ng-template #elseBlock>
+        <div class="flex items-center gap-4">
+          <a routerLink="login" class="px-4 py-2 text-indigo-600 hover:text-indigo-700 font-medium">
+            Login
+          </a>
+          <a routerLink="signup" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+            Sign Up
+          </a>
+        </div>
+      </ng-template>
     </div>
+  </div>
 
-    <!-- Mobile Search - Enhanced with animation -->
-    <!-- <div x-data="{ showMobileSearch: false }" class="mt-3 md:hidden">
+  <!-- Mobile Search - Enhanced with animation -->
+  <!-- <div x-data="{ showMobileSearch: false }" class="mt-3 md:hidden">
       <button @click="showMobileSearch = !showMobileSearch"
         class="w-full flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg text-gray-500 hover:text-blue-600 transition-colors">
         <span>Search services...</span>
@@ -171,5 +187,4 @@
         </div>
       </div>
     </div>-->
-  </div>
 </header>

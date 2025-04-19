@@ -51,4 +51,19 @@ export const authEffects = {
             )
         )
     }, { functional: true, dispatch: false }),
+
+    logout$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const authService = inject(LoginAuthService);
+        const router = inject(Router);
+
+        return actions$.pipe(
+            ofType(authActions.logout),
+            switchMap(({ userType }) =>
+                authService.logout(userType).pipe(
+                    tap(() => router.navigate(['landing_page']))
+                )
+            )
+        );
+    }, { functional: true, dispatch: false })
 }; 

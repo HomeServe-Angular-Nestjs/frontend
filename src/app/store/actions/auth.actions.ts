@@ -14,7 +14,7 @@ export const authActions = {
 
     setUserType: createAction('[Auth] Set User Type', props<{ userType: UserType }>()),
 
-    logout: createAction('[Auth] Logout'),
+    logout: createAction('[Auth] Logout', props<{ userType: UserType }>()),
 
     checkAuth: createAction('[Auth] Check Auth'),
-}
+};

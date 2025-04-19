@@ -38,7 +38,12 @@ export class LoginAuthService {
         return this.http.get<IResponse>(`${this.apiUrl}/google/init?type=${type}`);
     }
 
-    logout(userType: UserType) {
-        return this.http.post(`${this.apiUrl}/logout`, { userType }, { withCredentials: true });
+    logout(userType: UserType): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/logout`, { userType }).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const message = error?.error?.message || 'Something went wrong';
+                return throwError(() => new Error(message));
+            })
+        );
     }
 }

@@ -100,7 +100,7 @@ export class AdminSidebarComponent {
     console.log(parsedStorage.type);
     this.loginService.logout(parsedStorage.type).subscribe({
       next: () => {
-        this.store.dispatch(authActions.logout());
+        this.store.dispatch(authActions.logout({userType: 'admin'}));
         // localStorage.removeItem('auth');
         const url = loginNavigation(parsedStorage.type as UserType);
         this.router.navigate([url]);
