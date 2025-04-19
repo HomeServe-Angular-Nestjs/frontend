@@ -28,7 +28,8 @@
                     </h3>
                     <p class="text-gray-600 mb-4">{{ service.description }}</p>
                     <div class="flex items-center text-blue-600 font-medium">
-                        <a href="" class="flex items-center">
+                        <a [routerLink]="['/view_providers']" [queryParams]="{category: service.title}"
+                            class="flex items-center">
                             <span>more</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20"
                                 fill="currentColor">

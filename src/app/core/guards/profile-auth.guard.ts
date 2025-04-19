@@ -10,7 +10,7 @@ export const ProfileAuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot, s
 
     const isLoggedIn: string = route.queryParams['loggedIn'];
     const email: string = route.queryParams['email'];
-    console.log(isLoggedIn, email)
+
     if (isLoggedIn === 'true' && email !== '') {
         console.log('got in profile guard');
         store.dispatch(authActions.loginSuccess({ email }));

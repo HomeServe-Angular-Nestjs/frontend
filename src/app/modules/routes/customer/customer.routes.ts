@@ -20,6 +20,12 @@ export const customerRoutes: Routes = [
                 loadComponent: () => import('../../pages/customer/customer-homepage/homepage.component')
                     .then(c => c.CustomerHomepageComponent),
                 canActivate: [ProfileAuthGuard, AuthGuard,],
+            },
+            {
+                path: 'view_providers',
+                loadComponent: () => import('../../pages/customer/view-providers/customer-view-providers.component')
+                    .then(c => c.CustomerViewProvidersComponent),
+                canActivate: [AuthGuard]
             }
         ],
     },
