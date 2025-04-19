@@ -5,6 +5,7 @@ import { customerActions, userActions } from "../actions/user.actions";
 import { catchError, map, of, switchMap, tap, throwError } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
+import { ProviderService } from "../../core/services/provider.service";
 
 export const userEffects = {
     fetchUsers$: createEffect(() => {
@@ -22,6 +23,26 @@ export const userEffects = {
                         const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
                         notyf.error(errorMessage);
                         return of(userActions.fetchUsersFailure({ error: errorMessage }));
+                    })
+                )
+            )
+        );
+    }, { functional: true }),
+
+    fetchProviders$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const providerService = inject(ProviderService);
+
+        return actions$.pipe(
+            ofType(userActions.fetchProviders),
+            switchMap(() =>
+                providerService.getProviders().pipe(
+                    map((response) => userActions.fetchProvidersSuccess({ providers: response })),
+                    catchError((error: HttpErrorResponse) => {
+                        console.log('[Fetch Users Effect] API Error: ', error);
+                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
+                        // notyf.error(errorMessage);
+                        return of(customerActions.fetchCustomersFailure({ error: errorMessage }));
                     })
                 )
             )
@@ -47,8 +68,8 @@ export const userEffects = {
                     })
                 )
             )
-        )
+        );
     }, { functional: true }),
 
-    
+
 }

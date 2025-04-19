@@ -7,6 +7,15 @@ export const userActions = {
         props<{ customers: ICustomer[], providers: IProvider[] }>()
     ),
     fetchUsersFailure: createAction('[User] Fetch Both Customer & Provider', props<{ error: string }>()),
+
+
+
+
+    fetchProviders: createAction('[User] Fetch Providers'),
+    fetchProvidersSuccess: createAction('[User] Fetch Providers Success', props<{ providers: IProvider[] }>()),
+    fetchProviderFailure: createAction('[User] Fetch Provider Failure', props<{ error: string }>()),
+
+    updateProviderStatus: createAction('[User] Update Provider Status', props<{ status: string }>()),
 }
 
 export const customerActions = {
@@ -19,11 +28,11 @@ export const customerActions = {
     updateCustomerFailure: createAction('[User] Update Customer Failure', props<{ error: string }>()),
 }
 
-export const providerActions = {
-    fetchProviders: createAction('[User] Fetch Providers'),
-    fetchProvidersSuccess: createAction('[User] Fetch Providers Success', props<{ providers: IProvider[] }>()),
-    fetchProviderFailure: createAction('[User] Fetch Provider Failure', props<{ error: string }>()),
+// export const providerActions = {
+//     fetchProviders: createAction('[User] Fetch Providers'),
+//     fetchProvidersSuccess: createAction('[User] Fetch Providers Success', props<{ providers: IProvider[] }>()),
+//     fetchProviderFailure: createAction('[User] Fetch Provider Failure', props<{ error: string }>()),
 
-    updateProviderStatus: createAction('[User] Update Provider Status', props<{ status: string }>()),
+//     updateProviderStatus: createAction('[User] Update Provider Status', props<{ status: string }>()),
 
-}
+// }

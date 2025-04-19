@@ -16,4 +16,12 @@ export const selectProviderState = createSelector(
 
 export const { selectAll: selectAllCustomers } = customerAdaptor.getSelectors(selectCustomerState);
 
-export const { selectAll: selectAllProviders } = providerAdaptor.getSelectors(selectProviderState)
+export const {
+    selectAll: selectAllProviders,
+    selectEntities: selectProviderEntities,
+    selectIds: selectProviderIds,
+    selectTotal: selectTotalProviders
+} = providerAdaptor.getSelectors(selectProviderState);
+
+
+// export const selectTheProviderState = createFeatureSelector<IProviderState>('providers')
