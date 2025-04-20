@@ -51,7 +51,7 @@ export class ServiceCreateComponent {
       this.subServices.push(this.createSubServiceGroup());
     } else {
       this.subServices.markAllAsTouched();
-      this.subServices.controls.forEach((group, index) => {
+      this.subServices.controls.forEach((group) => {
         for (const fieldName in group.controls) {
           const control = group.get(fieldName) as AbstractControl;
           const errorMessage = getValidationMessage(control, fieldName);

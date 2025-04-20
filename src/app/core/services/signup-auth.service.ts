@@ -1,13 +1,8 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
-import { BehaviorSubject, Observable, tap } from "rxjs";
+import { BehaviorSubject, catchError, throwError } from "rxjs";
 import { IUser } from "../../modules/shared/models/user.model";
-
-interface IOtpResponse {
-    success: boolean,
-    message: string
-}
 
 @Injectable({ providedIn: "root" })
 export class SignupAuthService {
@@ -17,23 +12,34 @@ export class SignupAuthService {
 
     constructor(private http: HttpClient) { }
 
-    initiateSignup(email: string, type: string): Observable<IOtpResponse> {
-        return this.http.post<IOtpResponse>(`${this.apiUrl}/initiate_signup`, { email, type })
-            .pipe(
-                tap(() => this.currentStep.next(2))
-            );
+    initiateSignup(email: string, type: string) {
+        return this.http.post(`${this.apiUrl}/initiate_signup`, { email, type }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
     }
 
-    verifyOtp(email: string, code: string): Observable<IOtpResponse> {
-        return this.http.post<IOtpResponse>(`${this.apiUrl}/verify_otp`, { email, code })
-            .pipe(
-                tap(() => this.currentStep.next(3))
-            );
+    verifyOtp(email: string, code: string) {
+        return this.http.post(`${this.apiUrl}/verify_otp`, { email, code }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
     }
 
     completeOtp(user: IUser) {
-        return this.http.post(`${this.apiUrl}/complete_signup`, user);
+        return this.http.post(`${this.apiUrl}/complete_signup`, user).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        )
     }
 
-
+    private getErrorMessage(error: HttpErrorResponse): string {
+        return error?.error?.message || 'something went wrong';
+    }
 }

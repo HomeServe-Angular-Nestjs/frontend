@@ -1,12 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject, Input, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, Input } from "@angular/core";
 import { ISignupConfig } from "../../../../config/signup.config";
 import { CommonModule } from "@angular/common";
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
 import { SignupAuthService } from "../../../../../core/services/signup-auth.service";
 import { Router, RouterLink } from "@angular/router";
 import { AlertService } from "../../../../../core/services/public/alert.service";
-import { IUser } from "../../../models/user.model";
+import { IUser, UserType } from "../../../models/user.model";
 import { OtpComponent } from "../../../partials/auth/otp/otp.component";
+import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
+import { NotificationService } from "../../../../../core/services/public/notification.service";
+import { REGEXP_ENV } from "../../../../../environments/regex.environments";
 
 @Component({
     selector: 'app-signup-base',
@@ -19,124 +22,77 @@ export class SignupBaseComponent {
     private signupAuthService = inject(SignupAuthService);
     private router = inject(Router);
     private fb = inject(FormBuilder);
-    private alert = inject(AlertService);
+    private notyf = inject(NotificationService);
 
     @Input({ required: true }) config!: ISignupConfig;
-    currentStep = signal(1)
-    email = '';
-    username = '';
-    password = '';
-    regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
 
+    private pattern = REGEXP_ENV.password;
+    isValidForm = false;
+    user!: IUser;
 
     // Step: 1
     form: FormGroup = this.fb.group({
         email: ['', [Validators.required, Validators.email]],
         username: ['', [Validators.required, Validators.minLength(3)]],
-        password: ['', [Validators.required, Validators.pattern(this.regexPassword)]]
+        password: ['', [Validators.required, Validators.pattern(this.pattern)]]
     });
-
-    constructor() {
-        this.signupAuthService.currentStep$.subscribe(step => {
-            this.currentStep.set(step);
-        });
-    }
 
     submitForm(): void {
         const controls = {
-            email: this.form.get('email'),
-            username: this.form.get('username'),
-            password: this.form.get('password'),
+            email: this.form.get('email') as AbstractControl,
+            username: this.form.get('username') as AbstractControl,
+            password: this.form.get('password') as AbstractControl,
         };
 
-        if (this.currentStep() === 1) {
-            if (this.hasValidationErrors(controls.email, 'email')) {
+        if (this.form.valid) {
+            this.user = {
+                email: controls.email.value,
+                type: this.config.type,
+                password: controls.password.value,
+                username: controls.password.value
+            }
+
+            this.initializeSignup(this.user.email, this.user.type);
+
+
+        } else {
+            this.form.markAllAsTouched();
+            const errorMessage = getValidationMessage(controls['email'], 'email')
+                || getValidationMessage(this.form.get('username'), 'username')
+                || getValidationMessage(this.form.get('password'), 'password')
+
+            if (errorMessage) {
+                this.notyf.error(errorMessage);
                 return;
             }
-
-            this.email = this.form.value.email;
-            this.signupAuthService.initiateSignup(this.email, this.config.type).subscribe({
-                error: (err) => {
-                    if (err.error.statusCode === 409) {
-                        this.alert.showToast(err.error.message, 'error');
-                    } else {
-                        console.error(err.error);
-                    }
-                },
-            });
-        }
-
-        // Step: 3
-        if (this.currentStep() === 3) {
-            const hasErrors =
-                this.hasValidationErrors(controls.username, 'username') ||
-                this.hasValidationErrors(controls.password, 'password');
-
-            if (hasErrors) {
-                return;
-            }
-
-            const user: IUser = {
-                email: this.form.value.email,
-                username: this.form.value.username,
-                password: this.form.value.password,
-                type: this.config.type
-            }
-
-            this.signupAuthService.completeOtp(user).subscribe({
-                next: () => {
-                    const url: string = this.config.type === 'customer' ? 'login' : `${this.config.type}/login`;
-                    this.router.navigate([url]);
-                },
-                error: (err) => console.log(err)
-            });
         }
     }
 
-    // Step: 2
     verifyOtp(code: string) {
-        this.signupAuthService.verifyOtp(this.email, code).subscribe({
-            error: (err) => {
-                if (err.error.statusCode === 400) {
-                    this.alert.showToast(err.error.message, 'error');
-                } else {
-                    console.log(err);
-                }
+        this.signupAuthService.verifyOtp(this.user.email, code).subscribe({
+            next: () => this.finalizeSignup(this.user),
+            error: (err) => this.notyf.error(err),
+        });
+    }
+
+    finalizeSignup(user: IUser) {
+        this.signupAuthService.completeOtp(user).subscribe({
+            next: () => {
+                const url: string = this.user.type === 'customer' ? 'login' : `${this.user.type}/login`;
+                this.router.navigate([url]);
             },
+            error: (err) => this.notyf.error(err)
         });
     }
 
     resendOtp() {
-        this.signupAuthService.initiateSignup(this.email, this.config.type).subscribe({
-            next: () => this.alert.showToast('Otp resented', 'success'),
-            error: (err) => console.error(err.error)
-        });
+        this.initializeSignup(this.user.email, this.user.type);
     }
 
-    private errorMessages: { [key: string]: { [key: string]: string } } = {
-        email: {
-            required: 'Email is required',
-            email: 'Invalid email',
-        },
-        username: {
-            required: 'Username is required',
-            minLength: 'Username must be at least 3 characters',
-        },
-        password: {
-            required: 'Password is required',
-            pattern: 'Password does not meet the required format',
-        },
-    };
-
-    private hasValidationErrors(control: AbstractControl | null, fieldName: string): boolean {
-        if (control?.errors) {
-            Object.keys(control.errors).forEach((key) => {
-                if (this.errorMessages[fieldName]?.[key]) {
-                    this.alert.showToast(this.errorMessages[fieldName][key], 'error');
-                }
-            });
-            return true;
-        }
-        return false;
+    private initializeSignup(email: string, type: UserType) {
+        this.signupAuthService.initiateSignup(email, type).subscribe({
+            next: () => this.isValidForm = true,
+            error: (err) => this.notyf.error(err)
+        })
     }
 }

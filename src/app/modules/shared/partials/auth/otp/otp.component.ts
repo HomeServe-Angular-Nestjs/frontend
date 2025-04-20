@@ -30,25 +30,33 @@ export class OtpComponent implements OnDestroy, OnInit {
     }
 
 
-    onOtpInput(event: any, index: number) {
-        const input = event.target;
+    onOtpInput(event: Event, index: number): void {
+        const input = event.target as HTMLInputElement;
         const value = input.value;
 
-
-        // Update the digit in our array
-        this.otpDigits[index] = value;
-
-        // Handle focus changes for next input
-        if (value && index < this.otpDigits.length - 1) {
-            const nextInput = document.querySelectorAll('input[type=text]')[index + 1] as HTMLInputElement;
-            nextInput?.focus();
+        if (!/^\d?$/.test(value)) {
+            // Only allow single digit
+            input.value = '';
+            this.otpDigits[index] = '';
             return;
         }
 
-        // Handle focus changes for backspaced input
-        if (event.inputType === 'deleteContentBackward' && index > 0) {
-            const prevInput = document.querySelectorAll('input[type=text]')[index - 1] as HTMLInputElement;
-            prevInput?.focus();
+        this.otpDigits[index] = value;
+
+        if (value && index < this.otpDigits.length - 1) {
+            const nextInput = document.querySelectorAll('input[type=text]')[index + 1] as HTMLInputElement;
+            nextInput?.focus();
+        }
+    }
+
+    onOtpKeydown(event: KeyboardEvent, index: number): void {
+        const input = event.target as HTMLInputElement;
+
+        if (event.key === 'Backspace') {
+            if (!input.value && index > 0) {
+                const prevInput = document.querySelectorAll('input[type=text]')[index - 1] as HTMLInputElement;
+                prevInput?.focus();
+            }
         }
     }
 

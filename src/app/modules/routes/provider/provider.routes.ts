@@ -3,6 +3,7 @@ import { AuthGuard } from "../../../core/guards/auth.guard";
 import { ProviderLayoutComponent } from "../../pages/provider/layout/provider-layout.component";
 import { ProfilesLayoutComponent } from "../../pages/provider/profiles/profiles-layout.component";
 import { ProviderProfileOverviewLayoutComponent } from "../../shared/components/provider/profile-overview/layout/provider-profile-overview-layout.component";
+import { ProviderKycComponent } from "../../shared/components/provider/kyc/provider-kyc.component";
 
 export const providerRoutes: Routes = [
     {
@@ -53,6 +54,10 @@ export const providerRoutes: Routes = [
                     },
                 ],
                 canActivate: [AuthGuard],
+            },
+            {
+                path: 'kyc',
+                component: ProviderKycComponent
             }
         ],
     },

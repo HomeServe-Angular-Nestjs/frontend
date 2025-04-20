@@ -20,9 +20,9 @@ export const toTitleCase = (field: string): string => {
         .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-export const getValidationMessage = (control: AbstractControl, fieldName: string) => {
-
-    if (control && control.errors) {
+export const getValidationMessage = (control: AbstractControl | null, fieldName: string) => {
+    if (!control) return 'provider correct credentials';
+    if (control.errors) {
         for (const errorKey in control.errors) {
             const template = FORM_VALIDATION_ERROR_MESSAGES[errorKey];
 
@@ -41,5 +41,5 @@ export const getValidationMessage = (control: AbstractControl, fieldName: string
             }
         }
     }
-    return null
+    return null;
 }

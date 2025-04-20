@@ -24,7 +24,7 @@ export const navigationAfterLogin = (userType: UserType): string => {
             url = 'homepage';
             break;
         case 'provider':
-            url = 'provider/homepage';
+            url = 'provider/dashboard';
             break;
         case 'admin':
             url = 'admin/dashboard'
