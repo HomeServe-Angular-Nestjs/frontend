@@ -49,25 +49,7 @@ export const userEffects = {
         );
     }, { functional: true }),
 
-    fetchOneProvider$: createEffect(() => {
-        const actions$ = inject(Actions);
-        const providerService = inject(ProviderService);
-
-        return actions$.pipe(
-            ofType(providerActions.fetchOneProvider),
-            switchMap(() =>
-                providerService.getOneProvider().pipe(
-                    map((provider) => providerActions.fetchOneProviderSuccess({ provider })),
-                    catchError((error) => {
-                        console.log('[Fetch Users Effect] API Error: ', error);
-                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
-                        return of(providerActions.fetchOneProviderFailure({ error: errorMessage }));
-                    })
-                )
-            )
-        );
-
-    }, { functional: true }),
+   
 
     updateCustomer$: createEffect(() => {
         const actions$ = inject(Actions);

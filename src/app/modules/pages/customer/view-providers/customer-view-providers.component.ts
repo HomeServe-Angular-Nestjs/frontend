@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { userActions } from '../../../../store/actions/user.actions';
+import { userActions } from '../../../../store/users/user.actions';
 import { Observable } from 'rxjs';
-import { IProvider } from '../../../../store/models/user.model';
-import { selectAllProviders, selectProviderEntities } from '../../../../store/selectors/user.selector';
+import { IProvider } from '../../../../core/models/user.model';
+import { selectAllProviderEntities, selectProvidersEntities } from '../../../../store/users/user.selector';
 import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 
 interface Provider {
@@ -36,7 +36,7 @@ export class CustomerViewProvidersComponent {
 
   constructor(private store: Store) {
     this.store.dispatch(userActions.fetchProviders());
-    this.providers$ = this.store.select(selectAllProviders);
+    this.providers$ = this.store.select(selectAllProviderEntities);
   }
 
   searchQuery = '';

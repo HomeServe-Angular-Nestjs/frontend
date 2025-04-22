@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { LOGIN_CONFIGS } from "../../../config/login.config";
 import { Store } from "@ngrx/store";
-import { authActions } from "../../../../store/actions/auth.actions";
+import { authActions } from "../../../../store/auth/auth.actions";
 import { LoginBaseComponent } from "../../../shared/components/auth/login-base/login-base.component";
 
 @Component({

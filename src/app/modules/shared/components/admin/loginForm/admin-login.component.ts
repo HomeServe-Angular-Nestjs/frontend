@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { REGEXP_ENV } from '../../../../../environments/regex.environments';
 import { MESSAGES_ENV } from '../../../../../environments/messages.environments';
 import { IUser } from '../../../models/user.model';
-import { authActions } from '../../../../../store/actions/auth.actions';
+import { authActions } from '../../../../../store/auth/auth.actions';
 
 @Component({
   selector: 'app-admin-login',

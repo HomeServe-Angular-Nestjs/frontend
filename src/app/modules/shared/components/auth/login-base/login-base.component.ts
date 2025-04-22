@@ -9,7 +9,7 @@ import { MESSAGES_ENV } from "../../../../../environments/messages.environments"
 import { IUser, UserType } from "../../../models/user.model";
 import { NotificationService } from "../../../../../core/services/public/notification.service";
 import { API_ENV } from "../../../../../environments/api.environments";
-import { authActions } from "../../../../../store/actions/auth.actions";
+import { authActions } from "../../../../../store/auth/auth.actions";
 import { EmailInputComponent } from "../../../partials/auth/email-input/email-input.component";
 
 @Component({

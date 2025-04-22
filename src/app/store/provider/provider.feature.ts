@@ -23,13 +23,33 @@ export const providerFeature = createFeature({
         on(providerActions.fetchOneProviderSuccess, (state, { provider }) => ({
             ...state,
             provider,
-            loading: false
+            loading: false,
+            error: null
         })),
 
         on(providerActions.fetchOneProviderFailure, (state, { error }) => ({
             ...state,
             loading: false,
             error
-        }))
+        })),
+
+        on(providerActions.updateProvider, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        on(providerActions.updateProviderSuccess, (state, { updatedProviderData }) => ({
+            ...state,
+            provider: updatedProviderData,
+            error: null,
+            loading: false
+        })),
+
+        on(providerActions.updateProviderFailure, (state, { error }) => ({
+            ...state,
+            error,
+            loading: false
+        })),
     )
 })

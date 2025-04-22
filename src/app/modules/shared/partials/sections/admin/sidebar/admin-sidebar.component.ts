@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { LoginAuthService } from '../../../../../../core/services/login-auth.service';
-import { AuthState } from '../../../../../../store/models/auth.model';
-import { authActions } from '../../../../../../store/actions/auth.actions';
+import { AuthState } from '../../../../../../core/models/auth.model';
+import { authActions } from '../../../../../../store/auth/auth.actions';
 import { UserType } from '../../../../models/user.model';
 import { loginNavigation } from '../../../../../../core/utils/navigation.utils';
 

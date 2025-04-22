@@ -1,100 +1,195 @@
-<div class="p-8">
-    <!-- Profile Summary Card -->
-    <div class="bg-white rounded-xl shadow-md border-0 p-8 max-w-4xl">
-        <div class="flex items-start gap-8">
-            <!-- Left: Profile Picture Section -->
-            <div class="relative group">
-                <div class="w-40 h-40 rounded-xl overflow-hidden ring-4 ring-gray-50">
-                    <img src="/assets/profile.jpg" alt="John Doe" class="w-full h-full object-cover" />
-                </div>
-                <!-- <button
-                    class="absolute inset-0 bg-black bg-opacity-50 text-white opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center rounded-xl text-sm font-medium"
-                    aria-label="Change profile picture">
-                    <i class="fas fa-camera mr-2"></i>
-                    Update Photo
-                </button> -->
-            </div>
+<div class="p-8 bg-white min-h-screen">
+    <ng-container *ngIf="provider$ | async as provider">
+        <!-- Profile Summary Card -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 max-w-5xl mx-auto">
+            <div class="flex flex-col md:flex-row items-start gap-8">
+                <!-- Left: Profile Picture Section -->
+                <div class="w-full md:w-auto">
+                    <div class="relative group">
+                        <div class="w-40 h-40 rounded-xl overflow-hidden ring-4 ring-white shadow-md">
+                            <img [src]="provider.avatar || ''" alt="photo" class="w-full h-full object-cover"
+                                onerror="this.src='assets/images/default-avatar.png'" />
+                        </div>
+                    </div>
 
-            <!-- Right: Profile Details -->
-            <div class="flex-1 space-y-6">
-                <!-- Header Section -->
-                <div class="flex justify-between items-start">
-                    <div class="space-y-1">
-                        <h2 class="text-2xl font-bold text-gray-900">John Doe</h2>
-                        <div class="flex items-center gap-3">
-                            <span class="text-[#16A34A] font-semibold">Certified Electrician</span>
-                            <span class="text-gray-300">|</span>
-                            <div class="flex items-center">
-                                <div class="flex items-center text-yellow-400">
-                                    <i class="fas fa-star"></i>
-                                    <span class="ml-1.5 font-bold">4.8</span>
+                    <!-- Mobile-only action buttons -->
+                    <div class="mt-4 flex md:hidden justify-between space-x-2">
+                        <button (click)="edit()"
+                            class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#16A34A] text-white hover:bg-green-700 transition-colors duration-200 font-medium text-sm">
+                            <i class="fas fa-pen text-xs mr-2"></i>
+                            Edit
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Profile Details -->
+                <div class="flex-1 w-full space-y-6">
+                    <!-- Header Section -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-3">
+                                <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
+                                    {{provider.fullname || provider.username}}
+                                </h2>
+                                <span *ngIf="true"
+                                    class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
+                                    <i class="fas fa-crown text-xs mr-1"></i> PRO
+                                </span>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                <span class="text-[#16A34A] font-semibold flex items-center">
+                                    <i class="fas fa-briefcase mr-1.5 text-sm"></i>
+                                    {{provider.profession || 'Professional'}}
+                                </span>
+
+                                <span class="text-gray-300 hidden sm:inline">|</span>
+
+                                <div class="flex items-center">
+                                    <div class="flex items-center text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <span class="ml-1.5 font-bold text-gray-800">4.8</span>
+                                    </div>
+                                    <a class="ml-2 text-gray-500 hover:text-gray-700 text-sm underline cursor-pointer">
+                                        (120 reviews)
+                                    </a>
                                 </div>
-                                <a href="#reviews" class="ml-2 text-gray-500 hover:text-gray-700 text-sm">(120
-                                    reviews)</a>
+
+                                <span class="text-gray-300 hidden sm:inline">|</span>
+
+                                <span class="text-gray-500 text-sm flex items-center">
+                                    <i class="fas fa-user-clock mr-1.5"></i>
+                                    Member since {{provider.createdAt | date}}
+                                </span>
                             </div>
                         </div>
-                    </div>
-                    <button (click)="edit()"
-                        class="inline-flex items-center px-4 py-2 rounded-lg bg-[#16A34A] text-white hover:bg-green-700 transition-colors duration-200 font-medium text-sm">
-                        <i class="fas fa-pen text-xs mr-2"></i>
-                        Edit Profile
-                    </button>
-                </div>
 
-                <!-- Divider -->
-                <div class="border-t border-gray-100"></div>
-
-                <!-- Key Information Grid -->
-                <div class="grid grid-cols-2 gap-6">
-                    <!-- Location -->
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-map-marker-alt text-[#16A34A]"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500 mb-1">Location & Coverage</p>
-                            <p class="text-gray-900 font-medium">San Francisco, CA</p>
-                            <p class="text-sm text-gray-500 mt-0.5">Service radius: 25 miles</p>
+                        <!-- Desktop action buttons -->
+                        <div class="hidden md:flex items-center gap-3">
+                            <button (click)="edit()"
+                                class="inline-flex items-center px-4 py-2.5 rounded-lg bg-[#16A34A] text-white hover:bg-green-700 transition-colors duration-200 font-medium text-sm shadow-sm">
+                                <i class="fas fa-pen text-xs mr-2"></i>
+                                Edit Profile
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Experience -->
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-briefcase text-[#16A34A]"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500 mb-1">Professional Experience</p>
-                            <p class="text-gray-900 font-medium">5+ years</p>
-                            <p class="text-sm text-gray-500 mt-0.5">Licensed & Certified</p>
-                        </div>
-                    </div>
+                    <!-- Divider -->
+                    <div class="border-t border-gray-200 my-4"></div>
 
-                    <!-- Availability -->
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-clock text-[#16A34A]"></i>
+                    <!-- Key Information Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Location -->
+                        <div class="flex items-start gap-4 p-3 rounded-lg transition-colors">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center shadow-inner">
+                                <i class="fas fa-map-marker-alt text-[#16A34A] text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-500 mb-1">Location & Coverage</p>
+                                <p class="text-gray-900 font-medium flex items-center">
+                                    <i class="fas fa-city text-gray-400 mr-2 text-sm"></i>
+                                    {{ provider?.location ? provider.location : 'Not specified' }}
+                                </p>
+                                <p class="text-sm text-gray-500 mt-2 flex items-center">
+                                    <i class="fas fa-route text-gray-400 mr-2 text-sm"></i>
+                                    {{ provider?.serviceRadius !== undefined && provider?.serviceRadius !== null
+                                    ? 'Covers ' + provider.serviceRadius + ' mile radius'
+                                    : 'Service area not specified' }}
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500 mb-1">Working Hours</p>
-                            <p class="text-gray-900 font-medium">Mon - Fri, 8:00 AM - 6:00 PM</p>
-                            <p class="text-sm text-gray-500 mt-0.5">Available for emergencies</p>
-                        </div>
-                    </div>
 
-                    <!-- Performance -->
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-chart-line text-[#16A34A]"></i>
+                        <!-- Experience -->
+                        <div class="flex items-start gap-4 p-3 rounded-lg transition-colors">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center shadow-inner">
+                                <i class="fas fa-briefcase text-[#16A34A] text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-500 mb-1">Professional Experience</p>
+                                <p class="text-gray-900 font-medium flex items-center">
+                                    <i class="fas fa-history text-gray-400 mr-2 text-sm"></i>
+                                    {{ provider?.experience !== undefined && provider?.experience !== null ?
+                                    provider.experience + '+ years experience' : 'Experience not specified' }}
+                                </p>
+                                <p class="text-sm mt-2 flex items-center" [class.text-green-600]="provider?.isCertified"
+                                    [class.text-gray-500]="!provider?.isCertified">
+                                    <i class="fas" [class.fa-certificate]="provider?.isCertified"
+                                        [class.fa-times-circle]="!provider?.isCertified" class="mr-2 text-sm"></i>
+                                    {{ provider?.isCertified ? 'Licensed & Certified' : 'Not certified' }}
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500 mb-1">Track Record</p>
-                            <p class="text-gray-900 font-medium">250+ Jobs Completed</p>
-                            <p class="text-sm text-gray-500 mt-0.5">98% Satisfaction Rate</p>
+
+                        <!-- Availability -->
+                        <div class="flex items-start gap-4 p-3 rounded-lg transition-colors">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center shadow-inner">
+                                <i class="fas fa-clock text-[#16A34A] text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-500 mb-1">Availability</p>
+                                <ng-container
+                                    *ngIf="provider?.availability?.day?.from && provider?.availability?.day?.to && provider?.availability?.time?.from && provider?.availability?.time?.to; else notSet">
+                                    <p class="text-gray-900 font-medium flex items-center">
+                                        <i class="far fa-calendar-alt text-gray-400 mr-2 text-sm"></i>
+                                        {{ provider.availability.day.from }} - {{ provider.availability.day.to }}
+                                    </p>
+                                    <p class="text-gray-900 font-medium flex items-center mt-1">
+                                        <i class="far fa-clock text-gray-400 mr-2 text-sm"></i>
+                                        {{ provider.availability.time.from }} - {{ provider.availability.time.to }}
+                                    </p>
+                                </ng-container>
+                                <ng-template #notSet>
+                                    <p class="text-gray-500 italic">Availability not set</p>
+                                </ng-template>
+
+                                <p class="text-xs text-gray-400 mt-2">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Response time: Unknown
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Performance -->
+                        <div class="flex items-start gap-4 p-3 rounded-lg transition-colors">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center shadow-inner">
+                                <i class="fas fa-chart-line text-[#16A34A] text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-500 mb-1">Performance</p>
+
+                                <div class="grid grid-cols-2 gap-4 mt-2">
+                                    <!-- <div>
+                                        <p class="text-xs text-gray-500">Jobs Completed</p>
+                                        <p class="text-lg font-bold text-gray-800">
+                                            10
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Satisfaction</p>
+                                        <div class="flex items-center">
+                                            <div class="w-16 bg-gray-200 rounded-full h-1.5 mr-2">
+                                                <div class="bg-green-500 h-1.5 rounded-full">67%</div>
+                                            </div>
+                                            <span class=" text-sm font-medium text-gray-700">
+                                                40%
+                                            </span>
+                                        </div>
+                                    </div> -->
+                                </div>
+
+                                <p class="text-xs text-gray-400 mt-3">
+                                    <i class="fas fa-exclamation-triangle mr-1 text-yellow-500"></i>
+                                    Activity data not available
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </ng-container>
 </div>

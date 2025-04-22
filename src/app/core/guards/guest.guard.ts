@@ -4,7 +4,7 @@ import { inject } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { combineLatest, map, Observable, take } from "rxjs";
-import { selectAuthUserType, selectCheckStatus } from "../../store/selectors/auth.selector";
+import { selectAuthUserType, selectCheckStatus } from "../../store/auth/auth.selector";
 import {  navigationAfterLogin } from "../utils/navigation.utils";
 
 export const GuestGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> => {

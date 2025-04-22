@@ -3,7 +3,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as authSelector from '../../store/selectors/auth.selector';
+import * as authSelector from '../../store/auth/auth.selector';
 import { combineLatest, map, Observable, take } from 'rxjs';
 import { NotificationService } from '../services/public/notification.service';
 

@@ -3,7 +3,7 @@ import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { catchError, Observable, throwError } from "rxjs";
 import { NotificationService } from "./public/notification.service";
-import { IOfferedService } from "../../store/models/offeredService.model";
+import { IOfferedService } from "../models/offeredService.model";
 
 @Injectable({ providedIn: 'root' })
 export class OfferedServicesService {

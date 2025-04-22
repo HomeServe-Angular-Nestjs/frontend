@@ -4,8 +4,13 @@ import { ProviderLayoutComponent } from "../../pages/provider/layout/provider-la
 import { ProfilesLayoutComponent } from "../../pages/provider/profiles/profiles-layout.component";
 import { ProviderProfileOverviewLayoutComponent } from "../../shared/components/provider/profile-overview/layout/provider-profile-overview-layout.component";
 import { ProviderKycComponent } from "../../shared/components/provider/kyc/provider-kyc.component";
+import { ProviderResolver } from "../../../core/resolver/provider.resolver";
 
 export const providerRoutes: Routes = [
+    {
+        path: 'kyc',
+        component: ProviderKycComponent
+    },
     {
         path: 'provider',
         component: ProviderLayoutComponent,
@@ -20,6 +25,9 @@ export const providerRoutes: Routes = [
             {
                 path: 'profiles',
                 component: ProfilesLayoutComponent,
+                resolve: {
+                    provider: ProviderResolver
+                },
                 children: [
                     {
                         path: '',
@@ -55,10 +63,6 @@ export const providerRoutes: Routes = [
                 ],
                 canActivate: [AuthGuard],
             },
-            {
-                path: 'kyc',
-                component: ProviderKycComponent
-            }
         ],
     },
 ] 

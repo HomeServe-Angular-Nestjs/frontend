@@ -5,15 +5,17 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
-import { authFeature } from './store/feature/auth.feature';
-import { authEffects } from './store/effects/auth.effects';
-import { metaReducers } from './store/reducers/meta.reducer';
+import { authFeature } from './store/auth/auth.feature';
+import { authEffects } from './store/auth/auth.effects';
+import { metaReducers } from './store/auth/meta.reducer';
 import { provideAnimations } from '@angular/platform-browser/animations'
-import { userFeature } from './store/feature/user.feature';
-import { userEffects } from './store/effects/user.effect';
+import { userFeature } from './store/users/user.feature';
+import { userEffects } from './store/users/user.effect';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import { offeredServiceFeature } from './store/feature/offeredServices.feature';
-import { offeredServiceEffects } from './store/effects/offeredServices.effects';
+import { offeredServiceFeature } from './store/offered-services/offeredServices.feature';
+import { offeredServiceEffects } from './store/offered-services/offeredServices.effects';
+import { providerFeature } from './store/provider/provider.feature';
+import { providerEffects } from './store/provider/provider.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,8 +27,9 @@ export const appConfig: ApplicationConfig = {
       [authFeature.name]: authFeature.reducer,
       [userFeature.name]: userFeature.reducer,
       [offeredServiceFeature.name]: offeredServiceFeature.reducer,
+      [providerFeature.name]: providerFeature.reducer
     }, { metaReducers }),
-    provideEffects(authEffects, userEffects, offeredServiceEffects),
+    provideEffects(authEffects, userEffects, offeredServiceEffects, providerEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: true, autoPause: true })
   ]
 };

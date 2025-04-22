@@ -8,5 +8,6 @@ import { RouterOutlet } from '@angular/router';
   imports: [CommonModule, RouterOutlet],
   templateUrl: './provider-profile-overview-layout.component.html',
 })
-export class ProviderProfileOverviewLayoutComponent { }
+export class ProviderProfileOverviewLayoutComponent {
+}
 

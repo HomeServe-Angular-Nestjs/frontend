@@ -3,7 +3,7 @@ import { inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { catchError, first, mergeMap, of, throwError } from "rxjs";
 import { Store } from "@ngrx/store";
-import { selectAuthUserType } from "../../store/selectors/auth.selector";
+import { selectAuthUserType } from "../../store/auth/auth.selector";
 import { loginNavigation } from "../utils/navigation.utils";
 import { UserType } from "../../modules/shared/models/user.model";
 import { NotificationService } from "../services/public/notification.service";

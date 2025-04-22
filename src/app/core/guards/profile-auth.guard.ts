@@ -2,8 +2,8 @@ import { inject } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { filter, first, of, switchMap, tap } from "rxjs";
-import { authActions } from "../../store/actions/auth.actions";
-import { selectAuthUser } from "../../store/selectors/auth.selector";
+import { authActions } from "../../store/auth/auth.actions";
+import { selectAuthUser } from "../../store/auth/auth.selector";
 
 export const ProfileAuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const store = inject(Store);
@@ -12,7 +12,6 @@ export const ProfileAuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot, s
     const email: string = route.queryParams['email'];
 
     if (isLoggedIn === 'true' && email !== '') {
-        console.log('got in profile guard');
         store.dispatch(authActions.loginSuccess({ email }));
 
         // wait for the store to be updated.

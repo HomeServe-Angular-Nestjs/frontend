@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { IOfferedService } from "../../../../../../store/models/offeredService.model";
+import { IOfferedService } from "../../../../../../core/models/offeredService.model";
 import { CommonModule } from "@angular/common";
 
 @Component({

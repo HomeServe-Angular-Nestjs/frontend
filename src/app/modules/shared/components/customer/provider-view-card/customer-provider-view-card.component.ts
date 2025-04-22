@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IProvider } from '../../../../../store/models/user.model';
+import { IProvider } from '../../../../../core/models/user.model';
 
 @Component({
   selector: 'app-customer-provider-view-card',

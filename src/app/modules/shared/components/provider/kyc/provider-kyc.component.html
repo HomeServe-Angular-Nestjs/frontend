@@ -1,0 +1,496 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Main Card -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <!-- Header with Logo -->
+            <div class="bg-indigo-50 px-8 py-6 border-b border-indigo-100">
+                <div class="flex justify-center mb-2">
+                    <div class="flex items-center">
+                        <svg class="h-8 w-8 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-indigo-800">SecureKYC</span>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">Identity Verification</h1>
+                    <p class="text-gray-600 max-w-lg mx-auto">
+                        To comply with financial regulations and protect your account, we need to verify your identity.
+                        This information is encrypted and stored securely.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <div class="flex items-center">
+                    <div class="flex-1 bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 25%"></div>
+                    </div>
+                    <span class="ml-4 text-sm font-medium text-gray-700">Step 1 of 4</span>
+                </div>
+            </div>
+
+            <!-- Form Content Would Go Here -->
+            <div class="p-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Personal Information</h2>
+                <ng-container *ngIf="currentStep!==1">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First
+                                Name</label>
+                            <input type="text" id="firstName" name="firstName" [(ngModel)]="kycData.firstName" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" [(ngModel)]="kycData.lastName" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="dob" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                            <input type="date" id="dob" name="dob" [(ngModel)]="kycData.dob" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="nationality"
+                                class="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
+                            <select id="nationality" name="nationality" [(ngModel)]="kycData.nationality" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="" disabled selected>Select your country</option>
+                                <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="currentStep===2">
+
+                </ng-container>
+
+                <div class="mt-8 flex justify-end">
+                    <button type="submit" class="px-6  text-black rounded-lg font-medium">
+                        Next ->
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Security Footer -->
+            <div class="bg-gray-50 px-8 py-4 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
+                    <p class="text-xs text-gray-500 mb-2 sm:mb-0">
+                        <svg class="h-4 w-4 inline-block mr-1 -mt-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Your data is encrypted and never shared with third parties
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="text-xs text-gray-500 hover:text-gray-700">Privacy Policy</a>
+                        <a href="#" class="text-xs text-gray-500 hover:text-gray-700">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Complete Your Verification</h1>
+            <p class="text-lg text-gray-600">We need to verify your identity to comply with regulations and ensure
+                secure transactions.</p>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="mb-10">
+            <div class="flex justify-between relative">
+                <!-- Progress line -->
+                <div class="absolute top-1/2 h-1 bg-gray-200 w-full -z-10"></div>
+                <div [style.width.%]="(currentStep / steps.length) * 100"
+                    class="absolute top-1/2 h-1 bg-indigo-600 transition-all duration-300 -z-10"></div>
+
+                <!-- Steps -->
+                <div *ngFor="let step of steps; let i = index" class="flex flex-col items-center">
+                    <div [ngClass]="{
+              'bg-indigo-600 text-white': currentStep > i || (currentStep === i && !formSubmitted),
+              'bg-white border-2 border-indigo-600 text-indigo-600': currentStep === i && !formSubmitted,
+              'bg-white border-2 border-gray-300 text-gray-400': currentStep < i
+            }" class="w-10 h-10 rounded-full flex items-center justify-center font-medium">
+                        {{ i + 1 }}
+                    </div>
+                    <span [ngClass]="{
+              'text-indigo-600 font-medium': currentStep >= i,
+              'text-gray-500': currentStep < i
+            }" class="mt-2 text-sm">{{ step.title }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <!-- Personal Information (Step 1) -->
+            <form *ngIf="currentStep === 1" (ngSubmit)="nextStep()" class="p-6 sm:p-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Personal Information</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <input type="text" id="firstName" name="firstName" [(ngModel)]="kycData.firstName" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" [(ngModel)]="kycData.lastName" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label for="dob" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                        <input type="date" id="dob" name="dob" [(ngModel)]="kycData.dob" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label for="nationality"
+                            class="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
+                        <select id="nationality" name="nationality" [(ngModel)]="kycData.nationality" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" disabled selected>Select your country</option>
+                            <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button type="submit"
+                        class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                        Continue
+                    </button>
+                </div>
+            </form>
+
+            <!-- ID Verification (Step 2) -->
+            <form *ngIf="currentStep === 2" (ngSubmit)="nextStep()" class="p-6 sm:p-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Identity Verification</h2>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ID Document Type</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <label *ngFor="let doc of idDocuments" [ngClass]="{
+                         'border-indigo-500 ring-2 ring-indigo-500': kycData.idType === doc.value,
+                         'border-gray-300': kycData.idType !== doc.value
+                       }" class="border rounded-lg p-4 cursor-pointer">
+                                <input type="radio" name="idType" [(ngModel)]="kycData.idType" [value]="doc.value"
+                                    class="sr-only">
+                                <div class="flex items-center">
+                                    <div [ngClass]="{
+                      'bg-indigo-100': kycData.idType === doc.value,
+                      'bg-gray-100': kycData.idType !== doc.value
+                    }" class="p-2 rounded-lg mr-3">
+                                        <img [src]="doc.icon" [alt]="doc.label" class="h-6 w-6">
+                                    </div>
+                                    <span class="text-sm font-medium">{{ doc.label }}</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div *ngIf="kycData.idType">
+                        <label for="idNumber" class="block text-sm font-medium text-gray-700 mb-1">ID Number</label>
+                        <input type="text" id="idNumber" name="idNumber" [(ngModel)]="kycData.idNumber" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Upload ID Document</label>
+                        <div
+                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="idDocument"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none">
+                                        <span>Upload a file</span>
+                                        <input id="idDocument" name="idDocument" type="file" class="sr-only"
+                                            (change)="handleIdUpload($event)">
+                                    </label>
+                                    <p class="pl-1">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, PDF up to 5MB</p>
+                            </div>
+                        </div>
+                        <div *ngIf="kycData.idDocument" class="mt-2 flex items-center text-sm text-gray-900">
+                            <svg class="flex-shrink-0 h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            {{ kycData.idDocument.name }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Selfie with ID Document</label>
+                        <div
+                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="selfie"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none">
+                                        <span>Upload a selfie</span>
+                                        <input id="selfie" name="selfie" type="file" accept="image/*" class="sr-only"
+                                            (change)="handleSelfieUpload($event)">
+                                    </label>
+                                    <p class="pl-1">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500">JPG, PNG up to 5MB</p>
+                            </div>
+                        </div>
+                        <div *ngIf="kycData.selfie" class="mt-2 flex items-center text-sm text-gray-900">
+                            <svg class="flex-shrink-0 h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            {{ kycData.selfie.name }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button type="button" (click)="prevStep()"
+                        class="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        Back
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                        Continue
+                    </button>
+                </div>
+            </form>
+
+            <!-- Address Verification (Step 3) -->
+            <form *ngIf="currentStep === 3" (ngSubmit)="nextStep()" class="p-6 sm:p-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Address Verification</h2>
+
+                <div class="space-y-6">
+                    <div>
+                        <label for="streetAddress" class="block text-sm font-medium text-gray-700 mb-1">Street
+                            Address</label>
+                        <input type="text" id="streetAddress" name="streetAddress" [(ngModel)]="kycData.streetAddress"
+                            required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                            <input type="text" id="city" name="city" [(ngModel)]="kycData.city" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="state"
+                                class="block text-sm font-medium text-gray-700 mb-1">State/Province</label>
+                            <input type="text" id="state" name="state" [(ngModel)]="kycData.state" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="postalCode" class="block text-sm font-medium text-gray-700 mb-1">Postal
+                                Code</label>
+                            <input type="text" id="postalCode" name="postalCode" [(ngModel)]="kycData.postalCode"
+                                required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                        <select id="country" name="country" [(ngModel)]="kycData.country" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" disabled selected>Select your country</option>
+                            <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Proof of Address Document</label>
+                        <div
+                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="addressProof"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none">
+                                        <span>Upload a file</span>
+                                        <input id="addressProof" name="addressProof" type="file" class="sr-only"
+                                            (change)="handleAddressProofUpload($event)">
+                                    </label>
+                                    <p class="pl-1">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500">Utility bill, bank statement, etc. (PDF, JPG, PNG up to
+                                    5MB)</p>
+                            </div>
+                        </div>
+                        <div *ngIf="kycData.addressProof" class="mt-2 flex items-center text-sm text-gray-900">
+                            <svg class="flex-shrink-0 h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            {{ kycData.addressProof.name }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button type="button" (click)="prevStep()"
+                        class="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        Back
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                        Continue
+                    </button>
+                </div>
+            </form>
+
+            <!-- Review and Submit (Step 4) -->
+            <div *ngIf="currentStep === 4" class="p-6 sm:p-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Review Your Information</h2>
+
+                <div class="space-y-6">
+                    <!-- Personal Info Review -->
+                    <div class="border-b border-gray-200 pb-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Full Name</p>
+                                <p class="font-medium">{{ kycData.firstName }} {{ kycData.lastName }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Date of Birth</p>
+                                <p class="font-medium">{{ kycData.dob | date }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Nationality</p>
+                                <p class="font-medium">{{ kycData.nationality }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ID Verification Review -->
+                    <div class="border-b border-gray-200 pb-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Identity Verification</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">ID Type</p>
+                                <p class="font-medium">{{ getDocumentTypeLabel(kycData.idType) }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">ID Number</p>
+                                <p class="font-medium">{{ kycData.idNumber }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">ID Document</p>
+                                <p class="font-medium">{{ kycData.idDocument?.name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Selfie with ID</p>
+                                <p class="font-medium">{{ kycData.selfie?.name }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address Review -->
+                    <div class="pb-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Address Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Street Address</p>
+                                <p class="font-medium">{{ kycData.streetAddress }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">City</p>
+                                <p class="font-medium">{{ kycData.city }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">State/Province</p>
+                                <p class="font-medium">{{ kycData.state }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Postal Code</p>
+                                <p class="font-medium">{{ kycData.postalCode }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Country</p>
+                                <p class="font-medium">{{ kycData.country }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Proof of Address</p>
+                                <p class="font-medium">{{ kycData.addressProof?.name }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consent -->
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="consent" name="consent" type="checkbox" [(ngModel)]="kycData.consent" required
+                                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3">
+                            <label for="consent" class="text-sm text-gray-700">
+                                I certify that all information provided is accurate and complete. I consent to the
+                                processing of my personal data for verification purposes.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button type="button" (click)="prevStep()"
+                        class="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        Back
+                    </button>
+                    <button type="button" (click)="submitKYC()" [disabled]="!kycData.consent"
+                        class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-70">
+                        Submit Verification
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div *ngIf="formSubmitted" class="p-6 sm:p-8 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                    <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Verification Submitted</h2>
+                <p class="text-gray-600 mb-6">Thank you for completing your KYC verification. We'll review your
+                    information and notify you once the verification is complete.</p>
+                <button type="button" (click)="closeForm()"
+                    class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                    Return to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { customerActions, userActions } from '../../../../../store/actions/user.actions';
+import { customerActions, userActions } from '../../../../../store/users/user.actions';
 import { BehaviorSubject, combineLatest, map, Observable, startWith } from 'rxjs';
-import { ICustomer, IProvider } from '../../../../../store/models/user.model';
-import { selectAllCustomers, selectAllProviders } from '../../../../../store/selectors/user.selector';
+import { ICustomer, IProvider } from '../../../../../core/models/user.model';
+import { selectAllCustomers, selectAllProviderEntities } from '../../../../../store/users/user.selector';
 import { createUserTable } from '../../../../../core/utils/generate-tables.utils';
-import { TableAction, TableRow } from '../../../../../store/models/table.model';
+import { TableAction, TableRow } from '../../../../../core/models/table.model';
 import { TableComponent } from '../../../partials/shared/tables/table.component';
 import { FiltersComponent } from '../../../partials/shared/filters/filters.component';
 
@@ -25,7 +25,7 @@ export class UserManagementComponent {
   }
 
   customers$: Observable<ICustomer[]> = this.store.select(selectAllCustomers).pipe(startWith([]));
-  providers$: Observable<IProvider[]> = this.store.select(selectAllProviders).pipe(startWith([]));
+  providers$: Observable<IProvider[]> = this.store.select(selectAllProviderEntities).pipe(startWith([]));
 
   vm$ = combineLatest([this.customers$, this.providers$]).pipe(
     map(([customers, providers]) => ({

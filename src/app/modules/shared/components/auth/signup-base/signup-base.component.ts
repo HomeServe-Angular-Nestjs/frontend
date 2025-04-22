@@ -49,7 +49,7 @@ export class SignupBaseComponent {
                 email: controls.email.value,
                 type: this.config.type,
                 password: controls.password.value,
-                username: controls.password.value
+                username: controls.username.value
             }
 
             this.initializeSignup(this.user.email, this.user.type);

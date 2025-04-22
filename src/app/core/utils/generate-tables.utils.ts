@@ -1,4 +1,4 @@
-import { ICustomer, IProvider } from "../../store/models/user.model";
+import { ICustomer, IProvider } from "../models/user.model";
 
 export const createUserTable = (users: (ICustomer | IProvider)[]) => {
     return {

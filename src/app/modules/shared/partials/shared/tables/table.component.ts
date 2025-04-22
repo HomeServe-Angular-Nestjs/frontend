@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableData } from '../../../../../store/models/table.model';
+import { TableData } from '../../../../../core/models/table.model';
 
 @Component({
   selector: 'app-table',

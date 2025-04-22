@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
-import { ICustomer, IProvider, UserUpdationType } from "../../store/models/user.model";
+import { ICustomer, IProvider, UserUpdationType } from "../models/user.model";
 import { forkJoin, Observable, tap } from "rxjs";
 import { UserType } from "../../modules/shared/models/user.model";
 

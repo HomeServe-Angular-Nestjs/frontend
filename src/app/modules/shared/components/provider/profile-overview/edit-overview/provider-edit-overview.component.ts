@@ -1,63 +1,159 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
+import { NotificationService } from '../../../../../../core/services/public/notification.service';
+import { Day, IProvider } from '../../../../../../core/models/user.model';
+import { ProviderService } from '../../../../../../core/services/provider.service';
+import { firstValueFrom, Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectProvider } from '../../../../../../store/provider/provider.selector';
+import { providerActions } from '../../../../../../store/provider/provider.action';
+
+export interface profile {
+  fullName: string,
+  profession: string,
+  avatar: string | File
+  location: string,
+  serviceRadius: number,
+  experience: number,
+  licensed: true,
+  workingDays: {
+    start: string,
+    end: string
+  },
+  workingHours: {
+    start: string,
+    end: string
+  },
+  emergencyAvailable: boolean,
+};
 
 @Component({
   selector: 'app-provider-edit-overview',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './provider-edit-overview.component.html',
 })
-export class ProviderEditOverviewComponent {
+export class ProviderEditOverviewComponent implements OnInit {
+  provider$!: Observable<IProvider | null>;
+
   private router = inject(Router);
+  private fb = inject(FormBuilder);
+  private notyf = inject(NotificationService);
+  private providerService = inject(ProviderService);
 
-  profileImage: string | ArrayBuffer | null = null;
-  daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  previewImage!: string;
+  emergency = false;
+  daysOfWeek: Day[] = ['Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'];
+  profileImage!: File;
+  provider!: IProvider | null;
 
-  profile = {
-    fullName: 'John Doe',
-    profession: 'Certified Electrician',
-    location: 'San Francisco, CA',
-    serviceRadius: 25,
-    experience: 5,
-    licensed: true,
-    workingDays: {
-      start: 'Mon',
-      end: 'Fri'
-    },
-    workingHours: {
-      start: '08:00',
-      end: '18:00'
-    },
-    emergencyAvailable: true,
-    jobsCompleted: 250,
-    satisfactionRate: 98
-  };
+  profileForm: FormGroup = this.fb.group({
+    fullname: ['', Validators.required],
+    profession: ['', Validators.required],
+    experience: ['', [Validators.required, Validators.min(0), Validators.max(50)]],
+    location: ['', Validators.required],
+    serviceRadius: ['', [Validators.min(1), Validators.max(100)]],
+    workingDaysStart: ['', Validators.required],
+    workingDaysEnd: ['', Validators.required],
+    workingHoursStart: ['', Validators.required],
+    workingHoursEnd: ['', Validators.required],
+  });
 
-  originalProfile: any;
+  constructor(private store: Store) {
+    this.provider$ = this.store.select(selectProvider);
+  }
 
-  ngOnInit() {
-    // Create a deep copy of the original profile for cancel functionality
-    this.originalProfile = JSON.parse(JSON.stringify(this.profile));
+  async ngOnInit() {
+    this.provider = await firstValueFrom(this.provider$);
+
+    if (this.provider) {
+      this.profileForm.patchValue({
+        fullname: this.provider.fullname,
+        profession: this.provider.profession,
+        experience: this.provider.experience,
+        location: this.provider.location,
+        serviceRadius: this.provider.serviceRadius,
+        workingDaysStart: this.provider.availability?.day?.from,
+        workingDaysEnd: this.provider.availability?.day?.to,
+        workingHoursStart: this.provider.availability?.time?.from,
+        workingHoursEnd: this.provider.availability?.time?.to,
+      });
+
+      console.log(this.provider)
+    }
   }
 
   handleImageUpload(event: any) {
     const file = event.target.files[0];
     if (file) {
+      this.profileImage = file;
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.profileImage = e.target?.result as string;
-      };
+        this.previewImage = e.target?.result as string;
+      }
       reader.readAsDataURL(file);
     }
   }
 
   saveProfile() {
-    // Implement save logic here
-    console.log('Profile saved:', this.profile);
-    // In a real app, you would call a service to save the data
-    this.originalProfile = JSON.parse(JSON.stringify(this.profile));
+    const controls = {
+      fullname: this.profileForm.get('fullname'),
+      profession: this.profileForm.get('profession'),
+      experience: this.profileForm.get('experience'),
+      location: this.profileForm.get('location'),
+      serviceRadius: this.profileForm.get('serviceRadius'),
+      workingDaysStart: this.profileForm.get('workingDaysStart'),
+      workingDaysEnd: this.profileForm.get('workingDaysEnd'),
+      workingHoursStart: this.profileForm.get('workingHoursStart'),
+      workingHoursEnd: this.profileForm.get('workingHoursEnd'),
+    };
+
+    if (this.profileForm.valid) {
+      const provider: Partial<IProvider> = {
+        fullname: controls.fullname?.value,
+        profession: controls.profession?.value,
+        experience: controls.experience?.value,
+        serviceRadius: controls.serviceRadius?.value,
+        availability: {
+          day: {
+            from: controls.workingDaysStart?.value,
+            to: controls.workingDaysEnd?.value
+          },
+          time: {
+            from: controls.workingHoursStart?.value,
+            to: controls.workingHoursEnd?.value
+          }
+        }
+      }
+
+      const formData = new FormData();
+
+      formData.append('providerData', JSON.stringify(provider));
+      formData.append('providerAvatar', this.profileImage);
+
+      this.store.dispatch(providerActions.updateProvider({ updateProviderData: formData }));
+
+      // this.providerService.updateProviderData(formData).subscribe({
+      //   next: () => {
+      //     this.notyf.success('Profile updated Successfully');
+      //     this.router.navigate(['provider', 'profiles', 'overview']);
+      //   },
+      //   error: (err) => this.notyf.error(err)
+      // });
+
+    } else {
+      this.profileForm.markAllAsTouched();
+      for (const [key, control] of Object.entries(controls)) {
+        const message = getValidationMessage(control, key);
+        if (message) {
+          this.notyf.error(message);
+          return;
+        }
+      }
+    }
   }
 
   cancelEdit() {
