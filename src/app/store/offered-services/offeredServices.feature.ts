@@ -67,5 +67,36 @@ export const offeredServiceFeature = createFeature({
             error,
             loading: false
         })),
+
+        on(offeredServiceActions.updateSubService, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        on(offeredServiceActions.updateSubServiceSuccess, (state, { subService, id }) => {
+            const current = state.offeredServices.entities[id];
+            if (!current || !Array.isArray(current.subService) || !subService.id) {
+                return state;
+            }
+
+            const currentSubMap = new Map(
+                current.subService.map((ss) => [ss.id, ss])
+            );
+
+            currentSubMap.set(subService.id, subService);
+            const updatedSubServices = Array.from(currentSubMap.values());
+
+            return {
+                ...state,
+                offeredServices: offeredServiceAdaptor.updateOne(
+                    {
+                        id,
+                        changes: { subService: updatedSubServices }
+                    },
+                    state.offeredServices)
+            };
+
+        }),
     )
 })

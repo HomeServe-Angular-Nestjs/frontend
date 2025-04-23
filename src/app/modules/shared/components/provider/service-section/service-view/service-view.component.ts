@@ -6,7 +6,7 @@ import { offeredServiceActions } from '../../../../../../store/offered-services/
 import { ServiceListViewComponent } from '../../../../partials/sections/provider/service-list-view/service-list-view.component';
 import { selectAllOfferedServices } from '../../../../../../store/offered-services/offeredService.selector';
 import { Observable } from 'rxjs';
-import { IOfferedService } from '../../../../../../core/models/offeredService.model';
+import { IOfferedService, UpdateSubserviceType } from '../../../../../../core/models/offeredService.model';
 
 @Component({
   selector: 'app-service-view',
@@ -16,7 +16,6 @@ import { IOfferedService } from '../../../../../../core/models/offeredService.mo
 })
 export class ServiceViewComponent {
   offeredServices$!: Observable<IOfferedService[]>;
-  // serviceSelectedForUpdate$!: Observable<IOfferedService>;
 
   constructor(private store: Store) {
     this.store.dispatch(offeredServiceActions.fetchOfferedServices());
@@ -25,5 +24,9 @@ export class ServiceViewComponent {
 
   updateService(updateData: Partial<IOfferedService>) {
     this.store.dispatch(offeredServiceActions.updateOfferedService({ updateData }));
+  }
+
+  updateSubservice(updateData: UpdateSubserviceType) {
+    this.store.dispatch(offeredServiceActions.updateSubService({ updateData }));
   }
 }

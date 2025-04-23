@@ -5,6 +5,7 @@ import { catchError, map, of, switchMap } from "rxjs";
 import { OfferedServicesService } from "../../core/services/service-management.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
+import { providerActions } from "../provider/provider.action";
 
 export const offeredServiceEffects = {
     fetchOfferedServices$: createEffect(() => {
@@ -47,6 +48,30 @@ export const offeredServiceEffects = {
                 )
             )
         );
+    }, { functional: true }),
+
+    updateSubService$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const serviceOfferedService = inject(OfferedServicesService);
+        const notyf = inject(NotificationService);
+
+        return actions$.pipe(
+            ofType(offeredServiceActions.updateSubService),
+            switchMap(({ updateData }) =>
+                serviceOfferedService.updateSubService(updateData).pipe(
+                    map((response) => offeredServiceActions.updateSubServiceSuccess({
+                        id: response.id,
+                        subService: response.subService
+                    })),
+                    catchError((error) => {
+                        console.error('[Update sub Service Effect] API Error: ', error);
+                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
+                        notyf.error(errorMessage);
+                        return of(offeredServiceActions.updateOfferedServiceFailure({ error: errorMessage }));
+                    })
+                )
+            )
+        )
     }, { functional: true })
 
 }

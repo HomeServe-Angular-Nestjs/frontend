@@ -1,5 +1,5 @@
 import { createAction, props } from "@ngrx/store";
-import { IOfferedService } from "../../core/models/offeredService.model";
+import { IOfferedService, ISubService, UpdateSubserviceType } from "../../core/models/offeredService.model";
 
 export const offeredServiceActions = {
     fetchOfferedServices: createAction('[Offered Service] Fetch services'),
@@ -9,4 +9,8 @@ export const offeredServiceActions = {
     updateOfferedService: createAction('[Offered Service] Update service', props<{ updateData: Partial<IOfferedService> }>()),
     updateOfferedServiceSuccess: createAction('[Offered Service] Update service success', props<{ updatedService: IOfferedService }>()),
     updateOfferedServiceFailure: createAction('[Offered Service] Update service failure', props<{ error: string }>()),
+
+    updateSubService: createAction('[Offered Service] Update sub service', props<{ updateData: UpdateSubserviceType }>()),
+    updateSubServiceSuccess: createAction('[Offered Service] Update sub service success', props<{ id: string, subService: ISubService }>()),
+    updateSubServiceFailure: createAction('[Offered Service] Update sub service failure', props<{ error: string }>()),
 }

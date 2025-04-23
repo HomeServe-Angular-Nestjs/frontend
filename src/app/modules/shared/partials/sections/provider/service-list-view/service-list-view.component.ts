@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { IOfferedService } from "../../../../../../core/models/offeredService.model";
+import { IOfferedService, ISubService, UpdateSubserviceType } from "../../../../../../core/models/offeredService.model";
 import { CommonModule } from "@angular/common";
 
 @Component({
@@ -10,8 +10,13 @@ import { CommonModule } from "@angular/common";
 export class ServiceListViewComponent {
     @Input({ required: true }) offeredServices!: IOfferedService[];
     @Output() updateEvent = new EventEmitter<Partial<IOfferedService>>();
+    @Output() updateSubServiceEvent = new EventEmitter<UpdateSubserviceType>();
 
     updateService(updateData: Partial<IOfferedService>) {
         this.updateEvent.emit(updateData);
+    }
+
+    updateSubservice(updateData: UpdateSubserviceType) {
+        this.updateSubServiceEvent.emit(updateData);
     }
 }

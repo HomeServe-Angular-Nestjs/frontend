@@ -1,7 +1,8 @@
-import { createEntityAdapter } from "@ngrx/entity";
-import { IOfferedService } from "../../core/models/offeredService.model";
+import { createEntityAdapter, EntityAdapter } from "@ngrx/entity";
+import { IOfferedService, ISubService } from "../../core/models/offeredService.model";
 
-export const offeredServiceAdaptor = createEntityAdapter<IOfferedService>({
+export const offeredServiceAdaptor: EntityAdapter<IOfferedService> = createEntityAdapter<IOfferedService>({
     selectId: (offeredService) => offeredService.id,
     sortComparer: (a, b) => a.title.localeCompare(b.title)
 })
+

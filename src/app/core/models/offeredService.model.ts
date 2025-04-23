@@ -30,3 +30,7 @@ export interface IOfferedServiceState {
     loading: boolean;
     error: string | null;
 }
+
+
+
+export type UpdateSubserviceType = { id: string, subService: Partial<ISubService> };

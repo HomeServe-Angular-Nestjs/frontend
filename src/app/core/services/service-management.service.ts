@@ -3,7 +3,7 @@ import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { catchError, Observable, throwError } from "rxjs";
 import { NotificationService } from "./public/notification.service";
-import { IOfferedService } from "../models/offeredService.model";
+import { IOfferedService, ISubService } from "../models/offeredService.model";
 
 @Injectable({ providedIn: 'root' })
 export class OfferedServicesService {
@@ -38,5 +38,9 @@ export class OfferedServicesService {
 
     updateService(updateData: Partial<IOfferedService>): Observable<IOfferedService> {
         return this.http.patch<IOfferedService>(`${this.apiUrl}/offered_services`, updateData);
+    }
+
+    updateSubService(updateData: Partial<ISubService>): Observable<{ id: string, subService: ISubService }> {
+        return this.http.patch<{ id: string, subService: ISubService }>(`${this.apiUrl}/subservice`, updateData);
     }
 }
