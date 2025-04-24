@@ -1,0 +1,306 @@
+<app-customer-breadcrumbs></app-customer-breadcrumbs>
+<div class="container mx-auto p-4 md:p-6 lg:p-8">
+    <!-- Header Section with improved styling -->
+    <header class="mb-8 md:mb-12">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 flex items-center">
+                    Electrical Services
+                </h1>
+                <p class="text-gray-600 mt-2 max-w-xl">
+                    Professional electrical solutions for your home and business needs
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content area with responsive design -->
+    <div class="flex flex-col lg:flex-row gap-6 mb-8">
+        <!-- Categories Section - improved with icons and hover effects -->
+        <div class="w-full lg:w-1/4">
+            <div class="bg-white rounded-xl shadow-sm p-5 h-full">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <i class="fas fa-th-large text-blue-500 mr-2"></i>
+                    Categories
+                </h2>
+
+                <div class="space-y-1">
+                    <div
+                        class="category-item active px-4 py-3 rounded-lg cursor-pointer flex items-center transition hover:bg-blue-50">
+                        <img src="assets/images/circuit.png" alt="Circuit Installation" class="w-5 h-5 mr-3" />
+                        <span class="font-medium">Circuit Installation</span>
+                    </div>
+                    <div
+                        class="category-item active px-4 py-3 rounded-lg cursor-pointer flex items-center transition hover:bg-blue-50">
+                        <img src="assets/images/circuit.png" alt="Circuit Installation" class="w-5 h-5 mr-3" />
+                        <span class="font-medium">Circuit Installation</span>
+                    </div>
+                    <div
+                        class="category-item active px-4 py-3 rounded-lg cursor-pointer flex items-center transition hover:bg-blue-50">
+                        <img src="assets/images/circuit.png" alt="Circuit Installation" class="w-5 h-5 mr-3" />
+                        <span class="font-medium">Circuit Installation</span>
+                    </div>
+                </div>
+
+                <!-- Added helpful information section -->
+                <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="font-medium text-blue-800 mb-2 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Need Help?
+                    </h3>
+                    <p class="text-sm text-blue-700">
+                        Our experts are available 24/7 to assist you with choosing the right electrical services.
+                    </p>
+                    <button class="mt-3 text-sm text-blue-700 hover:text-blue-800 font-medium flex items-center">
+                        <i class="fas fa-phone-alt mr-2"></i>
+                        Contact Support
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Services Section - redesigned cards with clear CTAs -->
+        <div class="w-full lg:w-2/4">
+            <div class="bg-white rounded-xl shadow-sm p-5 h-full">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                        <i class="fas fa-list-ul text-blue-500 mr-2"></i>
+                        Available Services
+                    </h2>
+
+                    <!-- Added search/filter functionality -->
+                    <div class="relative">
+                        <input type="text" placeholder="Search services..."
+                            class="pl-9 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Service Card 1 - enhanced visual appeal -->
+                    <div
+                        class="service-card bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all duration-300">
+                        <div class="p-4 md:p-5">
+                            <div class="flex flex-col md:flex-row justify-between">
+
+                                <!-- Left Side: Service Info -->
+                                <div class="mb-4 md:mb-0 flex-1">
+                                    <div class="flex items-center mb-4">
+                                        <!-- Replace with your actual image path -->
+                                        <img src="assets/images/wiring-service.jpg" alt="Complete Home Wiring"
+                                            class="w-16 h-16 rounded-lg mr-4 object-cover" />
+                                        <div>
+                                            <h3 class="font-bold text-lg text-gray-800">Complete Home Wiring</h3>
+                                            <span
+                                                class="ml-0 mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <img src="assets/images/star.png" alt="Star" class="w-4 h-4 mr-1" />
+                                                Popular
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <p class="text-gray-600 text-sm">
+                                        Full electrical wiring service for homes including circuit breakers installation
+                                        and safety checks.
+                                    </p>
+
+                                    <div class="mt-4 flex items-center text-sm text-gray-500">
+                                        <div class="flex items-center mr-4">
+                                            <!-- <img src="assets/images/clock.png" alt="Duration" class="w-4 h-4 mr-1" /> -->
+                                            <span>2–3 hours</span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- Right Side: Price & Button -->
+                                <div
+                                    class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start md:ml-6">
+                                    <div class="text-xl font-bold text-blue-600">$299</div>
+                                    <button
+                                        class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center text-sm font-medium">
+                                        <img src="assets/images/cart.png" alt="Add to Cart" class="w-4 h-4 mr-2" />
+                                        Add to Cart
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="service-card bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all duration-300">
+                        <div class="p-4 md:p-5">
+                            <div class="flex flex-col md:flex-row justify-between">
+
+                                <!-- Left Side: Service Info -->
+                                <div class="mb-4 md:mb-0 flex-1">
+                                    <div class="flex items-center mb-4">
+                                        <!-- Replace with your actual image path -->
+                                        <img src="assets/images/wiring-service.jpg" alt="Complete Home Wiring"
+                                            class="w-16 h-16 rounded-lg mr-4 object-cover" />
+                                        <div>
+                                            <h3 class="font-bold text-lg text-gray-800">Complete Home Wiring</h3>
+                                            <span
+                                                class="ml-0 mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <img src="assets/images/star.png" alt="Star" class="w-4 h-4 mr-1" />
+                                                Popular
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <p class="text-gray-600 text-sm">
+                                        Full electrical wiring service for homes including circuit breakers installation
+                                        and safety checks.
+                                    </p>
+
+                                    <div class="mt-4 flex items-center text-sm text-gray-500">
+                                        <div class="flex items-center mr-4">
+                                            <!-- <img src="assets/images/clock.png" alt="Duration" class="w-4 h-4 mr-1" /> -->
+                                            <span>2–3 hours</span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- Right Side: Price & Button -->
+                                <div
+                                    class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start md:ml-6">
+                                    <div class="text-xl font-bold text-blue-600">$299</div>
+                                    <button
+                                        class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center text-sm font-medium">
+                                        <img src="assets/images/cart.png" alt="Add to Cart" class="w-4 h-4 mr-2" />
+                                        Add to Cart
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="service-card bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all duration-300">
+                        <div class="p-4 md:p-5">
+                            <div class="flex flex-col md:flex-row justify-between">
+
+                                <!-- Left Side: Service Info -->
+                                <div class="mb-4 md:mb-0 flex-1">
+                                    <div class="flex items-center mb-4">
+                                        <!-- Replace with your actual image path -->
+                                        <img src="assets/images/wiring-service.jpg" alt="Complete Home Wiring"
+                                            class="w-16 h-16 rounded-lg mr-4 object-cover" />
+                                        <div>
+                                            <h3 class="font-bold text-lg text-gray-800">Complete Home Wiring</h3>
+                                            <span
+                                                class="ml-0 mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <img src="assets/images/star.png" alt="Star" class="w-4 h-4 mr-1" />
+                                                Popular
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <p class="text-gray-600 text-sm">
+                                        Full electrical wiring service for homes including circuit breakers installation
+                                        and safety checks.
+                                    </p>
+
+                                    <div class="mt-4 flex items-center text-sm text-gray-500">
+                                        <div class="flex items-center mr-4">
+                                            <!-- <img src="assets/images/clock.png" alt="Duration" class="w-4 h-4 mr-1" /> -->
+                                            <span>2–3 hours</span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- Right Side: Price & Button -->
+                                <div
+                                    class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start md:ml-6">
+                                    <div class="text-xl font-bold text-blue-600">$299</div>
+                                    <button
+                                        class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center text-sm font-medium">
+                                        <img src="assets/images/cart.png" alt="Add to Cart" class="w-4 h-4 mr-2" />
+                                        Add to Cart
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart/Selected Services Section - improved with clear summary -->
+        <div class="w-full lg:w-1/4">
+            <div class="bg-white rounded-xl shadow-sm p-5 h-full">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <i class="fas fa-shopping-cart text-blue-500 mr-2"></i>
+                    Your Pick&apos;s
+                </h2>
+
+                <div class="divide-y divide-gray-200">
+                    <!-- Selected Service Item -->
+                    <div class="py-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-medium text-gray-800">Complete Home Wiring</h3>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-sm text-gray-500">2-3 hours</span>
+                                    <span class="mx-2 text-gray-300">|</span>
+                                    <span
+                                        class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">Popular</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-blue-600">$299</p>
+                            </div>
+                        </div>
+                        <button class="text-red-600 hover:text-red-700 text-sm flex items-center mt-2">
+                            <i class="fas fa-trash-alt mr-1 text-xs"></i>
+                            Remove
+                        </button>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="pt-4">
+                        <button
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition font-medium flex items-center justify-center">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            Schedule Service
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Added reassurance elements -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-5 rounded-xl shadow-sm flex items-center">
+            <div class="rounded-full w-12 h-12 bg-blue-100 flex items-center justify-center text-blue-600 mr-4">
+                <i class="fas fa-shield-alt text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-800">Licensed & Insured</h3>
+                <p class="text-sm text-gray-600">All our electricians are certified professionals</p>
+            </div>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow-sm flex items-center">
+            <div class="rounded-full w-12 h-12 bg-green-100 flex items-center justify-center text-green-600 mr-4">
+                <i class="fas fa-check-circle text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-800">Satisfaction Guaranteed</h3>
+                <p class="text-sm text-gray-600">100% satisfaction or your money back</p>
+            </div>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow-sm flex items-center">
+            <div class="rounded-full w-12 h-12 bg-amber-100 flex items-center justify-center text-amber-600 mr-4">
+                <i class="fas fa-bolt text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-800">Same-Day Service</h3>
+                <p class="text-sm text-gray-600">Fast response for your electrical needs</p>
+            </div>
+        </div>
+    </div>
+</div>

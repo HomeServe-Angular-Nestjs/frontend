@@ -11,6 +11,11 @@ export const customerRoutes: Routes = [
         data: { role: 'customer' },
         children: [
             {
+                path: '',
+                pathMatch: "full",
+                redirectTo: 'homePage'
+            },
+            {
                 path: 'landing_page',
                 pathMatch: 'full',
                 loadComponent: () => import('../../pages/customer/landing-page/customer-landing-page.component')
@@ -31,6 +36,7 @@ export const customerRoutes: Routes = [
             {
                 path: 'provider_details',
                 component: CustomerProviderProfileLayoutComponent,
+                canActivate: [AuthGuard],
                 children: [
                     {
                         path: '',
@@ -53,6 +59,12 @@ export const customerRoutes: Routes = [
                             .then(c => c.CustomerProviderProfileReviewComponent)
                     }
                 ]
+            },
+            {
+                path: 'pick_a_service',
+                loadComponent: () => import('../../pages/customer/booking-1-pick-service/customer-pick-a-service.component')
+                    .then(c => c.CustomerPickAServiceComponent),
+                canActivate: [AuthGuard]
             }
         ],
     },
