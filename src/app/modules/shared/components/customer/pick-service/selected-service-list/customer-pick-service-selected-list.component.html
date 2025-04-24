@@ -1,0 +1,56 @@
+<div class="bg-white rounded-xl shadow-sm p-5 h-full">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+        <i class="fas fa-shopping-cart text-blue-500 mr-2"></i>
+        Your Pick&apos;s
+    </h2>
+
+    <div class="divide-y divide-gray-200">
+        <ng-container *ngIf="purchasedServiceList.length > 0; else elseBlock">
+            <div *ngFor="let service of purchasedServiceList" class="py-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-medium text-gray-800">{{service.title}}</h3>
+                        <div class="flex items-center mt-1">
+                            <span class="text-sm text-gray-500">{{service.estimatedTime}}</span>
+                            <span class="mx-2 text-gray-300">|</span>
+                            <span
+                                class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">{{service.tag}}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-blue-600">{{service.price}}</p>
+                    </div>
+                </div>
+                <button (click)="removeFromSelectedList(service.id)"
+                    class="text-red-600 hover:text-red-700 text-sm flex items-center mt-2">
+                    <i class="fas fa-trash-alt mr-1 text-xs"></i>
+                    Remove
+                </button>
+            </div>
+        </ng-container>
+        <ng-template #elseBlock>
+            <div
+                class="flex flex-col items-center justify-center py-12 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 17v-2a4 4 0 00-4-4H5a2 2 0 00-2 2v3a2 2 0 002 2h4zm6 0v-2a4 4 0 014-4h.01a2 2 0 012 2v3a2 2 0 01-2 2h-4zm-6 0h6M12 9a3 3 0 110-6 3 3 0 010 6z" />
+                </svg>
+                <h2 class="text-lg font-semibold text-gray-700">No Services selected</h2>
+                <p class="mt-2 text-sm text-gray-500 max-w-sm px-4">
+                    You haven&apos;t selected any services yet.
+                </p>
+            </div>
+        </ng-template>
+
+        <!-- Action buttons -->
+        <div class="pt-4">
+            <button
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-md transition text-sm font-medium flex items-center justify-center">
+                <i class="fas fa-calendar-alt text-sm mr-2"></i>
+                Schedule
+            </button>
+
+        </div>
+    </div>
+</div>

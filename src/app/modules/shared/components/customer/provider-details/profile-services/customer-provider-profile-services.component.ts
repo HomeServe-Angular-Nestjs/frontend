@@ -50,10 +50,10 @@ export class CustomerProviderProfileServicesComponent {
     });
   }
 
-  bookService(id: string) {
-    if (!id) return;
+  bookService(ids: string[]) {
+    if (ids.length < 0) return;
     this.router.navigate(['pick_a_service'], {
-      queryParams: { id }
+      queryParams: { ids: ids.join(',') }
     });
   }
 

@@ -1,4 +1,4 @@
-<div class="bg-white rounded-lg shadow-lg p-6">
+<div *ngIf="providerData" class="bg-white rounded-lg shadow-lg p-6">
     <!-- Services Header with Search and Filters -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
@@ -94,116 +94,12 @@
                 </div>
 
                 <div class="text-right ml-4">
-                    <button (click)="bookService(service.id)"
+                    <button (click)="bookService(providerData.servicesOffered)"
                         class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
                         Book Now
                     </button>
                 </div>
             </div>
         </div>
-
-        <!-- Bathroom Renovation -->
-        <!-- <div class="border rounded-lg p-4">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-medium text-lg">Bathroom Renovation</h3>
-                    <p class="text-sm text-gray-600">
-                        Complete bathroom remodeling and plumbing services
-                    </p>
-                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
-                        <li>Fixture installation</li>
-                        <li>Shower and tub installation</li>
-                        <li>Toilet replacement</li>
-                        <li>Vanity plumbing</li>
-                    </ul>
-                </div>
-                <div class="text-right">
-                    <p class="font-semibold text-lg">$1,200+</p>
-                    <p class="text-sm text-gray-500">2-3 days</p>
-                    <button
-                        class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                        Book Now
-                    </button>
-                </div>
-            </div>
-        </div> -->
-
-        <!-- Water Heater Services -->
-        <!-- <div class="border rounded-lg p-4">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-medium text-lg">Water Heater Services</h3>
-                    <p class="text-sm text-gray-600">
-                        Installation, repair, and maintenance of water heaters
-                    </p>
-                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
-                        <li>New water heater installation</li>
-                        <li>Water heater repair</li>
-                        <li>Maintenance and inspection</li>
-                        <li>Tankless water heater services</li>
-                    </ul>
-                </div>
-                <div class="text-right">
-                    <p class="font-semibold text-lg">$400+</p>
-                    <p class="text-sm text-gray-500">4-6 hours</p>
-                    <button
-                        class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                        Book Now
-                    </button>
-                </div>
-            </div>
-        </div> -->
-
-        <!-- Drain Services -->
-        <!-- <div class="border rounded-lg p-4">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-medium text-lg">Drain Services</h3>
-                    <p class="text-sm text-gray-600">
-                        Professional drain cleaning and maintenance
-                    </p>
-                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
-                        <li>Drain cleaning</li>
-                        <li>Clog removal</li>
-                        <li>Drain inspection</li>
-                        <li>Preventive maintenance</li>
-                    </ul>
-                </div>
-                <div class="text-right">
-                    <p class="font-semibold text-lg">$150+</p>
-                    <p class="text-sm text-gray-500">1-2 hours</p>
-                    <button
-                        class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                        Book Now
-                    </button>
-                </div>
-            </div>
-        </div> -->
-
-        <!-- Gas Line Services -->
-        <!-- <div class="border rounded-lg p-4">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-medium text-lg">Gas Line Services</h3>
-                    <p class="text-sm text-gray-600">
-                        Gas line installation, repair, and inspection
-                    </p>
-                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
-                        <li>Gas line installation</li>
-                        <li>Leak detection</li>
-                        <li>Safety inspection</li>
-                        <li>Emergency gas line repair</li>
-                    </ul>
-                </div>
-                <div class="text-right">
-                    <p class="font-semibold text-lg">$200+</p>
-                    <p class="text-sm text-gray-500">2-4 hours</p>
-                    <button
-                        class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                        Book Now
-                    </button>
-                </div>
-            </div>
-        </div> -->
     </div>
 </div>

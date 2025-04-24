@@ -1,34 +1,81 @@
-import { AfterViewInit, Component, ElementRef, Renderer2 } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
+import { CustomerPickServiceCategoryListComponent } from "../../../shared/components/customer/pick-service/categories/customer-pick-service-category-list.component";
+import { CustomerPickServiceListComponent } from "../../../shared/components/customer/pick-service/service-list/customer-pick-service-list.component";
+import { CustomerServiceSelectedListComponent } from "../../../shared/components/customer/pick-service/selected-service-list/customer-pick-service-selected-list.component";
+import { ReassuranceComponent } from "../../../shared/partials/sections/customer/reassurance/reassurance.component";
+import { ActivatedRoute } from '@angular/router';
+import { IOfferedService, ISubService } from '../../../../core/models/offeredService.model';
+import { OfferedServicesService } from '../../../../core/services/service-management.service';
+import { NotificationService } from '../../../../core/services/public/notification.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-customer-pick-a-service',
   standalone: true,
-  imports: [CommonModule, CustomerBreadcrumbsComponent],
+  imports: [
+    CommonModule,
+    CustomerBreadcrumbsComponent,
+    CustomerPickServiceCategoryListComponent,
+    CustomerPickServiceListComponent,
+    CustomerServiceSelectedListComponent,
+    ReassuranceComponent,
+  ],
   templateUrl: './customer-pick-a-service.component.html',
 })
-export class CustomerPickAServiceComponent implements AfterViewInit {
-  constructor(private renderer: Renderer2, private elRef: ElementRef) { }
+export class CustomerPickAServiceComponent {
+  private serviceOfferedServices = inject(OfferedServicesService);
+  private notyf = inject(NotificationService);
 
-  ngAfterViewInit(): void {
-    // Category selection
-    const categoryItems = this.elRef.nativeElement.querySelectorAll('.category-item');
-    categoryItems.forEach((item: HTMLElement) => {
-      this.renderer.listen(item, 'click', () => {
-        categoryItems.forEach((el: HTMLElement) => el.classList.remove('active'));
-        item.classList.add('active');
-      });
+  serviceIds: string[] = [];
+  serviceData: IOfferedService[] = [];
+  serviceCategories: { title: string, image: string }[] = [];
+  selectedServices: ISubService[] = [];
+  purchasedServiceList: ISubService[] = [];
+
+  constructor(private route: ActivatedRoute) {
+    this.route.queryParamMap.subscribe(params => {
+      const idsParam = params.get('ids');
+      this.serviceIds = idsParam ? idsParam.split(',') : [];
     });
+    if (this.serviceIds.length > 0) {
+      this.fetchService(this.serviceIds);
+    }
+  }
 
-    const buttons = Array.from(this.elRef.nativeElement.querySelectorAll('button')) as HTMLButtonElement[];
+  fetchService(serviceIds: string[]): void {
+    const observables = serviceIds.map(id =>
+      this.serviceOfferedServices.fetchOneService(id)
+    );
 
-    const addButtons = buttons.filter(btn => btn.textContent?.trim() === 'Add');
+    forkJoin(observables).subscribe({
+      next: (services) => {
+        this.serviceData = services
+        services.forEach(service => {
+          this.serviceCategories.push({
+            title: service.title,
+            image: service.image
+          });
+        })
+      },
+      error: (err) => this.notyf.error(err)
+    })
+  }
 
-    addButtons.forEach(button => {
-      this.renderer.listen(button, 'click', () => {
-        alert('Service added to cart!');
-      });
-    });
+  getServiceOfSelectedCategory(categoryTitle: string) {
+    const selectedService = this.serviceData.find(service => service.title === categoryTitle);
+    this.selectedServices = selectedService?.subService ? selectedService.subService : [];
+  }
+
+  addSelectedService(serviceId: string) {
+    const selectedService = this.selectedServices.find(service => service.id === serviceId);
+    if (selectedService) {
+      this.purchasedServiceList.push(selectedService);
+    }
+  }
+
+  removeFromList(serviceId: string): void {
+    this.purchasedServiceList = this.purchasedServiceList.filter(service => service.id !== serviceId);
   }
 }
