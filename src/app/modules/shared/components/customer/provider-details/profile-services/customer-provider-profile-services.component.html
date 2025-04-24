@@ -1,0 +1,206 @@
+<div class="bg-white rounded-lg shadow-lg p-6">
+    <!-- Services Header with Search and Filters -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div>
+            <h2 class="text-xl font-semibold">Services Offered</h2>
+            <p class="text-sm text-gray-600">Browse through our comprehensive service offerings</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <div class="relative">
+                <input type="text" placeholder="Search services..."
+                    class="border rounded-lg pl-10 pr-4 py-1.5 text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+            </div>
+            <select class="border rounded-lg px-3 py-1.5 text-sm" aria-label="Sort services by">
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+                <option>Duration: Shortest First</option>
+                <option>Duration: Longest First</option>
+                <option>Most Popular</option>
+            </select>
+            <select class="border rounded-lg px-3 py-1.5 text-sm" aria-label="Filter by category">
+                <option>All Categories</option>
+                <option>Emergency Services</option>
+                <option>Installation</option>
+                <option>Maintenance</option>
+                <option>Repair</option>
+                <option>Renovation</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Price Range Filter -->
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-700 mb-2">Price Range</h3>
+        <div class="flex items-center gap-4">
+            <div class="flex-1">
+                <label class="block text-xs text-gray-600 mb-1">Min Price</label>
+                <input type="number" class="border rounded-lg px-3 py-1.5 text-sm w-full" placeholder="$0">
+            </div>
+            <div class="flex-1">
+                <label class="block text-xs text-gray-600 mb-1">Max Price</label>
+                <input type="number" class="border rounded-lg px-3 py-1.5 text-sm w-full" placeholder="$2000">
+            </div>
+            <button
+                class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition-colors mt-6">
+                Apply
+            </button>
+        </div>
+    </div>
+
+    <!-- Service Duration Filter -->
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-700 mb-2">Service Duration</h3>
+        <div class="flex flex-wrap gap-2">
+            <button
+                class="px-3 py-1.5 text-sm border rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors">
+                Quick Service (1-2 hours)
+            </button>
+            <button
+                class="px-3 py-1.5 text-sm border rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors">
+                Half Day (3-4 hours)
+            </button>
+            <button
+                class="px-3 py-1.5 text-sm border rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors">
+                Full Day (5-8 hours)
+            </button>
+            <button
+                class="px-3 py-1.5 text-sm border rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors">
+                Multi-day
+            </button>
+        </div>
+    </div>
+
+    <!-- Services List -->
+    <div class="space-y-4">
+        <!-- Emergency Services -->
+        <div class="border rounded-lg p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-medium text-lg">Emergency Plumbing Repair</h3>
+                    <p class="text-sm text-gray-600">
+                        24/7 emergency service for burst pipes, leaks, and clogs
+                    </p>
+                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
+                        <li>Burst pipe repair</li>
+                        <li>Severe leak fixing</li>
+                        <li>Emergency drain cleaning</li>
+                        <li>Water heater emergency repair</li>
+                    </ul>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-lg">$80/hr</p>
+                    <p class="text-sm text-gray-500">1-2 hours</p>
+                    <button
+                        class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bathroom Renovation -->
+        <div class="border rounded-lg p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-medium text-lg">Bathroom Renovation</h3>
+                    <p class="text-sm text-gray-600">
+                        Complete bathroom remodeling and plumbing services
+                    </p>
+                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
+                        <li>Fixture installation</li>
+                        <li>Shower and tub installation</li>
+                        <li>Toilet replacement</li>
+                        <li>Vanity plumbing</li>
+                    </ul>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-lg">$1,200+</p>
+                    <p class="text-sm text-gray-500">2-3 days</p>
+                    <button
+                        class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Water Heater Services -->
+        <div class="border rounded-lg p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-medium text-lg">Water Heater Services</h3>
+                    <p class="text-sm text-gray-600">
+                        Installation, repair, and maintenance of water heaters
+                    </p>
+                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
+                        <li>New water heater installation</li>
+                        <li>Water heater repair</li>
+                        <li>Maintenance and inspection</li>
+                        <li>Tankless water heater services</li>
+                    </ul>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-lg">$400+</p>
+                    <p class="text-sm text-gray-500">4-6 hours</p>
+                    <button
+                        class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drain Services -->
+        <div class="border rounded-lg p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-medium text-lg">Drain Services</h3>
+                    <p class="text-sm text-gray-600">
+                        Professional drain cleaning and maintenance
+                    </p>
+                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
+                        <li>Drain cleaning</li>
+                        <li>Clog removal</li>
+                        <li>Drain inspection</li>
+                        <li>Preventive maintenance</li>
+                    </ul>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-lg">$150+</p>
+                    <p class="text-sm text-gray-500">1-2 hours</p>
+                    <button
+                        class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gas Line Services -->
+        <div class="border rounded-lg p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-medium text-lg">Gas Line Services</h3>
+                    <p class="text-sm text-gray-600">
+                        Gas line installation, repair, and inspection
+                    </p>
+                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
+                        <li>Gas line installation</li>
+                        <li>Leak detection</li>
+                        <li>Safety inspection</li>
+                        <li>Emergency gas line repair</li>
+                    </ul>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-lg">$200+</p>
+                    <p class="text-sm text-gray-500">2-4 hours</p>
+                    <button
+                        class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

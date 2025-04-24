@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { AuthGuard } from "../../../core/guards/auth.guard";
 import { CustomerLayoutPageComponent } from "../../pages/customer/layout/customer-layout-page.component";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
+import { CustomerProviderProfileLayoutComponent } from "../../pages/customer/provider-details-page/customer-provider-profile-layout.component";
 
 export const customerRoutes: Routes = [
     {
@@ -26,7 +27,34 @@ export const customerRoutes: Routes = [
                 loadComponent: () => import('../../pages/customer/view-providers/customer-view-providers.component')
                     .then(c => c.CustomerViewProvidersComponent),
                 canActivate: [AuthGuard]
+            },
+            {
+                path: 'provider_details',
+                component: CustomerProviderProfileLayoutComponent,
+                children: [
+                    {
+                        path: '',
+                        pathMatch: "full",
+                        redirectTo: 'about'
+                    },
+                    {
+                        path: 'about',
+                        loadComponent: () => import('../../shared/components/customer/provider-details/profile-about/customer-provider-profile-about.component')
+                            .then(c => c.CustomerProviderProfileAboutComponent)
+                    },
+                    {
+                        path: 'services',
+                        loadComponent: () => import('../../shared/components/customer/provider-details/profile-services/customer-provider-profile-services.component')
+                            .then(c => c.CustomerProviderProfileServicesComponent)
+                    },
+                    {
+                        path: 'reviews',
+                        loadComponent: () => import('../../shared/components/customer/provider-details/profile-reviews/customer-provider-profile-review.component')
+                            .then(c => c.CustomerProviderProfileReviewComponent)
+                    }
+                ]
             }
         ],
     },
+
 ]
