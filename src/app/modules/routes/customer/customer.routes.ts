@@ -3,6 +3,7 @@ import { AuthGuard } from "../../../core/guards/auth.guard";
 import { CustomerLayoutPageComponent } from "../../pages/customer/layout/customer-layout-page.component";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
 import { CustomerProviderProfileLayoutComponent } from "../../pages/customer/provider-details-page/customer-provider-profile-layout.component";
+import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
 
 export const customerRoutes: Routes = [
     {

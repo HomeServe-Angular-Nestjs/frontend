@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject } from "@angular/core";
+import { Component, inject, Input } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 
 @Component({
@@ -10,6 +10,8 @@ import { Router, RouterLink } from "@angular/router";
 })
 export class CustomerProviderProfileNavigationComponent {
     private router = inject(Router);
+
+    @Input({ required: true }) providerId!: string | null;
 
     items = [
         {
@@ -34,7 +36,9 @@ export class CustomerProviderProfileNavigationComponent {
             ...item,
             active: i === index
         }));
-        this.router.navigate(this.items[index].route);
+        this.router.navigate(this.items[index].route, {
+            queryParams: { id: this.providerId }
+        });
     }
 
 }

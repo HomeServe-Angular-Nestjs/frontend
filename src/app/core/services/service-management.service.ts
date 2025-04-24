@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { catchError, Observable, throwError } from "rxjs";
@@ -36,11 +36,24 @@ export class OfferedServicesService {
         return this.http.get<IOfferedService[]>(`${this.apiUrl}/offered_services`);
     }
 
+    fetchOneService(id: string): Observable<IOfferedService> {
+        return this.http.get<IOfferedService>(`${this.apiUrl}/offered_service?id=${id}`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        )
+    }
+
     updateService(updateData: Partial<IOfferedService>): Observable<IOfferedService> {
         return this.http.patch<IOfferedService>(`${this.apiUrl}/offered_services`, updateData);
     }
 
     updateSubService(updateData: Partial<ISubService>): Observable<{ id: string, subService: ISubService }> {
         return this.http.patch<{ id: string, subService: ISubService }>(`${this.apiUrl}/subservice`, updateData);
+    }
+
+    private getErrorMessage(error: HttpErrorResponse): string {
+        return error?.error?.message || 'something went wrong';
     }
 }

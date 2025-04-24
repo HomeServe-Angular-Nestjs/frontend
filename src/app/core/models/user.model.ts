@@ -85,6 +85,7 @@ export interface IProvider extends IBaseUser {
     serviceRadius?: number;
     experience: number;
     availability: Availability;
+    servicesOffered: string[];
 }
 
 export interface IUserState {

@@ -4,17 +4,19 @@
         <h2 class="text-xl font-semibold mb-4">Availability</h2>
         <div class="space-y-2">
             <div class="flex justify-between">
-                <span class="text-gray-600">Monday - Friday</span>
-                <span class="font-medium">8:00 AM - 6:00 PM</span>
+                <span class="text-gray-600">Day</span>
+                <span class="font-medium">{{providerData?.availability?.day?.from}} -
+                    {{providerData?.availability?.day?.to}}</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-gray-600">Saturday</span>
-                <span class="font-medium">9:00 AM - 4:00 PM</span>
+                <span class="text-gray-600">Time</span>
+                <span class="font-medium">{{providerData?.availability?.time?.from}} -
+                    {{providerData?.availability?.time?.to}}</span>
             </div>
-            <div class="flex justify-between">
+            <!-- <div class="flex justify-between">
                 <span class="text-gray-600">Sunday</span>
                 <span class="font-medium">Emergency Only</span>
-            </div>
+            </div> -->
         </div>
         <div class="mt-4">
             <h3 class="font-medium mb-2">Service Area</h3>
@@ -37,7 +39,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <span class="text-gray-500">📧</span>
-                <span class="font-medium">john.smith&#64;example.com</span>
+                <span class="font-medium">{{providerData?.email}}</span>
             </div>
             <div class="flex items-center gap-3">
                 <span class="text-gray-500">📍</span>

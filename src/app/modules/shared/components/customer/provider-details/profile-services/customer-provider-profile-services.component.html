@@ -20,11 +20,7 @@
             </select>
             <select class="border rounded-lg px-3 py-1.5 text-sm" aria-label="Filter by category">
                 <option>All Categories</option>
-                <option>Emergency Services</option>
-                <option>Installation</option>
-                <option>Maintenance</option>
-                <option>Repair</option>
-                <option>Renovation</option>
+                <option *ngFor="let category of serviceCategories" [value]="category">{{category}}</option>
             </select>
         </div>
     </div>
@@ -74,24 +70,31 @@
     <!-- Services List -->
     <div class="space-y-4">
         <!-- Emergency Services -->
-        <div class="border rounded-lg p-4">
+        <div *ngFor="let service of serviceData" class="border rounded-lg p-4">
             <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-medium text-lg">Emergency Plumbing Repair</h3>
+                <div class="w-full">
+                    <h3 class="font-medium text-lg">{{ service.title }}</h3>
                     <p class="text-sm text-gray-600">
-                        24/7 emergency service for burst pipes, leaks, and clogs
+                        {{ service.desc }}
                     </p>
-                    <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
-                        <li>Burst pipe repair</li>
-                        <li>Severe leak fixing</li>
-                        <li>Emergency drain cleaning</li>
-                        <li>Water heater emergency repair</li>
+
+                    <ul class="mt-4 text-sm text-gray-700 space-y-1">
+                        <li class="flex justify-between font-semibold text-gray-900 border-b pb-1">
+                            <span class="w-1/3">Services</span>
+                            <span class="w-1/3 text-center">Price</span>
+                            <span class="w-1/3 text-right">Duration</span>
+                        </li>
+
+                        <li *ngFor="let sub of service.subService" class="flex justify-between py-1">
+                            <span class="w-1/3 text-gray-700">{{ sub.title }}</span>
+                            <span class="w-1/3 text-gray-700 text-center">{{ sub.price }}</span>
+                            <span class="w-1/3 text-gray-700 text-right">{{ sub.estimatedTime }}</span>
+                        </li>
                     </ul>
                 </div>
-                <div class="text-right">
-                    <p class="font-semibold text-lg">$80/hr</p>
-                    <p class="text-sm text-gray-500">1-2 hours</p>
-                    <button
+
+                <div class="text-right ml-4">
+                    <button (click)="bookService(service.id)"
                         class="mt-2 bg-blue-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
                         Book Now
                     </button>
@@ -100,7 +103,7 @@
         </div>
 
         <!-- Bathroom Renovation -->
-        <div class="border rounded-lg p-4">
+        <!-- <div class="border rounded-lg p-4">
             <div class="flex justify-between items-start">
                 <div>
                     <h3 class="font-medium text-lg">Bathroom Renovation</h3>
@@ -123,10 +126,10 @@
                     </button>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Water Heater Services -->
-        <div class="border rounded-lg p-4">
+        <!-- <div class="border rounded-lg p-4">
             <div class="flex justify-between items-start">
                 <div>
                     <h3 class="font-medium text-lg">Water Heater Services</h3>
@@ -149,10 +152,10 @@
                     </button>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Drain Services -->
-        <div class="border rounded-lg p-4">
+        <!-- <div class="border rounded-lg p-4">
             <div class="flex justify-between items-start">
                 <div>
                     <h3 class="font-medium text-lg">Drain Services</h3>
@@ -175,10 +178,10 @@
                     </button>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Gas Line Services -->
-        <div class="border rounded-lg p-4">
+        <!-- <div class="border rounded-lg p-4">
             <div class="flex justify-between items-start">
                 <div>
                     <h3 class="font-medium text-lg">Gas Line Services</h3>
@@ -201,6 +204,6 @@
                     </button>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>

@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IProvider } from '../../../../../core/models/user.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-customer-provider-view-card',
@@ -9,6 +10,8 @@ import { IProvider } from '../../../../../core/models/user.model';
   templateUrl: './customer-provider-view-card.component.html',
 })
 export class CustomerProviderViewCardComponent {
+  private router = inject(Router);
+
   @Input({ required: true }) providers!: IProvider[];
 
   searchQuery = '';
@@ -65,8 +68,7 @@ export class CustomerProviderViewCardComponent {
     provider.isActive = !provider.isActive;
   }
 
-  viewProvider(provider: IProvider) {
-    // Implement navigation to provider details
-    console.log('Viewing provider:', provider.fullname);
+  viewProvider(providerId: string) {
+    this.router.navigate(['provider_details'], { queryParams: { id: providerId } });
   }
 }

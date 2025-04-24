@@ -1,62 +1,62 @@
-    <!-- Profile Overview Section -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <div class="flex flex-col md:flex-row gap-6">
-            <!-- Profile Image -->
-            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
-                <img src="assets/images/profile-placeholder.jpg" alt="Provider Profile"
-                    class="w-full h-full object-cover" />
+<!-- Profile Overview Section -->
+<div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+    <div class="flex flex-col md:flex-row gap-6">
+        <!-- Profile Image -->
+        <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
+            <img [src]="providerData?.avatar || ''" alt="Provider Profile" class="w-full h-full object-cover" />
+        </div>
+        <!-- Profile Info -->
+        <div class="flex-1">
+            <div class="flex items-center gap-4 mb-4">
+                <h1 class="text-2xl font-bold text-gray-800">{{providerData?.fullname || providerData?.username}}</h1>
+                <span *ngIf="providerData?.isCertified"
+                    class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Verified</span>
             </div>
-
-            <!-- Profile Info -->
-            <div class="flex-1">
-                <div class="flex items-center gap-4 mb-4">
-                    <h1 class="text-2xl font-bold text-gray-800">John Smith</h1>
-                    <span
-                        class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Verified</span>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-yellow-400">⭐</span>
+                <span class="font-semibold">4.8</span>
+                <span class="text-gray-500">(128 reviews)</span>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <span
+                    class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{{providerData?.profession}}</span>
+                <span
+                    class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{{providerData?.experience}}+
+                    Years
+                    Experience</span>
+                <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Top
+                    Rated</span>
+            </div>
+            <!-- Track Records -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 py-4 border-t border-b">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-600">500+</div>
+                    <div class="text-sm text-gray-600">Jobs Completed</div>
                 </div>
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="text-yellow-400">⭐</span>
-                    <span class="font-semibold">4.8</span>
-                    <span class="text-gray-500">(128 reviews)</span>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-600">98%</div>
+                    <div class="text-sm text-gray-600">Success Rate</div>
                 </div>
-                <div class="flex flex-wrap gap-2 mb-4">
-                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Plumbing
-                        Expert</span>
-                    <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">10+ Years
-                        Experience</span>
-                    <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Top
-                        Rated</span>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-purple-600">4.8</div>
+                    <div class="text-sm text-gray-600">Avg. Rating</div>
                 </div>
-                <!-- Track Records -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 py-4 border-t border-b">
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-blue-600">500+</div>
-                        <div class="text-sm text-gray-600">Jobs Completed</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-green-600">98%</div>
-                        <div class="text-sm text-gray-600">Success Rate</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-purple-600">4.8</div>
-                        <div class="text-sm text-gray-600">Avg. Rating</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-orange-600">10+</div>
-                        <div class="text-sm text-gray-600">Years Experience</div>
-                    </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-orange-600">{{providerData?.experience}}+</div>
+                    <div class="text-sm text-gray-600">Years Experience</div>
                 </div>
-                <div class="flex gap-4">
-                    <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                        Book Now
-                    </button>
-                    <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        Message
-                    </button>
-                    <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <span class="text-red-500">❤</span> Favorite
-                    </button>
-                </div>
+            </div>
+            <div class="flex gap-4">
+                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Book Now
+                </button>
+                <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                    Message
+                </button>
+                <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                    <span class="text-red-500">❤</span> Favorite
+                </button>
             </div>
         </div>
     </div>
+</div>
