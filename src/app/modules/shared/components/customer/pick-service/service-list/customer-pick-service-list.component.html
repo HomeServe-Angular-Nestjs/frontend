@@ -14,8 +14,8 @@
 
     <div class="space-y-4">
         <!-- Service Card 1 - enhanced visual appeal -->
-        <ng-container *ngIf="selectedServices.length > 0; else elseBlock">
-            <div *ngFor="let service of selectedServices"
+        <ng-container *ngIf="selectedServices && selectedServices.subService.length > 0; else elseBlock">
+            <div *ngFor="let service of selectedServices.subService"
                 class="service-card bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all duration-300">
                 <div class="p-4 md:p-5">
                     <div class="flex flex-col md:flex-row justify-between">
@@ -49,7 +49,7 @@
                             <div class="text-xl font-bold text-blue-600">
                                 {{ service.price }}
                             </div>
-                            <button (click)="addService(service.id)"
+                            <button (click)="addService({id: selectedServices.id, selectedId: service.id})"
                                 class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center text-sm font-medium">
                                 <i class="fa fas-cart mr-2"></i>
                                 Add

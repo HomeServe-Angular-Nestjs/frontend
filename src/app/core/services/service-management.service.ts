@@ -45,6 +45,15 @@ export class OfferedServicesService {
         )
     }
 
+    fetchSubservice(id: string): Observable<ISubService> {
+        return this.http.get<ISubService>(`${this.apiUrl}/fetch_subservice?id=${id}`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        )
+    }
+
     updateService(updateData: Partial<IOfferedService>): Observable<IOfferedService> {
         return this.http.patch<IOfferedService>(`${this.apiUrl}/offered_services`, updateData);
     }

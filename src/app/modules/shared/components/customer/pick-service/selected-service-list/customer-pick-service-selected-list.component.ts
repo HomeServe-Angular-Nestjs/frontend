@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ISubService } from '../../../../../../core/models/offeredService.model';
+import { SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
+import { SelectedServiceIdType } from '../service-list/customer-pick-service-list.component';
 
 @Component({
   selector: 'app-customer-pick-service-selected-list',
@@ -9,11 +10,15 @@ import { ISubService } from '../../../../../../core/models/offeredService.model'
   templateUrl: './customer-pick-service-selected-list.component.html',
 })
 export class CustomerServiceSelectedListComponent {
-  @Input({ required: true }) purchasedServiceList: ISubService[] = [];
-  @Output() serviceRemoveFromListEvent = new EventEmitter<string>();
+  @Input({ required: true }) purchasedServiceList: SelectedServiceType[] = [];
+  @Output() serviceRemoveFromListEvent = new EventEmitter<SelectedServiceIdType>();
+  @Output() scheduleEvent = new EventEmitter<boolean>();
 
+  removeFromSelectedList(data: SelectedServiceIdType): void {
+    this.serviceRemoveFromListEvent.emit(data);
+  }
 
-  removeFromSelectedList(id: string): void {
-    this.serviceRemoveFromListEvent.emit(id);
+  triggerSchedule(): void {
+    this.scheduleEvent.emit(true);
   }
 } 

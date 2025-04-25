@@ -25,7 +25,7 @@
 
         <!-- Available Services Section -->
         <div class="w-full lg:w-2/4 h-full">
-            <app-customer-pick-service-list [selectedServices]="selectedServices"
+            <app-customer-pick-service-list [selectedServices]="servicesOfSelectedCategory"
                 (serviceSelectEvent)="addSelectedService($event)">
             </app-customer-pick-service-list>
         </div>
@@ -33,7 +33,7 @@
         <!-- Cart/Selected Services Section -->
         <div class="w-full lg:w-1/4 h-full">
             <app-customer-pick-service-selected-list [purchasedServiceList]="purchasedServiceList"
-                (serviceRemoveFromListEvent)="removeFromList($event)">
+                (serviceRemoveFromListEvent)="removeFromList($event)" (scheduleEvent)="scheduleTime($event)">
             </app-customer-pick-service-selected-list>
         </div>
     </div>

@@ -2,14 +2,25 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
 import { CustomerPickServiceCategoryListComponent } from "../../../shared/components/customer/pick-service/categories/customer-pick-service-category-list.component";
-import { CustomerPickServiceListComponent } from "../../../shared/components/customer/pick-service/service-list/customer-pick-service-list.component";
+import { CustomerPickServiceListComponent, SelectedServiceIdType } from "../../../shared/components/customer/pick-service/service-list/customer-pick-service-list.component";
 import { CustomerServiceSelectedListComponent } from "../../../shared/components/customer/pick-service/selected-service-list/customer-pick-service-selected-list.component";
 import { ReassuranceComponent } from "../../../shared/partials/sections/customer/reassurance/reassurance.component";
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IOfferedService, ISubService } from '../../../../core/models/offeredService.model';
 import { OfferedServicesService } from '../../../../core/services/service-management.service';
 import { NotificationService } from '../../../../core/services/public/notification.service';
 import { forkJoin } from 'rxjs';
+import { SharedDataService } from '../../../../core/services/public/shared-data.service';
+
+export type SelectedServiceType = {
+  id: string,
+  subService: ISubService[]
+};
+
+export type SelectedServiceIdsType = {
+  id: string,
+  selectedIds: string[]
+};
 
 @Component({
   selector: 'app-customer-pick-a-service',
@@ -25,14 +36,16 @@ import { forkJoin } from 'rxjs';
   templateUrl: './customer-pick-a-service.component.html',
 })
 export class CustomerPickAServiceComponent {
-  private serviceOfferedServices = inject(OfferedServicesService);
-  private notyf = inject(NotificationService);
+  private readonly serviceOfferedServices = inject(OfferedServicesService);
+  private readonly notyf = inject(NotificationService);
+  private readonly sharedDataService = inject(SharedDataService);
+  private router = inject(Router);
 
   serviceIds: string[] = [];
   serviceData: IOfferedService[] = [];
   serviceCategories: { title: string, image: string }[] = [];
-  selectedServices: ISubService[] = [];
-  purchasedServiceList: ISubService[] = [];
+  servicesOfSelectedCategory!: SelectedServiceType;
+  purchasedServiceList: SelectedServiceType[] = [];
 
   constructor(private route: ActivatedRoute) {
     this.route.queryParamMap.subscribe(params => {
@@ -65,17 +78,63 @@ export class CustomerPickAServiceComponent {
 
   getServiceOfSelectedCategory(categoryTitle: string) {
     const selectedService = this.serviceData.find(service => service.title === categoryTitle);
-    this.selectedServices = selectedService?.subService ? selectedService.subService : [];
-  }
-
-  addSelectedService(serviceId: string) {
-    const selectedService = this.selectedServices.find(service => service.id === serviceId);
     if (selectedService) {
-      this.purchasedServiceList.push(selectedService);
+      this.servicesOfSelectedCategory = {
+        id: selectedService.id,
+        subService: selectedService.subService
+      }
     }
   }
 
-  removeFromList(serviceId: string): void {
-    this.purchasedServiceList = this.purchasedServiceList.filter(service => service.id !== serviceId);
+  addSelectedService(data: SelectedServiceIdType) {
+    const { id } = this.servicesOfSelectedCategory;
+
+    if (id && id === data.id) {
+      if (!this.purchasedServiceList.length) {
+        const sub = this.servicesOfSelectedCategory.subService.find(s => s.id === data.selectedId);
+        this.purchasedServiceList.push({
+          id: data.id,
+          subService: sub ? [sub] : []
+        });
+      } else {
+        this.purchasedServiceList.map(item => {
+          if (item.id === id) {
+            const selectedSub = this.servicesOfSelectedCategory.subService.find(s => s.id === data.selectedId);
+            if (!selectedSub) return;
+
+            const existingCategory = this.purchasedServiceList.find(item => item.id === data.id);
+
+            if (existingCategory) {
+              const alreadyExists = existingCategory.subService.find(s => s.id === data.selectedId);
+
+              if (!alreadyExists) {
+                existingCategory.subService.push(selectedSub);
+              }
+            } else {
+              this.purchasedServiceList.push({
+                id,
+                subService: [selectedSub]
+              });
+            }
+          }
+        });
+      }
+    }
+  }
+
+  removeFromList(data: SelectedServiceIdType): void {
+    this.purchasedServiceList.forEach(item => {
+      if (item.id === data.id) {
+        item.subService = item.subService.filter(s => s.id !== data.selectedId)
+      }
+    });
+  }
+
+  scheduleTime(event: boolean) {
+    if (event) {
+      this.sharedDataService.setSelectedServiceData(this.purchasedServiceList);
+
+      this.router.navigate(['schedule_service']);
+    }
   }
 }

@@ -1,0 +1,94 @@
+<div class=" rounded-lg shadow-md p-6 bg-white ">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Booking Details</h1>
+    <!-- Mobile Verification -->
+    <div class="mb-8">
+        <label class="block text-gray-800 text-sm font-semibold mb-2">Mobile Verification</label>
+        <div class="flex items-end space-x-4">
+            <div class="flex-1">
+                <div class="flex">
+                    <select
+                        class="border border-gray-300 rounded-l-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option>+1</option>
+                        <option>+91</option>
+                        <option>+44</option>
+                    </select>
+                    <input type="tel" placeholder="Enter your mobile number"
+                        class="w-full px-4 py-2 border-t border-b border-r border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md whitespace-nowrap">
+                Send Code
+            </button>
+        </div>
+        <div class="mt-4 space-x-4 hidden" id="verificationCodeSection">
+            <div class="flex-1">
+                <label class="block text-gray-600 mb-1">Verification Code</label>
+                <input type="text" placeholder="Enter 6-digit code"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md">
+            </div>
+            <button
+                class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md mt-6 whitespace-nowrap">
+                Verify
+            </button>
+        </div>
+    </div>
+
+    <!-- Service Location with Map -->
+    <div class="mb-8">
+        <label class="block text-gray-800 text-sm font-semibold mb-2">Your Location</label>
+
+        <div class="bg-white mt-4 p-4 rounded-lg border border-gray-200 shadow-sm flex items-start">
+            <i class="fas fa-map-pin text-blue-500 mr-3 mt-1"></i>
+            <p class="text-gray-800 text-sm">{{ selectedAddress || 'No location selected' }}</p>
+        </div>
+
+        <button class="mt-4 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition"
+            (click)="toggleMap()">
+            <i class="fas fa-map-marker-alt mr-2 text-base"></i>
+            {{ mapVisible ? 'Hide Map' : 'Change Location' }}
+        </button>
+
+        <!-- Map Container -->
+        <div *ngIf="mapVisible" class="mt-4 border rounded-lg overflow-hidden">
+            <app-mapbox-map [center]="center" [zoom]="zoom" [accessToken]="mapboxToken"
+                (locationChanged)="onMapLocationChanged($event)">
+            </app-mapbox-map>
+        </div>
+    </div>
+    <!-- Date and Time Picker -->
+    <div class="mb-8">
+        <label class="block text-gray-800 text-sm font-semibold mb-3">Select Date & Time</label>
+
+        <div class="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
+            <input type="date"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onchange="handleDateChange(this.value)" />
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+            <button
+                class="w-full py-2 px-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                9:00 - 11:00 AM
+            </button>
+            <button
+                class="w-full py-2 px-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                11:00 AM - 1:00 PM
+            </button>
+            <button
+                class="w-full py-2 px-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                2:00 - 4:00 PM
+            </button>
+            <button
+                class="w-full py-2 px-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                4:00 - 6:00 PM
+            </button>
+        </div>
+
+        <div class="bg-blue-50 p-4 rounded-md border border-blue-200 shadow-sm">
+            <p class="text-blue-700 text-sm">
+                <i class="fas fa-info-circle mr-2"></i>
+                Next available slot: <strong id="nextSlot">Today, 2:00 PM</strong>
+            </p>
+        </div>
+    </div>
+</div>

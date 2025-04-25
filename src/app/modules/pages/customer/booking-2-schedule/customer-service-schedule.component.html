@@ -1,0 +1,14 @@
+<app-customer-breadcrumbs></app-customer-breadcrumbs>
+<div class="flex">
+    <!-- Left Section - Booking Form -->
+    <div class="w-1/2 p-8 overflow-y-auto flex flex-col justify-between">
+        <app-customer-schedule-booking-details></app-customer-schedule-booking-details>
+    </div>
+
+    <!-- Right Section - Order Summary -->
+    <div class="w-1/2 p-8 overflow-y-auto flex flex-col">
+        <app-customer-schedule-order-summary
+            [selectedServiceData]="selectedServiceData"></app-customer-schedule-order-summary>
+
+    </div>
+</div>

@@ -66,6 +66,12 @@ export const customerRoutes: Routes = [
                 loadComponent: () => import('../../pages/customer/booking-1-pick-service/customer-pick-a-service.component')
                     .then(c => c.CustomerPickAServiceComponent),
                 canActivate: [AuthGuard]
+            },
+            {
+                path: 'schedule_service',
+                loadComponent: () => import('../../pages/customer/booking-2-schedule/customer-service-schedule.component')
+                    .then(c => c.CustomerServiceScheduleComponent),
+                canActivate: [AuthGuard]
             }
         ],
     },
