@@ -1,0 +1,76 @@
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <!-- Calendar Header -->
+    <div class="p-6 border-b">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <h2 class="text-2xl font-semibold text-gray-900">
+                    {{ currentDate | date: 'MMMM yyyy' }}
+                </h2>
+                <div class="flex items-center gap-2 text-sm">
+                    <button (click)="prev()" class="p-2 hover:bg-gray-100 rounded-full">
+                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <button (click)="next()" class="p-2 hover:bg-gray-100 rounded-full">
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <input type="date" [(ngModel)]="dateInput" (change)="onDateInputChange()"
+                    class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none text-sm bg-white hover:border-green-300 transition-all">
+
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-clock" aria-hidden="true"></i>
+                    <span>Default Hours</span>
+                </button>
+                <button
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-copy" aria-hidden="true"></i>
+                    <span>Copy Schedule</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Body -->
+    <div class="p-6">
+        <!-- Week Days Header -->
+        <div class="grid grid-cols-7 mb-4">
+            <div *ngFor="let day of days" class="text-sm font-medium text-gray-500 text-center">
+                {{day}}
+            </div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="grid grid-cols-7 gap-2">
+            <div *ngFor="let date of visibleDates" (click)="selectDate(date)"
+                class="min-h-[120px] p-3 rounded-lg border border-gray-200 hover:border-green-500 cursor-pointer transition-colors relative group"
+                [ngClass]="{'bg-green-100 border-green-500': isSelected(date)}">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-400">{{ date.split(' ')[2] }}</span>
+                    <span class="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">3 slots</span>
+                </div>
+
+                <div class="space-y-1">
+                    <div
+                        class="text-xs px-2 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
+                        9:00 AM - 11:00 AM
+                    </div>
+                    <div
+                        class="text-xs px-2 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
+                        2:00 PM - 4:00 PM
+                    </div>
+                </div>
+
+                <button
+                    class="w-full mt-2 py-1 text-xs text-[#16A34A] opacity-0 group-hover:opacity-100 hover:bg-green-50 rounded transition-all">
+                    <i class="fas fa-plus" aria-hidden="true"></i> Add Slots
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
