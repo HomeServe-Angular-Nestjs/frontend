@@ -1,7 +1,10 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ISlot, SlotType } from '../../../../../../core/models/schedules.model';
+import { SlotType } from '../../../../../../core/models/schedules.model';
+import { ProviderService } from '../../../../../../core/services/provider.service';
+import { NotificationService } from '../../../../../../core/services/public/notification.service';
+import { IProvider } from '../../../../../../core/models/user.model';
 
 @Component({
   selector: 'app-provider-schedule-default-time',
@@ -9,11 +12,18 @@ import { ISlot, SlotType } from '../../../../../../core/models/schedules.model';
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './provider-schedule-default-time.component.html',
 })
-export class ProviderScheduleDefaultTimeComponent {
+export class ProviderScheduleDefaultTimeComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private readonly providerService = inject(ProviderService);
+  private readonly notyf = inject(NotificationService);
 
+  @Input({ required: true }) providerData!: IProvider | null;
+  @Input({ required: true }) addNewSlots!: boolean;
+  @Input({ required: true }) pickedDate!: string | null;
   @Output() closeModal = new EventEmitter<boolean>();
 
+
+  defaultSlots: SlotType[] = [];
   newSlots: SlotType[] = [];
 
   defaultForm: FormGroup = this.fb.group({
@@ -21,8 +31,21 @@ export class ProviderScheduleDefaultTimeComponent {
     to: ['', Validators.required]
   });
 
+  ngOnInit(): void {
+    if (this.providerData && this.providerData.defaultSlots.length > 0) {
+      this.defaultSlots.push(...this.providerData.defaultSlots);
+    }
+  }
+
   close() {
     this.closeModal.emit(false);
+  }
+
+  clearSlots() {
+    this.providerService.deleteDefaultSlot().subscribe({
+      next: () => this.defaultSlots = [],
+      error: (err) => this.notyf.error(err)
+    });
   }
 
   submit() {
@@ -45,22 +68,24 @@ export class ProviderScheduleDefaultTimeComponent {
       return;
     }
 
-    const isOverlapping = this.newSlots.some(slot => {
-      const existingFrom24 = this.convertTo24HourFormat(slot.from);
-      const existingTo24 = this.convertTo24HourFormat(slot.to);
+    const slotsToCheck = this.addNewSlots ? this.newSlots : this.defaultSlots;
 
-      const existingFromMinutes = this.timeToMinutes(existingFrom24);
-      const existingToMinutes = this.timeToMinutes(existingTo24);
-
-      return (fromMinutes < existingToMinutes && toMinutes > existingFromMinutes);
-    });
-
-    if (isOverlapping) {
+    if (this.hasOverlap(slotsToCheck, fromMinutes, toMinutes)) {
       alert('This time range overlaps with an existing slot.');
       return;
     }
 
-    this.newSlots.push({ from: from12, to: to12 });
+    if (this.addNewSlots) {
+      console.log(this.pickedDate);
+      this.newSlots.push({ from: from12, to: to12 })
+      console.log(this.newSlots);
+    } else {
+      this.providerService.updateDefaultSlot({ from: from12, to: to12 }).subscribe({
+        next: () => this.defaultSlots.push({ from: from12, to: to12 }),
+        error: (err) => this.notyf.error(err)
+      });
+    }
+
   }
 
   private timeToMinutes(time: string): number {
@@ -88,5 +113,16 @@ export class ProviderScheduleDefaultTimeComponent {
     }
 
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
+  private hasOverlap(slots: SlotType[], fromMinutes: number, toMinutes: number): boolean {
+    return slots.some(slot => {
+      const existingFrom24 = this.convertTo24HourFormat(slot.from);
+      const existingTo24 = this.convertTo24HourFormat(slot.to);
+      const existingFromMinutes = this.timeToMinutes(existingFrom24);
+      const existingToMinutes = this.timeToMinutes(existingTo24);
+
+      return (fromMinutes < existingToMinutes && toMinutes > existingFromMinutes);
+    });
   }
 }

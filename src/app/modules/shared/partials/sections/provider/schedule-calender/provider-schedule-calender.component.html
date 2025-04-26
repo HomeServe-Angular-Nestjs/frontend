@@ -59,10 +59,6 @@
                         class="text-xs px-2 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
                         9:00 AM - 11:00 AM
                     </div>
-                    <div
-                        class="text-xs px-2 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
-                        2:00 PM - 4:00 PM
-                    </div>
                 </div>
 
                 <button type="button" (click)="addSlots(date)"
@@ -75,5 +71,5 @@
     </div>
 </div>
 
-<app-provider-schedule-default-time *ngIf="modal"
+<app-provider-schedule-default-time *ngIf="modal" [providerData]="providerData$ | async" [addNewSlots]="addNewSlots" [pickedDate]="pickedDate" 
     (closeModal)="closeModal($event)"></app-provider-schedule-default-time>

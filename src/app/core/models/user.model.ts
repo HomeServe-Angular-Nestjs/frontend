@@ -1,4 +1,5 @@
 import { EntityState } from '@ngrx/entity';
+import { ISlot } from './schedules.model';
 
 export type Coordinates = {
     lat: number;
@@ -86,6 +87,7 @@ export interface IProvider extends IBaseUser {
     experience: number;
     availability: Availability;
     servicesOffered: string[];
+    defaultSlots: Omit<ISlot, 'takenBy'>[];
 }
 
 export interface IUserState {

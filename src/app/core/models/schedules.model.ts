@@ -8,13 +8,11 @@ export type SlotType = Omit<ISlot, 'takenBy'>;
 
 export interface ISchedule {
     id: string,
-    scheduledDate: Date,
+    scheduleDate: Date,
     slots: ISlot[];
     status: boolean;
     bookingLimit?: number;
     bufferTime?: string;
     serviceArea?: [number, number];
     serviceRadius: number;
-    default: Omit<ISlot, 'takenBy'>[];
-
 }

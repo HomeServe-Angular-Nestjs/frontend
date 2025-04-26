@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProviderScheduleDefaultTimeComponent } from "../schedule-default-time/provider-schedule-default-time.component";
+import { IProvider } from '../../../../../../core/models/user.model';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectProvider } from '../../../../../../store/provider/provider.selector';
 
 @Component({
   selector: 'app-provider-schedule-calender',
@@ -10,12 +14,22 @@ import { ProviderScheduleDefaultTimeComponent } from "../schedule-default-time/p
   templateUrl: './provider-schedule-calender.component.html',
 })
 export class ProviderScheduleCalenderComponent implements OnInit {
+  providerData$!: Observable<IProvider | null>;
+
+  constructor(private store: Store) {
+    this.providerData$ = this.store.select(selectProvider);
+  }
+
+
+
   currentDate: Date = new Date();
   dateInput: string = '';
   visibleDates: string[] = [];
   days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   selectedDate: string | null = null;
   modal: boolean = false;
+  addNewSlots: boolean = false;
+  pickedDate: string | null = null;
 
   ngOnInit(): void {
     this.syncDateInputToCurrent();
@@ -65,11 +79,14 @@ export class ProviderScheduleCalenderComponent implements OnInit {
   }
 
   addSlots(date: string) {
-    console.log(date)
+    this.modal = true;
+    this.addNewSlots = true;
+    this.pickedDate = date;
   }
 
   setDefaultHours() {
     this.modal = true;
+    this.addNewSlots = false;
   }
 
   closeModal(event: boolean) {

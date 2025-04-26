@@ -10,6 +10,4 @@ import { ProviderScheduleCalenderComponent } from "../../../../partials/sections
   templateUrl: './provider-schedule-create.component.html',
 })
 export class ProviderScheduleCreateComponent {
-
-
 }

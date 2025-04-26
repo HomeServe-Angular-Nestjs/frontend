@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ScheduleService } from '../../../../../../core/services/schedule.service';
+import { IProvider } from '../../../../../../core/models/user.model';
 
 @Component({
   selector: 'app-provider-schedule-view',
@@ -11,5 +12,8 @@ import { ScheduleService } from '../../../../../../core/services/schedule.servic
 })
 export class ProviderScheduleViewComponent {
   private scheduleService = inject(ScheduleService);
+
+
+  newSchedule() { }
 
 }

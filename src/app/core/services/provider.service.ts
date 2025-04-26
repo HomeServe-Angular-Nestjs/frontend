@@ -3,6 +3,7 @@ import { inject, Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
 import { IProvider } from "../models/user.model";
 import { API_ENV } from "../../environments/api.environments";
+import { ISlot, SlotType } from "../models/schedules.model";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
@@ -27,7 +28,25 @@ export class ProviderService {
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
             )
-        )
+        );
+    }
+
+    updateDefaultSlot(slot: SlotType) {
+        return this.http.patch(`${this.apiUrl}/default_slots`, slot).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    deleteDefaultSlot() {
+        return this.http.delete(`${this.apiUrl}/default_slots`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
     }
 
     setProviderData(data: IProvider) {
