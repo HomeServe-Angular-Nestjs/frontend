@@ -32,7 +32,7 @@ export class ProfileBreadcrumbsComponent {
             name: 'Work Scheduled',
             icon: 'fa-clock',
             active: false,
-            route: ''
+            route: 'schedule'
         },
         {
             name: 'Gallery',
@@ -40,5 +40,12 @@ export class ProfileBreadcrumbsComponent {
             active: false,
             route: ''
         },
-    ]
+    ];
+
+    changeStatus(name: string): void {
+        this.crumbs = this.crumbs.map((item) => ({
+            ...item,
+            active: name === item.name
+        }));
+    }
 }

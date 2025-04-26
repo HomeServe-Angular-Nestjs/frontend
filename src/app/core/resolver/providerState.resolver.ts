@@ -30,7 +30,7 @@ export class ProviderResolver implements Resolve<boolean> {
                     take(1),
                     switchMap(({ type }) => {
                         if (type === providerActions.fetchOneProviderFailure.type) {
-                            // this.router.navigate(['']),
+                            this.router.navigate(['provider', 'dashboard'])
                             return of(false);
                         }
                         return of(true)
