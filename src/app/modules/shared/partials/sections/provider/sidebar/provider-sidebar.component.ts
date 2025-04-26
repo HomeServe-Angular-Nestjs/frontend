@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { LoginAuthService } from '../../../../../../core/services/login-auth.service';
+import { NotificationService } from '../../../../../../core/services/public/notification.service';
+import { Store } from '@ngrx/store';
+import { authActions } from '../../../../../../store/auth/auth.actions';
 
 @Component({
   selector: 'app-provider-sidebar',
@@ -10,6 +14,8 @@ import { RouterLink } from '@angular/router';
   // styleUrl: './provider-sidebar.component.scss',
 })
 export class ProviderSidebarComponent {
+  constructor(private store: Store) { }
+
   menuItems = [
     {
       title: 'primary navigation',
@@ -97,5 +103,9 @@ export class ProviderSidebarComponent {
         }
       ]
     }
-  ]
+  ];
+
+  logout() {
+    this.store.dispatch(authActions.logout({ userType: 'provider' }));
+  }
 }

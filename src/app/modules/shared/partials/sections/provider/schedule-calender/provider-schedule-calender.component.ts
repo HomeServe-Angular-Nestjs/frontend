@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ProviderScheduleDefaultTimeComponent } from "../schedule-default-time/provider-schedule-default-time.component";
 
 @Component({
   selector: 'app-provider-schedule-calender',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ProviderScheduleDefaultTimeComponent],
   templateUrl: './provider-schedule-calender.component.html',
 })
 export class ProviderScheduleCalenderComponent implements OnInit {
@@ -13,41 +14,12 @@ export class ProviderScheduleCalenderComponent implements OnInit {
   dateInput: string = '';
   visibleDates: string[] = [];
   days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  selectedDate: string | null = null;
+  modal: boolean = false;
 
   ngOnInit(): void {
     this.syncDateInputToCurrent();
     this.generateWeek(this.currentDate);
-  }
-
-  syncDateInputToCurrent() {
-    this.dateInput = this.formatDateInput(this.currentDate);
-  }
-
-  formatDateInput(date: Date): string {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  generateWeek(baseDate: Date) {
-    const startOfWeek = this.getStartOfWeek(baseDate);
-    const dates: string[] = [];
-
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(startOfWeek);
-      day.setDate(startOfWeek.getDate() + i);
-      dates.push(day.toDateString());
-    }
-
-    this.visibleDates = dates;
-  }
-
-  getStartOfWeek(date: Date): Date {
-    const start = new Date(date);
-    const day = start.getDay(); // 0 = Sun, 1 = Mon, ...
-    start.setDate(start.getDate() - day);
-    return start;
   }
 
   prev() {
@@ -78,13 +50,6 @@ export class ProviderScheduleCalenderComponent implements OnInit {
     return formatted === this.dateInput;
   }
 
-  
-getMonthNumber(monthName: string): number {
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return months.indexOf(monthName);
-}
-
   selectDate(dateStr: string) {
     const [weekday, month, day, year] = dateStr.split(' ');
     const localDate = new Date(Number(year), this.getMonthNumber(month), Number(day));
@@ -99,5 +64,52 @@ getMonthNumber(monthName: string): number {
     this.generateWeek(this.currentDate);
   }
 
+  addSlots(date: string) {
+    console.log(date)
+  }
 
+  setDefaultHours() {
+    this.modal = true;
+  }
+
+  closeModal(event: boolean) {
+    this.modal = event;
+  }
+
+  private getMonthNumber(monthName: string): number {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return months.indexOf(monthName);
+  }
+
+  private syncDateInputToCurrent() {
+    this.dateInput = this.formatDateInput(this.currentDate);
+  }
+
+  private formatDateInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private generateWeek(baseDate: Date) {
+    const startOfWeek = this.getStartOfWeek(baseDate);
+    const dates: string[] = [];
+
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      dates.push(day.toDateString());
+    }
+
+    this.visibleDates = dates;
+  }
+
+  private getStartOfWeek(date: Date): Date {
+    const start = new Date(date);
+    const day = start.getDay(); // 0 = Sun, 1 = Mon, ...
+    start.setDate(start.getDate() - day);
+    return start;
+  }
 }

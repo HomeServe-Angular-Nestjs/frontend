@@ -21,7 +21,7 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <button
+                <button (click)="setDefaultHours()"
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">
                     <i class="fas fa-clock" aria-hidden="true"></i>
                     <span>Default Hours</span>
@@ -65,7 +65,7 @@
                     </div>
                 </div>
 
-                <button
+                <button type="button" (click)="addSlots(date)"
                     class="w-full mt-2 py-1 text-xs text-[#16A34A] opacity-0 group-hover:opacity-100 hover:bg-green-50 rounded transition-all">
                     <i class="fas fa-plus" aria-hidden="true"></i> Add Slots
                 </button>
@@ -74,3 +74,6 @@
         </div>
     </div>
 </div>
+
+<app-provider-schedule-default-time *ngIf="modal"
+    (closeModal)="closeModal($event)"></app-provider-schedule-default-time>
