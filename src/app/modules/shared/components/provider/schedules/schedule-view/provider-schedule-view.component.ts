@@ -12,4 +12,6 @@ import { ScheduleService } from '../../../../../../core/services/schedule.servic
 export class ProviderScheduleViewComponent {
   private scheduleService = inject(ScheduleService);
 
+  newSchedule() { }
+
 }
