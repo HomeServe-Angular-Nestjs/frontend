@@ -5,6 +5,9 @@ import { SlotType } from '../../../../../../core/models/schedules.model';
 import { ProviderService } from '../../../../../../core/services/provider.service';
 import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { IProvider } from '../../../../../../core/models/user.model';
+import { ScheduleService } from '../../../../../../core/services/schedule.service';
+import { Store } from '@ngrx/store';
+import { scheduleActions } from '../../../../../../store/schedules/schedule.action';
 
 @Component({
   selector: 'app-provider-schedule-default-time',
@@ -14,13 +17,16 @@ import { IProvider } from '../../../../../../core/models/user.model';
 })
 export class ProviderScheduleDefaultTimeComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private store = inject(Store);
   private readonly providerService = inject(ProviderService);
+  private readonly scheduleService = inject(ScheduleService);
   private readonly notyf = inject(NotificationService);
 
   @Input({ required: true }) providerData!: IProvider | null;
   @Input({ required: true }) addNewSlots!: boolean;
   @Input({ required: true }) pickedDate!: string | null;
   @Output() closeModal = new EventEmitter<boolean>();
+  @Output() newSlotEvent = new EventEmitter<SlotType>();
 
 
   defaultSlots: SlotType[] = [];
@@ -76,9 +82,7 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
     }
 
     if (this.addNewSlots) {
-      console.log(this.pickedDate);
-      this.newSlots.push({ from: from12, to: to12 })
-      console.log(this.newSlots);
+      this.newSlotEvent.emit({ from: from12, to: to12 });
     } else {
       this.providerService.updateDefaultSlot({ from: from12, to: to12 }).subscribe({
         next: () => this.defaultSlots.push({ from: from12, to: to12 }),
