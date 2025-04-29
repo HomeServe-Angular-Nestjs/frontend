@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { API_KEY } from '../../../../../../environments/api.environments';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
+import { ISchedule } from '../../../../../../core/models/schedules.model';
 
 
 @Component({
@@ -11,6 +12,9 @@ import { MapboxMapComponent } from "../../../../partials/shared/map/map.componen
   templateUrl: './customer-schedule-booking-details.component.html',
 })
 export class CustomerScheduleBookingDetailsComponent {
+
+  @Input({ required: true }) schedules!: ISchedule[] | null;
+
   mapVisible = false;
   center: [number, number] = [76.9560, 8.5010];
   zoom = 12;

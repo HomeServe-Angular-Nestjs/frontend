@@ -28,9 +28,7 @@ export class CustomerProviderProfileLayoutComponent {
         private readonly providerService: ProviderService,
         private readonly notyf: NotificationService
     ) {
-        this.route.queryParams.subscribe(params => {
-            this.providerId = params['id'];
-        });
+        this.providerId = this.route.snapshot.paramMap.get('id');
         if (this.providerId) {
             this.providerService.getOneProvider(this.providerId).subscribe({
                 next: (provider) => this.providerService.setProviderData(provider),

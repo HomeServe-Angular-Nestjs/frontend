@@ -69,6 +69,6 @@ export class CustomerProviderViewCardComponent {
   }
 
   viewProvider(providerId: string) {
-    this.router.navigate(['provider_details'], { queryParams: { id: providerId } });
+    this.router.navigate(['provider_details', providerId, 'services']);
   }
 }

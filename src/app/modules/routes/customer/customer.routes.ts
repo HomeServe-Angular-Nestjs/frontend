@@ -35,7 +35,7 @@ export const customerRoutes: Routes = [
                 canActivate: [AuthGuard]
             },
             {
-                path: 'provider_details',
+                path: 'provider_details/:id',
                 component: CustomerProviderProfileLayoutComponent,
                 canActivate: [AuthGuard],
                 children: [
@@ -62,7 +62,7 @@ export const customerRoutes: Routes = [
                 ]
             },
             {
-                path: 'pick_a_service',
+                path: 'pick_a_service/:id',
                 loadComponent: () => import('../../pages/customer/booking-1-pick-service/customer-pick-a-service.component')
                     .then(c => c.CustomerPickAServiceComponent),
                 canActivate: [AuthGuard]

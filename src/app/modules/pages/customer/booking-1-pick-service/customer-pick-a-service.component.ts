@@ -133,7 +133,6 @@ export class CustomerPickAServiceComponent {
   scheduleTime(event: boolean) {
     if (event) {
       this.sharedDataService.setSelectedServiceData(this.purchasedServiceList);
-
       this.router.navigate(['schedule_service']);
     }
   }
