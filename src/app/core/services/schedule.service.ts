@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { API_ENV } from '../../environments/api.environments';
 import { catchError, Observable, throwError } from 'rxjs';
 import { ISchedule, SlotType } from '../models/schedules.model';
+import { IProvider } from '../models/user.model';
 
 @Injectable({ providedIn: 'root', })
 export class ScheduleService {
@@ -20,9 +21,8 @@ export class ScheduleService {
     );
   }
 
-  updateSchedule(data: Partial<ISchedule>): Observable<ISchedule> {
-    console.log('service: ', data)
-    return this.http.put<ISchedule>(`${this.apiUrl}/schedules`, data).pipe(
+  updateSchedule(data: Partial<ISchedule>): Observable<{ schedule: ISchedule, provider: IProvider }> {
+    return this.http.put<{ schedule: ISchedule, provider: IProvider }>(`${this.apiUrl}/schedules`, data).pipe(
       catchError((error: HttpErrorResponse) =>
         throwError(() =>
           new Error(this.getErrorMessage(error)))
