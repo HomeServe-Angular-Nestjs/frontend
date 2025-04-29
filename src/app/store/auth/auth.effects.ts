@@ -7,6 +7,7 @@ import { authActions } from "./auth.actions";
 import { catchError, map, of, switchMap, tap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
+import { handleApiError } from "../../core/utils/handle-errors.utils";
 
 export const authEffects = {
     login$: createEffect(() => {
@@ -26,42 +27,45 @@ export const authEffects = {
                         router.navigate([url]);
                     }),
                     catchError((error: HttpErrorResponse) => {
-                        console.error('[Login Effect] API Error:', error);
-                        const errorMessage = error?.error?.message || 'Something went wrong. Please try again.';
-                        notyf.error(errorMessage);
-                        return of(authActions.loginFailure(({ error: errorMessage })));
+                        return handleApiError(error, authActions.loginFailure, notyf);
                     })
                 )
             )
-        )
+        );
     }, { functional: true }),
 
     googleLogin$: createEffect(() => {
         const actions$ = inject(Actions);
         const loginService = inject(LoginAuthService);
+        const notyf = inject(NotificationService);
 
         return actions$.pipe(
             ofType(authActions.googleLogin),
             switchMap(({ userType }) =>
                 loginService.initializeGoogleAuth(userType).pipe(
-                    tap((response) => {
-                        window.location.href = response.data;
+                    tap((response) => window.location.href = response.data),
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, authActions.loginFailure, notyf);
                     })
                 )
             )
-        )
+        );
     }, { functional: true, dispatch: false }),
 
     logout$: createEffect(() => {
         const actions$ = inject(Actions);
         const authService = inject(LoginAuthService);
         const router = inject(Router);
+        const notyf = inject(NotificationService);
 
         return actions$.pipe(
             ofType(authActions.logout),
             switchMap(({ userType }) =>
                 authService.logout(userType).pipe(
-                    tap(() => router.navigate(['landing_page']))
+                    tap(() => router.navigate(['landing_page'])),
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, authActions.loginFailure, notyf);
+                    })
                 )
             )
         );

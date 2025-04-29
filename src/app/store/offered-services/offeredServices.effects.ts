@@ -5,7 +5,7 @@ import { catchError, map, of, switchMap } from "rxjs";
 import { OfferedServicesService } from "../../core/services/service-management.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
-import { providerActions } from "../provider/provider.action";
+import { handleApiError } from "../../core/utils/handle-errors.utils";
 
 export const offeredServiceEffects = {
     fetchOfferedServices$: createEffect(() => {
@@ -19,10 +19,7 @@ export const offeredServiceEffects = {
                 serviceOfferedService.fetchOfferedServices().pipe(
                     map((response) => offeredServiceActions.fetchOfferedServicesSuccess({ offeredServices: response })),
                     catchError((error: HttpErrorResponse) => {
-                        console.error('[Fetch Offered Service Effect] API Error: ', error);
-                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
-                        notyf.error(errorMessage);
-                        return of(offeredServiceActions.fetchOfferedServiceFailure({ error: errorMessage }));
+                        return handleApiError(error, offeredServiceActions.fetchOfferedServiceFailure, notyf);
                     })
                 )
             )
@@ -39,11 +36,8 @@ export const offeredServiceEffects = {
             switchMap(({ updateData }) =>
                 serviceOfferedService.updateService(updateData).pipe(
                     map((response) => offeredServiceActions.updateOfferedServiceSuccess({ updatedService: response })),
-                    catchError((error) => {
-                        console.error('[Update Offered Service Effect] API Error: ', error);
-                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
-                        notyf.error(errorMessage);
-                        return of(offeredServiceActions.updateOfferedServiceFailure({ error: errorMessage }));
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, notyf);
                     })
                 )
             )
@@ -63,15 +57,12 @@ export const offeredServiceEffects = {
                         id: response.id,
                         subService: response.subService
                     })),
-                    catchError((error) => {
-                        console.error('[Update sub Service Effect] API Error: ', error);
-                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
-                        notyf.error(errorMessage);
-                        return of(offeredServiceActions.updateOfferedServiceFailure({ error: errorMessage }));
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, notyf);
                     })
                 )
             )
-        )
+        );
     }, { functional: true })
 
 }

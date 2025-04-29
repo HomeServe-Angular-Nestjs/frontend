@@ -51,18 +51,24 @@
                 [ngClass]="{'bg-green-100 border-green-500': isSelected(date)}">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-sm text-gray-400">{{ date.split(' ')[2] }}</span>
-                    <span class="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">3 slots</span>
+                    <span *ngIf="schedules && schedules.length > 0"
+                        class="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">{{schedules.length}}
+                        slots</span>
                 </div>
 
                 <div class="space-y-1">
-                    <div
-                        class="text-xs px-2 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
-                        9:00 AM - 11:00 AM
-                    </div>
-                    <div
-                        class="text-xs px-2 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
-                        2:00 PM - 4:00 PM
-                    </div>
+                    <ng-container *ngIf="schedules && schedules.length > 0">
+                        <ng-container *ngFor="let item of schedules">
+                            <ng-container *ngIf="item.scheduleDate === date">
+                                <ng-container *ngFor="let slot of item.slots">
+                                    <div class="text-xs px-2 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100
+                                    transition-colors">
+                                        {{slot.from}} - {{slot.to}}
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
                 </div>
 
                 <button type="button" (click)="addSlots(date)"
@@ -75,5 +81,6 @@
     </div>
 </div>
 
-<app-provider-schedule-default-time *ngIf="modal"
-    (closeModal)="closeModal($event)"></app-provider-schedule-default-time>
+<app-provider-schedule-default-time *ngIf="modal" [providerData]="providerData$ | async" [addNewSlots]="addNewSlots"
+    [pickedDate]="pickedDate" (closeModal)="closeModal($event)"
+    (newSlotEvent)="addToNewSlot($event)"></app-provider-schedule-default-time>

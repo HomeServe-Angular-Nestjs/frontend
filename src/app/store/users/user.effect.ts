@@ -7,6 +7,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
 import { ProviderService } from "../../core/services/provider.service";
 import { providerActions } from "../provider/provider.action";
+import { handleApiError } from "../../core/utils/handle-errors.utils";
 
 export const userEffects = {
     fetchUsers$: createEffect(() => {
@@ -20,10 +21,7 @@ export const userEffects = {
                 userService.getUsers().pipe(
                     map((response) => userActions.fetchUsersSuccess({ customers: response.customers, providers: response.providers })),
                     catchError((error: HttpErrorResponse) => {
-                        console.error('[Fetch Users Effect] API Error: ', error);
-                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
-                        notyf.error(errorMessage);
-                        return of(userActions.fetchUsersFailure({ error: errorMessage }));
+                        return handleApiError(error, userActions.fetchUsersFailure, notyf);
                     })
                 )
             )
@@ -33,6 +31,7 @@ export const userEffects = {
     fetchProviders$: createEffect(() => {
         const actions$ = inject(Actions);
         const providerService = inject(ProviderService);
+        const notyf = inject(NotificationService);
 
         return actions$.pipe(
             ofType(userActions.fetchProviders),
@@ -40,16 +39,14 @@ export const userEffects = {
                 providerService.getProviders().pipe(
                     map((response) => userActions.fetchProvidersSuccess({ providers: response })),
                     catchError((error: HttpErrorResponse) => {
-                        console.log('[Fetch Users Effect] API Error: ', error);
-                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
-                        return of(userActions.fetchProvidersFailure({ error: errorMessage }));
+                        return handleApiError(error, userActions.fetchProvidersFailure, notyf);
                     })
                 )
             )
         );
     }, { functional: true }),
 
-   
+
 
     updateCustomer$: createEffect(() => {
         const actions$ = inject(Actions);
@@ -63,9 +60,7 @@ export const userEffects = {
                     map((customer) => customerActions.updateCustomerSuccess({ customer })),
                     tap(() => notyf.success('Updated Successfully')),
                     catchError((error) => {
-                        console.log('[Fetch Users Effect] API Error: ', error);
-                        const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
-                        return of(customerActions.updateCustomerFailure({ error: errorMessage }));
+                        return handleApiError(error, customerActions.updateCustomerFailure, notyf);
                     })
                 )
             )

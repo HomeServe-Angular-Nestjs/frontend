@@ -2,6 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProviderScheduleDefaultTimeComponent } from "../schedule-default-time/provider-schedule-default-time.component";
+import { IProvider } from '../../../../../../core/models/user.model';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectProvider } from '../../../../../../store/provider/provider.selector';
+import { ISchedule, ISlot, SlotType } from '../../../../../../core/models/schedules.model';
+import { scheduleActions } from '../../../../../../store/schedules/schedule.action';
+import { selectAllSchedules } from '../../../../../../store/schedules/schedule.selector';
 
 @Component({
   selector: 'app-provider-schedule-calender',
@@ -10,12 +17,24 @@ import { ProviderScheduleDefaultTimeComponent } from "../schedule-default-time/p
   templateUrl: './provider-schedule-calender.component.html',
 })
 export class ProviderScheduleCalenderComponent implements OnInit {
+  providerData$!: Observable<IProvider | null>;
+  // schedules$!: Observable<ISchedule[]>;
+
+  constructor(private store: Store) {
+    this.providerData$ = this.store.select(selectProvider);
+    this.store.select(selectAllSchedules).subscribe(data => {
+      this.schedules = data;
+    });
+  }
+
   currentDate: Date = new Date();
   dateInput: string = '';
   visibleDates: string[] = [];
   days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  selectedDate: string | null = null;
   modal: boolean = false;
+  addNewSlots: boolean = false;
+  pickedDate!: string;
+  schedules: ISchedule[] = [];
 
   ngOnInit(): void {
     this.syncDateInputToCurrent();
@@ -65,11 +84,24 @@ export class ProviderScheduleCalenderComponent implements OnInit {
   }
 
   addSlots(date: string) {
-    console.log(date)
+    this.modal = true;
+    this.addNewSlots = true;
+    this.pickedDate = date;
+  }
+
+  addToNewSlot(slot: SlotType) {
+    this.modal = false;
+    this.store.dispatch(scheduleActions.updateSchedule({
+      updateData: {
+        scheduleDate: this.pickedDate,
+        slot
+      }
+    }));
   }
 
   setDefaultHours() {
     this.modal = true;
+    this.addNewSlots = false;
   }
 
   closeModal(event: boolean) {
