@@ -14,15 +14,8 @@ import { scheduleActions } from '../../../../../../store/schedules/schedule.acti
 export class ProviderScheduleViewComponent {
   private scheduleService = inject(ScheduleService);
 
-<<<<<<< HEAD
-=======
   constructor(private store: Store) {
     this.store.dispatch(scheduleActions.fetchSchedules());
   }
-
-
->>>>>>> dev
-
   newSchedule() { }
-
 }
