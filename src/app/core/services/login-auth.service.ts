@@ -16,10 +16,11 @@ export class LoginAuthService {
     constructor(private http: HttpClient) { }
 
     authCredentials(user: IUser) {
-        console.log('[Login Service] logging the params: ', user);
         return this.http.post(`${this.apiUrl}/auth`, user).pipe(
-            tap((response) => console.log(response))
-        );
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            ));
     }
 
     forgotPassword(user: IUser) {
@@ -45,5 +46,9 @@ export class LoginAuthService {
                 return throwError(() => new Error(message));
             })
         );
+    }
+
+    private getErrorMessage(error: HttpErrorResponse): string {
+        return error?.error?.message || 'something went wrong';
     }
 }

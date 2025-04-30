@@ -11,6 +11,7 @@ import { NotificationService } from "../../../../../core/services/public/notific
 import { API_ENV } from "../../../../../environments/api.environments";
 import { authActions } from "../../../../../store/auth/auth.actions";
 import { EmailInputComponent } from "../../../partials/auth/email-input/email-input.component";
+import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
 
 @Component({
     selector: 'app-login-base',
@@ -19,19 +20,19 @@ import { EmailInputComponent } from "../../../partials/auth/email-input/email-in
     imports: [CommonModule, ReactiveFormsModule, EmailInputComponent, RouterLink]
 })
 export class LoginBaseComponent {
-    private fb = inject(FormBuilder);
-    private store = inject(Store);
-    private notyf = inject(NotificationService);
+    private _fb = inject(FormBuilder);
+    private _store = inject(Store);
+    private _notyf = inject(NotificationService);
 
     @Input({ required: true }) config!: ILoginConfig;
     regexp = REGEXP_ENV;
-    messages = MESSAGES_ENV;
     hidePassword = true;
     forgotPassword = false;
     apiUrl = API_ENV.loginAuth
     type!: UserType;
+    formError: string = 'Email required';
 
-    form: FormGroup = this.fb.group({
+    form: FormGroup = this._fb.group({
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.pattern(this.regexp.password)]]
     });
@@ -42,18 +43,23 @@ export class LoginBaseComponent {
             password: this.form.get('password')
         }
 
-        const hasErrors = this.hasValidationErrors(controls.email, 'email') ||
-            this.hasValidationErrors(controls.password, 'password');
-        if (hasErrors) return;
-
-        const user: IUser = {
-            email: this.form.value.email,
-            password: this.form.value.password,
-            type: this.config.type
-        }
-
         if (this.form.valid) {
-            this.store.dispatch(authActions.login({ user }));
+            const user: IUser = {
+                email: this.form.value.email,
+                password: this.form.value.password,
+                type: this.config.type
+            }
+
+            this._store.dispatch(authActions.login({ user }));
+        } else {
+            this.form.markAllAsTouched();
+            for (const [key, control] of Object.entries(controls)) {
+                const message = getValidationMessage(control, key);
+                if (message) {
+                    this._notyf.error(message);
+                    return;
+                }
+            }
         }
     }
 
@@ -67,18 +73,6 @@ export class LoginBaseComponent {
     }
 
     getGoogleAuthUrl() {
-        this.store.dispatch(authActions.googleLogin({ userType: this.config.type }));
-    }
-
-    private hasValidationErrors(control: AbstractControl | null, fieldName: string): boolean {
-        if (control?.errors) {
-            Object.keys(control.errors).forEach((key) => {
-                if (this.messages['errorMessages'][fieldName]?.[key]) {
-                    this.notyf.error(this.messages['errorMessages'][fieldName][key]);
-                }
-            });
-            return true;
-        }
-        return false;
+        this._store.dispatch(authActions.googleLogin({ userType: this.config.type }));
     }
 }

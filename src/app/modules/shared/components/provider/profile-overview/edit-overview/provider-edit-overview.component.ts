@@ -39,18 +39,19 @@ export interface profile {
 export class ProviderEditOverviewComponent implements OnInit {
   provider$!: Observable<IProvider | null>;
 
-  private router = inject(Router);
-  private fb = inject(FormBuilder);
-  private notyf = inject(NotificationService);
-  private providerService = inject(ProviderService);
+  private _router = inject(Router);
+  private _fb = inject(FormBuilder);
+  private _notyf = inject(NotificationService);
+  private _providerService = inject(ProviderService);
 
   previewImage!: string;
   emergency = false;
   daysOfWeek: Day[] = ['Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'];
   profileImage!: File;
+  selectedLocation: string = '';
   provider!: IProvider | null;
 
-  profileForm: FormGroup = this.fb.group({
+  profileForm: FormGroup = this._fb.group({
     fullname: ['', Validators.required],
     profession: ['', Validators.required],
     experience: ['', [Validators.required, Validators.min(0), Validators.max(50)]],
@@ -149,7 +150,7 @@ export class ProviderEditOverviewComponent implements OnInit {
       for (const [key, control] of Object.entries(controls)) {
         const message = getValidationMessage(control, key);
         if (message) {
-          this.notyf.error(message);
+          this._notyf.error(message);
           return;
         }
       }
@@ -157,6 +158,6 @@ export class ProviderEditOverviewComponent implements OnInit {
   }
 
   cancelEdit() {
-    this.router.navigate(['provider', 'profiles'])
+    this._router.navigate(['provider', 'profiles'])
   }
 }

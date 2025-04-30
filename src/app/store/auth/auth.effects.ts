@@ -8,6 +8,7 @@ import { catchError, map, of, switchMap, tap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
+import { navigationAfterLogin } from "../../core/utils/navigation.utils";
 
 export const authEffects = {
     login$: createEffect(() => {
@@ -22,8 +23,7 @@ export const authEffects = {
                 loginService.authCredentials(user).pipe(
                     map(() => authActions.loginSuccess({ email: user.email })),
                     tap(() => {
-                        const url = user.type === 'customer' ? 'homepage' :
-                            user.type === 'provider' ? 'provider/dashboard' : 'admin/dashboard';
+                        const url = navigationAfterLogin(user.type);
                         router.navigate([url]);
                     }),
                     catchError((error: HttpErrorResponse) => {

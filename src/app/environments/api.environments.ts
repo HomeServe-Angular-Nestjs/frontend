@@ -1,7 +1,7 @@
 const domainName = 'http://localhost:5000'
 export const API_ENV = {
-    signupAuth: `${domainName}/signup`,
-    loginAuth: `${domainName}/login`,
+    signupAuth: `${domainName}/api/signup`,
+    loginAuth: `${domainName}/api/login`,
     auth: `${domainName}/auth`,
     admin: `${domainName}/admin`,
     customer: `${domainName}`,
