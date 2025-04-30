@@ -1,13 +1,25 @@
-//* Guards Authenticated Users navigating to signup/login page.
-
 import { inject } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { combineLatest, map, Observable, take } from "rxjs";
 import { selectAuthUserType, selectCheckStatus } from "../../store/auth/auth.selector";
-import {  navigationAfterLogin } from "../utils/navigation.utils";
+import { navigationAfterLogin } from "../utils/navigation.utils";
 
-export const GuestGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> => {
+/**
+ * Guard to prevent authenticated users from accessing guest-only routes.
+ *
+ * @param {ActivatedRouteSnapshot} route - Snapshot of the current activated route.
+ * @param {RouterStateSnapshot} state - Current state of the router.
+ * @returns {Observable<boolean | UrlTree>} - Returns `true` if the user is a guest;
+ * otherwise redirects authenticated users to their respective dashboard based on user type.
+ *
+ * This guard checks the authentication status and user type from the store.
+ * If the user is authenticated, it generates a redirect `UrlTree` using the user type
+ * to send them to the appropriate route (e.g., admin or customer dashboard).
+ * Otherwise, it allows access to the route.
+ */
+
+export const GuestGuard: CanActivateFn = (): Observable<boolean | UrlTree> => {
     const store = inject(Store);
     const router = inject(Router);
 
@@ -25,5 +37,4 @@ export const GuestGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: 
             return true;
         })
     );
-
 };

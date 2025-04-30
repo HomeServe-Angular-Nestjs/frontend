@@ -1,4 +1,4 @@
-const domainName = 'http://localhost:5000'
+const domainName = 'http://localhost:5000';
 export const API_ENV = {
     signupAuth: `${domainName}/api/signup`,
     loginAuth: `${domainName}/api/login`,

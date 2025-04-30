@@ -5,12 +5,9 @@ import { ProfilesLayoutComponent } from "../../pages/provider/profiles/profiles-
 import { ProviderProfileOverviewLayoutComponent } from "../../shared/components/provider/profile-overview/layout/provider-profile-overview-layout.component";
 import { ProviderKycComponent } from "../../shared/components/provider/kyc/provider-kyc.component";
 import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
+import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
 
 export const providerRoutes: Routes = [
-    {
-        path: 'kyc',
-        component: ProviderKycComponent
-    },
     {
         path: 'provider',
         component: ProviderLayoutComponent,
@@ -20,7 +17,7 @@ export const providerRoutes: Routes = [
                 path: 'dashboard',
                 loadComponent: () => import('../../pages/provider/provider-homepage/provider-homepage.component')
                     .then(c => c.ProviderHomepageComponent),
-                canActivate: [AuthGuard],
+                canActivate: [ProfileAuthGuard, AuthGuard],
             },
             {
                 path: 'profiles',
