@@ -68,7 +68,7 @@ export const customerRoutes: Routes = [
                 canActivate: [AuthGuard]
             },
             {
-                path: 'schedule_service',
+                path: 'schedule_service/:id',
                 loadComponent: () => import('../../pages/customer/booking-2-schedule/customer-service-schedule.component')
                     .then(c => c.CustomerServiceScheduleComponent),
                 canActivate: [AuthGuard]

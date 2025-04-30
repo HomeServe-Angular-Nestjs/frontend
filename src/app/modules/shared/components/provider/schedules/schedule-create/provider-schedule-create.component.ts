@@ -14,6 +14,6 @@ import { scheduleActions } from '../../../../../../store/schedules/schedule.acti
 export class ProviderScheduleCreateComponent {
   
   constructor(private store: Store) {
-    this.store.dispatch(scheduleActions.fetchSchedules());
+    this.store.dispatch(scheduleActions.fetchSchedules({}));
   }
 }

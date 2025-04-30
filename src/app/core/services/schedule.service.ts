@@ -12,8 +12,8 @@ export class ScheduleService {
 
   private apiUrl = API_ENV.provider;
 
-  fetchSchedules(): Observable<ISchedule[]> {
-    return this.http.get<ISchedule[]>(`${this.apiUrl}/schedules`).pipe(
+  fetchSchedules(providerId?: string): Observable<ISchedule[]> {
+    return this.http.get<ISchedule[]>(`${this.apiUrl}/schedules?id=${providerId}`).pipe(
       catchError((error: HttpErrorResponse) =>
         throwError(() =>
           new Error(this.getErrorMessage(error)))

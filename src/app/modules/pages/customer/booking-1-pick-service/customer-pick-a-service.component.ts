@@ -41,6 +41,7 @@ export class CustomerPickAServiceComponent {
   private readonly sharedDataService = inject(SharedDataService);
   private router = inject(Router);
 
+  providerId!: string | null;
   serviceIds: string[] = [];
   serviceData: IOfferedService[] = [];
   serviceCategories: { title: string, image: string }[] = [];
@@ -48,10 +49,15 @@ export class CustomerPickAServiceComponent {
   purchasedServiceList: SelectedServiceType[] = [];
 
   constructor(private route: ActivatedRoute) {
+    this.route.paramMap.subscribe(param => {
+      this.providerId = param.get('id');
+    })
+
     this.route.queryParamMap.subscribe(params => {
       const idsParam = params.get('ids');
       this.serviceIds = idsParam ? idsParam.split(',') : [];
     });
+
     if (this.serviceIds.length > 0) {
       this.fetchService(this.serviceIds);
     }
@@ -133,7 +139,7 @@ export class CustomerPickAServiceComponent {
   scheduleTime(event: boolean) {
     if (event) {
       this.sharedDataService.setSelectedServiceData(this.purchasedServiceList);
-      this.router.navigate(['schedule_service']);
+      this.router.navigate(['schedule_service', this.providerId]);
     }
   }
 }

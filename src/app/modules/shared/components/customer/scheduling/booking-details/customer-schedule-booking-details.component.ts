@@ -2,13 +2,14 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { API_KEY } from '../../../../../../environments/api.environments';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { ISchedule } from '../../../../../../core/models/schedules.model';
+import { ISchedule, ISlot } from '../../../../../../core/models/schedules.model';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-customer-schedule-booking-details',
   standalone: true,
-  imports: [CommonModule, MapboxMapComponent],
+  imports: [CommonModule, MapboxMapComponent, FormsModule],
   templateUrl: './customer-schedule-booking-details.component.html',
 })
 export class CustomerScheduleBookingDetailsComponent {
@@ -19,11 +20,24 @@ export class CustomerScheduleBookingDetailsComponent {
   center: [number, number] = [76.9560, 8.5010];
   zoom = 12;
   selectedAddress: string | null = null;
+  selectedDate: string = '';
+  slots: ISlot[] = [];
 
   readonly mapboxToken = API_KEY.mapbox;
 
   toggleMap() {
     this.mapVisible = !this.mapVisible;
+  }
+
+  handleDateChange() {
+    const formattedDate = new Date(this.selectedDate).toDateString();
+
+    this.schedules?.forEach((schedule: ISchedule) => {
+      console.log(schedule)
+      if (schedule.scheduleDate === formattedDate) {
+        this.slots = schedule.slots;
+      }
+    });
   }
 
   async onMapLocationChanged(newCenter: [number, number]) {

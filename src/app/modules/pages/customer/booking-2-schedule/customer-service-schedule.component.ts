@@ -31,16 +31,25 @@ export class CustomerServiceScheduleComponent {
   private readonly notyf = inject(NotificationService);
 
   schedules$!: Observable<ISchedule[]> | null;
-
+  providerId!: string | null;
   selectedServiceData: SelectedServiceType[] = [];
   preparedDataForCalculation: SelectedServiceIdsType[] = [];
 
-  constructor(private store: Store, private readonly sharedDataService: SharedDataService) {
-    this.store.dispatch(scheduleActions.fetchSchedules());
+  constructor(
+    private store: Store,
+    private readonly sharedDataService: SharedDataService,
+    private route: ActivatedRoute
+  ) {
+    this.route.paramMap.subscribe(param => {
+      this.providerId = param.get('id');
+    });
+    
+    this.store.dispatch(scheduleActions.fetchSchedules({ providerId: this.providerId as string }));
     this.schedules$ = this.store.select(selectAllSchedules);
     this.selectedServiceData = this.sharedDataService.getSelectedServiceData();
     this.preparedDataForCalculation = this.prepareTheDataForPriceCalculation(this.selectedServiceData);
   }
+
 
   fetchServices(serviceIds: string[]): void {
     const observables = serviceIds.map(id =>

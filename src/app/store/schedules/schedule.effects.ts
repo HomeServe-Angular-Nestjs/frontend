@@ -15,8 +15,8 @@ export const scheduleEffects = {
 
         return actions$.pipe(
             ofType(scheduleActions.fetchSchedules),
-            switchMap(() =>
-                scheduleService.fetchSchedules().pipe(
+            switchMap(({ providerId }) =>
+                scheduleService.fetchSchedules(providerId).pipe(
                     map((schedules) => scheduleActions.fetchSchedulesSuccess({ schedules })),
                     catchError((error: HttpErrorResponse) => {
                         return handleApiError(error, scheduleActions.fetchSchedulesFailure, notyf);
