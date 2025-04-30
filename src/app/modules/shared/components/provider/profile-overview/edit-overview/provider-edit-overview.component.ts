@@ -10,6 +10,8 @@ import { firstValueFrom, Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectProvider } from '../../../../../../store/provider/provider.selector';
 import { providerActions } from '../../../../../../store/provider/provider.action';
+import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
+import { API_KEY } from '../../../../../../environments/api.environments';
 
 export interface profile {
   fullName: string,
@@ -33,7 +35,7 @@ export interface profile {
 @Component({
   selector: 'app-provider-edit-overview',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapboxMapComponent],
   templateUrl: './provider-edit-overview.component.html',
 })
 export class ProviderEditOverviewComponent implements OnInit {
@@ -44,12 +46,17 @@ export class ProviderEditOverviewComponent implements OnInit {
   private _notyf = inject(NotificationService);
   private _providerService = inject(ProviderService);
 
-  previewImage!: string;
+  previewImage: string | undefined = '';
   emergency = false;
   daysOfWeek: Day[] = ['Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'];
   profileImage!: File;
   selectedLocation: string = '';
   provider!: IProvider | null;
+  center: [number, number] = [76.9560, 8.5010];
+  zoom = 12;
+  selectedAddress: string = '';
+
+  readonly mapboxToken = API_KEY.mapbox;
 
   profileForm: FormGroup = this._fb.group({
     fullname: ['', Validators.required],
@@ -69,6 +76,7 @@ export class ProviderEditOverviewComponent implements OnInit {
 
   async ngOnInit() {
     this.provider = await firstValueFrom(this.provider$);
+    this.previewImage = this.provider?.avatar;
 
     if (this.provider) {
       this.profileForm.patchValue({
@@ -83,7 +91,6 @@ export class ProviderEditOverviewComponent implements OnInit {
         workingHoursEnd: this.provider.availability?.time?.to,
       });
 
-      console.log(this.provider)
     }
   }
 
@@ -155,6 +162,16 @@ export class ProviderEditOverviewComponent implements OnInit {
         }
       }
     }
+  }
+
+  async onMapLocationChanged(newCenter: [number, number]) {
+    this.center = newCenter;
+    const [lng, lat] = newCenter;
+    const response = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${this.mapboxToken}`
+    );
+    const data = await response.json();
+    this.selectedAddress = data.features[0]?.place_name || 'No address found';
   }
 
   cancelEdit() {
