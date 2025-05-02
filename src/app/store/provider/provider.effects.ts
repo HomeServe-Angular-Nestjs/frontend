@@ -1,6 +1,6 @@
 import { inject } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, map, of, switchMap } from "rxjs";
+import { catchError, map, of, switchMap, tap } from "rxjs";
 import { providerActions } from "./provider.action";
 import { ProviderService } from "../../core/services/provider.service";
 import { Router } from "@angular/router";
@@ -39,6 +39,7 @@ export const providerEffects = {
                 providerService.updateProviderData(updateProviderData).pipe(
                     map((updatedProviderData) => {
                         router.navigate(['provider', 'profiles', 'overview']);
+                        notyf.success('profile updated successfully');
                         return providerActions.updateProviderSuccess({ updatedProviderData });
                     }),
                     catchError((error: HttpErrorResponse) => {

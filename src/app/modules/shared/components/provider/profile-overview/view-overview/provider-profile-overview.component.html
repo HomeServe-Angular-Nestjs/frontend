@@ -85,16 +85,20 @@
                                 class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center shadow-inner">
                                 <i class="fas fa-map-marker-alt text-[#16A34A] text-lg"></i>
                             </div>
-                            <div class="flex-1">
+                            <div class="flex-1 truncate">
                                 <p class="text-sm font-medium text-gray-500 mb-1">Location & Coverage</p>
                                 <p class="text-gray-900 font-medium flex items-center">
                                     <i class="fas fa-city text-gray-400 mr-2 text-sm"></i>
-                                    {{ provider?.location ? provider.location : 'Not specified' }}
+                                    <span class="block max-w-full text-wrap ">
+                                        {{ provider?.location && provider?.location?.address
+                                        ? provider.location?.address
+                                        : 'Not specified' }}
+                                    </span>
                                 </p>
                                 <p class="text-sm text-gray-500 mt-2 flex items-center">
                                     <i class="fas fa-route text-gray-400 mr-2 text-sm"></i>
                                     {{ provider?.serviceRadius !== undefined && provider?.serviceRadius !== null
-                                    ? 'Covers ' + provider.serviceRadius + ' mile radius'
+                                    ? 'Covers ' + provider.serviceRadius + ' kilometers radius'
                                     : 'Service area not specified' }}
                                 </p>
                             </div>

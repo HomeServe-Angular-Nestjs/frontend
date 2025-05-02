@@ -1,5 +1,4 @@
-// mapbox-map.component.ts
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, AfterViewInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import * as mapboxgl from 'mapbox-gl';
 
@@ -7,13 +6,13 @@ import * as mapboxgl from 'mapbox-gl';
     selector: 'app-mapbox-map',
     template: `
     <div class="relative">
+        <div #geocoderContainer class=" z-50 custom-geocoder w-full"></div>
         <div #mapContainer id="map" style="width: 100%; height: 400px;"></div>
-        <div #geocoderContainer class="absolute top-4 left-4 w-[90%] md:w-[400px] z-50"></div>
     </div>
     `,
     standalone: true
 })
-export class MapboxMapComponent implements AfterViewInit, OnDestroy {
+export class MapboxMapComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() center: [number, number] = [0, 0];
     @Input() zoom: number = 12;
     @Input() accessToken!: string;
@@ -25,6 +24,17 @@ export class MapboxMapComponent implements AfterViewInit, OnDestroy {
 
     private map!: mapboxgl.Map;
     private marker!: mapboxgl.Marker;
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['center'] && !changes['center'].firstChange) {
+            this.map.setCenter(this.center);
+            this.marker.setLngLat(this.center);
+        }
+
+        if (changes['zoom'] && !changes['zoom'].firstChange) {
+            this.map.setZoom(this.zoom);
+        }
+    }
 
     ngAfterViewInit(): void {
         this.map = new mapboxgl.Map({

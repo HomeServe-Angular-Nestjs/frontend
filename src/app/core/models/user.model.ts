@@ -1,10 +1,7 @@
 import { EntityState } from '@ngrx/entity';
 import { ISlot } from './schedules.model';
 
-export type Coordinates = {
-    lat: number;
-    lng: number;
-}
+
 
 export type AdditionalDocs = {
     type: string;
@@ -23,11 +20,9 @@ export type Verification = {
 };
 
 export type Address = {
-    street: string;
-    city: string;
-    state: string;
-    zipcode: string;
-    coordinates: Coordinates;
+    type: 'point',
+    address: string
+    coordinates: [number, number];
 };
 
 export type Expertise = {
@@ -66,7 +61,7 @@ export interface IBaseUser {
 }
 
 export interface ICustomer extends IBaseUser {
-    locations?: Coordinates[];
+    locations?: Address[];
     savedProviders?: string[];
 }
 

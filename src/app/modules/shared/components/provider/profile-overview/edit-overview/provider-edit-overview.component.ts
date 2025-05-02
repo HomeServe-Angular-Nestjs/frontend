@@ -50,7 +50,6 @@ export class ProviderEditOverviewComponent implements OnInit {
   emergency = false;
   daysOfWeek: Day[] = ['Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'];
   profileImage!: File;
-  selectedLocation: string = '';
   provider!: IProvider | null;
   center: [number, number] = [76.9560, 8.5010];
   zoom = 12;
@@ -62,7 +61,7 @@ export class ProviderEditOverviewComponent implements OnInit {
     fullname: ['', Validators.required],
     profession: ['', Validators.required],
     experience: ['', [Validators.required, Validators.min(0), Validators.max(50)]],
-    location: ['', Validators.required],
+    location: [null, Validators.required],
     serviceRadius: ['', [Validators.min(1), Validators.max(100)]],
     workingDaysStart: ['', Validators.required],
     workingDaysEnd: ['', Validators.required],
@@ -90,7 +89,11 @@ export class ProviderEditOverviewComponent implements OnInit {
         workingHoursStart: this.provider.availability?.time?.from,
         workingHoursEnd: this.provider.availability?.time?.to,
       });
+    }
 
+    const location = this.provider?.location;
+    if (location && location.coordinates.length) {
+      this.onMapLocationChanged(location.coordinates);
     }
   }
 
@@ -119,6 +122,7 @@ export class ProviderEditOverviewComponent implements OnInit {
       workingHoursEnd: this.profileForm.get('workingHoursEnd'),
     };
 
+
     if (this.profileForm.valid) {
       const provider: Partial<IProvider> = {
         fullname: controls.fullname?.value,
@@ -134,7 +138,9 @@ export class ProviderEditOverviewComponent implements OnInit {
             from: controls.workingHoursStart?.value,
             to: controls.workingHoursEnd?.value
           }
-        }
+        },
+        location: controls.location?.value,
+        avatar: this.provider?.avatar,
       }
 
       const formData = new FormData();
@@ -143,15 +149,6 @@ export class ProviderEditOverviewComponent implements OnInit {
       formData.append('providerAvatar', this.profileImage);
 
       this.store.dispatch(providerActions.updateProvider({ updateProviderData: formData }));
-
-      // this.providerService.updateProviderData(formData).subscribe({
-      //   next: () => {
-      //     this.notyf.success('Profile updated Successfully');
-      //     this.router.navigate(['provider', 'profiles', 'overview']);
-      //   },
-      //   error: (err) => this.notyf.error(err)
-      // });
-
     } else {
       this.profileForm.markAllAsTouched();
       for (const [key, control] of Object.entries(controls)) {
@@ -172,6 +169,14 @@ export class ProviderEditOverviewComponent implements OnInit {
     );
     const data = await response.json();
     this.selectedAddress = data.features[0]?.place_name || 'No address found';
+
+    const location = {
+      type: 'point',
+      coordinates: [lng, lat],
+      address: this.selectedAddress,
+    }
+
+    this.profileForm.get('location')?.setValue(location);
   }
 
   cancelEdit() {

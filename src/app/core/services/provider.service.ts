@@ -23,7 +23,7 @@ export class ProviderService {
     }
 
     updateProviderData(formData: FormData | Partial<IProvider>): Observable<IProvider> {
-        return this.http.patch<IProvider>(`${this.apiUrl}/update_providers`, formData).pipe(
+        return this.http.patch<IProvider>(`${this.apiUrl}/update_provider`, formData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
