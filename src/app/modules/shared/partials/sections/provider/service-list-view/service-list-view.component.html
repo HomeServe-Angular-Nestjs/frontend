@@ -69,51 +69,62 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100">
                         <!-- Sub-service Row -->
-                        <tr *ngFor="let subService of service.subService">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
-                                        <img [src]="subService.image" alt="service-image" class="object-cover">
+                        <ng-container *ngIf="service.subService.length > 0; else noSubServices">
+                            <tr *ngFor="let subService of service.subService; let index = index">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
+                                            <img [src]="subService.image" alt="service-image" class="object-cover">
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900">{{subService.title}}</span>
                                     </div>
-                                    <span class="text-sm font-medium text-gray-900">{{subService.title}}</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="text-sm text-gray-500">{{subService.desc}}</span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <span class="text-sm font-medium text-[#16A34A]">${{subService.price}}</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex justify-center">
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" class="sr-only peer" [checked]="subService.isActive"
-                                            (change)="updateSubservice({
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-sm text-gray-500">{{subService.desc}}</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="text-sm font-medium text-[#16A34A]">${{subService.price}}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-center">
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" [checked]="subService.isActive"
+                                                (change)="updateSubservice({
                                                 id: service.id,
                                                 subService: {
                                                   id: subService.id,
                                                   isActive: !subService.isActive
                                                 }
                                               })">
-                                        <div
-                                            class="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#16A34A]">
-                                        </div>
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <button class="p-1.5 text-gray-400 hover:text-[#16A34A]"
-                                        aria-label="Edit sub-service">
-                                        <i class="fas fa-edit" aria-hidden="true"></i>
-                                    </button>
-                                    <button class="p-1.5 text-gray-400 hover:text-red-500"
-                                        aria-label="Remove sub-service">
-                                        <i class="fas fa-trash-alt" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                            <div
+                                                class="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#16A34A]">
+                                            </div>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <button type="button" (click)="goToEditPage(index, service.id)"
+                                            class="p-1.5 text-gray-400 hover:text-[#16A34A]"
+                                            aria-label="Edit sub-service">
+                                            <i class="fas fa-edit" aria-hidden="true"></i>
+                                        </button>
+                                        <button type="button" (click)="deleteSub(subService.id)"
+                                            class="p-1.5 text-gray-400 hover:text-red-500"
+                                            aria-label="Remove sub-service">
+                                            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <ng-template #noSubServices>
+                            <tr>
+                                <td colspan="5" class="text-center py-6 text-gray-500">
+                                    No sub-services available.
+                                </td>
+                            </tr>
+                        </ng-template>
                     </tbody>
                 </table>
             </div>

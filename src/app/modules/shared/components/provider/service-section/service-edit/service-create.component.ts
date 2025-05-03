@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, ViewportScroller } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
 import { NotificationService } from '../../../../../../core/services/public/notification.service';
@@ -32,6 +32,7 @@ export class ServiceCreateComponent {
   private _serviceOfferedService = inject(OfferedServicesService);
   private _notyf = inject(NotificationService);
   private _store = inject(Store);
+  private _scroller = inject(ViewportScroller);
 
   serviceImagePreview?: string;
   serviceImageFile?: File;
@@ -55,6 +56,14 @@ export class ServiceCreateComponent {
       this.serviceId = param.get('id');
     });
 
+    this.route.queryParams.subscribe(params => {
+      if (params['subIdx'] !== undefined) {
+        setTimeout(() => {
+          this.scrollToSubService(+params['subIdx']);
+        }, 300);
+      }
+    })
+
     // If editing, fetch the existing service details
     if (this.serviceId) {
       this._serviceOfferedService.fetchOneService(this.serviceId).subscribe({
@@ -65,6 +74,11 @@ export class ServiceCreateComponent {
         error: (err) => this._notyf.error(err)
       });
     }
+  }
+
+  scrollToSubService(index: number) {
+    const elementId = `sub-service-${index}`;
+    this._scroller.scrollToAnchor(elementId);
   }
 
   /**
