@@ -7,11 +7,12 @@ import { ServiceListViewComponent } from '../../../../partials/sections/provider
 import { selectAllOfferedServices } from '../../../../../../store/offered-services/offeredService.selector';
 import { Observable } from 'rxjs';
 import { IOfferedService, UpdateSubserviceType } from '../../../../../../core/models/offeredService.model';
+import { FilterDeletedSubservicePipe } from '../../../../../../core/pipes/filter-deleted-sub-services.pipe';
 
 @Component({
   selector: 'app-service-view',
   standalone: true,
-  imports: [CommonModule, RouterLink, ServiceListViewComponent],
+  imports: [CommonModule, RouterLink, ServiceListViewComponent, FilterDeletedSubservicePipe],
   templateUrl: './service-view.component.html',
 })
 export class ServiceViewComponent {

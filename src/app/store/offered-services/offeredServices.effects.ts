@@ -1,7 +1,7 @@
 import { inject } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { offeredServiceActions } from "./offeredService.action";
-import { catchError, map, switchMap } from "rxjs";
+import { catchError, map, mergeMap, of, switchMap, throwError } from "rxjs";
 import { OfferedServicesService } from "../../core/services/service-management.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
@@ -39,7 +39,7 @@ export const offeredServiceEffects = {
                 serviceOfferedService.updateService(updateData).pipe(
                     map((updatedService) => {
                         router.navigate(['provider', 'profiles', 'service_offered']);
-                        return offeredServiceActions.updateOfferedServiceSuccess({ updatedService })
+                        return of(offeredServiceActions.updateOfferedServiceSuccess({ updatedService }))
                     }),
                     catchError((error: HttpErrorResponse) => {
                         return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, notyf);
@@ -68,6 +68,29 @@ export const offeredServiceEffects = {
                 )
             )
         );
-    }, { functional: true })
+    }, { functional: true }),
+
+    // deleteSubService$: createEffect(() => {
+    //     const actions$ = inject(Actions);
+    //     const serviceOfferedService = inject(OfferedServicesService);
+    //     const notyf = inject(NotificationService);
+
+    //     return actions$.pipe(
+    //         ofType(offeredServiceActions.deleteSubService),
+    //         switchMap(({ serviceId, subId }) =>
+    //             serviceOfferedService.deleteSubService(serviceId, subId).pipe(
+    //                 mergeMap((success) => {
+    //                     if (success) {
+    //                         return of(offeredServiceActions.deleteSubServiceSuccess({ serviceId, subId }));
+    //                     } else {
+    //                         return throwError(() => new Error('Failed to delete sub service'));
+    //                     }
+    //                 }),
+    //                 catchError((error: HttpErrorResponse) => {
+    //                     return handleApiError(error, offeredServiceActions.deleteSubServiceFailure, notyf);
+    //                 }))
+    //         )
+    //     )
+    // }, { functional: true })
 
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { CommonModule, ViewportScroller } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
@@ -34,6 +34,8 @@ export class ServiceCreateComponent {
   private _store = inject(Store);
   private _scroller = inject(ViewportScroller);
 
+  @ViewChild('addSubServiceBtn', { static: false }) buttonElementRef!: ElementRef<HTMLButtonElement>;
+
   serviceImagePreview?: string;
   serviceImageFile?: File;
   serviceUrl?: string;
@@ -62,6 +64,12 @@ export class ServiceCreateComponent {
           this.scrollToSubService(+params['subIdx']);
         }, 300);
       }
+
+      if (params['addSs']) {
+        setTimeout(() => {
+          this.scrollToAddSubService();
+        })
+      }
     })
 
     // If editing, fetch the existing service details
@@ -79,6 +87,19 @@ export class ServiceCreateComponent {
   scrollToSubService(index: number) {
     const elementId = `sub-service-${index}`;
     this._scroller.scrollToAnchor(elementId);
+  }
+
+  scrollToAddSubService() {
+    const button = this.buttonElementRef?.nativeElement;
+    if (button) {
+      button.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      button.classList.add('glow-blink');
+
+      setTimeout(() => {
+        button.classList.remove('glow-blink');
+      }, 2000);
+    }
   }
 
   /**

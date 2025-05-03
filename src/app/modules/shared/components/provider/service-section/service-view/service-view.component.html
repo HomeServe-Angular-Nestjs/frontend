@@ -31,7 +31,8 @@
 
         <!-- Services List View -->
         <ng-container *ngIf="offeredServices$ | async as services; else emptyService">
-            <app-service-list-view [offeredServices]="services" (updateEvent)="updateService($event)"
+            <app-service-list-view [offeredServices]="services | filterDeletedSubServices"
+                (updateEvent)="updateService($event)"
                 (updateSubServiceEvent)="updateSubservice($event)"></app-service-list-view>
         </ng-container>
         <ng-template #emptyService>

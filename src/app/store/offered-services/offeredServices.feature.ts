@@ -75,17 +75,15 @@ export const offeredServiceFeature = createFeature({
         })),
 
         on(offeredServiceActions.updateSubServiceSuccess, (state, { subService, id }) => {
-            const current = state.offeredServices.entities[id];
-            if (!current || !Array.isArray(current.subService) || !subService.id) {
+            const currentService = state.offeredServices.entities[id];
+
+            if (!currentService || !Array.isArray(currentService.subService)) {
                 return state;
             }
 
-            const currentSubMap = new Map(
-                current.subService.map((ss) => [ss.id, ss])
+            const updatedSubServices = currentService.subService.map(ss =>
+                ss.id === subService.id ? { ...ss, ...subService } : ss
             );
-
-            currentSubMap.set(subService.id, subService);
-            const updatedSubServices = Array.from(currentSubMap.values());
 
             return {
                 ...state,
@@ -94,9 +92,63 @@ export const offeredServiceFeature = createFeature({
                         id,
                         changes: { subService: updatedSubServices }
                     },
-                    state.offeredServices)
+                    state.offeredServices
+                )
             };
-
         }),
+
+        on(offeredServiceActions.updateSubServiceFailure, (state, { error }) => ({
+            ...state,
+            error,
+            loading: false
+        })),
+
+        // on(offeredServiceActions.deleteSubService, (state) => ({
+        //     ...state,
+        //     loading: true,
+        //     error: null,
+        // })),
+
+        // on(offeredServiceActions.deleteSubServiceSuccess, (state, { serviceId, subId }) => {
+        //     const existingService = state.offeredServices.entities[serviceId];
+        //     console.log('existingService: ', existingService);
+
+        //     if (!existingService) {
+        //         return {
+        //             ...state,
+        //             loading: false,
+        //             error: 'Service not found in state.'
+        //         };
+        //     }
+
+        //     const updatedSubServices = existingService.subService?.filter(sub => sub.id !== subId) || [];
+
+        //     const updatedService = {
+        //         ...existingService,
+        //         subService: updatedSubServices
+        //     };
+
+        //     console.log('updatedService: ', updatedService);
+
+        //     return {
+        //         ...state,
+        //         offeredServices: offeredServiceAdaptor.updateOne(
+        //             {
+        //                 id: serviceId,
+        //                 changes: updatedService
+        //             },
+        //             state.offeredServices
+        //         ),
+        //         loading: false,
+        //         error: null,
+        //     };
+        // }),
+
+        // on(offeredServiceActions.deleteSubServiceFailure, (state, { error }) => ({
+        //     ...state,
+        //     error,
+        //     loading: false
+        // })),
+
     )
-})
+});

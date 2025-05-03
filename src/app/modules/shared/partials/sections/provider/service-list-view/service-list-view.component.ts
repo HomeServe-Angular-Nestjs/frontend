@@ -32,12 +32,23 @@ export class ServiceListViewComponent {
         });
     }
 
-    // deleteSub(id: string) {
-    //     this.offeredServices = this.offeredServices.map((service: IOfferedService) => ({
-    //         ...service,
-    //         subService: service.subService.filter((sub: ISubService) => sub.id !== id)
-    //     }));
+    addSubService(id: string) {
+        this._router.navigate(['provider', 'profiles', 'service_offered', 'edit', id], {
+            queryParams: { addSs: true }
+        });
+    }
 
-    //     this._store.dispatch(offeredServiceActions.deleteSubService({ id }));
-    // }
+    deleteSub(serviceId: string, subId: string) {
+        // this.offeredServices = this.offeredServices.map((service: IOfferedService) => ({
+        //     ...service,
+        //     subService: service.subService.filter((sub: ISubService) => sub.id !== subId)
+        // }));
+
+        this._store.dispatch(offeredServiceActions.updateSubService({
+            updateData: {
+                id: serviceId,
+                subService: { id: subId, isDeleted: true }
+            }
+        }));
+    }
 }
