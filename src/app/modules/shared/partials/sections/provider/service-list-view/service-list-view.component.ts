@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { IOfferedService, ISubService, UpdateSubserviceType } from "../../../../../../core/models/offeredService.model";
+import { IOfferedService, UpdateSubserviceType } from "../../../../../../core/models/offeredService.model";
 import { CommonModule } from "@angular/common";
+import { RouterLink } from "@angular/router";
 
 @Component({
     selector: "app-service-list-view",
-    imports: [CommonModule],
+    imports: [CommonModule, RouterLink],
     templateUrl: './service-list-view.component.html'
 })
 export class ServiceListViewComponent {

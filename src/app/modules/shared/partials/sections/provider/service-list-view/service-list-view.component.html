@@ -24,10 +24,11 @@
                 </div>
                 <!-- Right: Actions -->
                 <div class="flex items-center gap-4">
-                    <button class="text-gray-600 hover:text-[#16A34A] p-2 rounded-lg hover:bg-gray-50"
+                    <a [routerLink]="['/provider/profiles/service_offered/edit/', service.id]"
+                        class="text-gray-600 hover:text-[#16A34A] p-2 rounded-lg hover:bg-gray-50"
                         aria-label="Edit main service">
                         <i class="fas fa-edit" aria-hidden="true"></i>
-                    </button>
+                    </a>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" class="sr-only peer" [checked]="service.isActive"
                             (change)="updateService({id: service.id, isActive:!service.isActive})">

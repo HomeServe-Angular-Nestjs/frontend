@@ -1,10 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
 import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { IOfferedService, ISubService } from '../../../../../../core/models/offeredService.model';
+import { Store } from '@ngrx/store';
+import { offeredServiceActions } from '../../../../../../store/offered-services/offeredService.action';
 
 export interface SubService {
   id?: number;
@@ -20,35 +23,64 @@ export interface SubService {
 @Component({
   selector: 'app-service-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './service-create.component.html',
   styleUrl: './service-create.component.scss'
 })
 export class ServiceCreateComponent {
-  private fb = inject(FormBuilder);
-  private serviceOfferedService = inject(OfferedServicesService);
-  private notyf = inject(NotificationService);
+  private _fb = inject(FormBuilder);
+  private _serviceOfferedService = inject(OfferedServicesService);
+  private _notyf = inject(NotificationService);
+  private _store = inject(Store);
 
   serviceImagePreview?: string;
   serviceImageFile?: File;
   serviceUrl?: string;
+  serviceId: string | null = null;
+  service!: IOfferedService;
 
-  // Main form group combining service and sub-services
-  serviceForm: FormGroup = this.fb.group({
+  /**
+    * Main form for managing service creation,
+    * including dynamically added sub-services.
+    */
+  serviceForm: FormGroup = this._fb.group({
     serviceTitle: ['', Validators.required],
     serviceDesc: ['', Validators.required],
-    subServices: this.fb.array<FormGroup>([])
+    subServices: this._fb.array<FormGroup>([]),
   });
 
-  // Getter for sub-services
+  constructor(private route: ActivatedRoute) {
+    // Subscribe to route param to get service ID (edit mode)
+    this.route.paramMap.subscribe(param => {
+      this.serviceId = param.get('id');
+    });
+
+    // If editing, fetch the existing service details
+    if (this.serviceId) {
+      this._serviceOfferedService.fetchOneService(this.serviceId).subscribe({
+        next: (service) => {
+          this.service = service;
+          this._patchServiceForm();
+        },
+        error: (err) => this._notyf.error(err)
+      });
+    }
+  }
+
+  /**
+   * Getter for accessing sub-service FormArray
+   */
   get subServices(): FormArray<FormGroup> {
     return this.serviceForm.get('subServices') as FormArray<FormGroup>;
   }
 
-  // Add a new sub-service if all existing are valid
+  /**
+   * Adds a new sub-service form group to the form
+   * Only adds if existing entries are valid.
+   */
   addSubService(): void {
     if (this.subServices.valid) {
-      this.subServices.push(this.createSubServiceGroup());
+      this.subServices.push(this._createSubServiceGroup());
     } else {
       this.subServices.markAllAsTouched();
       this.subServices.controls.forEach((group) => {
@@ -56,7 +88,7 @@ export class ServiceCreateComponent {
           const control = group.get(fieldName) as AbstractControl;
           const errorMessage = getValidationMessage(control, fieldName);
           if (errorMessage) {
-            this.notyf.error(errorMessage);
+            this._notyf.error(errorMessage);
             return;
           }
         }
@@ -64,23 +96,33 @@ export class ServiceCreateComponent {
     }
   }
 
-  // Remove a sub-service at a specific index
+  /**
+   * Removes a sub-service form group by index
+   * @param index Index of sub-service to remove
+   */
   removeSubService(index: number): void {
     this.subServices.removeAt(index);
   }
 
-  // Upload main service image
+  /**
+   * Handles main service image file upload
+   * @param event File input change event
+   */
   onServiceImageUpload(event: Event): void {
-    const file = this.extractFile(event);
+    const file = this._extractFile(event);
     if (!file) return;
 
     this.serviceImageFile = file;
-    this.previewImage(file, (img) => this.serviceImagePreview = img);
+    this._previewImage(file, (img) => this.serviceImagePreview = img);
   }
 
-  // Upload sub-service image and set it in the corresponding form group
+  /**
+   * Handles image upload for a specific sub-service
+   * @param event File input change event
+   * @param subServiceIndex Index of the sub-service form group
+   */
   onSubServiceImageUpload(event: Event, subServiceIndex: number): void {
-    const file = this.extractFile(event);
+    const file = this._extractFile(event);
     if (!file) return;
 
     const reader = new FileReader();
@@ -92,74 +134,144 @@ export class ServiceCreateComponent {
     reader.readAsDataURL(file);
   }
 
-  // Form submission logic
+  /**
+   * Submits the complete service form with attached files via FormData
+   */
   onSubmit(): void {
-    if (!this.serviceImageFile) {
-      this.notyf.error('Service image must be uploaded before submitting.');
+    const isEditMode = !!this.service?.id;
+
+    if (!this.serviceImageFile && !this.service?.image && !isEditMode) {
+      this._notyf.error('Service image must be uploaded before submitting.');
       return;
     }
 
-    ['serviceTitle', 'serviceDesc'].forEach(field => {
+    for (const field of ['serviceTitle', 'serviceDesc']) {
       const control = this.serviceForm.get(field) as AbstractControl;
       const errorMessage = getValidationMessage(control, field);
       if (errorMessage) {
-        this.notyf.error(errorMessage);
+        this._notyf.error(errorMessage);
         return;
       }
-    });
+    }
 
+    const formData = this.buildServiceFormData(isEditMode);
+
+    if (isEditMode) {
+      formData.append('id', this.service.id);
+      this._store.dispatch(offeredServiceActions.updateOfferedService({ updateData: formData }));
+    } else {
+      this._serviceOfferedService.sendFormData(formData).subscribe({
+        next: (res) => console.log(res),
+        error: (err) => console.error(err)
+      });
+    }
+  }
+
+  /**
+ * Builds and returns a FormData object from the service form.
+ */
+  private buildServiceFormData(isEditMode: boolean): FormData {
     const formData = new FormData();
+    const formValue = this.serviceForm.value;
 
-    // Add main service fields
-    formData.append('serviceTitle', this.serviceForm.value.serviceTitle);
-    formData.append('serviceDesc', this.serviceForm.value.serviceDesc);
-    formData.append('serviceImageFile', this.serviceImageFile);
+    // Main service fields
+    formData.append('title', formValue.serviceTitle);
+    formData.append('desc', formValue.serviceDesc);
 
-    // Add sub-services as indexed fields
-    this.serviceForm.value.subServices.forEach((sub: any, index: number) => {
-      // Append individual fields with indexing
+    // Append new image file only if it's newly uploaded
+    if (this.serviceImageFile) {
+      formData.append('serviceImageFile', this.serviceImageFile);
+    }
+
+    // Sub-services handling
+    formValue.subServices.forEach((sub: any, index: number) => {
       formData.append(`subServices[${index}][title]`, sub.title);
       formData.append(`subServices[${index}][desc]`, sub.desc);
       formData.append(`subServices[${index}][price]`, sub.price);
       formData.append(`subServices[${index}][estimatedTime]`, sub.estimatedTime);
       formData.append(`subServices[${index}][tag]`, sub.tag || '');
 
-      // Append image if it exists
+      // Append image only if user uploaded a new file
       if (sub.imageFile) {
         formData.append(`subServices[${index}][imageFile]`, sub.imageFile);
       }
+
+      // Optionally include existing image URL for backend to keep or update
+      if (isEditMode && sub.image && !sub.imageFile) {
+        formData.append(`subServices[${index}][image]`, sub.image);
+      }
     });
 
-    this.serviceOfferedService.sendFormData(formData).subscribe({
-      next: (res) => console.log(res),
-      error: (err) => console.error(err)
-    });
+    // Optional: include existing main image URL too (if backend needs it)
+    if (isEditMode && this.service?.image && !this.serviceImageFile) {
+      formData.append('image', this.service.image);
+    }
+
+    return formData;
   }
 
-  // Utility to create a new sub-service group
-  private createSubServiceGroup(): FormGroup {
-    return this.fb.group({
+  /**
+  * Creates a new empty sub-service form group with validation
+  */
+  private _createSubServiceGroup(): FormGroup {
+    return this._fb.group({
       title: ['', Validators.required],
       desc: ['', Validators.required],
       price: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
       estimatedTime: ['', Validators.required],
-      tag: ['', Validators.required],
-      availability: ['', Validators.required],
+      tag: ['',],
+      availability: ['',],
       image: [null],
       imageFile: [null]
     });
   }
 
-  // Generic image preview utility
-  private previewImage(file: File, callback: (img: string) => void): void {
+  /**
+   * Reads and previews image as a base64 string
+   */
+  private _previewImage(file: File, callback: (img: string) => void): void {
     const reader = new FileReader();
     reader.onload = (e) => callback(e.target?.result as string);
     reader.readAsDataURL(file);
   }
 
-  // Extract file from input event
-  private extractFile(event: Event): File | null {
+  /**
+   * Extracts a File object from a file input event
+   */
+  private _extractFile(event: Event): File | null {
     const input = event.target as HTMLInputElement;
     return input.files?.[0] || null;
+  }
+
+  /**
+     * Fills the form with existing service data in edit mode
+     */
+  private _patchServiceForm(): void {
+    if (!this.service) return;
+
+    this.serviceForm.patchValue({
+      serviceTitle: this.service.title,
+      serviceDesc: this.service.desc
+    });
+
+    const subServiceArray = this.serviceForm.get('subServices') as FormArray;
+    subServiceArray.clear();
+
+    this.service.subService.forEach((sub: any) => {
+      const group = this._createSubServiceGroup();
+      group.patchValue({
+        title: sub.title,
+        desc: sub.desc,
+        price: sub.price,
+        estimatedTime: sub.estimatedTime,
+        tag: sub.tag,
+        availability: sub.availability,
+        image: sub.image || null,
+        imageFile: null
+      });
+      subServiceArray.push(group);
+    });
+
+    this.serviceImagePreview = this.service.image;
   }
 }

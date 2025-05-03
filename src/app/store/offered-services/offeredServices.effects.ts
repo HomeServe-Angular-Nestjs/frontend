@@ -1,11 +1,12 @@
 import { inject } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { offeredServiceActions } from "./offeredService.action";
-import { catchError, map, of, switchMap } from "rxjs";
+import { catchError, map, switchMap } from "rxjs";
 import { OfferedServicesService } from "../../core/services/service-management.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
+import { Router } from "@angular/router";
 
 export const offeredServiceEffects = {
     fetchOfferedServices$: createEffect(() => {
@@ -30,12 +31,16 @@ export const offeredServiceEffects = {
         const actions$ = inject(Actions);
         const serviceOfferedService = inject(OfferedServicesService);
         const notyf = inject(NotificationService);
+        const router = inject(Router);
 
         return actions$.pipe(
             ofType(offeredServiceActions.updateOfferedService),
             switchMap(({ updateData }) =>
                 serviceOfferedService.updateService(updateData).pipe(
-                    map((response) => offeredServiceActions.updateOfferedServiceSuccess({ updatedService: response })),
+                    map((updatedService) => {
+                        router.navigate(['provider', 'profiles', 'service_offered']);
+                        return offeredServiceActions.updateOfferedServiceSuccess({ updatedService })
+                    }),
                     catchError((error: HttpErrorResponse) => {
                         return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, notyf);
                     })

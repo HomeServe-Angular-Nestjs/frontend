@@ -50,10 +50,15 @@ export const providerRoutes: Routes = [
                     {
                         path: 'service_offered',
                         loadComponent: () => import('../../shared/components/provider/service-section/service-view/service-view.component')
-                            .then(c => c.ServiceViewComponent)
+                            .then(c => c.ServiceViewComponent),
                     },
                     {
-                        path: 'create_service',
+                        path: 'service_offered/create',
+                        loadComponent: () => import('../../shared/components/provider/service-section/service-edit/service-create.component')
+                            .then(c => c.ServiceCreateComponent)
+                    },
+                    {
+                        path: 'service_offered/edit/:id',
                         loadComponent: () => import('../../shared/components/provider/service-section/service-edit/service-create.component')
                             .then(c => c.ServiceCreateComponent)
                     },

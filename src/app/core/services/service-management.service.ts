@@ -54,8 +54,8 @@ export class OfferedServicesService {
         )
     }
 
-    updateService(updateData: Partial<IOfferedService>): Observable<IOfferedService> {
-        return this.http.patch<IOfferedService>(`${this.apiUrl}/offered_services`, updateData);
+    updateService(updateData: Partial<IOfferedService> | FormData): Observable<IOfferedService> {
+        return this.http.patch<IOfferedService>(`${this.apiUrl}/offered_service`, updateData);
     }
 
     updateSubService(updateData: Partial<ISubService>): Observable<{ id: string, subService: ISubService }> {
