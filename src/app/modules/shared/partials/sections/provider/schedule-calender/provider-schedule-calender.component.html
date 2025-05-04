@@ -26,11 +26,6 @@
                     <i class="fas fa-clock" aria-hidden="true"></i>
                     <span>Default Hours</span>
                 </button>
-                <button
-                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">
-                    <i class="fas fa-copy" aria-hidden="true"></i>
-                    <span>Copy Schedule</span>
-                </button>
             </div>
         </div>
     </div>
@@ -51,24 +46,36 @@
                 [ngClass]="{'bg-green-100 border-green-500': isSelected(date)}">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-sm text-gray-400">{{ date.split(' ')[2] }}</span>
-                    <span *ngIf="schedules && schedules.length > 0"
-                        class="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">{{schedules.length}}
-                        slots</span>
+                    <ng-container *ngIf="(schedules$ | async) as schedules">
+                        <span *ngIf="schedules.length > 0"
+                            class="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">
+                            {{ schedules.length }} slots
+                        </span>
+                    </ng-container>
                 </div>
 
                 <div class="space-y-1">
-                    <ng-container *ngIf="schedules && schedules.length > 0">
-                        <ng-container *ngFor="let item of schedules">
-                            <ng-container *ngIf="item.scheduleDate === date">
-                                <ng-container *ngFor="let slot of item.slots">
-                                    <div class="text-xs px-2 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100
-                                    transition-colors">
-                                        {{slot.from}} - {{slot.to}}
+                    <ng-container *ngIf="schedules$ | async as schedules; else loading">
+                        <!-- Check if schedules exist and are not empty -->
+                        <ng-container *ngIf="schedules?.length">
+                            <!-- Loop through schedules -->
+                            <ng-container *ngFor="let item of schedules">
+                                <!-- Match current date with schedule date -->
+                                <ng-container *ngIf="item.scheduleDate === date">
+                                    <!-- Loop through matching schedule's slots -->
+                                    <div *ngFor="let slot of item.slots"
+                                        class="text-xs px-1 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
+                                        {{ slot.from }} - {{ slot.to }}
                                     </div>
                                 </ng-container>
                             </ng-container>
                         </ng-container>
                     </ng-container>
+
+                    <!-- Loading state for schedules observable -->
+                    <ng-template #loading>
+                        <div>Loading...</div>
+                    </ng-template>
                 </div>
 
                 <button type="button" (click)="addSlots(date)"

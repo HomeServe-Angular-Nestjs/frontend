@@ -39,7 +39,7 @@ export const offeredServiceEffects = {
                 serviceOfferedService.updateService(updateData).pipe(
                     map((updatedService) => {
                         router.navigate(['provider', 'profiles', 'service_offered']);
-                        return of(offeredServiceActions.updateOfferedServiceSuccess({ updatedService }))
+                        return offeredServiceActions.updateOfferedServiceSuccess({ updatedService })
                     }),
                     catchError((error: HttpErrorResponse) => {
                         return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, notyf);

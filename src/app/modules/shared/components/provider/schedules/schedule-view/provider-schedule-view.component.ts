@@ -15,7 +15,7 @@ export class ProviderScheduleViewComponent {
   private scheduleService = inject(ScheduleService);
 
   constructor(private store: Store) {
-    this.store.dispatch(scheduleActions.fetchSchedules({}));
+    // this.store.dispatch(scheduleActions.fetchSchedules({}));
   }
   newSchedule() { }
 }

@@ -40,7 +40,6 @@ export const scheduleFeature = createFeature({
         })),
 
         on(scheduleActions.updateScheduleSuccess, (state, { updatedSchedule }) => {
-            console.log(updatedSchedule)
             return {
                 ...state,
                 loading: false,

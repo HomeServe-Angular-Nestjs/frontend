@@ -1,7 +1,7 @@
 import { inject } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { scheduleActions } from "./schedule.action";
-import { catchError, map, switchMap } from "rxjs";
+import { catchError, map, of, switchMap } from "rxjs";
 import { ScheduleService } from "../../core/services/schedule.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { handleApiError } from "../../core/utils/handle-errors.utils";

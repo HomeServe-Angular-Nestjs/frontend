@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProviderScheduleDefaultTimeComponent } from "../schedule-default-time/provider-schedule-default-time.component";
 import { IProvider } from '../../../../../../core/models/user.model';
-import { Observable } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectProvider } from '../../../../../../store/provider/provider.selector';
-import { ISchedule, ISlot, SlotType } from '../../../../../../core/models/schedules.model';
+import { ISchedule, SlotType } from '../../../../../../core/models/schedules.model';
 import { scheduleActions } from '../../../../../../store/schedules/schedule.action';
 import { selectAllSchedules } from '../../../../../../store/schedules/schedule.selector';
 
@@ -16,16 +16,13 @@ import { selectAllSchedules } from '../../../../../../store/schedules/schedule.s
   imports: [CommonModule, FormsModule, ProviderScheduleDefaultTimeComponent],
   templateUrl: './provider-schedule-calender.component.html',
 })
-export class ProviderScheduleCalenderComponent implements OnInit {
+export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   providerData$!: Observable<IProvider | null>;
-  // schedules$!: Observable<ISchedule[]>;
+  schedules$!: Observable<ISchedule[]>;
 
-  constructor(private store: Store) {
-    this.providerData$ = this.store.select(selectProvider);
-    this.store.select(selectAllSchedules).subscribe(data => {
-      this.schedules = data;
-    });
-  }
+  private destroy$ = new Subject<void>();
+
+  constructor(private store: Store) { }
 
   currentDate: Date = new Date();
   dateInput: string = '';
@@ -34,53 +31,67 @@ export class ProviderScheduleCalenderComponent implements OnInit {
   modal: boolean = false;
   addNewSlots: boolean = false;
   pickedDate!: string;
-  schedules: ISchedule[] = [];
+  // schedules: ISchedule[] = [];
 
   ngOnInit(): void {
-    this.syncDateInputToCurrent();
-    this.generateWeek(this.currentDate);
+    this.providerData$ = this.store.select(selectProvider);
+
+    // Dispatch an action to fetch schedules once provider ID is available
+    this.providerData$.pipe(
+      takeUntil(this.destroy$),
+      filter((provider): provider is IProvider => !!provider && !!provider.id)
+    ).subscribe(provider => {
+      this.store.dispatch(scheduleActions.fetchSchedules({ providerId: provider.id }));
+    })
+
+    this.schedules$ = this.store.select(selectAllSchedules);
+
+    this.schedules$.subscribe(data => console.log(data))
+
+    this._syncDateInputToCurrent();
+    this._generateWeek(this.currentDate);
   }
 
   prev() {
     this.currentDate.setDate(this.currentDate.getDate() - 7);
-    this.syncDateInputToCurrent();
-    this.generateWeek(this.currentDate);
+    this._syncDateInputToCurrent();
+    this._generateWeek(this.currentDate);
   }
 
   next() {
     this.currentDate.setDate(this.currentDate.getDate() + 7);
-    this.syncDateInputToCurrent();
-    this.generateWeek(this.currentDate);
+    this._syncDateInputToCurrent();
+    this._generateWeek(this.currentDate);
   }
 
   onDateInputChange() {
     const selected = new Date(this.dateInput);
     if (!isNaN(selected.getTime())) {
       this.currentDate = selected;
-      this.syncDateInputToCurrent();
-      this.generateWeek(this.currentDate);
+      this._syncDateInputToCurrent();
+      this._generateWeek(this.currentDate);
     }
   }
 
   isSelected(dateStr: string): boolean {
     const [weekday, month, day, year] = dateStr.split(' ');
-    const localDate = new Date(Number(year), this.getMonthNumber(month), Number(day));
-    const formatted = this.formatDateInput(localDate);
+    const localDate = new Date(Number(year), this._getMonthNumber(month), Number(day));
+    const formatted = this._formatDateInput(localDate);
     return formatted === this.dateInput;
   }
 
   selectDate(dateStr: string) {
     const [weekday, month, day, year] = dateStr.split(' ');
-    const localDate = new Date(Number(year), this.getMonthNumber(month), Number(day));
+    const localDate = new Date(Number(year), this._getMonthNumber(month), Number(day));
 
     // Update the dateInput (for the input field)
-    this.dateInput = this.formatDateInput(localDate);
+    this.dateInput = this._formatDateInput(localDate);
 
     // Update currentDate (for the week view and month/year heading)
     this.currentDate = localDate;
 
     // Regenerate the week based on the selected date
-    this.generateWeek(this.currentDate);
+    this._generateWeek(this.currentDate);
   }
 
   addSlots(date: string) {
@@ -108,25 +119,25 @@ export class ProviderScheduleCalenderComponent implements OnInit {
     this.modal = event;
   }
 
-  private getMonthNumber(monthName: string): number {
+  private _getMonthNumber(monthName: string): number {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return months.indexOf(monthName);
   }
 
-  private syncDateInputToCurrent() {
-    this.dateInput = this.formatDateInput(this.currentDate);
+  private _syncDateInputToCurrent() {
+    this.dateInput = this._formatDateInput(this.currentDate);
   }
 
-  private formatDateInput(date: Date): string {
+  private _formatDateInput(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
-  private generateWeek(baseDate: Date) {
-    const startOfWeek = this.getStartOfWeek(baseDate);
+  private _generateWeek(baseDate: Date) {
+    const startOfWeek = this._getStartOfWeek(baseDate);
     const dates: string[] = [];
 
     for (let i = 0; i < 7; i++) {
@@ -138,10 +149,16 @@ export class ProviderScheduleCalenderComponent implements OnInit {
     this.visibleDates = dates;
   }
 
-  private getStartOfWeek(date: Date): Date {
+  private _getStartOfWeek(date: Date): Date {
     const start = new Date(date);
     const day = start.getDay(); // 0 = Sun, 1 = Mon, ...
     start.setDate(start.getDate() - day);
     return start;
+  }
+
+  ngOnDestroy(): void {
+    // Complete the destroy$ subject to clean up subscriptions
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

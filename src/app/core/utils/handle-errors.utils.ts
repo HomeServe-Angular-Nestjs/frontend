@@ -8,7 +8,7 @@ export function handleApiError(
     notyf: NotificationService
 ) {
     console.error('[API Error]', error);
-    const errorMessage = error?.error?.message || 'Something went wrong. Please try again!';
+    const errorMessage = error?.error?.message || error.message || 'Something went wrong. Please try again!';
     notyf.error(errorMessage);
     return of(fallbackAction({ error: errorMessage }));
 }
