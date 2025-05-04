@@ -31,7 +31,6 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   modal: boolean = false;
   addNewSlots: boolean = false;
   pickedDate!: string;
-  // schedules: ISchedule[] = [];
 
   ngOnInit(): void {
     this.providerData$ = this.store.select(selectProvider);
@@ -45,8 +44,6 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
     })
 
     this.schedules$ = this.store.select(selectAllSchedules);
-
-    this.schedules$.subscribe(data => console.log(data))
 
     this._syncDateInputToCurrent();
     this._generateWeek(this.currentDate);
@@ -101,7 +98,6 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   }
 
   addToNewSlot(slot: SlotType) {
-    this.modal = false;
     this.store.dispatch(scheduleActions.updateSchedule({
       updateData: {
         scheduleDate: this.pickedDate,

@@ -12,11 +12,6 @@ export interface ISchedule {
     id: string,
     scheduleDate: string,
     slots: ISlot[];
-    // status?: string;
-    // bookingLimit?: number;
-    // bufferTime?: string;
-    // serviceArea?: [number, number];
-    // serviceRadius?: number;
 }
 
 export type UpdateScheduleType = {

@@ -7,3 +7,8 @@ export const selectProvider = createSelector(
     selectProviderState,
     (state) => state.provider
 );
+
+export const selectDefaultSlots = createSelector(
+    selectProviderState,
+    (state) => state.provider?.defaultSlots
+);

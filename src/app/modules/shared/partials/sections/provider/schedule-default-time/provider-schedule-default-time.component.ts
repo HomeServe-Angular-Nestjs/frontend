@@ -8,6 +8,8 @@ import { IProvider } from '../../../../../../core/models/user.model';
 import { ScheduleService } from '../../../../../../core/services/schedule.service';
 import { Store } from '@ngrx/store';
 import { scheduleActions } from '../../../../../../store/schedules/schedule.action';
+import { selectDefaultSlots } from '../../../../../../store/provider/provider.selector';
+import { providerActions } from '../../../../../../store/provider/provider.action';
 
 @Component({
   selector: 'app-provider-schedule-default-time',
@@ -16,11 +18,10 @@ import { scheduleActions } from '../../../../../../store/schedules/schedule.acti
   templateUrl: './provider-schedule-default-time.component.html',
 })
 export class ProviderScheduleDefaultTimeComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private store = inject(Store);
-  private readonly providerService = inject(ProviderService);
-  private readonly scheduleService = inject(ScheduleService);
-  private readonly notyf = inject(NotificationService);
+  private _fb = inject(FormBuilder);
+  private _store = inject(Store);
+  private readonly _providerService = inject(ProviderService);
+  private readonly _notyf = inject(NotificationService);
 
   @Input({ required: true }) providerData!: IProvider | null;
   @Input({ required: true }) addNewSlots!: boolean;
@@ -32,15 +33,17 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
   defaultSlots: SlotType[] = [];
   newSlots: SlotType[] = [];
 
-  defaultForm: FormGroup = this.fb.group({
+  defaultForm: FormGroup = this._fb.group({
     from: ['', Validators.required],
     to: ['', Validators.required]
   });
 
   ngOnInit(): void {
-    if (this.providerData && this.providerData.defaultSlots.length > 0) {
-      this.defaultSlots.push(...this.providerData.defaultSlots);
-    }
+    this._store.select(selectDefaultSlots).subscribe(data => {
+      if (data) {
+        this.defaultSlots = [...data];
+      }
+    });
   }
 
   close() {
@@ -48,9 +51,12 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
   }
 
   clearSlots() {
-    this.providerService.deleteDefaultSlot().subscribe({
-      next: () => this.defaultSlots = [],
-      error: (err) => this.notyf.error(err)
+    this._providerService.deleteDefaultSlot().subscribe({
+      next: () => {
+        this._store.dispatch(providerActions.clearDefaultSlot());
+        this.defaultSlots = [];
+      },
+      error: (err) => this._notyf.error(err)
     });
   }
 
@@ -70,26 +76,40 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
     const toMinutes = this.timeToMinutes(toValue);
 
     if (fromMinutes >= toMinutes) {
-      alert('Start time must be earlier than end time.');
+      this._notyf.error('Start time must be earlier than end time.');
       return;
     }
 
     const slotsToCheck = this.addNewSlots ? this.newSlots : this.defaultSlots;
 
     if (this.hasOverlap(slotsToCheck, fromMinutes, toMinutes)) {
-      alert('This time range overlaps with an existing slot.');
+      this._notyf.error('This time range overlaps with an existing slot.');
       return;
     }
 
     if (this.addNewSlots) {
       this.newSlotEvent.emit({ from: from12, to: to12 });
     } else {
-      this.providerService.updateDefaultSlot({ from: from12, to: to12 }).subscribe({
-        next: () => this.defaultSlots.push({ from: from12, to: to12 }),
-        error: (err) => this.notyf.error(err)
+      this._providerService.updateDefaultSlot({ from: from12, to: to12 }).subscribe({
+        next: () => {
+          this._store.dispatch(providerActions.addDefaultSlot({ slot: { from: from12, to: to12 } }))
+        },
+        error: (err) => this._notyf.error(err)
       });
     }
 
+    this.defaultForm.reset();
+  }
+
+  setDefaultSlots() {
+    if (this.providerData && this.providerData.defaultSlots.length > 0) {
+      for (let slot of this.providerData.defaultSlots) {
+        this.newSlots.push({ from: slot.from, to: slot.to });
+        this.newSlotEvent.emit({ from: slot.from, to: slot.to });
+      }
+    } else {
+      this._notyf.error('No slots in default');
+    }
   }
 
   private timeToMinutes(time: string): number {

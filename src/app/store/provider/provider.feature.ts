@@ -1,5 +1,4 @@
 import { createFeature, createReducer, on } from "@ngrx/store";
-import { providerAdaptor } from "../users/user.entities";
 import { IProviderState } from "../../core/models/user.model";
 import { providerActions } from "./provider.action";
 
@@ -50,6 +49,28 @@ export const providerFeature = createFeature({
             ...state,
             error,
             loading: false
+        })),
+
+        on(providerActions.addDefaultSlot, (state, { slot }) => ({
+            ...state,
+            provider: state.provider
+                ? {
+                    ...state.provider,
+                    defaultSlots: [...state.provider.defaultSlots, slot]
+                }
+                : null
+        })),
+
+        on(providerActions.clearDefaultSlot, (state) => ({
+            ...state,
+            provider: state.provider
+                ? {
+                    ...state.provider,
+                    defaultSlots: [],
+                }
+                : null,
+            loading: false,
+            error: null
         })),
     )
 })

@@ -27,12 +27,16 @@
             <!-- Action Button -->
             <div class="flex justify-end gap-4">
                 <button *ngIf="!addNewSlots" type="button" (click)="clearSlots()"
-                    class=" px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                    class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
                     Clear All
                 </button>
                 <button *ngIf="!addNewSlots" type="submit"
                     class="px-5 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
                     Add
+                </button>
+                <button *ngIf="addNewSlots" type="button" (click)="setDefaultSlots()"
+                    class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                    Default
                 </button>
                 <button *ngIf="addNewSlots" type="submit"
                     class="px-5 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
