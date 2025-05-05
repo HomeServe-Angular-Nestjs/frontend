@@ -4,106 +4,86 @@
         <app-provider-schedule-calender></app-provider-schedule-calender>
 
         <!-- Booking Limits -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">
-                Booking Limits
-            </h3>
-            <div class="flex items-center gap-6">
-                <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Maximum bookings per day</label>
-                    <select
-                        class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <!-- Add more options -->
-                    </select>
-                </div>
-                <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Buffer time between bookings</label>
-                    <select
-                        class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option>15 minutes</option>
-                        <option>30 minutes</option>
-                        <option>45 minutes</option>
-                        <option>1 hour</option>
-                        <!-- Add more options -->
-                    </select>
+        <form [formGroup]="scheduleForm" (ngSubmit)="saveData()">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    Booking Limits
+                </h3>
+                <div class="flex items-center gap-6">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Maximum bookings per day</label>
+                        <select formControlName="bookingLimit"
+                            class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option [ngValue]="null">None</option>
+                            <option *ngFor="let limit of bookingLimits" [ngValue]="limit">{{ limit }}</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Buffer time between bookings</label>
+                        <select formControlName="bufferTime"
+                            class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option [ngValue]="null">None</option>
+                            <option *ngFor="let option of bufferOptions" [ngValue]="option.value">{{ option.label }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Service Area -->
-        <div class="bg-white rounded-lg shadow-sm">
-            <div class="p-6 border-b">
-                <div class="flex items-center justify-between">
+            <!-- Service Area -->
+            <div class="bg-white rounded-lg shadow-sm">
+                <div class="p-6 border-b">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">
+                                Service Area
+                            </h3>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Define your service coverage area if you want to limit your
+                                service radius
+                            </p>
+                        </div>
+                        <div class="flex items-center">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input formControlName="serviceArea" type="checkbox" class="sr-only peer" />
+                                <div
+                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#16A34A]">
+                                </div>
+                                <span class="ml-3 text-sm font-medium text-gray-700">Enable service area</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Info Message -->
+            <div class="bg-blue-50 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-500 mt-0.5" aria-hidden="true"></i>
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900">
-                            Service Area (Optional)
-                        </h3>
-                        <p class="text-sm text-gray-500 mt-1">
-                            Define your service coverage area if you want to limit your
-                            service radius
+                        <p class="text-sm text-blue-800">
+                            Your availability settings help us match you with customers in
+                            your area. Make sure to:
                         </p>
-                    </div>
-                    <div class="flex items-center">
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" />
-                            <div
-                                class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#16A34A]">
-                            </div>
-                            <span class="ml-3 text-sm font-medium text-gray-700">Enable service area</span>
-                        </label>
+                        <ul class="mt-2 text-sm text-blue-700 list-disc list-inside space-y-1">
+                            <li>Set realistic working hours</li>
+                            <li>Define an appropriate service radius</li>
+                            <li>Keep your schedule updated regularly</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-
-            <div class="p-6">
-                <!-- Map Container -->
-                <div class="bg-gray-100 rounded-lg h-[400px] mb-4">
-                    <!-- Map will be integrated here -->
-                    <div class="h-full flex items-center justify-center text-gray-500">
-                        <span>Map Integration</span>
-                    </div>
-                </div>
-
-                <!-- Service Radius -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Service radius</label>
-                    <div class="flex items-center gap-4">
-                        <input type="range" min="1" max="50" value="25" class="flex-1" />
-                        <span class="text-sm font-medium text-gray-900">25 km</span>
-                    </div>
-                </div>
+            <div class="flex justify-end space-x-4 mt-4">
+                <a routerLink="/provider/profiles/schedule"
+                    class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium">
+                    Cancel
+                </a>
+                <button type="submit" class="px-4 py-2 bg-[#16A34A] text-white rounded-lg text-sm hover:bg-green-600">
+                    Save
+                </button>
             </div>
-        </div>
-
-        <!-- Info Message -->
-        <div class="bg-blue-50 rounded-lg p-4">
-            <div class="flex items-start gap-3">
-                <i class="fas fa-info-circle text-blue-500 mt-0.5" aria-hidden="true"></i>
-                <div>
-                    <p class="text-sm text-blue-800">
-                        Your availability settings help us match you with customers in
-                        your area. Make sure to:
-                    </p>
-                    <ul class="mt-2 text-sm text-blue-700 list-disc list-inside space-y-1">
-                        <li>Set realistic working hours</li>
-                        <li>Define an appropriate service radius</li>
-                        <li>Keep your schedule updated regularly</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
-    <div class="flex justify-end space-x-4 mt-4">
-        <a routerLink="/provider/profiles/schedule" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium">
-            Cancel
-        </a>
-        <button class="px-4 py-2 bg-[#16A34A] text-white rounded-lg text-sm hover:bg-green-600">
-            Save
-        </button>
-    </div>
+
 </div>

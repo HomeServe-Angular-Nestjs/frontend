@@ -39,7 +39,7 @@ export const providerEffects = {
                 providerService.updateProviderData(updateProviderData).pipe(
                     map((updatedProviderData) => {
                         router.navigate(['provider', 'profiles', 'overview']);
-                        notyf.success('profile updated successfully');
+                        notyf.success('Update Success');
                         return providerActions.updateProviderSuccess({ updatedProviderData });
                     }),
                     catchError((error: HttpErrorResponse) => {
