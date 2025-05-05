@@ -13,4 +13,8 @@ export const scheduleActions = {
         updatedProvider: IProvider
     }>()),
     updateSchedulesFailure: createAction('[Schedule] Update Schedule Failure', props<{ error: string }>()),
+
+    removeSchedule: createAction('[Schedule] Remove Schedule', props<{ date: string, id: string }>()),
+    removeScheduleSuccess: createAction('[Schedule] Remove Schedule', props<{ removedScheduleId: string }>()),
+    removeScheduleFailure: createAction('[Schedule] Remove Schedule', props<{ error: string }>()),
 };

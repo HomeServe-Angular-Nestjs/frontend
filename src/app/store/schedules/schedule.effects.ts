@@ -6,6 +6,7 @@ import { ScheduleService } from "../../core/services/schedule.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { NotificationService } from "../../core/services/public/notification.service";
+import { providerActions } from "../provider/provider.action";
 
 export const scheduleEffects = {
     fetchScheduleEffect$: createEffect(() => {
@@ -37,7 +38,7 @@ export const scheduleEffects = {
                 scheduleService.updateSchedule(updateData).pipe(
                     map((response) => scheduleActions.updateScheduleSuccess({
                         updatedSchedule: response.schedule,
-                        updatedProvider: response.provider
+                        updatedProvider: response.provider //ToDo Not finished
                     })),
                     catchError((error: HttpErrorResponse) => {
                         return handleApiError(error, scheduleActions.updateSchedulesFailure, notyf);
@@ -45,6 +46,22 @@ export const scheduleEffects = {
                 )
             )
         );
-    }, { functional: true })
+    }, { functional: true }),
+
+    removeSchedule$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const scheduleService = inject(ScheduleService);
+        const notyf = inject(NotificationService);
+
+        return actions$.pipe(
+            ofType(scheduleActions.removeSchedule),
+            switchMap(({ date, id }) => scheduleService.removeSchedule(date, id).pipe(
+                map((response) => scheduleActions.removeScheduleSuccess({ removedScheduleId: response.id })),
+                catchError((error: HttpErrorResponse) => {
+                    return handleApiError(error, scheduleActions.removeScheduleFailure, notyf)
+                })
+            ))
+        );
+    }, { functional: true }),
 
 }

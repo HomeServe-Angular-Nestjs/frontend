@@ -56,5 +56,36 @@ export const scheduleFeature = createFeature({
             loading: false,
             error
         })),
+
+        on(scheduleActions.removeSchedule, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        on(scheduleActions.removeScheduleSuccess, (state, { removedScheduleId }) => {
+            if (!removedScheduleId) {
+                return {
+                    ...state,
+                    loading: false,
+                    error: 'Id not found'
+                }
+            }
+
+            const updatedEntityState = scheduleAdaptor.removeOne(removedScheduleId, state.schedules);
+
+            return {
+                ...state,
+                schedules: updatedEntityState,
+                loading: false,
+                error: null
+            }
+        }),
+
+        on(scheduleActions.removeScheduleFailure, (state, { error }) => ({
+            ...state,
+            loading: false,
+            error
+        })),
     )
 });

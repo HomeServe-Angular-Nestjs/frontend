@@ -20,10 +20,11 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   providerData$!: Observable<IProvider | null>;
   schedules$!: Observable<ISchedule[]>;
 
-  private destroy$ = new Subject<void>();
+  private _destroy$ = new Subject<void>();
 
-  constructor(private store: Store) { }
+  constructor(private _store: Store) { }
 
+  loading: boolean = false;
   currentDate: Date = new Date();
   dateInput: string = '';
   visibleDates: string[] = [];
@@ -33,17 +34,17 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   pickedDate!: string;
 
   ngOnInit(): void {
-    this.providerData$ = this.store.select(selectProvider);
+    this.providerData$ = this._store.select(selectProvider);
 
     // Dispatch an action to fetch schedules once provider ID is available
     this.providerData$.pipe(
-      takeUntil(this.destroy$),
+      takeUntil(this._destroy$),
       filter((provider): provider is IProvider => !!provider && !!provider.id)
     ).subscribe(provider => {
-      this.store.dispatch(scheduleActions.fetchSchedules({ providerId: provider.id }));
+      this._store.dispatch(scheduleActions.fetchSchedules({ providerId: provider.id }));
     })
 
-    this.schedules$ = this.store.select(selectAllSchedules);
+    this.schedules$ = this._store.select(selectAllSchedules);
 
     this._syncDateInputToCurrent();
     this._generateWeek(this.currentDate);
@@ -98,13 +99,18 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   }
 
   addToNewSlot(slot: SlotType) {
-    this.store.dispatch(scheduleActions.updateSchedule({
+    this._store.dispatch(scheduleActions.updateSchedule({
       updateData: {
         scheduleDate: this.pickedDate,
         slot
       }
     }));
   }
+
+  clearSlots(date: string, id: string, event: MouseEvent) {
+    this._store.dispatch(scheduleActions.removeSchedule({ date, id }));
+  }
+
 
   setDefaultHours() {
     this.modal = true;
@@ -154,7 +160,7 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // Complete the destroy$ subject to clean up subscriptions
-    this.destroy$.next();
-    this.destroy$.complete();
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 }

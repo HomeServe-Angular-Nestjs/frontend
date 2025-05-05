@@ -1,31 +1,55 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { API_ENV } from '../../environments/api.environments';
 import { catchError, Observable, throwError } from 'rxjs';
 import { ISchedule, SlotType } from '../models/schedules.model';
 import { IProvider } from '../models/user.model';
 
+interface IRemoveSchedule {
+  removedScheduleId: string,
+  provider: IProvider
+}
+
+interface IUpdateSchedule {
+  schedule: ISchedule,
+  provider: IProvider
+}
+
 @Injectable({ providedIn: 'root', })
 export class ScheduleService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private _http: HttpClient) { }
 
-  private apiUrl = API_ENV.provider;
+  private _apiUrl = API_ENV.provider;
 
   fetchSchedules(providerId?: string): Observable<ISchedule[]> {
-    return this.http.get<ISchedule[]>(`${this.apiUrl}/schedules?id=${providerId}`).pipe(
+    return this._http.get<ISchedule[]>(`${this._apiUrl}/schedules?id=${providerId}`).pipe(
       catchError((error: HttpErrorResponse) =>
         throwError(() =>
           new Error(this.getErrorMessage(error)))
-      )
-    );
+      ));
   }
 
-  updateSchedule(data: Partial<ISchedule>): Observable<{ schedule: ISchedule, provider: IProvider }> {
-    return this.http.put<{ schedule: ISchedule, provider: IProvider }>(`${this.apiUrl}/schedules`, data).pipe(
+  updateSchedule(data: Partial<ISchedule>): Observable<IUpdateSchedule> {
+    return this._http.put<IUpdateSchedule>(`${this._apiUrl}/schedules`, data).pipe(
       catchError((error: HttpErrorResponse) =>
         throwError(() =>
           new Error(this.getErrorMessage(error)))
+      ));
+  }
+
+  removeSchedule(date: string, id: string): Observable<{ id: string }> {
+    if (!date || !id) {
+      throw new Error('Missing required schedule parameters (date or id)');
+    }
+
+    const params = new HttpParams()
+      .set('date', date)
+      .set('id', id);
+
+    return this._http.delete<{ id: string }>(`${this._apiUrl}/schedule`, { params }).pipe(
+      catchError((error: HttpErrorResponse) =>
+        throwError(() => new Error(this.getErrorMessage(error)))
       )
     );
   }

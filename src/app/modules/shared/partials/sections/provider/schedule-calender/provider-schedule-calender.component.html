@@ -35,7 +35,7 @@
         <!-- Week Days Header -->
         <div class="grid grid-cols-7 mb-4">
             <div *ngFor="let day of days" class="text-sm font-medium text-gray-500 text-center">
-                {{day}}
+                {{ day }}
             </div>
         </div>
 
@@ -44,9 +44,10 @@
             <div *ngFor="let date of visibleDates" (click)="selectDate(date)"
                 class="min-h-[120px] p-3 rounded-lg border border-gray-200 hover:border-green-500 cursor-pointer transition-colors relative group"
                 [ngClass]="{'bg-green-100 border-green-500': isSelected(date)}">
+
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-sm text-gray-400">{{ date.split(' ')[2] }}</span>
-                    <ng-container *ngIf="(schedules$ | async) as schedules">
+                    <ng-container *ngIf="schedules$ | async as schedules">
                         <span *ngIf="schedules.length > 0"
                             class="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">
                             {{ schedules.length }} slots
@@ -56,23 +57,16 @@
 
                 <div class="space-y-1">
                     <ng-container *ngIf="schedules$ | async as schedules; else loading">
-                        <!-- Check if schedules exist and are not empty -->
-                        <ng-container *ngIf="schedules?.length">
-                            <!-- Loop through schedules -->
-                            <ng-container *ngFor="let item of schedules">
-                                <!-- Match current date with schedule date -->
-                                <ng-container *ngIf="item.scheduleDate === date">
-                                    <!-- Loop through matching schedule's slots -->
-                                    <div *ngFor="let slot of item.slots"
-                                        class="text-xs px-1 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
-                                        {{ slot.from }} - {{ slot.to }}
-                                    </div>
-                                </ng-container>
+                        <ng-container *ngFor="let item of schedules">
+                            <ng-container *ngIf="item.scheduleDate === date">
+                                <div *ngFor="let slot of item.slots"
+                                    class="text-xs px-1 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
+                                    {{ slot.from }} - {{ slot.to }}
+                                </div>
                             </ng-container>
                         </ng-container>
                     </ng-container>
 
-                    <!-- Loading state for schedules observable -->
                     <ng-template #loading>
                         <div>Loading...</div>
                     </ng-template>
@@ -82,10 +76,22 @@
                     class="w-full mt-2 py-1 text-xs text-[#16A34A] opacity-0 group-hover:opacity-100 hover:bg-green-50 rounded transition-all">
                     <i class="fas fa-plus" aria-hidden="true"></i> Add Slots
                 </button>
-            </div>
 
+                <ng-container *ngIf="schedules$ | async as schedules">
+                    <ng-container *ngFor="let item of schedules">
+                        <ng-container *ngIf="item.scheduleDate === date && item.slots.length > 0">
+                            <button *ngIf="item.scheduleDate && item.id" type="button"
+                                (click)="clearSlots(item.scheduleDate, item.id, $event)"
+                                class="w-full mt-2 py-1 text-xs text-[#16A34A] opacity-0 group-hover:opacity-100 hover:bg-green-50 rounded transition-all">
+                                <i class="fas fa-trash" aria-hidden="true"></i> Clear
+                            </button>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
         </div>
     </div>
+
 </div>
 
 <app-provider-schedule-default-time *ngIf="modal" [providerData]="providerData$ | async" [addNewSlots]="addNewSlots"
