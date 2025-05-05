@@ -4,7 +4,7 @@ import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, Reacti
 import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
 import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IOfferedService, ISubService } from '../../../../../../core/models/offeredService.model';
 import { Store } from '@ngrx/store';
 import { offeredServiceActions } from '../../../../../../store/offered-services/offeredService.action';
@@ -33,6 +33,7 @@ export class ServiceCreateComponent {
   private _notyf = inject(NotificationService);
   private _store = inject(Store);
   private _scroller = inject(ViewportScroller);
+  private _router = inject(Router);
 
   @ViewChild('addSubServiceBtn', { static: false }) buttonElementRef!: ElementRef<HTMLButtonElement>;
 
@@ -196,8 +197,11 @@ export class ServiceCreateComponent {
       this._store.dispatch(offeredServiceActions.updateOfferedService({ updateData: formData }));
     } else {
       this._serviceOfferedService.sendFormData(formData).subscribe({
-        next: (res) => console.log(res),
-        error: (err) => console.error(err)
+        next: () => {
+          this._notyf.success('Creation Success')
+          this._router.navigate(['provider', 'profiles', 'service_offered'])
+        },
+        error: (err) => this._notyf.error(err)
       });
     }
   }
@@ -210,8 +214,8 @@ export class ServiceCreateComponent {
     const formValue = this.serviceForm.value;
 
     // Main service fields
-    formData.append('title', formValue.serviceTitle);
-    formData.append('desc', formValue.serviceDesc);
+    formData.append('serviceTitle', formValue.serviceTitle);
+    formData.append('serviceDesc', formValue.serviceDesc);
 
     // Append new image file only if it's newly uploaded
     if (this.serviceImageFile) {
