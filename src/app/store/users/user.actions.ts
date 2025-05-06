@@ -16,7 +16,7 @@ export const customerActions = {
     fetchCustomersSuccess: createAction('[User] Fetch Customer Success', props<{ customers: ICustomer[] }>()),
     fetchCustomersFailure: createAction('[User] Fetch Customer Failure', props<{ error: string }>()),
 
-    updateCustomer: createAction('[User] Update Customer', props<{ email: string, data: Partial<ICustomer> }>()),
+    updateCustomer: createAction('[User] Update Customer', props<{ id: string, data: Partial<ICustomer> }>()),
     updateCustomerSuccess: createAction('[User] Update Customer Success', props<{ customer: ICustomer }>()),
     updateCustomerFailure: createAction('[User] Update Customer Failure', props<{ error: string }>()),
 }

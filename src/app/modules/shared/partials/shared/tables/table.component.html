@@ -23,7 +23,7 @@
                         <div class="flex items-center justify-center space-x-2">
                             <ng-container *ngFor="let action of row.actions">
                                 <button class="p-2 rounded-full hover:bg-gray-200 transition-colors"
-                                    [title]="action.toolTip" (click)="actionTriggered.emit({actions: action, row})">
+                                    [title]="action.toolTip" (click)="actionTriggeredEvent.emit({actions: action, row})">
                                     <i class="fa text-[#64748B] hover:text-[#334155]"
                                         [ngClass]="action.icon + ' ' + action.styles"></i>
                                 </button>

@@ -55,8 +55,8 @@ export const userEffects = {
 
         return actions$.pipe(
             ofType(customerActions.updateCustomer),
-            switchMap(({ email, data }) =>
-                userService.updateUser(email, data, 'customer').pipe(
+            switchMap(({ id, data }) =>
+                userService.updateUser(id, data, 'customer').pipe(
                     map((customer) => customerActions.updateCustomerSuccess({ customer })),
                     tap(() => notyf.success('Updated Successfully')),
                     catchError((error) => {

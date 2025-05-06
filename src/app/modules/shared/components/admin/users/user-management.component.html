@@ -11,5 +11,5 @@
 <!-- </ng-container> -->
 
 <ng-container *ngIf="filteredData$ | async as data">
-    <app-table [tableData]="data.tableData"></app-table>
+    <app-table [tableData]="data.tableData" (actionTriggeredEvent)="onActionFromTable($event)"></app-table>
 </ng-container>

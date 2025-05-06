@@ -36,4 +36,8 @@ export class UserManagementService {
         return this.http.patch<T>(`${this.customerUrl}`, { email, data, type });
     }
 
+    blockUser(id: string, userType: 'provider' | 'customer') { 
+        
+    }
+
 }

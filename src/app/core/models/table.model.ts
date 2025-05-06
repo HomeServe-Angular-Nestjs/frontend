@@ -7,7 +7,7 @@ export interface TableAction {
 }
 
 export interface TableRow {
-    id: string | number;
+    id: string;
     username: string;
     email: string;
     contact?: string;

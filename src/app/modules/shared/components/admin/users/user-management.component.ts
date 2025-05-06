@@ -9,6 +9,8 @@ import { createUserTable } from '../../../../../core/utils/generate-tables.utils
 import { TableAction, TableRow } from '../../../../../core/models/table.model';
 import { TableComponent } from '../../../partials/shared/tables/table.component';
 import { FiltersComponent } from '../../../partials/shared/filters/filters.component';
+import { providerActions } from '../../../../../store/provider/provider.action';
+import { NotificationService } from '../../../../../core/services/public/notification.service';
 
 @Component({
   selector: 'app-user-management',
@@ -16,16 +18,19 @@ import { FiltersComponent } from '../../../partials/shared/filters/filters.compo
   imports: [CommonModule, TableComponent, FiltersComponent],
 })
 export class UserManagementComponent {
-  private store = inject(Store);
-  private roleSubject$ = new BehaviorSubject<'customer' | 'provider'>('customer');
-  role$ = this.roleSubject$.asObservable();
+  private _store = inject(Store);
+  private _roleSubject$ = new BehaviorSubject<'customer' | 'provider'>('customer');
+  private _notyf = inject(NotificationService);
+  role$ = this._roleSubject$.asObservable();
+
+
 
   constructor() {
-    this.store.dispatch(userActions.fetchUsers());
+    this._store.dispatch(userActions.fetchUsers());
   }
 
-  customers$: Observable<ICustomer[]> = this.store.select(selectAllCustomers).pipe(startWith([]));
-  providers$: Observable<IProvider[]> = this.store.select(selectAllProviderEntities).pipe(startWith([]));
+  customers$: Observable<ICustomer[]> = this._store.select(selectAllCustomers).pipe(startWith([]));
+  providers$: Observable<IProvider[]> = this._store.select(selectAllProviderEntities).pipe(startWith([]));
 
   vm$ = combineLatest([this.customers$, this.providers$]).pipe(
     map(([customers, providers]) => ({
@@ -41,11 +46,19 @@ export class UserManagementComponent {
     }))
   );
 
-  onActionFromTable(event: { actions: TableAction, row: TableRow }, userType: 'customer' | 'provider') {
-    switch (event.actions.action) {
+
+  onActionFromTable(event: { actions: TableAction, row: TableRow }) {
+    const { actions, row } = event;
+
+    switch (actions.action) {
       case "toggleStatus":
         console.log('toggle status')
-        // this.handleToggleStatus(userType, event.row.email, event.row.status)
+        const userType = this._roleSubject$.value;
+        if (row.id) {
+          this.handleToggleStatus(userType, row.id, row.status)
+        } else {
+          this._notyf.error('Missing email or status in row data');
+        }
         break;
       case "delete":
         console.log('delete')
@@ -58,22 +71,23 @@ export class UserManagementComponent {
     }
   }
 
-  private handleToggleStatus(userType: 'customer' | 'provider', email: string, status: string) {
-    const isActive = status === 'Active';
+  private handleToggleStatus(userType: 'customer' | 'provider', id: string, status: string) {
+    const isCurrentlyActive = status === 'Active';
+    const isActive = !isCurrentlyActive;
 
-    const actionMap = {
-      customer: customerActions.updateCustomer,
-      provider: customerActions.updateCustomer
-    }
-
-    const action = actionMap[userType];
-    if (action) {
-      this.store.dispatch(action({ email, data: { isActive: !isActive } }));
+    if (userType === 'customer') {
+      this._store.dispatch(customerActions.updateCustomer({ data: { isActive }, id }))
+    } else if (userType === 'provider') {
+      const providerData = { id, isActive };
+      const formData = new FormData();
+      formData.append('providerData', JSON.stringify(providerData));
+      this._store.dispatch(providerActions.updateProvider({ updateProviderData: formData }));
     }
   }
 
-  onRoleChange(newRole: any) {
-    this.roleSubject$.next(newRole);
+
+  onRoleChange(newRole: 'customer' | 'provider') {
+    this._roleSubject$.next(newRole);
   }
 
 }

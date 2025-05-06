@@ -10,11 +10,12 @@ import { TableData } from '../../../../../core/models/table.model';
 })
 export class TableComponent implements OnChanges {
   @Input({ required: true }) tableData!: TableData;
-  @Output() actionTriggered = new EventEmitter()
+  @Output() actionTriggeredEvent = new EventEmitter()
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tableData']) {
       console.log(this.tableData)
     }
   }
+
 }
