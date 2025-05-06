@@ -5,7 +5,6 @@ import { API_ENV } from "../../environments/api.environments";
 import { catchError, map, Observable, tap, throwError } from "rxjs";
 import { IResponse, IVerifyTokenResponse } from "../../modules/shared/models/response.model";
 import { Store } from "@ngrx/store";
-import { AuthState } from "../models/auth.model";
 
 
 @Injectable({ providedIn: "root" })

@@ -40,6 +40,6 @@ export class SignupAuthService {
     }
 
     private getErrorMessage(error: HttpErrorResponse): string {
-        return error?.error?.message || 'something went wrong';
+        return error?.error?.message || error?.message || 'something went wrong';
     }
 }

@@ -2,41 +2,57 @@
     <h2 class="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
 
     <div class="space-y-4">
-        <!-- <div *ngFor="let service of selectedServiceData" class="flex justify-between items-start">
-            <div *ngFor="let s of service">
-                <div>
-                    <p class=" font-medium">{{s.title}}</p>
-                    <p class="text-gray-500 text-sm">{{s.desc}}</p>
+        <ng-container *ngIf="selectedServiceData && selectedServiceData.length > 0; else noServices">
+            <div class="space-y-6">
+                <div *ngFor="let service of selectedServiceData" class="space-y-4">
+                    <!-- Each Service Block -->
+                    <div class="grid md:grid-cols-1 gap-4">
+                        <div *ngFor="let sub of service.subService"
+                            class="bg-white rounded-2xl shadow-md p-4 flex items-start gap-4">
+                            <img [src]="sub.image" alt="{{sub.title}}" class="w-24 h-24 object-cover rounded-lg" />
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-lg font-semibold text-gray-800">{{ sub.title }}</h3>
+                                    <span class="text-blue-600 font-semibold">₹{{ sub.price }}</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">{{ sub.desc }}</p>
+                                <p class="text-xs text-gray-400 mt-1 italic">Estimated Time: {{ sub.estimatedTime }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <span class="font-medium">{{s.price}}</span>
             </div>
-        </div> -->
+        </ng-container>
+
+        <ng-template #noServices>
+            <p class="text-center text-gray-500 py-8">No services selected.</p>
+        </ng-template>
 
         <div class="border-t border-gray-200 my-6"></div>
 
         <div class="space-y-3">
             <div class="flex justify-between">
                 <span class="text-gray-600">Subtotal</span>
-                <span>$388</span>
+                <span>₹{{priceBreakup.subTotal.toFixed()}}</span>
             </div>
             <div class="flex justify-between">
                 <span class="text-gray-600">Service Fee</span>
-                <span>$20</span>
+                <span>₹{{priceBreakup.visitingFee.toFixed()}}</span>
             </div>
             <div class="flex justify-between">
                 <span class="text-gray-600">Tax</span>
-                <span>$38.80</span>
+                <span>₹{{priceBreakup.tax.toFixed()}}</span>
             </div>
             <div class="flex justify-between">
                 <span class="text-gray-600">Visiting Fee</span>
-                <span>$50</span>
+                <span>₹{{priceBreakup.total.toFixed()}}</span>
             </div>
         </div>
 
         <div class="border-t border-gray-200 mt-6 pt-4">
             <div class="flex justify-between items-center">
                 <span class="text-lg font-bold">Total</span>
-                <span class="text-xl font-bold text-blue-600">$408.00</span>
+                <span class="text-xl font-bold text-blue-600">₹{{priceBreakup.total.toFixed()}}</span>
             </div>
         </div>
 
