@@ -38,19 +38,6 @@ export const providerFeature = createFeature({
             error: null
         })),
 
-        on(providerActions.updateProviderSuccess, (state, { updatedProviderData }) => ({
-            ...state,
-            provider: updatedProviderData,
-            error: null,
-            loading: false
-        })),
-
-        on(providerActions.updateProviderFailure, (state, { error }) => ({
-            ...state,
-            error,
-            loading: false
-        })),
-
         on(providerActions.addDefaultSlot, (state, { slot }) => ({
             ...state,
             provider: state.provider

@@ -14,7 +14,6 @@ export class TableComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tableData']) {
-      console.log(this.tableData)
     }
   }
 

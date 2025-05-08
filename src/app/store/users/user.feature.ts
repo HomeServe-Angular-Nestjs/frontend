@@ -1,8 +1,12 @@
 import { createFeature, createReducer, on } from "@ngrx/store";
-import { customerActions, userActions } from "./user.actions";
-import { ICustomerState, IUserState } from "../../core/models/user.model";
+import { userActions } from "./user.actions";
+import { IUserState } from "../../core/models/user.model";
 import { customerAdaptor, providerAdaptor } from "./user.entities";
 
+/**
+ * @constant
+ * @description Initial state for the user feature.
+ */
 export const initialUserState: IUserState = {
     customers: customerAdaptor.getInitialState(),
     providers: providerAdaptor.getInitialState(),
@@ -10,24 +14,28 @@ export const initialUserState: IUserState = {
     error: null
 }
 
-export const initialCustomerState: ICustomerState = {
-    customers: customerAdaptor.getInitialState(),
-    loading: false,
-    error: null,
-};
-
-
+/**
+ * @feature User State Feature
+ * @description Handles user-related state including customers and providers.
+ */
 export const userFeature = createFeature({
     name: 'users',
     reducer: createReducer(
         initialUserState,
 
+        /** Triggered when fetching users begins. */
         on(userActions.fetchUsers, (state) => ({
             ...state,
             loading: true,
             error: null,
         })),
 
+        /**
+         * @action Successfully fetched users.
+         * @param customers - List of customer entities.
+         * @param providers - List of provider entities.
+         * @returns Updated state with new entities and loading disabled.
+         */
         on(userActions.fetchUsersSuccess, (state, { customers, providers }) => ({
             ...state,
             customers: customerAdaptor.setAll(customers, state.customers),
@@ -35,18 +43,24 @@ export const userFeature = createFeature({
             error: null
         })),
 
+        /** Sets error state when user fetch fails. */
         on(userActions.fetchUsersFailure, (state, { error }) => ({
             ...state,
             error,
             loading: false
         })),
 
+        /** Triggered when fetching providers begins. */
         on(userActions.fetchProviders, (state) => ({
             ...state,
             loading: true,
             error: null
         })),
 
+        /**
+         * @action Successfully fetched providers.
+         * @param providers - List of provider entities.
+         */
         on(userActions.fetchProvidersSuccess, (state, { providers }) => ({
             ...state,
             loading: false,
@@ -54,52 +68,70 @@ export const userFeature = createFeature({
             error: null
         })),
 
+        /** Sets error state when provider fetch fails. */
         on(userActions.fetchProvidersFailure, (state, { error }) => ({
             ...state,
             error,
             loading: false
         })),
-    )
-});
 
-export const customerFeature = createFeature({
-    name: 'customers',
-    reducer: createReducer(
-        initialCustomerState,
-
-        on(customerActions.fetchCustomers, (state) => ({
+        /** Triggered when partial update for a provider starts. */
+        on(userActions.partialUpdateProvider, (state) => ({
             ...state,
             loading: true,
             error: null
         })),
 
-        on(customerActions.fetchCustomersSuccess, (state, { customers }) => {
-            console.log('setting customers: ', customers)
+        /**
+        * @action Successfully updated a provider.
+        * @param provider - Updated provider entity.
+        */
+        on(userActions.partialUpdateProviderSuccess, (state, { provider }) => {
             return {
                 ...state,
+                providers: providerAdaptor.updateOne(
+                    { id: provider.id, changes: provider },
+                    state.providers
+                ),
                 loading: false,
-                customers: customerAdaptor.setAll(customers, state.customers),
                 error: null
             }
         }),
 
-        on(customerActions.fetchCustomersFailure, (state, { error }) => ({
+        /** Sets error state when provider update fails. */
+        on(userActions.partialUpdateProviderFailure, (state, { error }) => ({
             ...state,
             loading: false,
             error
         })),
 
-        on(customerActions.updateCustomer, (state) => ({
+        /** Triggered when partial update for a customer starts. */
+        on(userActions.partialUpdateCustomer, (state) => ({
             ...state,
             loading: true,
+            error: null,
         })),
 
-        on(customerActions.updateCustomerSuccess, (state, { customer }) => ({
+        /**
+         * @action Successfully updated a customer.
+         * @param customer - Updated customer entity.
+         */
+        on(userActions.partialUpdateCustomerSuccess, (state, { customer }) => {
+            return {
+                ...state,
+                customers: customerAdaptor.updateOne(
+                    { id: customer.id, changes: customer },
+                    state.customers
+                ),
+                loading: false,
+                error: null
+            }
+        }),
+
+        /** Sets error state when customer update fails. */
+        on(userActions.partialUpdateCustomerFailure, (state, { error }) => ({
             ...state,
-            customers: customerAdaptor.updateOne(
-                { id: customer.id, changes: customer },
-                state.customers
-            )
+            error
         })),
     )
 });

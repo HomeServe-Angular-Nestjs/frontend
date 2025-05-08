@@ -9,14 +9,23 @@ export const userActions = {
     fetchProviders: createAction('[User] Fetch Providers'),
     fetchProvidersSuccess: createAction('[User] Fetch Providers Success', props<{ providers: IProvider[] }>()),
     fetchProvidersFailure: createAction('[User] Fetch Provider Failure', props<{ error: string }>()),
+
+    partialUpdateProvider: createAction('[User] Partial update provider', props<{ updateData: Partial<IProvider> }>()),
+    partialUpdateProviderSuccess: createAction('[User] Partial update provider success', props<{ provider: IProvider }>()),
+    partialUpdateProviderFailure: createAction('[User] Partial update provider failure', props<{ error: string }>()),
+
+    partialUpdateCustomer: createAction('[User] Update Customer', props<{ updateData: Partial<ICustomer> }>()),
+    partialUpdateCustomerSuccess: createAction('[User] Update Customer Success', props<{ customer: ICustomer }>()),
+    partialUpdateCustomerFailure: createAction('[User] Update Customer Failure', props<{ error: string }>()),
+
 }
 
-export const customerActions = {
-    fetchCustomers: createAction('[User] Fetch Customers'),
-    fetchCustomersSuccess: createAction('[User] Fetch Customer Success', props<{ customers: ICustomer[] }>()),
-    fetchCustomersFailure: createAction('[User] Fetch Customer Failure', props<{ error: string }>()),
+// export const customerActions = {
+//     fetchCustomers: createAction('[User] Fetch Customers'),
+//     fetchCustomersSuccess: createAction('[User] Fetch Customer Success', props<{ customers: ICustomer[] }>()),
+//     fetchCustomersFailure: createAction('[User] Fetch Customer Failure', props<{ error: string }>()),
 
-    updateCustomer: createAction('[User] Update Customer', props<{ id: string, data: Partial<ICustomer> }>()),
-    updateCustomerSuccess: createAction('[User] Update Customer Success', props<{ customer: ICustomer }>()),
-    updateCustomerFailure: createAction('[User] Update Customer Failure', props<{ error: string }>()),
-}
+//     updateCustomer: createAction('[User] Update Customer', props<{ id: string, data: Partial<ICustomer> }>()),
+//     updateCustomerSuccess: createAction('[User] Update Customer Success', props<{ customer: ICustomer }>()),
+//     updateCustomerFailure: createAction('[User] Update Customer Failure', props<{ error: string }>()),
+// }

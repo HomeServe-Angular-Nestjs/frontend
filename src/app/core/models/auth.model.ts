@@ -1,4 +1,4 @@
-import { IUser, UserType } from "../../modules/shared/models/user.model";
+import { UserType } from "../../modules/shared/models/user.model";
 
 export type StatusType = 'pending' | 'loading' | 'authenticated' | 'error';
 

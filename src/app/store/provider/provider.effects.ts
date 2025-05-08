@@ -27,7 +27,7 @@ export const providerEffects = {
         );
     }, { functional: true }),
 
-    updateProvider$: createEffect(() => {
+    bulkUpdate$: createEffect(() => {
         const actions$ = inject(Actions);
         const providerService = inject(ProviderService);
         const router = inject(Router);
@@ -36,7 +36,7 @@ export const providerEffects = {
         return actions$.pipe(
             ofType(providerActions.updateProvider),
             switchMap(({ updateProviderData }) =>
-                providerService.updateProviderData(updateProviderData).pipe(
+                providerService.bulkUpdate(updateProviderData).pipe(
                     map((updatedProviderData) => {
                         router.navigate(['provider', 'profiles', 'overview']);
                         notyf.success('Update Success');
@@ -48,5 +48,5 @@ export const providerEffects = {
                 )
             )
         );
-    }, { functional: true })
+    }, { functional: true }),
 }

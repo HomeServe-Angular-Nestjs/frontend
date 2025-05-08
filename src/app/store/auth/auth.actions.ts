@@ -1,6 +1,7 @@
 import { createAction, props } from "@ngrx/store";
 import { IUser, UserType } from "../../modules/shared/models/user.model";
 import { StatusType } from "../../core/models/auth.model";
+import { IProvider } from "../../core/models/user.model";
 
 
 export const authActions = {

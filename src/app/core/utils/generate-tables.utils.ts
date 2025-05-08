@@ -1,10 +1,11 @@
 import { ICustomer, IProvider } from "../models/user.model";
 
 export const createUserTable = (users: (ICustomer | IProvider)[]) => {
+    const filteredUser = users.filter(user => !user.isDeleted);
     return {
         // label: t,
         columns: ['id', 'username', 'email', 'contact', 'status', 'joined', 'actions'],
-        rows: users.map(user => ({
+        rows: filteredUser.map(user => ({
             id: user.id,
             username: user.username,
             email: user.email,
@@ -14,6 +15,7 @@ export const createUserTable = (users: (ICustomer | IProvider)[]) => {
             actions: [
                 {
                     id: user.id,
+                    value: user.isActive,
                     toolTip: user.isActive ? 'Block' : 'Unblock',
                     action: 'toggleStatus',
                     icon: user.isActive ? 'fa-user-slash' : 'fa-user-check',
@@ -21,6 +23,7 @@ export const createUserTable = (users: (ICustomer | IProvider)[]) => {
                 },
                 {
                     id: user.id,
+                    value: user.isDeleted,
                     toolTip: 'Delete',
                     action: 'delete',
                     icon: 'fa-trash',
@@ -28,6 +31,7 @@ export const createUserTable = (users: (ICustomer | IProvider)[]) => {
                 },
                 {
                     id: user.id,
+                    value: user.id,
                     toolTip: 'View',
                     action: 'view',
                     icon: 'fa-eye',

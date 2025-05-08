@@ -1,5 +1,6 @@
 export interface TableAction {
     id: string | number;
+    value: boolean | string | number;
     toolTip: string;
     action: 'toggleStatus' | 'delete' | 'view' | string;
     icon?: string;

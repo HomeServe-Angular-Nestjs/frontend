@@ -1,8 +1,6 @@
 import { EntityState } from '@ngrx/entity';
 import { ISlot } from './schedules.model';
 
-
-
 export type AdditionalDocs = {
     type: string;
     fileUrl: string;
@@ -54,7 +52,6 @@ export interface IBaseUser {
     avatar?: string;
     googleId?: string;
     isActive: boolean
-    isBlocked: boolean;
     isDeleted: boolean;
     createdAt: Date;
     updatedAt: Date;
