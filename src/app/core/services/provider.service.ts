@@ -1,9 +1,10 @@
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
 import { IProvider } from "../models/user.model";
 import { API_ENV } from "../../environments/api.environments";
 import { SlotType } from "../models/schedules.model";
+import { IFilter } from "./customer.service";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
@@ -19,8 +20,9 @@ export class ProviderService {
      * Fetches the list of all providers.
      * @returns An observable containing an array of providers.
      */
-    getProviders(): Observable<IProvider[]> {
-        return this._http.get<IProvider[]>(`${this._apiUrl}/fetch_providers`);
+    getProviders(filter: IFilter = {}): Observable<IProvider[]> {
+        const params = this._buildFilterParams(filter);
+        return this._http.get<IProvider[]>(`${this._apiUrl}/fetch_providers`, { params });
     }
 
     /**
@@ -93,6 +95,23 @@ export class ProviderService {
      */
     setProviderData(data: IProvider) {
         this.providerDataSource.next(data);
+    }
+
+    /**
+     * Converts a plain filter object into HttpParams by omitting null or undefined values.
+     * @param {IFilter} filter - The filter criteria to convert.
+     * @returns HttpParams - Angular-compatible query parameters.
+     */
+    private _buildFilterParams(filter: IFilter): HttpParams {
+        let params = new HttpParams();
+
+        Object.entries(filter).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                params = params.set(key, value);
+            }
+        });
+
+        return params;
     }
 
     /**

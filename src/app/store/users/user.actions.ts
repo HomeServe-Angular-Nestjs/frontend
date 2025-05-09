@@ -18,14 +18,11 @@ export const userActions = {
     partialUpdateCustomerSuccess: createAction('[User] Update Customer Success', props<{ customer: ICustomer }>()),
     partialUpdateCustomerFailure: createAction('[User] Update Customer Failure', props<{ error: string }>()),
 
+    searchCustomers: createAction('[User] Search Customers', props<{ searchTerm: string }>()),
+    searchCustomersSuccess: createAction('[user] Search Customers success', props<{ customers: ICustomer[] }>()),
+    searchCustomersFailure: createAction('[User] Search Customers Failure', props<{ error: string }>()),
+
+    searchProviders: createAction('[User] Search Providers', props<{ searchTerm: string }>()),
+    searchProvidersSuccess: createAction('[user] Search Providers success', props<{ providers: IProvider[] }>()),
+    searchProvidersFailure: createAction('[User] Search Providers Failure', props<{ error: string }>()),
 }
-
-// export const customerActions = {
-//     fetchCustomers: createAction('[User] Fetch Customers'),
-//     fetchCustomersSuccess: createAction('[User] Fetch Customer Success', props<{ customers: ICustomer[] }>()),
-//     fetchCustomersFailure: createAction('[User] Fetch Customer Failure', props<{ error: string }>()),
-
-//     updateCustomer: createAction('[User] Update Customer', props<{ id: string, data: Partial<ICustomer> }>()),
-//     updateCustomerSuccess: createAction('[User] Update Customer Success', props<{ customer: ICustomer }>()),
-//     updateCustomerFailure: createAction('[User] Update Customer Failure', props<{ error: string }>()),
-// }

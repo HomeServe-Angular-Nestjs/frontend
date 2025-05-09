@@ -11,6 +11,10 @@ import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { CustomerService } from "../../core/services/customer.service";
 
 export const userEffects = {
+    /**
+    * Fetches users (customers and providers) when 'fetchUsers' is dispatched.
+    * On success, dispatches 'fetchUsersSuccess'. On error, shows a notification and dispatches 'fetchUsersFailure'.
+    */
     fetchUsers$: createEffect(() => {
         const actions$ = inject(Actions);
         const userService = inject(UserManagementService);
@@ -29,6 +33,10 @@ export const userEffects = {
         );
     }, { functional: true }),
 
+    /**
+     * Fetches providers when 'fetchProviders' is dispatched.
+     * On success, dispatches 'fetchProvidersSuccess'. On error, shows a notification and dispatches 'fetchProvidersFailure'.
+     */
     fetchProviders$: createEffect(() => {
         const actions$ = inject(Actions);
         const providerService = inject(ProviderService);
@@ -47,6 +55,10 @@ export const userEffects = {
         );
     }, { functional: true }),
 
+    /**
+     * Partially updates a provider when 'partialUpdateProvider' is dispatched.
+     * On success, dispatches 'partialUpdateProviderSuccess'. On error, handles it and dispatches 'partialUpdateProviderFailure'.
+     */
     partialUpdateProvider$: createEffect(() => {
         const actions$ = inject(Actions);
         const providerService = inject(ProviderService);
@@ -65,6 +77,10 @@ export const userEffects = {
         );
     }, { functional: true }),
 
+    /**
+     * Partially updates a customer when 'partialUpdateCustomer' is dispatched.
+     * On success, dispatches 'partialUpdateCustomerSuccess'. On error, handles it and dispatches 'partialUpdateCustomerFailure'.
+     */
     partialUpdateCustomer$: createEffect(() => {
         const actions$ = inject(Actions);
         const customerService = inject(CustomerService);
@@ -77,6 +93,50 @@ export const userEffects = {
                     map((customer) => userActions.partialUpdateCustomerSuccess({ customer })),
                     catchError((error: HttpErrorResponse) => {
                         return handleApiError(error, userActions.partialUpdateCustomerFailure, notyf);
+                    })
+                )
+            )
+        );
+    }, { functional: true }),
+
+    /**
+     * Searches for customers when 'searchCustomers' is dispatched.
+     * On success, dispatches 'searchCustomersSuccess'. On error, shows a notification and dispatches 'searchCustomersFailure'.
+     */
+    searchCustomers$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const customerService = inject(CustomerService);
+        const notyf = inject(NotificationService);
+
+        return actions$.pipe(
+            ofType(userActions.searchCustomers),
+            switchMap(({ searchTerm }) =>
+                customerService.getCustomers({ search: searchTerm }).pipe(
+                    map((customers) => userActions.searchCustomersSuccess({ customers })),
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, userActions.searchCustomersFailure, notyf);
+                    })
+                )
+            )
+        )
+    }, { functional: true }),
+
+    /**
+     * Searches for providers when 'searchProviders' is dispatched.
+     * On success, dispatches 'searchProvidersSuccess'. On error, shows a notification and dispatches 'searchProvidersFailure'.
+     */
+    searchProviders$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const providerService = inject(ProviderService);
+        const notyf = inject(NotificationService);
+
+        return actions$.pipe(
+            ofType(userActions.searchProviders),
+            switchMap(({ searchTerm }) =>
+                providerService.getProviders({ search: searchTerm }).pipe(
+                    map((providers) => userActions.searchProvidersSuccess({ providers })),
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, userActions.searchProvidersFailure, notyf);
                     })
                 )
             )

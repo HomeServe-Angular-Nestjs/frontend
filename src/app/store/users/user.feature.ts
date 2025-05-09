@@ -23,7 +23,7 @@ export const userFeature = createFeature({
     reducer: createReducer(
         initialUserState,
 
-        /** Triggered when fetching users begins. */
+        /** @action Triggered when fetching users begins. */
         on(userActions.fetchUsers, (state) => ({
             ...state,
             loading: true,
@@ -43,14 +43,14 @@ export const userFeature = createFeature({
             error: null
         })),
 
-        /** Sets error state when user fetch fails. */
+        /** @action Sets error state when user fetch fails. */
         on(userActions.fetchUsersFailure, (state, { error }) => ({
             ...state,
             error,
             loading: false
         })),
 
-        /** Triggered when fetching providers begins. */
+        /** @action Triggered when fetching providers begins. */
         on(userActions.fetchProviders, (state) => ({
             ...state,
             loading: true,
@@ -68,14 +68,14 @@ export const userFeature = createFeature({
             error: null
         })),
 
-        /** Sets error state when provider fetch fails. */
+        /** @action Sets error state when provider fetch fails. */
         on(userActions.fetchProvidersFailure, (state, { error }) => ({
             ...state,
             error,
             loading: false
         })),
 
-        /** Triggered when partial update for a provider starts. */
+        /** @action Triggered when partial update for a provider starts. */
         on(userActions.partialUpdateProvider, (state) => ({
             ...state,
             loading: true,
@@ -98,14 +98,14 @@ export const userFeature = createFeature({
             }
         }),
 
-        /** Sets error state when provider update fails. */
+        /** @action Sets error state when provider update fails. */
         on(userActions.partialUpdateProviderFailure, (state, { error }) => ({
             ...state,
             loading: false,
             error
         })),
 
-        /** Triggered when partial update for a customer starts. */
+        /** @action Triggered when partial update for a customer starts. */
         on(userActions.partialUpdateCustomer, (state) => ({
             ...state,
             loading: true,
@@ -128,9 +128,59 @@ export const userFeature = createFeature({
             }
         }),
 
-        /** Sets error state when customer update fails. */
+        /** @action Sets error state when customer update fails. */
         on(userActions.partialUpdateCustomerFailure, (state, { error }) => ({
             ...state,
+            error
+        })),
+
+        /** @action Successfully fetched customers. */
+        on(userActions.searchCustomers, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        /**
+         * @action Successfully fetched customers.
+         * @param customers - Updated customers entity.
+         */
+        on(userActions.searchCustomersSuccess, (state, { customers }) => ({
+            ...state,
+            customers: customerAdaptor.setAll(customers, state.customers),
+            loading: false,
+            error: null
+        })),
+
+        /** @action Sets error state when customer fetch fails. */
+        on(userActions.searchCustomersFailure, (state, { error }) => ({
+            ...state,
+            loading: false,
+            error
+        })),
+
+        /** @action Successfully fetched providers. */
+        on(userActions.searchProviders, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        /**
+         * @action Successfully fetched providers.
+         * @param providers - Updated providers entity.
+         */
+        on(userActions.searchProvidersSuccess, (state, { providers }) => ({
+            ...state,
+            providers: customerAdaptor.setAll(providers, state.providers),
+            loading: false,
+            error: null
+        })),
+
+        /** @action Sets error state when provider fetch fails. */
+        on(userActions.searchProvidersFailure, (state, { error }) => ({
+            ...state,
+            loading: false,
             error
         })),
     )

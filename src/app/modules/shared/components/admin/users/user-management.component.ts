@@ -73,6 +73,10 @@ export class UserManagementComponent {
     }
   }
 
+  filterEvent(event: any) {
+    console.log(event)
+  }
+
   /**
   * Changes the currently selected user role.
   * @param newRole - The new role to set ('customer' or 'provider').
