@@ -10,6 +10,7 @@ import { TableAction, TableRow } from '../../../../../core/models/table.model';
 import { TableComponent } from '../../../partials/shared/tables/table.component';
 import { FiltersComponent } from '../../../partials/shared/filters/filters.component';
 import { NotificationService } from '../../../../../core/services/public/notification.service';
+import { IFilter } from '../../../../../core/models/filter.model';
 
 type UType = 'customer' | 'provider';
 @Component({
@@ -73,8 +74,19 @@ export class UserManagementComponent {
     }
   }
 
-  filterEvent(event: any) {
-    console.log(event)
+  /**
+   * Handles filtering of Table data.
+   * @param filter - The filter data contains search input, user status
+   */
+  filterEvent(filter: IFilter) {
+    this.role$.subscribe(role => {
+      if (role === 'customer') {
+        this._store.dispatch(userActions.filterCustomer({ filter }));
+      } else if (role === 'provider') {
+        console.log(filter)
+        this._store.dispatch(userActions.filterProvider({ filter }));
+      }
+    });
   }
 
   /**

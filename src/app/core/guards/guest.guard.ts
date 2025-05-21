@@ -1,5 +1,5 @@
 import { inject } from "@angular/core";
-import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree } from "@angular/router";
+import { CanActivateFn, Router, UrlTree } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { combineLatest, map, Observable, take } from "rxjs";
 import { selectAuthUserType, selectCheckStatus } from "../../store/auth/auth.selector";
@@ -8,8 +8,6 @@ import { navigationAfterLogin } from "../utils/navigation.utils";
 /**
  * Guard to prevent authenticated users from accessing guest-only routes.
  *
- * @param {ActivatedRouteSnapshot} route - Snapshot of the current activated route.
- * @param {RouterStateSnapshot} state - Current state of the router.
  * @returns {Observable<boolean | UrlTree>} - Returns `true` if the user is a guest;
  * otherwise redirects authenticated users to their respective dashboard based on user type.
  *
@@ -29,7 +27,7 @@ export const GuestGuard: CanActivateFn = (): Observable<boolean | UrlTree> => {
     ]).pipe(
         take(1),
         map(([status, type]) => {
-            console.log('GuestGuard check:', { status, type });
+            // console.log('GuestGuard check:', { status, type });
             if (status === 'authenticated' && type) {
                 const url = navigationAfterLogin(type)
                 return router.createUrlTree([url]);

@@ -92,7 +92,7 @@ export class AdminSidebarComponent {
     if (!storage) {
       return;
     }
-    console.log(storage);
+
     const parsedStorage = JSON.parse(storage) as AuthState;
     if (!parsedStorage.type) {
       return;

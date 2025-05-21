@@ -4,7 +4,7 @@ import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
 import { IProvider } from "../models/user.model";
 import { API_ENV } from "../../environments/api.environments";
 import { SlotType } from "../models/schedules.model";
-import { IFilter } from "./customer.service";
+import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {

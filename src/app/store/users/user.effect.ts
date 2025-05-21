@@ -9,6 +9,8 @@ import { ProviderService } from "../../core/services/provider.service";
 import { providerActions } from "../provider/provider.action";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { CustomerService } from "../../core/services/customer.service";
+import { Store } from "@ngrx/store";
+import { authActions } from "../auth/auth.actions";
 
 export const userEffects = {
     /**
@@ -19,6 +21,7 @@ export const userEffects = {
         const actions$ = inject(Actions);
         const userService = inject(UserManagementService);
         const notyf = inject(NotificationService);
+        const store = inject(Store);
 
         return actions$.pipe(
             ofType(userActions.fetchUsers),
@@ -26,7 +29,7 @@ export const userEffects = {
                 userService.getUsers().pipe(
                     map((response) => userActions.fetchUsersSuccess({ customers: response.customers, providers: response.providers })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.fetchUsersFailure, notyf);
+                        return handleApiError(error, userActions.fetchUsersFailure, notyf, store);
                     })
                 )
             )
@@ -100,46 +103,46 @@ export const userEffects = {
     }, { functional: true }),
 
     /**
-     * Searches for customers when 'searchCustomers' is dispatched.
-     * On success, dispatches 'searchCustomersSuccess'. On error, shows a notification and dispatches 'searchCustomersFailure'.
+     * fetches filtered customers when 'filterCustomer' is dispatched.
+     * On success, dispatches 'filterCustomerSuccess'. On error, shows a notification and dispatches 'filterCustomerFailure'.
      */
-    searchCustomers$: createEffect(() => {
+    filterCustomers$: createEffect(() => {
         const actions$ = inject(Actions);
         const customerService = inject(CustomerService);
         const notyf = inject(NotificationService);
 
         return actions$.pipe(
-            ofType(userActions.searchCustomers),
-            switchMap(({ searchTerm }) =>
-                customerService.getCustomers({ search: searchTerm }).pipe(
-                    map((customers) => userActions.searchCustomersSuccess({ customers })),
+            ofType(userActions.filterCustomer),
+            switchMap(({ filter }) =>
+                customerService.getCustomers(filter).pipe(
+                    map((customers) => userActions.filterCustomerSuccess({ customers })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.searchCustomersFailure, notyf);
+                        return handleApiError(error, userActions.filterCustomerFailure, notyf);
                     })
                 )
             )
-        )
+        );
     }, { functional: true }),
 
     /**
-     * Searches for providers when 'searchProviders' is dispatched.
-     * On success, dispatches 'searchProvidersSuccess'. On error, shows a notification and dispatches 'searchProvidersFailure'.
+     * fetches filtered providers when 'filterProvider' is dispatched.
+     * On success, dispatches 'filterProviderSuccess'. On error, shows a notification and dispatches 'filterProviderFailure'.
      */
-    searchProviders$: createEffect(() => {
+    filterProviders$: createEffect(() => {
         const actions$ = inject(Actions);
         const providerService = inject(ProviderService);
         const notyf = inject(NotificationService);
 
         return actions$.pipe(
-            ofType(userActions.searchProviders),
-            switchMap(({ searchTerm }) =>
-                providerService.getProviders({ search: searchTerm }).pipe(
-                    map((providers) => userActions.searchProvidersSuccess({ providers })),
+            ofType(userActions.filterProvider),
+            switchMap(({ filter }) =>
+                providerService.getProviders(filter).pipe(
+                    map((providers) => userActions.filterProviderSuccess({ providers })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.searchProvidersFailure, notyf);
+                        return handleApiError(error, userActions.filterProviderFailure, notyf);
                     })
                 )
             )
         );
-    }, { functional: true })
+    }, { functional: true }),
 }

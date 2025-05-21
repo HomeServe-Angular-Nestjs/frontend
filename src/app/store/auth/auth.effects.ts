@@ -8,7 +8,7 @@ import { catchError, map, of, switchMap, tap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
-import { navigationAfterLogin } from "../../core/utils/navigation.utils";
+import { loginNavigation, navigationAfterLogin } from "../../core/utils/navigation.utils";
 
 export const authEffects = {
     login$: createEffect(() => {
@@ -62,7 +62,10 @@ export const authEffects = {
             ofType(authActions.logout),
             switchMap(({ userType }) =>
                 authService.logout(userType).pipe(
-                    tap(() => router.navigate(['landing_page'])),
+                    tap(() => {
+                        const url = loginNavigation(userType);
+                        router.navigate(['landing_page'])
+                    }),
                     catchError((error: HttpErrorResponse) => {
                         return handleApiError(error, authActions.loginFailure, notyf);
                     })

@@ -9,7 +9,6 @@ import { NotificationService } from '../services/public/notification.service';
  * Guard that controls access to routes based on authentication status and user role.
  *
  * @param {ActivatedRouteSnapshot} route - Snapshot of the current route that is being activated.
- * @param {RouterStateSnapshot} state - Snapshot of the router's state when the guard is executed.
  * @returns {Observable<boolean | UrlTree>} - Returns `true` if the user is authenticated and has the required role;
  * otherwise redirects to the login page or a specific login page based on user type.
  *

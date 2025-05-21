@@ -1,5 +1,6 @@
 import { createAction, props } from "@ngrx/store";
 import { ICustomer, IProvider } from "../../core/models/user.model";
+import { IFilter } from "../../core/models/filter.model";
 
 export const userActions = {
     fetchUsers: createAction('[User] Fetch Both Customer & Provider'),
@@ -18,11 +19,11 @@ export const userActions = {
     partialUpdateCustomerSuccess: createAction('[User] Update Customer Success', props<{ customer: ICustomer }>()),
     partialUpdateCustomerFailure: createAction('[User] Update Customer Failure', props<{ error: string }>()),
 
-    searchCustomers: createAction('[User] Search Customers', props<{ searchTerm: string }>()),
-    searchCustomersSuccess: createAction('[user] Search Customers success', props<{ customers: ICustomer[] }>()),
-    searchCustomersFailure: createAction('[User] Search Customers Failure', props<{ error: string }>()),
-
-    searchProviders: createAction('[User] Search Providers', props<{ searchTerm: string }>()),
-    searchProvidersSuccess: createAction('[user] Search Providers success', props<{ providers: IProvider[] }>()),
-    searchProvidersFailure: createAction('[User] Search Providers Failure', props<{ error: string }>()),
+    filterCustomer: createAction('[User] Fetch filtered customers', props<{ filter: IFilter }>()),
+    filterCustomerSuccess: createAction('[User] Fetch filtered customers success', props<{ customers: ICustomer[] }>()),
+    filterCustomerFailure: createAction('[User] Fetch filtered customers failure', props<{ error: string }>()),
+   
+    filterProvider: createAction('[User] Fetch filtered Providers', props<{ filter: IFilter }>()),
+    filterProviderSuccess: createAction('[User] Fetch filtered Providers success', props<{ providers: IProvider[] }>()),
+    filterProviderFailure: createAction('[User] Fetch filtered Providers failure', props<{ error: string }>()),
 }

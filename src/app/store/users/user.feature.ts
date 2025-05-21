@@ -134,8 +134,8 @@ export const userFeature = createFeature({
             error
         })),
 
-        /** @action Successfully fetched customers. */
-        on(userActions.searchCustomers, (state) => ({
+        /** @action Triggered when filter customers starts. */
+        on(userActions.filterCustomer, (state) => ({
             ...state,
             loading: true,
             error: null
@@ -145,22 +145,22 @@ export const userFeature = createFeature({
          * @action Successfully fetched customers.
          * @param customers - Updated customers entity.
          */
-        on(userActions.searchCustomersSuccess, (state, { customers }) => ({
+        on(userActions.filterCustomerSuccess, (state, { customers }) => ({
             ...state,
             customers: customerAdaptor.setAll(customers, state.customers),
             loading: false,
             error: null
         })),
 
-        /** @action Sets error state when customer fetch fails. */
-        on(userActions.searchCustomersFailure, (state, { error }) => ({
+        /** @action Sets error state when customer search fails. */
+        on(userActions.filterCustomerFailure, (state, { error }) => ({
             ...state,
             loading: false,
             error
         })),
 
-        /** @action Successfully fetched providers. */
-        on(userActions.searchProviders, (state) => ({
+        /** @action Triggered when filter providers starts. */
+        on(userActions.filterProvider, (state) => ({
             ...state,
             loading: true,
             error: null
@@ -170,15 +170,15 @@ export const userFeature = createFeature({
          * @action Successfully fetched providers.
          * @param providers - Updated providers entity.
          */
-        on(userActions.searchProvidersSuccess, (state, { providers }) => ({
+        on(userActions.filterProviderSuccess, (state, { providers }) => ({
             ...state,
-            providers: customerAdaptor.setAll(providers, state.providers),
+            providers: providerAdaptor.setAll(providers, state.providers),
             loading: false,
             error: null
         })),
 
-        /** @action Sets error state when provider fetch fails. */
-        on(userActions.searchProvidersFailure, (state, { error }) => ({
+        /** @action Sets error state when providers search fails. */
+        on(userActions.filterProviderFailure, (state, { error }) => ({
             ...state,
             loading: false,
             error

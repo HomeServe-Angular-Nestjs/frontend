@@ -18,7 +18,7 @@ export class DebounceService {
     * @param delay - The debounce time in milliseconds
     * @returns Observable emitting the debounced value
     */
-    onSearch(delay: number = 300): Observable<string> {
+    onSearch(delay: number = 100): Observable<string> {
         return this._searchSubject.asObservable().pipe(
             debounceTime(delay),
             distinctUntilChanged(),

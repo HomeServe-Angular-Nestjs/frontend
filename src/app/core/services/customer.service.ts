@@ -3,10 +3,7 @@ import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { ICustomer } from "../models/user.model";
 import { catchError, Observable, throwError } from "rxjs";
-
-export interface IFilter {
-    search?: string,
-}
+import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
 export class CustomerService {
@@ -21,7 +18,6 @@ export class CustomerService {
      */
     getCustomers(filter: IFilter = {}): Observable<ICustomer[]> {
         const params = this._buildFilterParams(filter);
-
         return this._http.get<ICustomer[]>(`${this._apiUrl}/customers`, { params }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
@@ -70,3 +66,4 @@ export class CustomerService {
         return error?.error?.message || 'something went wrong';
     }
 }
+

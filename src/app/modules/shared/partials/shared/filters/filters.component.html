@@ -17,18 +17,29 @@
             <i class="fas fa-calendar absolute right-3 top-2.5 text-gray-400" aria-hidden="true"></i>
         </div>
 
-        <!-- Status Dropdown -->
-        <div class="relative">
-            <label for="statusSelect" class="sr-only">Status</label>
-            <select id="statusSelect" aria-label="Select status" [(ngModel)]="selectedStatus"
-                class="pl-4 pr-10 py-2 text-sm text-gray-700 bg-gray-50 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="inactive">Inactive</option>
-            </select>
-            <i class="fas fa-chevron-down absolute right-3 top-2.5 text-gray-400 pointer-events-none"
-                aria-hidden="true"></i>
+        <!-- Role Toggle -->
+        <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-600">Status:</span>
+            <div class="flex bg-gray-100 rounded-full p-1">
+                <button (click)="changeStatus('all')" [ngClass]="{
+                    'toggle-active': selectedStatus === 'all',
+                    'toggle-inactive': selectedStatus !== 'all'
+                  }" class="toggle-base">
+                    All
+                </button>
+                <button (click)="changeStatus(true)" [ngClass]="{
+                    'toggle-active': selectedStatus === true,
+                    'toggle-inactive': selectedStatus !== true
+                  }" class="toggle-base">
+                    Active
+                </button>
+                <button (click)="changeStatus(false)" [ngClass]="{
+                    'toggle-active': selectedStatus === false,
+                    'toggle-inactive': selectedStatus !== false
+                  }" class="toggle-base">
+                    Blocked
+                </button>
+            </div>
         </div>
 
         <!-- Role Toggle -->
@@ -41,6 +52,7 @@
                 }" class="toggle-base">
                     Customer
                 </button>
+
                 <button (click)="setRole('provider')" [ngClass]="{
                   'toggle-active': selectedRole === 'provider',
                   'toggle-inactive': selectedRole !== 'provider'
@@ -49,11 +61,5 @@
                 </button>
             </div>
         </div>
-
-        <!-- Apply Filters Button
-        <button (click)="applyFilters()"
-            class="ml-auto px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:bg-blue-400 focus:ring-offset-2 transition-colors">
-            Apply Filters
-        </button> -->
     </div>
 </div>
