@@ -106,6 +106,6 @@ export class ProviderSidebarComponent {
   ];
 
   logout() {
-    this.store.dispatch(authActions.logout({ userType: 'provider' }));
+    this.store.dispatch(authActions.logout({ fromInterceptor: false }));
   }
 }

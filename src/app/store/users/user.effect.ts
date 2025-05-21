@@ -21,7 +21,6 @@ export const userEffects = {
         const actions$ = inject(Actions);
         const userService = inject(UserManagementService);
         const notyf = inject(NotificationService);
-        const store = inject(Store);
 
         return actions$.pipe(
             ofType(userActions.fetchUsers),
@@ -29,7 +28,7 @@ export const userEffects = {
                 userService.getUsers().pipe(
                     map((response) => userActions.fetchUsersSuccess({ customers: response.customers, providers: response.providers })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.fetchUsersFailure, notyf, store);
+                        return handleApiError(error, userActions.fetchUsersFailure, notyf);
                     })
                 )
             )

@@ -15,9 +15,9 @@ import { loginNavigation } from '../../../../../../core/utils/navigation.utils';
   // styleUrls: ['./admin-sidebar.component.scss'],
 })
 export class AdminSidebarComponent {
-  private router = inject(Router);
-  private loginService = inject(LoginAuthService);
-  private store = inject(Store);
+  private _router = inject(Router);
+  private _loginService = inject(LoginAuthService);
+  private _store = inject(Store);
 
   menuItems = [
     {
@@ -75,11 +75,11 @@ export class AdminSidebarComponent {
   ];
 
   navigateTo(route: string) {
-    this.router.navigate([route]);
+    this._router.navigate([route]);
   }
 
   isActive(route: string): boolean {
-    return this.router.isActive(route, {
+    return this._router.isActive(route, {
       paths: 'subset',
       queryParams: 'subset',
       fragment: 'ignored',
@@ -88,26 +88,7 @@ export class AdminSidebarComponent {
   }
 
   logout() {
-    const storage = localStorage.getItem('auth');
-    if (!storage) {
-      return;
-    }
 
-    const parsedStorage = JSON.parse(storage) as AuthState;
-    if (!parsedStorage.type) {
-      return;
-    }
-    console.log(parsedStorage.type);
-    this.loginService.logout(parsedStorage.type).subscribe({
-      next: () => {
-        this.store.dispatch(authActions.logout({userType: 'admin'}));
-        // localStorage.removeItem('auth');
-        const url = loginNavigation(parsedStorage.type as UserType);
-        this.router.navigate([url]);
-      },
-      error: (err) => {
-        console.error('[ERROR] Logout: ', err);
-      }
-    });
+    this._store.dispatch(authActions.logout({ fromInterceptor: false }));
   }
 }

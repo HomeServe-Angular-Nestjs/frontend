@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, RouterConfigOptions, withInMemoryScrolling, withRouterConfig, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
@@ -21,11 +21,20 @@ import { offeredServiceEffects } from './store/offered-services/offeredServices.
 import { metaReducers } from './store/auth/meta.reducer';
 import { scheduleEffects } from './store/schedules/schedule.effects';
 
+
+
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes,
+      withViewTransitions(), // optional
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'enabled',
+        anchorScrolling: 'enabled',
+        
+      })),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore({
       [authFeature.name]: authFeature.reducer,

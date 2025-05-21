@@ -7,6 +7,7 @@ import { selectAuthUserType } from "../../store/auth/auth.selector";
 import { loginNavigation } from "../utils/navigation.utils";
 import { UserType } from "../../modules/shared/models/user.model";
 import { NotificationService } from "../services/public/notification.service";
+import { authActions } from "../../store/auth/auth.actions";
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const router = inject(Router);
@@ -25,19 +26,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
             return next(modifiedRequest).pipe(
                 catchError((error: HttpErrorResponse) => {
-                    const errorMessage = error?.error?.message || "Something went wrong. Please try again!";
-                    notyf.error(errorMessage);
-
                     if (error.status === 401) {
-                        const url = loginNavigation(userType as UserType);
-                        router.navigate([url], { queryParams: { return: req.url } });
+                        store.dispatch(authActions.logout({ fromInterceptor: true }));
                         return of();
                     } else if (error.status === 403) {
                         console.log(error);
                         return of();
                     }
 
-                    return throwError(() => error)
+                    return throwError(() => {
+                        console.error(error)
+                        throw new Error('Session Expired!');
+                    })
                 })
             )
         })

@@ -20,6 +20,6 @@ export class CustomerHeaderComponent {
   }
 
   logout(): void {
-    this.store.dispatch(authActions.logout({ userType: 'customer' }));
+    this.store.dispatch(authActions.logout({ fromInterceptor: false }));
   }
 }

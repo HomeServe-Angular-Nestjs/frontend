@@ -1,6 +1,6 @@
 import { createFeature, createReducer, on } from "@ngrx/store";
 import { authActions } from "./auth.actions";
-import { AuthState } from "../../core/models/auth.model";
+import { AuthState, StatusType } from "../../core/models/auth.model";
 
 export const initialState: AuthState = {
     email: null,
@@ -48,6 +48,11 @@ export const authFeature = createFeature({
         })),
 
         //When logs out
-        on(authActions.logout, () => initialState)
+        on(authActions.logoutSuccess, (state) => ({
+            ...state,
+            email: null,
+            status: 'pending' as StatusType, 
+            error: null
+        }))
     )
 });

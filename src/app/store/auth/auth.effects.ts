@@ -4,11 +4,14 @@ import { Actions } from "@ngrx/effects"
 import { LoginAuthService } from "../../core/services/login-auth.service";
 import { Router } from "@angular/router";
 import { authActions } from "./auth.actions";
-import { catchError, map, of, switchMap, tap } from "rxjs";
+import { catchError, first, map, of, switchMap, tap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NotificationService } from "../../core/services/public/notification.service";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { loginNavigation, navigationAfterLogin } from "../../core/utils/navigation.utils";
+import { Store } from "@ngrx/store";
+import { selectAuthUserType } from "./auth.selector";
+import { UserType } from "../../modules/shared/models/user.model";
 
 export const authEffects = {
     login$: createEffect(() => {
@@ -54,23 +57,33 @@ export const authEffects = {
 
     logout$: createEffect(() => {
         const actions$ = inject(Actions);
-        const authService = inject(LoginAuthService);
+        const loginService = inject(LoginAuthService);
         const router = inject(Router);
+        const store = inject(Store);
         const notyf = inject(NotificationService);
 
         return actions$.pipe(
             ofType(authActions.logout),
-            switchMap(({ userType }) =>
-                authService.logout(userType).pipe(
-                    tap(() => {
-                        const url = loginNavigation(userType);
-                        router.navigate(['landing_page'])
-                    }),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, authActions.loginFailure, notyf);
+            switchMap(({ fromInterceptor }) =>
+                store.select(selectAuthUserType).pipe(
+                    first(),
+                    switchMap((userType) => {
+                        if (fromInterceptor) {
+                            router.navigate([loginNavigation(userType as UserType)]);
+                            notyf.error('session expired!');
+                            return of(authActions.logoutSuccess());
+                        }
+
+                        return loginService.logout().pipe(
+                            catchError((error) => of(null)),
+                            map(() => authActions.logoutSuccess()),
+                            tap(() => {
+                                notyf.error('session expired!');
+                                router.navigate([loginNavigation(userType as UserType)]);
+                            })
+                        );
                     })
-                )
-            )
+                )),
         );
-    }, { functional: true, dispatch: false })
+    }, { functional: true })
 }; 
