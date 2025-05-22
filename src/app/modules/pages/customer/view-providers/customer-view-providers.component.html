@@ -12,11 +12,14 @@
         </div>
 
         <!-- Search and Filters Section -->
-        <app-customer-provider-view-card-filter (filterEvents)="applyFilters($event)"></app-customer-provider-view-card-filter>
+        <app-customer-provider-view-card-filter
+            (filterEvents)="applyFilters($event)"></app-customer-provider-view-card-filter>
 
         <!-- Provider Cards Grid -->
-        <ng-container *ngIf="providers$ | async as providers; noProviders">
-            <app-customer-provider-view-card [providers]="providers"></app-customer-provider-view-card>
+        <ng-container *ngIf="providers$ | async as providers; else noProviders">
+            <ng-container *ngIf="providers.length > 0; else noProviders">
+                <app-customer-provider-view-card [providers]="providers"></app-customer-provider-view-card>
+            </ng-container>
         </ng-container>
         <ng-template #noProviders>
             <div class="bg-white rounded-xl shadow-sm p-8 text-center">

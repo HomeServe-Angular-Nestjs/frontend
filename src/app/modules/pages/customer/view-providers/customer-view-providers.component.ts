@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
 import { FormsModule } from '@angular/forms';
@@ -33,19 +33,25 @@ interface Provider {
   imports: [CommonModule, CustomerBreadcrumbsComponent, FormsModule, CustomerProviderViewCardComponent, ProviderViewCardFilterComponent],
   templateUrl: './customer-view-providers.component.html',
 })
-export class CustomerViewProvidersComponent {
-  readonly providers$!: Observable<IProvider[]>;
+export class CustomerViewProvidersComponent implements OnInit {
+  private _store = inject(Store);
+  providers$!: Observable<IProvider[]>;
 
-  constructor(private store: Store) {
-    this.store.dispatch(userActions.fetchProviders());
-    this.providers$ = this.store.select(selectAllProviderEntities);
+  @ViewChild(ProviderViewCardFilterComponent)
+  filterComponent!: ProviderViewCardFilterComponent
+
+  ngOnInit(): void {
+    this._store.dispatch(userActions.fetchProviders());
+    this.providers$ = this._store.select(selectAllProviderEntities);
   }
 
-
-  applyFilters(filters: IFilter) {
-    console.log(filters)
+  applyFilters(filter: IFilter) {
+    this._store.dispatch(userActions.filterProvider({ filter }));
   }
 
-  resetFilters() { }
-
+  resetFilters() {
+    if(this.filterComponent){
+      this.filterComponent.reset();
+    }
+  }
 }
