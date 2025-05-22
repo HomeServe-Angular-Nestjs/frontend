@@ -5,8 +5,20 @@
         <div class="p-6">
             <!-- Provider Header -->
             <div class="flex items-start gap-4 mb-5">
-                <img [src]="provider.avatar" [alt]="provider.fullname"
-                    class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm">
+                <!-- <img [src]="provider.avatar" [alt]="provider.fullname"
+                    class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"> -->
+                <!-- Avatar image if exists -->
+                <img *ngIf="provider.avatar; else fallbackAvatar" [src]="provider.avatar" alt="User profile"
+                    class="h-9 w-9 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all" />
+
+                <!-- Fallback avatar with colored background -->
+                <ng-template #fallbackAvatar>
+                    <div class="h-9 w-9 flex items-center justify-center rounded-full text-white font-medium border-2 border-transparent group-hover:border-blue-300 transition-all"
+                        [style.background-color]="fallbackColor(provider.username)">
+                        {{ fallbackChar }}
+                    </div>
+                </ng-template>
+
                 <div class="flex-1">
                     <div class="flex items-center gap-2 flex-wrap">
                         <h3 class="font-semibold text-lg text-gray-900">{{ provider.fullname || provider.username}}</h3>
@@ -71,16 +83,13 @@
 
             <!-- Availability Tags -->
             <div class="flex flex-wrap gap-2 mb-5">
-                <span *ngIf=""
-                    class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                <span *ngIf="" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
                     Available Today
                 </span>
-                <span *ngIf=""
-                    class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                <span *ngIf="" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
                     Special Offer
                 </span>
-                <span *ngIf=""
-                    class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                <span *ngIf="" class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
                     Fast Response
                 </span>
             </div>
