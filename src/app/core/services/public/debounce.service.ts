@@ -6,10 +6,10 @@ export class DebounceService {
     private _searchSubject = new Subject<string>();
 
     /**
-     * Push a new search value into the stream.
+     * Push a new delay value into the stream.
      * @param value - The current input value
      */
-    public search(value: string): void {
+    delay(value: any): void {
         this._searchSubject.next(value);
     }
 
@@ -18,7 +18,7 @@ export class DebounceService {
     * @param delay - The debounce time in milliseconds
     * @returns Observable emitting the debounced value
     */
-    onSearch(delay: number = 100): Observable<string> {
+    onSearch(delay: number = 300): Observable<string> {
         return this._searchSubject.asObservable().pipe(
             debounceTime(delay),
             distinctUntilChanged(),

@@ -12,7 +12,7 @@
         </div>
 
         <!-- Search and Filters Section -->
-        <app-customer-provider-view-card-filter></app-customer-provider-view-card-filter>
+        <app-customer-provider-view-card-filter (filterEvents)="applyFilters($event)"></app-customer-provider-view-card-filter>
 
         <!-- Provider Cards Grid -->
         <ng-container *ngIf="providers$ | async as providers; noProviders">

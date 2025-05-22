@@ -36,14 +36,22 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
                 this.filterEvents.emit(filter);
             });
 
-        this._debounceService.onSearch()
+        this._debounceService.onSearch(700)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(() => {
+                this._emitFilter()
+            })
     }
 
-    onSearchTriggered() { }
+    onSearchTriggered() {
+        this._debounceService.delay(this.searchQuery);
+    }
 
     filterProviders() { }
 
-    toggleCertifiedOnly() { }
+    toggleCertifiedOnly() {
+        this._debounceService.delay(this.certifiedOnly);
+    }
 
     sortProviders() { }
 
@@ -51,8 +59,9 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
         const filter: IFilter = {
             search: this.searchQuery,
             isCertified: this.certifiedOnly,
-
         };
+
+        this._filters$.next(filter);
     }
 
     ngOnDestroy(): void {

@@ -50,7 +50,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
    * Triggers the debounce search mechanism when the search input changes.
    */
   onSearchTriggered() {
-    this._debounceService.search(this.searchTerm);
+    this._debounceService.delay(this.searchTerm);
   }
 
   /**

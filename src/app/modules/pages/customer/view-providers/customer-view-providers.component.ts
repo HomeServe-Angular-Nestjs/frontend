@@ -9,6 +9,7 @@ import { IProvider } from '../../../../core/models/user.model';
 import { selectAllProviderEntities, selectProvidersEntities } from '../../../../store/users/user.selector';
 import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 import { ProviderViewCardFilterComponent } from "../../../shared/partials/sections/customer/provider-view-card-filter/provider-view-card-filter.component";
+import { IFilter } from '../../../../core/models/filter.model';
 
 interface Provider {
   id: number;
@@ -40,6 +41,10 @@ export class CustomerViewProvidersComponent {
     this.providers$ = this.store.select(selectAllProviderEntities);
   }
 
+
+  applyFilters(filters: IFilter) {
+    console.log(filters)
+  }
 
   resetFilters() { }
 
