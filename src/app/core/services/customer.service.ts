@@ -27,6 +27,18 @@ export class CustomerService {
     }
 
     /**
+     * @returns An Observable of the customer's avatar.
+     */
+    fetchOneCustomer(): Observable<ICustomer> {
+        return this._http.get<ICustomer>(`${this._apiUrl}/customer`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    /**
      * Updates specific fields of a customer (partial update).
      * @param data - A partial customer object.
      * @returns An observable of the updated customer.

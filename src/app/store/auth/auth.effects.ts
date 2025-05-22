@@ -78,7 +78,6 @@ export const authEffects = {
                             catchError((error) => of(null)),
                             map(() => authActions.logoutSuccess()),
                             tap(() => {
-                                notyf.error('session expired!');
                                 router.navigate([loginNavigation(userType as UserType)]);
                             })
                         );

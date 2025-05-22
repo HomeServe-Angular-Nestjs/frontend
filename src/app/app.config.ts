@@ -20,9 +20,8 @@ import { providerEffects } from './store/provider/provider.effects';
 import { offeredServiceEffects } from './store/offered-services/offeredServices.effects';
 import { metaReducers } from './store/auth/meta.reducer';
 import { scheduleEffects } from './store/schedules/schedule.effects';
-
-
-
+import { customerFeature } from './store/customer/customer.feature';
+import { customerEffects } from './store/customer/customer.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,7 +32,7 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
-        
+
       })),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore({
@@ -42,8 +41,9 @@ export const appConfig: ApplicationConfig = {
       [offeredServiceFeature.name]: offeredServiceFeature.reducer,
       [providerFeature.name]: providerFeature.reducer,
       [scheduleFeature.name]: scheduleFeature.reducer,
+      [customerFeature.name]: customerFeature.reducer,
     }, { metaReducers }),
-    provideEffects(authEffects, userEffects, offeredServiceEffects, providerEffects, scheduleEffects),
+    provideEffects(authEffects, userEffects, offeredServiceEffects, providerEffects, scheduleEffects, customerEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: true, autoPause: true })
   ]
 };

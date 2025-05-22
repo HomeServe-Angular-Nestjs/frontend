@@ -92,14 +92,20 @@ export interface IUserState {
     error: string | null;
 }
 
-export interface ICustomerState {
-    customers: EntityState<ICustomer>;
+// export interface ICustomerState {
+//     customers: EntityState<ICustomer>;
+//     loading: boolean;
+//     error: string | null;
+// }
+
+export interface IProviderState {
+    provider: IProvider | null;
     loading: boolean;
     error: string | null;
 }
 
-export interface IProviderState {
-    provider: IProvider | null;
+export interface ICustomerState {
+    customer: ICustomer | null;
     loading: boolean;
     error: string | null;
 }
