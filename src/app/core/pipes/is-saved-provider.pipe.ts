@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { selectSavedProviders } from '../../store/customer/customer.selector';
 
@@ -19,7 +19,7 @@ import { selectSavedProviders } from '../../store/customer/customer.selector';
     pure: true
 })
 export class IsSavedPipe implements PipeTransform {
- 
+
     constructor(private _store: Store) { }
 
     /**
@@ -29,10 +29,12 @@ export class IsSavedPipe implements PipeTransform {
      * @param providerId - The unique identifier of the provider.
      * @returns An Observable<boolean> which emits `true` if the provider is saved, otherwise `false`.
      */
-    transform(providerId: string): Observable<boolean> {
-        console.log(providerId)
-        return this._store.select(selectSavedProviders).pipe(
-            map((saved: string[]) => saved?.includes(providerId) ?? false)
-        );
+    transform(providerId: string | undefined): Observable<boolean> {
+        if (providerId) {
+            return this._store.select(selectSavedProviders).pipe(
+                map((saved: string[]) => saved?.includes(providerId) ?? false)
+            );
+        }
+        return of(false);
     }
 }

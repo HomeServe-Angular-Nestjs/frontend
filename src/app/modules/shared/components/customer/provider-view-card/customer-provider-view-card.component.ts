@@ -37,19 +37,6 @@ export class CustomerProviderViewCardComponent implements OnDestroy {
     this._store.dispatch(customerActions.updateAddToSaved({ providerId }))
   }
 
-  // isSaved(providerId: string): boolean {
-  //   let state: boolean = false;
-  //   this._store.select(selectSavedProviders)
-  //     .pipe(takeUntil(this._destroy$))
-  //     .subscribe((saved) => {
-  //       if (saved && saved.length > 0) {
-  //         state = saved.some((id: string) => id === providerId);
-  //         console.log(state)
-  //       }
-  //     });
-  //   return state;
-  // }
-
   viewProvider(providerId: string) {
     this._router.navigate(['provider_details', providerId, 'services']);
   }
