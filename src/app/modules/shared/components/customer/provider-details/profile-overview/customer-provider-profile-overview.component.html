@@ -4,6 +4,17 @@
         <!-- Profile Image -->
         <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
             <img [src]="providerData?.avatar || ''" alt="Provider Profile" class="w-full h-full object-cover" />
+            <!-- Avatar image if exists -->
+            <!-- <img *ngIf="providerData?.avatar; else fallbackAvatar" [src]="providerData?.avatar" alt="User profile"
+                class="h-9 w-9 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all" /> -->
+
+            <!-- Fallback avatar with colored background -->
+            <!-- <ng-template #fallbackAvatar>
+                <div class="h-9 w-9 flex items-center justify-center rounded-full text-white font-medium border-2 border-transparent group-hover:border-blue-300 transition-all"
+                    [style.background-color]="fallbackColor(providerData?.username)">
+                    {{ fallbackChar }}
+                </div>
+            </ng-template> -->
         </div>
         <!-- Profile Info -->
         <div class="flex-1">

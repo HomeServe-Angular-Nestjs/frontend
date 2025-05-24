@@ -1,0 +1,34 @@
+:host {
+  display: block;
+}
+
+:root {
+  --stroke-color: #0e0620;
+  --fill-color: #ffffff;
+  --fill-dark: #0e0620;
+}
+
+.spaceman-container {
+  width: 100%;
+  height: auto;
+}
+
+svg {
+  max-width: 100%;
+}
+
+.stroke {
+  fill: none;
+  stroke: var(--stroke-color);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fill-white {
+  fill: var(--fill-color);
+}
+
+.fill-dark {
+  fill: var(--fill-dark);
+}

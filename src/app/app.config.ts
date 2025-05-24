@@ -44,6 +44,7 @@ export const appConfig: ApplicationConfig = {
       [customerFeature.name]: customerFeature.reducer,
     }, { metaReducers }),
     provideEffects(authEffects, userEffects, offeredServiceEffects, providerEffects, scheduleEffects, customerEffects),
-    provideStoreDevtools({ maxAge: 25, logOnly: true, autoPause: true })
+    provideStoreDevtools({ maxAge: 25, logOnly: true, autoPause: true }),
+    provideAnimations()
   ]
 };

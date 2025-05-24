@@ -12,6 +12,7 @@ import { ProviderService } from '../../../../../../core/services/provider.servic
 })
 export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestroy {
   private providerService = inject(ProviderService);
+  // private router
 
   private providerDataSub!: Subscription;
 
@@ -21,7 +22,13 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
     this.providerDataSub = this.providerService.providerData$.subscribe(data => {
       this.providerData = data;
     });
+
+    // if (!this.providerData) {
+    //   this.
+    // }
   }
+
+  fallbackColor(text: string) { }
 
   ngOnDestroy(): void {
     if (this.providerDataSub) {

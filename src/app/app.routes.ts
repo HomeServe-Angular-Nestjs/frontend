@@ -8,5 +8,11 @@ export const routes: Routes = [
     ...authRoutes,
     ...customerRoutes,
     ...providerRoutes,
-    ...adminRoute
+    ...adminRoute,
+    {
+        path: '**',
+        loadComponent: () => import('./modules/pages/404 page/404.component')
+            .then(c => c.NotFoundComponent),
+        data: { type: 'route' }
+    }
 ];

@@ -5,8 +5,6 @@
         <div class="p-6">
             <!-- Provider Header -->
             <div class="flex items-start gap-4 mb-5">
-                <!-- <img [src]="provider.avatar" [alt]="provider.fullname"
-                    class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"> -->
                 <!-- Avatar image if exists -->
                 <img *ngIf="provider.avatar; else fallbackAvatar" [src]="provider.avatar" alt="User profile"
                     class="h-9 w-9 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all" />
