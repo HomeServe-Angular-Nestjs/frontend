@@ -1,24 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
-import { SpacemanAnimationComponent } from '../../shared/partials/shared/loading-Animations/spaceman/spaceman.component';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-not-found',
     standalone: true,
-    imports: [CommonModule, RouterModule, SpacemanAnimationComponent],
+    imports: [CommonModule, RouterModule,],
     templateUrl: './404.component.html',
     styleUrls: ['./404.component.scss']
 })
 export class NotFoundComponent implements OnInit {
     type: 'route' | 'data' = 'route';
-
-    constructor(private route: ActivatedRoute) { }
+    private _router = inject(Router)
+    constructor() { }
 
     ngOnInit(): void {
         console.log('404 Page Rendered');
-        this.route.data.subscribe(data => {
-            this.type = data['type'] || 'route';
-        });
+        const nav = this._router.getCurrentNavigation();
+        this.type = nav?.extras.state?.['type'] || 'route';
+    }
+
+    goToHome() {
+
     }
 }

@@ -24,15 +24,19 @@ export class CustomerProviderProfileLayoutComponent {
     providerId: string | null = null;
 
     constructor(
-        private route: ActivatedRoute,
-        private readonly providerService: ProviderService,
-        private readonly notyf: NotificationService
+        private _route: ActivatedRoute,
+        private _router: Router,
+        private readonly _providerService: ProviderService,
     ) {
-        this.providerId = this.route.snapshot.paramMap.get('id');
+        this.providerId = this._route.snapshot.paramMap.get('id');
         if (this.providerId) {
-            this.providerService.getOneProvider(this.providerId).subscribe({
-                next: (provider) => this.providerService.setProviderData(provider),
-                error: (err) => this.notyf.error(err)
+            this._providerService.getOneProvider(this.providerId).subscribe({
+                next: (provider) => this._providerService.setProviderData(provider),
+                error: () => {
+                    this._router.navigate(['not_found'], {
+                        state: { type: 'data' }
+                    });
+                }
             });
         }
     }
