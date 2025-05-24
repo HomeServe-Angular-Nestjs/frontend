@@ -52,6 +52,15 @@ export class CustomerService {
         );
     }
 
+    updateAddToSaved(providerId: string): Observable<ICustomer> {
+        return this._http.patch<ICustomer>(`${this._apiUrl}/saved_providers`, { providerId }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
     /**
      * Converts a plain filter object into HttpParams by omitting null or undefined values.
      * @param {IFilter} filter - The filter criteria to convert.

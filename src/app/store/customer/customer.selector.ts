@@ -7,3 +7,7 @@ export const selectCustomer = createSelector(
     selectCustomerState,
     (state) => state.customer
 );
+export const selectSavedProviders = createSelector(
+    selectCustomerState,
+    (state) => state.customer?.savedProviders ?? []
+)

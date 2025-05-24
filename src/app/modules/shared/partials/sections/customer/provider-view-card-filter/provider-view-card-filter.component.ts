@@ -56,7 +56,7 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
     sortProviders() { }
 
     reset() {
-        this.certifiedOnly = true;
+        this.certifiedOnly = false;
         this.searchQuery = '';
         // this.ratingFilter = 0;
         // this.sortOption = 'rating';

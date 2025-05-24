@@ -19,16 +19,29 @@ export const customerFeature = createFeature({
             error: null
         })),
 
-        on(customerActions.fetchOneCustomerSuccess, (state, { customer }) => ({
+        on(customerActions.updateCustomer, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        on(customerActions.updateAddToSaved, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        on(customerActions.customerSuccessAction, (state, { customer }) => ({
             ...state,
             customer,
             loading: false
         })),
 
-        on(customerActions.fetchOneCustomerFailure, (state, { error }) => ({
+        on(customerActions.customerFailureAction, (state, { error }) => ({
             ...state,
             error,
             loading: false
-        }))
+        })),
+
     )
 })

@@ -1,17 +1,25 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IProvider } from '../../../../../core/models/user.model';
 import { Router } from '@angular/router';
 import { getColorFromChar } from '../../../../../core/utils/style.utils';
+import { Store } from '@ngrx/store';
+import { customerActions } from '../../../../../store/customer/customer.actions';
+import { selectSavedProviders } from '../../../../../store/customer/customer.selector';
+import { Subject, takeUntil } from 'rxjs';
+import { IsSavedPipe } from '../../../../../core/pipes/is-saved-provider.pipe';
 
 @Component({
   selector: 'app-customer-provider-view-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IsSavedPipe],
   templateUrl: './customer-provider-view-card.component.html',
 })
-export class CustomerProviderViewCardComponent {
-  private router = inject(Router);
+export class CustomerProviderViewCardComponent implements OnDestroy {
+  private _router = inject(Router);
+  private _store = inject(Store);
+
+  private _destroy$ = new Subject<void>();
 
   @Input({ required: true }) providers!: IProvider[];
   fallbackChar: string = '';
@@ -25,7 +33,29 @@ export class CustomerProviderViewCardComponent {
     return getColorFromChar(text.charAt(0));
   }
 
+  addToSaved(providerId: string) {
+    this._store.dispatch(customerActions.updateAddToSaved({ providerId }))
+  }
+
+  // isSaved(providerId: string): boolean {
+  //   let state: boolean = false;
+  //   this._store.select(selectSavedProviders)
+  //     .pipe(takeUntil(this._destroy$))
+  //     .subscribe((saved) => {
+  //       if (saved && saved.length > 0) {
+  //         state = saved.some((id: string) => id === providerId);
+  //         console.log(state)
+  //       }
+  //     });
+  //   return state;
+  // }
+
   viewProvider(providerId: string) {
-    this.router.navigate(['provider_details', providerId, 'services']);
+    this._router.navigate(['provider_details', providerId, 'services']);
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete()
   }
 }

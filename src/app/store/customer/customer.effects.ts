@@ -8,7 +8,7 @@ import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { NotificationService } from "../../core/services/public/notification.service";
 
 export const customerEffects = {
-    fetchAvatar$: createEffect(() => {
+    fetchOneCustomer$: createEffect(() => {
         const actions$ = inject(Actions);
         const customerService = inject(CustomerService);
         const notyf = inject(NotificationService);
@@ -17,9 +17,45 @@ export const customerEffects = {
             ofType(customerActions.fetchOneCustomer),
             switchMap(() =>
                 customerService.fetchOneCustomer().pipe(
-                    map((customer) => customerActions.fetchOneCustomerSuccess({ customer })),
+                    map((customer) => customerActions.customerSuccessAction({ customer })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, customerActions.fetchOneCustomerFailure, notyf)
+                        return handleApiError(error, customerActions.customerFailureAction, notyf)
+                    })
+                )
+            )
+        );
+    }, { functional: true }),
+
+    updateCustomer$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const customerService = inject(CustomerService);
+        const notyf = inject(NotificationService);
+
+        return actions$.pipe(
+            ofType(customerActions.updateCustomer),
+            switchMap(({ updateData }) =>
+                customerService.partialUpdate(updateData).pipe(
+                    map((customer) => customerActions.customerSuccessAction({ customer })),
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, customerActions.customerFailureAction, notyf)
+                    })
+                )
+            )
+        );
+    }, { functional: true }),
+
+    updateAddToSaved$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const customerService = inject(CustomerService);
+        const notyf = inject(NotificationService);
+
+        return actions$.pipe(
+            ofType(customerActions.updateAddToSaved),
+            switchMap(({ providerId }) =>
+                customerService.updateAddToSaved(providerId).pipe(
+                    map((customer) => customerActions.customerSuccessAction({ customer })),
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, customerActions.customerFailureAction, notyf)
                     })
                 )
             )
