@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, Input, OnInit } from "@angular/core";
-import { ActivatedRoute, Router, RouterLink } from "@angular/router";
+import { Router } from "@angular/router";
 
 @Component({
     selector: 'app-customer-provider-profile-nav',
@@ -8,9 +8,8 @@ import { ActivatedRoute, Router, RouterLink } from "@angular/router";
     standalone: true,
     imports: [CommonModule]
 })
-export class CustomerProviderProfileNavigationComponent {
+export class CustomerProviderProfileNavigationComponent implements OnInit {
     private router = inject(Router);
-    private route = inject(ActivatedRoute)
 
     @Input({ required: true }) providerId!: string | null;
 
@@ -18,7 +17,7 @@ export class CustomerProviderProfileNavigationComponent {
         {
             name: 'About',
             route: 'about',
-            active: true
+            active: false
         },
         {
             name: 'Services',
@@ -30,7 +29,16 @@ export class CustomerProviderProfileNavigationComponent {
             route: 'reviews',
             active: false
         }
-    ]
+    ];
+
+    ngOnInit(): void {
+        this.items = this.items.map((item) => ({
+            ...item,
+            active: item.name === 'About' ? true : false
+        }));
+
+        this.router.navigate(['provider_details', this.providerId, this.items[0].route]);
+    }
 
     changHover(index: number): void {
         this.items = this.items.map((item, i) => ({
