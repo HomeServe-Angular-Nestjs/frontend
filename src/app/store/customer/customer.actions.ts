@@ -7,6 +7,7 @@ export const customerActions = {
 
     fetchOneCustomer: createAction('[Customer] fetch customer'),
     updateCustomer: createAction('[Customer] update customer', props<{ updateData: Partial<ICustomer> }>()),
-    updateAddToSaved: createAction('[Customer] update add to saved', props<{ providerId: string }>())
+    updateAddToSaved: createAction('[Customer] update add to saved', props<{ providerId: string }>()),
+    
 
 }

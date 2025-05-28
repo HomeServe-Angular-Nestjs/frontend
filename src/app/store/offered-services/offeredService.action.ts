@@ -17,5 +17,4 @@ export const offeredServiceActions = {
     deleteSubService: createAction('[Offered Service] Delete sub service', props<{ serviceId: string, subId: string }>()),
     deleteSubServiceSuccess: createAction('[Offered Service] Delete sub service success', props<{ serviceId: string, subId: string }>()),
     deleteSubServiceFailure: createAction('[Offered Service] Delete sub service failure', props<{ error: string }>()),
-
 }

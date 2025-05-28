@@ -1,9 +1,10 @@
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { catchError, Observable, pipe, throwError } from "rxjs";
 import { NotificationService } from "./public/notification.service";
 import { IOfferedService, ISubService } from "../models/offeredService.model";
+import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
 export class OfferedServicesService {
@@ -75,14 +76,32 @@ export class OfferedServicesService {
         );
     }
 
-    // deleteSubService(serviceId: string, subId: string): Observable<boolean> {
-    //     return this.http.delete<boolean>(`${this.apiUrl}/offered_service?serviceId=${serviceId}&subId=${subId}`).pipe(
-    //         catchError((error: HttpErrorResponse) =>
-    //             throwError(() =>
-    //                 new Error(this.getErrorMessage(error)))
-    //         )
-    //     );
-    // }
+    fetchFilteredServices(providerId: string, filter: IFilter): Observable<IOfferedService[]> {
+        const params = this._buildFilterParams(filter);
+        return this.http.get<IOfferedService[]>(`${this.apiUrl}/filter_service?id=${providerId}`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    /**
+     * Converts a plain filter object into HttpParams by omitting null or undefined values.
+     * @param {IFilter} filter - The filter criteria to convert.
+     * @returns HttpParams - Angular-compatible query parameters.
+     */
+    private _buildFilterParams(filter: IFilter): HttpParams {
+        let params = new HttpParams();
+
+        Object.entries(filter).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                params = params.set(key, value);
+            }
+        });
+
+        return params;
+    }
 
     private getErrorMessage(error: HttpErrorResponse): string {
         return error?.error?.message || 'something went wrong';

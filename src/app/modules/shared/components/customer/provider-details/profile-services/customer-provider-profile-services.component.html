@@ -7,19 +7,23 @@
         </div>
         <div class="flex flex-wrap gap-3">
             <div class="relative">
-                <input type="text" placeholder="Search services..."
+                <input type="text" placeholder="Search services..." [(ngModel)]="searchTerm"
+                    (ngModelChange)="triggerSearch()"
                     class="border rounded-lg pl-10 pr-4 py-1.5 text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
             </div>
-            <select class="border rounded-lg px-3 py-1.5 text-sm" aria-label="Sort services by">
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-                <option>Duration: Shortest First</option>
-                <option>Duration: Longest First</option>
-                <option>Most Popular</option>
+            <select class="border rounded-lg px-3 py-1.5 text-sm" aria-label="Sort services by" [(ngModel)]="sortOption"
+                (ngModelChange)="applySort($event)">
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="duration-asc">Duration: Shortest First</option>
+                <option value="duration-desc">Duration: Longest First</option>
+                <option value="popular">Most Popular</option>
             </select>
-            <select class="border rounded-lg px-3 py-1.5 text-sm" aria-label="Filter by category">
-                <option>All Categories</option>
+
+            <select class="border rounded-lg px-3 py-1.5 text-sm" aria-label="Filter by category"
+                [(ngModel)]="selectedServiceCategory" (ngModelChange)="selectCategory($event)">
+                <option value="">All Categories</option>
                 <option *ngFor="let category of serviceCategories" [value]="category">{{category}}</option>
             </select>
         </div>
@@ -28,44 +32,46 @@
     <!-- Price Range Filter -->
     <div class="mb-6 p-4 bg-gray-50 rounded-lg">
         <h3 class="text-sm font-medium text-gray-700 mb-2">Price Range</h3>
+
         <div class="flex items-center gap-4">
+            <!-- Min Price -->
             <div class="flex-1">
                 <label class="block text-xs text-gray-600 mb-1">Min Price</label>
-                <input type="number" class="border rounded-lg px-3 py-1.5 text-sm w-full" placeholder="$0">
+                <input type="number" min="0" class="border rounded-lg px-3 py-1.5 text-sm w-full" placeholder="$0"
+                    [(ngModel)]="priceRange.min" />
             </div>
+
+            <!-- Max Price -->
             <div class="flex-1">
                 <label class="block text-xs text-gray-600 mb-1">Max Price</label>
-                <input type="number" class="border rounded-lg px-3 py-1.5 text-sm w-full" placeholder="$2000">
+                <input type="number" min="0" class="border rounded-lg px-3 py-1.5 text-sm w-full" placeholder="$2000"
+                    [(ngModel)]="priceRange.max" />
             </div>
-            <button
+
+            <!-- Apply Button -->
+            <button (click)="selectPriceRange()"
                 class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition-colors mt-6">
                 Apply
             </button>
         </div>
     </div>
 
+
     <!-- Service Duration Filter -->
     <div class="mb-6 p-4 bg-gray-50 rounded-lg">
         <h3 class="text-sm font-medium text-gray-700 mb-2">Service Duration</h3>
         <div class="flex flex-wrap gap-2">
-            <button
-                class="px-3 py-1.5 text-sm border rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors">
-                Quick Service (1-2 hours)
-            </button>
-            <button
-                class="px-3 py-1.5 text-sm border rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors">
-                Half Day (3-4 hours)
-            </button>
-            <button
-                class="px-3 py-1.5 text-sm border rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors">
-                Full Day (5-8 hours)
-            </button>
-            <button
-                class="px-3 py-1.5 text-sm border rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors">
-                Multi-day
+            <button *ngFor="let key of durationKeys" (click)="selectDuration(key)" [ngClass]="{
+        'bg-blue-100 border-blue-500 text-blue-700': selectedDurationKey === key,
+        'hover:bg-blue-50 hover:border-blue-500': true,
+        'px-3 py-1.5 text-sm border rounded-lg transition-colors': true
+      }">
+                {{ key }} ({{ serviceDurations[key].minHours }}{{ serviceDurations[key].maxHours ? '–' +
+                serviceDurations[key].maxHours : '+' }} hours)
             </button>
         </div>
     </div>
+
 
     <!-- Services List -->
     <div class="space-y-4">
