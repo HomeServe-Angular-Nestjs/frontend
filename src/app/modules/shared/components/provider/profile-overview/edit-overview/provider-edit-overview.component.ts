@@ -44,7 +44,6 @@ export class ProviderEditOverviewComponent implements OnInit {
   private _router = inject(Router);
   private _fb = inject(FormBuilder);
   private _notyf = inject(NotificationService);
-  private _providerService = inject(ProviderService);
 
   previewImage: string | undefined = '';
   emergency = false;

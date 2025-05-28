@@ -1,6 +1,6 @@
 <div class="space-y-6">
     <!-- Availability Section -->
-    <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-xl font-semibold mb-4">Availability</h2>
         <div class="space-y-2">
             <div class="flex justify-between">
@@ -20,31 +20,59 @@
         </div>
         <div class="mt-4">
             <h3 class="font-medium mb-2">Service Area</h3>
-            <div class="h-48 bg-gray-100 rounded-lg">
-                <!-- Map placeholder -->
-                <div class="w-full h-full flex items-center justify-center text-gray-500">
-                    Map View
-                </div>
+            <div class=" bg-white rounded-lg relative overflow-hidden">
+                <ng-container *ngIf="center; else noCenter">
+                    <!-- Map Component -->
+                    <div class="w-full rounded-lg">
+                        <app-mapbox-map [center]="center" [zoom]="zoom" [accessToken]="mapboxToken"
+                            [disableInteraction]="true" class="w-full h-full">
+                        </app-mapbox-map>
+                    </div>
+                </ng-container>
+
+                <!-- Fallback Template -->
+                <ng-template #noCenter>
+                    <div class="w-full h-48 flex items-center justify-center text-gray-500">
+                        No address provided
+                    </div>
+                </ng-template>
             </div>
         </div>
     </div>
 
     <!-- Contact Section -->
-    <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-xl font-semibold mb-4">Contact</h2>
         <div class="space-y-4">
             <div class="flex items-center gap-3">
                 <span class="text-gray-500">📞</span>
-                <span class="font-medium">(555) 123-4567</span>
+                <ng-container *ngIf="providerData && providerData?.phone; else unavailablePhone">
+                    <span class="font-medium">{{ providerData.phone }}</span>
+                </ng-container>
+                <ng-template #unavailablePhone>
+                    <span class="text-gray-400 italic">Unavailable</span>
+                </ng-template>
             </div>
+
             <div class="flex items-center gap-3">
                 <span class="text-gray-500">📧</span>
                 <span class="font-medium">{{providerData?.email}}</span>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="text-gray-500">📍</span>
-                <span class="font-medium">123 Service Street, City, State</span>
+
+            <div class="flex items-start gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M5.05 2.05a7 7 0 119.9 9.9L10 17.9l-4.95-5.95a7 7 0 010-9.9zM10 11a3 3 0 100-6 3 3 0 000 6z"
+                        clip-rule="evenodd" />
+                </svg> <ng-container *ngIf="providerData && providerData?.location?.address; else unavailableLocation">
+                    <span class="font-medium">{{ providerData.location?.address }}</span>
+                </ng-container>
+                <ng-template #unavailableLocation>
+                    <span class="text-gray-400 italic">Unavailable</span>
+                </ng-template>
             </div>
+
             <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
                 Book Appointment
             </button>
