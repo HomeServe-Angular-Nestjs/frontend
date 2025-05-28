@@ -1,21 +1,20 @@
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, AfterViewInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import * as mapboxgl from 'mapbox-gl';
 
 @Component({
     selector: 'app-mapbox-map',
-    template: `
-    <div class="relative">
-        <div #geocoderContainer class=" z-50 custom-geocoder w-full"></div>
-        <div #mapContainer id="map" style="width: 100%; height: 400px;"></div>
-    </div>
-    `,
+    imports: [CommonModule],
+    templateUrl: './map.component.html',
     standalone: true
 })
 export class MapboxMapComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() center: [number, number] = [0, 0];
     @Input() zoom: number = 12;
     @Input() accessToken!: string;
+    @Input() search: boolean = false;
+    @Input() disableInteraction: boolean = false;
 
     @Output() locationChanged = new EventEmitter<[number, number]>();
 
@@ -45,35 +44,49 @@ export class MapboxMapComponent implements AfterViewInit, OnChanges, OnDestroy {
             accessToken: this.accessToken
         });
 
-        this.marker = new mapboxgl.Marker({ draggable: true })
+        if (this.disableInteraction) {
+            this.map.scrollZoom.disable();
+            this.map.boxZoom.disable();
+            this.map.dragRotate.disable();
+            this.map.dragPan.disable();
+            this.map.keyboard.disable();
+            this.map.doubleClickZoom.disable();
+            this.map.touchZoomRotate.disable();
+        }
+
+        this.marker = new mapboxgl.Marker({ draggable: !this.disableInteraction })
             .setLngLat(this.center)
             .addTo(this.map);
 
-        this.marker.on('dragend', () => {
-            const lngLat = this.marker.getLngLat();
-            this.locationChanged.emit([lngLat.lng, lngLat.lat]);
-        });
+        if (!this.disableInteraction) {
+            this.marker.on('dragend', () => {
+                const lngLat = this.marker.getLngLat();
+                this.locationChanged.emit([lngLat.lng, lngLat.lat]);
+            });
 
-        this.map.on('click', (event) => {
-            const lngLat = event.lngLat;
-            this.marker.setLngLat(lngLat);
-            this.locationChanged.emit([lngLat.lng, lngLat.lat]);
-        });
+            this.map.on('click', (event) => {
+                const lngLat = event.lngLat;
+                this.marker.setLngLat(lngLat);
+                this.locationChanged.emit([lngLat.lng, lngLat.lat]);
+            });
+        }
 
-        const geocoder = new MapboxGeocoder({
-            accessToken: this.accessToken,
-            mapboxgl: mapboxgl,
-            marker: false // We'll handle marker ourselves
-        });
+        if (this.search && this.geocoderElementRef?.nativeElement && !this.disableInteraction) {
+            const geocoder = new MapboxGeocoder({
+                accessToken: this.accessToken,
+                mapboxgl: mapboxgl,
+                marker: false
+            });
 
-        geocoder.on('result', (event) => {
-            const coords = event.result.center as [number, number];
-            this.map.flyTo({ center: coords, zoom: this.zoom });
-            this.marker.setLngLat(coords);
-            this.locationChanged.emit(coords);
-        });
+            geocoder.on('result', (event) => {
+                const coords = event.result.center as [number, number];
+                this.map.flyTo({ center: coords, zoom: this.zoom });
+                this.marker.setLngLat(coords);
+                this.locationChanged.emit(coords);
+            });
 
-        this.geocoderElementRef.nativeElement.appendChild(geocoder.onAdd(this.map));
+            this.geocoderElementRef.nativeElement.appendChild(geocoder.onAdd(this.map));
+        }
 
         setTimeout(() => this.map.resize(), 100);
     }
