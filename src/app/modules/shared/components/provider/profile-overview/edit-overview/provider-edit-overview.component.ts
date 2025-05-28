@@ -1,11 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
 import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { Day, IProvider } from '../../../../../../core/models/user.model';
-import { ProviderService } from '../../../../../../core/services/provider.service';
 import { firstValueFrom, Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectProvider } from '../../../../../../store/provider/provider.selector';
