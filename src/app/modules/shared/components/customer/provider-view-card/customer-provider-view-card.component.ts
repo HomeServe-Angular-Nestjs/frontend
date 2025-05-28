@@ -38,7 +38,7 @@ export class CustomerProviderViewCardComponent implements OnDestroy {
   }
 
   viewProvider(providerId: string) {
-    this._router.navigate(['provider_details', providerId, 'services']);
+    this._router.navigate(['provider_details', providerId, 'about']);
   }
 
   ngOnDestroy(): void {
