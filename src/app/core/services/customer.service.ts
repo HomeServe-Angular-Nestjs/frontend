@@ -61,6 +61,8 @@ export class CustomerService {
         );
     }
 
+    // verifyPhoneNumber(phone: number):Observable<boolean>
+
     /**
      * Converts a plain filter object into HttpParams by omitting null or undefined values.
      * @param {IFilter} filter - The filter criteria to convert.

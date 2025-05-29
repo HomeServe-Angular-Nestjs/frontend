@@ -1,9 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { API_KEY } from '../../../../../../environments/api.environments';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
 import { ISchedule, ISlot } from '../../../../../../core/models/schedules.model';
 import { FormsModule } from '@angular/forms';
+import { NotificationService } from '../../../../../../core/services/public/notification.service';
+import { OtpService } from '../../../../../../core/services/public/otp.service';
 
 
 @Component({
@@ -11,8 +13,11 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, MapboxMapComponent, FormsModule],
   templateUrl: './customer-schedule-booking-details.component.html',
+  providers: [OtpService]
 })
 export class CustomerScheduleBookingDetailsComponent {
+  private readonly _notyf = inject(NotificationService);
+  private readonly _otpService = inject(OtpService);
 
   @Input({ required: true }) schedules!: ISchedule[] | null;
 
@@ -24,6 +29,8 @@ export class CustomerScheduleBookingDetailsComponent {
   slots: ISlot[] = [];
 
   readonly mapboxToken = API_KEY.mapbox;
+
+  phoneNumber: number | undefined = undefined;
 
   toggleMap() {
     this.mapVisible = !this.mapVisible;
@@ -38,6 +45,21 @@ export class CustomerScheduleBookingDetailsComponent {
         this.slots = schedule.slots;
       }
     });
+  }
+
+  sendOtp() {
+    if (this.phoneNumber && this.phoneNumber.toString().length === 10) {
+      this._otpService.sendOtpToPhone(this.phoneNumber).subscribe({
+        next: (isSent) => {
+          console.log(isSent)
+        },
+        error: (err) => {
+          this._notyf.error(err);
+        }
+      })
+    } else {
+      this._notyf.error('Invalid phone number');
+    }
   }
 
   async onMapLocationChanged(newCenter: [number, number]) {

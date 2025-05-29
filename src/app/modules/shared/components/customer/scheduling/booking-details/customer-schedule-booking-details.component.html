@@ -12,11 +12,11 @@
                         <option>+91</option>
                         <option>+44</option>
                     </select>
-                    <input type="tel" placeholder="Enter your mobile number"
+                    <input type="tel" placeholder="Enter your mobile number" [(ngModel)]="phoneNumber"
                         class="w-full px-4 py-2 border-t border-b border-r border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md whitespace-nowrap">
+            <button (click)="sendOtp()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md whitespace-nowrap">
                 Send Code
             </button>
         </div>

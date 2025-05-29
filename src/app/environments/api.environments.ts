@@ -1,11 +1,11 @@
-const domainName = 'http://localhost:5000';
+const domainName = 'http://localhost:5000/api';
 export const API_ENV = {
-    signupAuth: `${domainName}/api/signup`,
-    loginAuth: `${domainName}/api/login`,
-    auth: `${domainName}/api/auth`,
-    admin: `${domainName}/api/admin`,
-    customer: `${domainName}/api`,
-    provider: `${domainName}/api/provider`
+    signupAuth: `${domainName}/signup`,
+    loginAuth: `${domainName}/login`,
+    auth: `${domainName}/auth`,
+    admin: `${domainName}/admin`,
+    customer: `${domainName}`,
+    provider: `${domainName}/provider`,
 }
 
 export const API_KEY = {

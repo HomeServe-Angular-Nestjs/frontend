@@ -11,7 +11,10 @@ export class CustomerPickServiceCategoryListComponent {
   @Input({ required: true }) serviceCategories: { title: string, image: string }[] = [];
   @Output() categorySelectEvent = new EventEmitter<string>();
 
+  selectedCategory: string | null = null;
+
   selectCategory(categoryTitle: string) {
+    this.selectedCategory = categoryTitle;
     this.categorySelectEvent.emit(categoryTitle);
   }
 }
