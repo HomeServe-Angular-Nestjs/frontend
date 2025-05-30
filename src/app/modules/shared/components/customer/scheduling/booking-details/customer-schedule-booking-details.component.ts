@@ -2,11 +2,13 @@ import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { API_KEY } from '../../../../../../environments/api.environments';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { ISchedule, ISlot } from '../../../../../../core/models/schedules.model';
+import { ISchedule, ISlot, ISlotData } from '../../../../../../core/models/schedules.model';
 import { FormsModule } from '@angular/forms';
 import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { OtpService } from '../../../../../../core/services/public/otp.service';
-
+import { CustomerBookingService } from '../../../../../../core/services/booking.service';
+import { Address } from '../../../../../../core/models/user.model';
+import { CustomerLocationType } from '../../../../../../core/models/booking.model';
 
 @Component({
   selector: 'app-customer-schedule-booking-details',
@@ -18,6 +20,7 @@ import { OtpService } from '../../../../../../core/services/public/otp.service';
 export class CustomerScheduleBookingDetailsComponent {
   private readonly _notyf = inject(NotificationService);
   private readonly _otpService = inject(OtpService);
+  private readonly _bookingService = inject(CustomerBookingService)
 
   @Input({ required: true }) schedules!: ISchedule[] | null;
 
@@ -26,11 +29,12 @@ export class CustomerScheduleBookingDetailsComponent {
   zoom = 12;
   selectedAddress: string | null = null;
   selectedDate: string = '';
-  slots: ISlot[] = [];
+  slotData: ISlotData = { scheduleId: '', slots: [] };
+  selectedSlot: string | null = null;
 
   readonly mapboxToken = API_KEY.mapbox;
 
-  phoneNumber: number | undefined = undefined;
+  phoneNumber: number | null = null;
 
   toggleMap() {
     this.mapVisible = !this.mapVisible;
@@ -38,13 +42,25 @@ export class CustomerScheduleBookingDetailsComponent {
 
   handleDateChange() {
     const formattedDate = new Date(this.selectedDate).toDateString();
+    const matchedSchedule = this.schedules?.find(
+      (schedule: ISchedule) => schedule.scheduleDate === formattedDate
+    );
 
-    this.schedules?.forEach((schedule: ISchedule) => {
-      console.log(schedule)
-      if (schedule.scheduleDate === formattedDate) {
-        this.slots = schedule.slots;
-      }
-    });
+    if (matchedSchedule) {
+      this.slotData = {
+        scheduleId: matchedSchedule.id,
+        slots: matchedSchedule.slots
+      };
+    }
+  }
+
+  selectSlot(slotId: string, scheduleId: string) {
+    this.selectedSlot = slotId;
+    this._bookingService.setSelectedSlot({ slotId, scheduleId });
+  }
+
+  isSelectedSlot(slotId: string): boolean {
+    return this.selectedSlot === slotId;
   }
 
   sendOtp() {
@@ -70,5 +86,11 @@ export class CustomerScheduleBookingDetailsComponent {
     );
     const data = await response.json();
     this.selectedAddress = data.features[0]?.place_name || 'No address found';
+
+    const location: CustomerLocationType = {
+      address: this.selectedAddress ?? '',
+      coordinates: this.center,
+    }
+    this._bookingService.setSelectedAddress(location);
   }
 }

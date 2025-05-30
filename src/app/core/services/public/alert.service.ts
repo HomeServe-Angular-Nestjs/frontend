@@ -4,7 +4,7 @@ import Swal, { SweetAlertIcon, SweetAlertPosition } from 'sweetalert2'
 @Injectable({ providedIn: "root" })
 export class AlertService {
 
-    showToast(message: string, icon: SweetAlertIcon, timer: number = 3000, position: SweetAlertPosition = 'top-right') {
+    showToast(message: string, icon: SweetAlertIcon, position: SweetAlertPosition = 'top-right', timer: number = 3000,) {
         const Toast = this.prepareToast(position, timer);
         Toast.fire({
             icon,

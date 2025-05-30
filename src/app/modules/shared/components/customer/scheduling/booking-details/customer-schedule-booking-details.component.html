@@ -16,7 +16,8 @@
                         class="w-full px-4 py-2 border-t border-b border-r border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
-            <button (click)="sendOtp()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md whitespace-nowrap">
+            <button (click)="sendOtp()"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md whitespace-nowrap">
                 Send Code
             </button>
         </div>
@@ -50,7 +51,7 @@
 
         <!-- Map Container -->
         <div *ngIf="mapVisible" class="mt-4 border rounded-lg overflow-hidden">
-            <app-mapbox-map [center]="center" [zoom]="zoom" [accessToken]="mapboxToken"
+            <app-mapbox-map [center]="center" [zoom]="zoom" [accessToken]="mapboxToken" [search]="true"
                 (locationChanged)="onMapLocationChanged($event)">
             </app-mapbox-map>
         </div>
@@ -67,10 +68,13 @@
 
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
             <!-- {{schedules | json}} -->
-            <ng-container *ngIf="slots.length > 0">
-                <button *ngFor="let slot of slots" class="w-full py-2 px-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-blue-100
-                focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    {{slot.from}} - {{slot.to}}
+            <ng-container *ngIf="slotData.slots.length">
+                <button *ngFor="let slot of slotData.slots" (click)="selectSlot(slot.id, slotData.scheduleId)"
+                    class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100" [ngClass]="{
+                                'border-2 border-blue-500': isSelectedSlot(slot.id),
+                                'border border-gray-300': !isSelectedSlot(slot.id)
+                            }">
+                    {{ slot.from }} - {{ slot.to }}
                 </button>
             </ng-container>
         </div>

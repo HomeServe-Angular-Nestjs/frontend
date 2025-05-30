@@ -1,5 +1,5 @@
 import { EntityState } from '@ngrx/entity';
-import { ISlot } from './schedules.model';
+import { ISlot, SlotType } from './schedules.model';
 
 export type AdditionalDocs = {
     type: string;
@@ -82,7 +82,7 @@ export interface IProvider extends IBaseUser {
     experience: number;
     availability: Availability;
     servicesOffered: string[];
-    defaultSlots: Omit<ISlot, 'takenBy'>[];
+    defaultSlots: SlotType[];
 }
 
 export interface IUserState {
