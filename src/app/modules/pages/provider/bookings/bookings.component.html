@@ -1,0 +1,515 @@
+<div class="p-8">
+    <!-- Filters and Controls -->
+    <div class="mb-8 bg-white rounded-lg shadow p-4">
+        <div class="flex flex-wrap items-center gap-4">
+            <!-- Status Filter -->
+            <div class="flex-1 min-w-[200px]">
+                <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="statusFilter"
+                    class="w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                    <option value="all">All Bookings</option>
+                    <option value="new">New</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                    <option value="canceled">Canceled</option>
+                </select>
+            </div>
+
+            <!-- Date Range -->
+            <div class="flex-1 min-w-[200px]">
+                <label for="dateRange" class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                <select id="dateRange"
+                    class="w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+            </div>
+
+            <!-- Sort By -->
+            <div class="flex-1 min-w-[200px]">
+                <label for="sortBy" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                <select id="sortBy"
+                    class="w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="highest">Highest Paid</option>
+                    <option value="service">Service Type</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <!-- Total Bookings -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600">Total Bookings</p>
+                    <p class="text-2xl font-bold text-gray-800">248</p>
+                </div>
+                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-calendar text-green-700"></i>
+                </div>
+            </div>
+            <div class="mt-2 flex items-center text-sm">
+                <span class="text-green-700"><i class="fas fa-arrow-up"></i> 12%</span>
+                <span class="text-gray-500 ml-2">vs last month</span>
+            </div>
+        </div>
+
+        <!-- Pending Requests -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600">Pending Requests</p>
+                    <p class="text-2xl font-bold text-gray-800">15</p>
+                </div>
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-clock text-blue-700"></i>
+                </div>
+            </div>
+            <div class="mt-2 flex items-center text-sm">
+                <span class="text-blue-700">New requests</span>
+            </div>
+        </div>
+
+        <!-- Ongoing Services -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600">Ongoing Services</p>
+                    <p class="text-2xl font-bold text-gray-800">8</p>
+                </div>
+                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-spinner text-yellow-700"></i>
+                </div>
+            </div>
+            <div class="mt-2 flex items-center text-sm">
+                <span class="text-yellow-700">Active jobs</span>
+            </div>
+        </div>
+
+        <!-- Completed Jobs -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600">Completed Jobs</p>
+                    <p class="text-2xl font-bold text-gray-800">195</p>
+                </div>
+                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-check-circle text-green-700"></i>
+                </div>
+            </div>
+            <div class="mt-2 flex items-center text-sm">
+                <span class="text-green-700"><i class="fas fa-arrow-up"></i> 8%</span>
+                <span class="text-gray-500 ml-2">vs last month</span>
+            </div>
+        </div>
+
+        <!-- Canceled Bookings -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600">Canceled Bookings</p>
+                    <p class="text-2xl font-bold text-gray-800">30</p>
+                </div>
+                <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-times-circle text-red-700"></i>
+                </div>
+            </div>
+            <div class="mt-2 flex items-center text-sm">
+                <span class="text-red-700"><i class="fas fa-arrow-down"></i> 5%</span>
+                <span class="text-gray-500 ml-2">vs last month</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="mb-8 flex justify-end">
+        <div class="inline-flex rounded-lg border border-gray-200 p-1 bg-white shadow-sm">
+            <button class="px-4 py-2 text-sm bg-green-700 text-white rounded-lg" aria-label="List view">
+                <i class="fas fa-list-ul mr-2"></i>List View
+            </button>
+            <button class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 rounded-lg transition-colors"
+                aria-label="Calendar view">
+                <i class="fas fa-calendar-alt mr-2"></i>Calendar View
+            </button>
+        </div>
+    </div>
+
+    <!-- List View Section -->
+    <div class="bg-white rounded-lg shadow">
+        <!-- List Header -->
+        <div class="p-4 border-b flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-800">All Bookings</h2>
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500">Total: 248 bookings</span>
+                <button
+                    class="px-3 py-1.5 text-sm text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                    <i class="fas fa-download mr-1"></i>Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Bookings List -->
+        <div class="divide-y divide-gray-100">
+            <!-- Booking Item -->
+            <div class="p-4 hover:bg-gray-50 transition-colors">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0">
+                            <img src="/assets/avatar1.jpg" alt="" class="h-10 w-10 rounded-full">
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">House Cleaning Service</h3>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <span><i class="fas fa-user mr-1"></i>Sarah Wilson</span>
+                                <span><i class="fas fa-map-marker-alt mr-1"></i>123 Main St, City</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Completed</span>
+                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">Paid</span>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                    <div class="flex items-center gap-4 text-xs text-gray-500">
+                        <span><i class="far fa-calendar mr-1"></i>Mar 25, 2024</span>
+                        <span><i class="far fa-clock mr-1"></i>10:00 AM</span>
+                        <span><i class="fas fa-dollar-sign mr-1"></i>120.00</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            aria-label="View details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                            aria-label="Message">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="p-1.5 text-gray-400 hover:bg-gray-50 rounded-lg transition-colors"
+                            aria-label="More options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Another Booking Item (Pending) -->
+            <div class="p-4 hover:bg-gray-50 transition-colors">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0">
+                            <img src="/assets/avatar2.jpg" alt="" class="h-10 w-10 rounded-full">
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">Deep Cleaning Service</h3>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <span><i class="fas fa-user mr-1"></i>Michael Brown</span>
+                                <span><i class="fas fa-map-marker-alt mr-1"></i>456 Oak Ave, City</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">Pending</span>
+                        <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">Unpaid</span>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                    <div class="flex items-center gap-4 text-xs text-gray-500">
+                        <span><i class="far fa-calendar mr-1"></i>Mar 26, 2024</span>
+                        <span><i class="far fa-clock mr-1"></i>2:00 PM</span>
+                        <span><i class="fas fa-dollar-sign mr-1"></i>180.00</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button
+                            class="px-2 py-1 text-xs text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                            Accept
+                        </button>
+                        <button
+                            class="px-2 py-1 text-xs text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                            Decline
+                        </button>
+                        <button class="p-1.5 text-gray-400 hover:bg-gray-50 rounded-lg transition-colors"
+                            aria-label="More options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="p-4 border-t">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-500">
+                    Showing 1 to 10 of 248 bookings
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                        Previous
+                    </button>
+                    <button class="px-3 py-1.5 text-sm bg-green-700 text-white rounded-lg">
+                        1
+                    </button>
+                    <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                        2
+                    </button>
+                    <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                        3
+                    </button>
+                    <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Section -->
+    <div class="bg-white rounded-lg shadow mb-8">
+        <!-- Calendar Header -->
+        <div class="p-6 border-b flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <h2 class="text-xl font-semibold text-gray-800">March 2024</h2>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 hover:bg-gray-100 rounded-lg text-gray-600" aria-label="Previous month">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="px-4 py-2 text-sm font-medium bg-green-700 text-white rounded-lg hover:bg-green-800">
+                        Today
+                    </button>
+                    <button class="p-2 hover:bg-gray-100 rounded-lg text-gray-600" aria-label="Next month">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span>Completed</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                    <span>Ongoing</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                    <span>Pending</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span>Canceled</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="p-6">
+            <!-- Days of Week -->
+            <div class="grid grid-cols-7 mb-4">
+                <div class="text-sm font-medium text-gray-500 text-center">Sun</div>
+                <div class="text-sm font-medium text-gray-500 text-center">Mon</div>
+                <div class="text-sm font-medium text-gray-500 text-center">Tue</div>
+                <div class="text-sm font-medium text-gray-500 text-center">Wed</div>
+                <div class="text-sm font-medium text-gray-500 text-center">Thu</div>
+                <div class="text-sm font-medium text-gray-500 text-center">Fri</div>
+                <div class="text-sm font-medium text-gray-500 text-center">Sat</div>
+            </div>
+
+            <!-- Calendar Days -->
+            <div class="grid grid-cols-7 gap-4">
+                <!-- Example Day -->
+                <div
+                    class="min-h-[120px] p-3 border hover:border-green-500 rounded-lg cursor-pointer transition-colors group">
+                    <span class="text-sm">1</span>
+                    <div class="mt-2 space-y-1">
+                        <div class="flex items-center text-xs text-gray-600">
+                            <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                            <span>9:00 AM - House Cleaning</span>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-600">
+                            <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
+                            <span>2:00 PM - Deep Cleaning</span>
+                        </div>
+                        <!-- View More Button -->
+                        <button
+                            class="mt-2 w-full text-xs text-green-700 bg-green-50 py-1 px-2 rounded hover:bg-green-100 transition-colors">
+                            <i class="fas fa-plus-circle mr-1"></i>2 more bookings
+                        </button>
+                    </div>
+                    <!-- Hover Preview -->
+                    <div
+                        class="hidden group-hover:block absolute bg-white border rounded-lg shadow-lg p-4 z-20 w-64 mt-2">
+                        <h4 class="font-medium text-sm mb-2">March 1, 2024</h4>
+                        <div class="space-y-2">
+                            <div class="text-xs">
+                                <div class="flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                                    <span>9:00 AM - House Cleaning</span>
+                                </div>
+                                <p class="text-gray-500 ml-4">Sarah Wilson</p>
+                            </div>
+                            <div class="text-xs">
+                                <div class="flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
+                                    <span>2:00 PM - Deep Cleaning</span>
+                                </div>
+                                <p class="text-gray-500 ml-4">Michael Brown</p>
+                            </div>
+                            <div class="text-xs">
+                                <div class="flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
+                                    <span>4:00 PM - Window Cleaning</span>
+                                </div>
+                                <p class="text-gray-500 ml-4">Emma Davis</p>
+                            </div>
+                        </div>
+                        <button
+                            class="mt-3 w-full text-xs bg-green-700 text-white py-1.5 px-3 rounded-lg hover:bg-green-800 transition-colors">
+                            View All Bookings
+                        </button>
+                    </div>
+                </div>
+                <!-- ... other days ... -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Day Details Modal -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden" id="dayDetailsModal">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
+            <div class="p-4 border-b flex items-center justify-between">
+                <h3 class="text-lg font-semibold">March 15, 2024</h3>
+                <button class="text-gray-500 hover:text-gray-700" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4 max-h-[70vh] overflow-y-auto space-y-4">
+                <!-- Time Slots -->
+                <div class="border-l-4 border-yellow-500 pl-4 pb-4">
+                    <div class="text-sm font-medium text-gray-500">10:00 AM</div>
+                    <div class="mt-2">
+                        <div class="font-medium">Window Cleaning</div>
+                        <div class="text-sm text-gray-600">Sarah Wilson</div>
+                        <div class="mt-2 flex items-center gap-2">
+                            <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">Pending</span>
+                            <button class="text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-comment mr-1"></i>Contact
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings Section -->
+    <div class="mt-8">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Recent Bookings</h2>
+        <div class="bg-white rounded-lg shadow">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Booking ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Service</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date & Time</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Payment</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <!-- Sample booking row -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-900">#BK-2024001</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <img src="/assets/avatar1.jpg" alt="" class="h-8 w-8 rounded-full">
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900">Sarah Wilson</p>
+                                        <p class="text-sm text-gray-500">sarahexample.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-900">House Cleaning</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Mar 25, 2024</div>
+                                <div class="text-sm text-gray-500">10:00 AM</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                                    Completed
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                                    Paid
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div class="flex items-center gap-2">
+                                    <button class="text-blue-600 hover:text-blue-800" aria-label="View details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-green-600 hover:text-green-800" aria-label="Message customer">
+                                        <i class="fas fa-comment"></i>
+                                    </button>
+                                    <button class="text-gray-600 hover:text-gray-800" aria-label="More options">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Add more booking rows as needed -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="px-6 py-4 border-t">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        Showing 1 to 10 of 248 bookings
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-gray-50">
+                            Previous
+                        </button>
+                        <button class="px-3 py-1 border rounded text-sm bg-green-700 text-white">
+                            1
+                        </button>
+                        <button class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-gray-50">
+                            2
+                        </button>
+                        <button class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-gray-50">
+                            3
+                        </button>
+                        <button class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-gray-50">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

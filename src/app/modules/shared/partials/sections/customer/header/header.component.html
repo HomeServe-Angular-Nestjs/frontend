@@ -3,8 +3,7 @@
     <div class="flex items-center justify-between">
       <!-- Logo - Enhanced with hover effects -->
       <div class="flex items-center">
-        <a href="/"
-          class="flex items-center group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-l">
+        <a [routerLink]="['/homepage']" class="flex items-center group rounded-l">
           <div class="flex items-center justify-center">
             <svg width="28" height="22" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg"
               class="transition-transform group-hover:rotate-12">
@@ -147,9 +146,9 @@
                   <p class="text-xs text-gray-500">{{(email$ | async)}}</p>
                 </div>
                 <div class="py-1">
-                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
+                  <a [routerLink]="['/profile']" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Manage Profile</a>
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Chat</a>
                   <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Settings</a>
-                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Messages</a>
                 </div>
                 <div class="py-1 border-t border-gray-100">
                   <button (click)="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Log

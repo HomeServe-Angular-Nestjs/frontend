@@ -4,6 +4,7 @@ import { API_ENV } from "../../environments/api.environments";
 import { BehaviorSubject, catchError, map, Observable, throwError } from "rxjs";
 import { CustomerLocationType, IBookingData, IPriceBreakup, IPriceBreakupData } from "../models/booking.model";
 import { ISlotSource } from "../models/schedules.model";
+import { IBooking, IBookingResponse } from "../models/bookings.model";
 
 
 
@@ -38,12 +39,15 @@ export class CustomerBookingService {
 
     postBookingData(data: IBookingData): Observable<boolean> {
         return this._http.post<boolean>(`${this._apiUrl}/booking/confirm`, data).pipe(
-            // map((response) => {
-            //     if (!response) {
-            //         throw new Error('Sorry, booking failed due to some technical issues. If occurs again contact the admin.');
-            //     }
-            //     return true;
-            // }),
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    fetchBookings(): Observable<IBookingResponse[]> {
+        return this._http.get<IBookingResponse[]>(`${this._apiUrl}/booking/fetch`).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

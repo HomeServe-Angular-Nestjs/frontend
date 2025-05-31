@@ -4,6 +4,7 @@ import { CustomerLayoutPageComponent } from "../../pages/customer/layout/custome
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
 import { CustomerProviderProfileLayoutComponent } from "../../pages/customer/provider-details-page/customer-provider-profile-layout.component";
 import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
+import { CustomerProfileLayout } from "../../pages/customer/profile/profile-layout/layout.component";
 
 export const customerRoutes: Routes = [
     {
@@ -72,6 +73,22 @@ export const customerRoutes: Routes = [
                 loadComponent: () => import('../../pages/customer/booking-2-schedule/customer-service-schedule.component')
                     .then(c => c.CustomerServiceScheduleComponent),
                 canActivate: [AuthGuard]
+            },
+            {
+                path: 'profile',
+                component: CustomerProfileLayout,
+                children: [
+                    {
+                        path: '',
+                        pathMatch: "full",
+                        redirectTo: 'bookings'
+                    },
+                    {
+                        path: 'bookings',
+                        loadComponent: () => import('../../shared/components/customer/bookings/booking-lists.component')
+                            .then(c => c.CustomerBookingListsComponent)
+                    }
+                ],
             }
         ],
     },
