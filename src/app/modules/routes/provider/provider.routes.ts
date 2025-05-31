@@ -6,6 +6,7 @@ import { ProviderProfileOverviewLayoutComponent } from "../../shared/components/
 import { ProviderKycComponent } from "../../shared/components/provider/kyc/provider-kyc.component";
 import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
+import { ProviderBookingsComponent } from "../../pages/provider/bookings/bookings.component";
 
 export const providerRoutes: Routes = [
     {
@@ -75,6 +76,10 @@ export const providerRoutes: Routes = [
                 ],
                 canActivate: [AuthGuard],
             },
+            {
+                path: 'bookings',
+                component: ProviderBookingsComponent
+            }
         ],
     },
 

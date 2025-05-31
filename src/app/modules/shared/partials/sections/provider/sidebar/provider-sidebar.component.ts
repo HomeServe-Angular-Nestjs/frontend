@@ -29,7 +29,7 @@ export class ProviderSidebarComponent {
         {
           name: 'Bookings',
           icon: 'fas fa-calendar-check',
-          route: '',
+          route: 'bookings',
           active: false
         }
       ]

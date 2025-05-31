@@ -1,0 +1,35 @@
+<div class="flex flex-wrap items-center gap-4">
+    <!-- Status Filter -->
+    <div class="flex-1 min-w-[200px]">
+        <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <select id="statusFilter" class="w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+            <option value="all">All Bookings</option>
+            <option value="new">New</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="completed">Completed</option>
+            <option value="canceled">Canceled</option>
+        </select>
+    </div>
+
+    <!-- Date Range -->
+    <div class="flex-1 min-w-[200px]">
+        <label for="dateRange" class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+        <select id="dateRange" class="w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="custom">Custom Range</option>
+        </select>
+    </div>
+
+    <!-- Sort By -->
+    <div class="flex-1 min-w-[200px]">
+        <label for="sortBy" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+        <select id="sortBy" class="w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="highest">Highest Paid</option>
+            <option value="service">Service Type</option>
+        </select>
+    </div>
+</div>

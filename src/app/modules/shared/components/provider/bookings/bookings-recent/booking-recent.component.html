@@ -1,0 +1,78 @@
+<div class="mt-8">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Recent Bookings</h2>
+    <div class="bg-white rounded-lg shadow">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Booking ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Service</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date & Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Payment</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <!-- Sample booking row -->
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-900">#BK-2024001</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <img src="/assets/avatar1.jpg" alt="" class="h-8 w-8 rounded-full">
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">Sarah Wilson</p>
+                                    <p class="text-sm text-gray-500">sarahexample.com</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-900">House Cleaning</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">Mar 25, 2024</div>
+                            <div class="text-sm text-gray-500">10:00 AM</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                                Completed
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                                Paid
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="flex items-center gap-2">
+                                <button class="text-blue-600 hover:text-blue-800" aria-label="View details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="text-green-600 hover:text-green-800" aria-label="Message customer">
+                                    <i class="fas fa-comment"></i>
+                                </button>
+                                <button class="text-gray-600 hover:text-gray-800" aria-label="More options">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Add more booking rows as needed -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+       <app-provider-pagination></app-provider-pagination>
+    </div>
+</div>

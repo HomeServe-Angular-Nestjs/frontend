@@ -1,0 +1,61 @@
+<div class="bg-white rounded-lg shadow">
+    <!-- List Header -->
+    <div class="p-4 border-b flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-800">All Bookings</h2>
+        <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-500">Total: 248 bookings</span>
+            <button
+                class="px-3 py-1.5 text-sm text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                <i class="fas fa-download mr-1"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Bookings List -->
+    <div class="divide-y divide-gray-100">
+        <!-- Booking Item -->
+        <div class="p-4 hover:bg-gray-50 transition-colors">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                        <img src="/assets/avatar1.jpg" alt="" class="h-10 w-10 rounded-full">
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-900">House Cleaning Service</h3>
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                            <span><i class="fas fa-user mr-1"></i>Sarah Wilson</span>
+                            <span><i class="fas fa-map-marker-alt mr-1"></i>123 Main St, City</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Completed</span>
+                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">Paid</span>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center justify-between">
+                <div class="flex items-center gap-4 text-xs text-gray-500">
+                    <span><i class="far fa-calendar mr-1"></i>Mar 25, 2024</span>
+                    <span><i class="far fa-clock mr-1"></i>10:00 AM</span>
+                    <span><i class="fas fa-dollar-sign mr-1"></i>120.00</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        aria-label="View details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        aria-label="Message">
+                        <i class="fas fa-comment"></i>
+                    </button>
+                    <button class="p-1.5 text-gray-400 hover:bg-gray-50 rounded-lg transition-colors"
+                        aria-label="More options">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <app-provider-pagination></app-provider-pagination>
+    </div>
