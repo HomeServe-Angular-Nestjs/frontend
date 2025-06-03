@@ -1,11 +1,11 @@
 import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
-import { CustomerBookingService } from '../../../../../../core/services/booking.service';
+import { BookingService } from '../../../../../../core/services/booking.service';
 import { CustomerLocationType, IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { ISlotSource } from '../../../../../../core/models/schedules.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AlertService } from '../../../../../../core/services/public/alert.service';
 
@@ -16,10 +16,11 @@ import { AlertService } from '../../../../../../core/services/public/alert.servi
   templateUrl: './customer-schedule-order-summary.component.html',
 })
 export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy {
-  private readonly _bookingService = inject(CustomerBookingService);
+  private readonly _bookingService = inject(BookingService);
   private readonly _notyf = inject(NotificationService);
   private _route = inject(ActivatedRoute);
   private _alertService = inject(AlertService);
+  private _router = inject(Router);
 
   private _subscriptions: Subscription[] = [];
 
@@ -89,12 +90,12 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       serviceIds
     };
 
-    console.log(bookingData)
     this._bookingService.postBookingData(bookingData).subscribe({
       next: (success) => {
         if (success) {
           this._alertService.showToast('Service booked successfully!', 'success');
           localStorage.removeItem('selectedServiceData');
+          this._router.navigate(['profile', 'bookings'])
         } else {
           // TODO - write an alert confirm.
           console.log('Sorry, booking failed due to some technical issues. If occurs again contact the admin.')

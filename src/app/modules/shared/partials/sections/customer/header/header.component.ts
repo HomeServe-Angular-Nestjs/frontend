@@ -32,6 +32,7 @@ export class CustomerHeaderComponent implements OnInit {
     this._store.dispatch(customerActions.fetchOneCustomer());
 
     const customer$ = this._store.select(selectCustomer);
+    
 
     this.avatar$ = customer$.pipe(
       map(customer => customer?.avatar ?? null)

@@ -117,17 +117,19 @@
               <button class="flex items-center space-x-1 focus:outline-none group rounded-full p-1">
                 <div class="relative">
                   <!-- Avatar image if exists -->
-                  <img *ngIf="(avatar$ | async) as avatar; else fallbackAvatar" [src]="avatar" alt="User profile"
-                    class="h-9 w-9 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all" />
+                  <!-- <ng-container *ngIf="(avatar$ | async) as avatar; else fallbackAvatar">
+                    <img [src]="avatar" alt="User profile"
+                      class="h-9 w-9 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all" />
+                  </ng-container> -->
 
                   <!-- Fallback avatar with colored background -->
-                  <ng-template #fallbackAvatar>
+                  <!-- <ng-template #fallbackAvatar> -->
                     <div
                       class="h-9 w-9 flex items-center justify-center rounded-full text-white font-medium border-2 border-transparent group-hover:border-blue-300 transition-all"
                       [style.background-color]="(fallbackColor$ | async)">
                       {{ (fallbackChar$ | async) }}
                     </div>
-                  </ng-template>
+                  <!-- </ng-template> -->
 
                   <!-- Online status indicator -->
                   <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white">
@@ -146,7 +148,8 @@
                   <p class="text-xs text-gray-500">{{(email$ | async)}}</p>
                 </div>
                 <div class="py-1">
-                  <a [routerLink]="['/profile']" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Manage Profile</a>
+                  <a [routerLink]="['/profile']" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Manage
+                    Profile</a>
                   <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Chat</a>
                   <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Settings</a>
                 </div>

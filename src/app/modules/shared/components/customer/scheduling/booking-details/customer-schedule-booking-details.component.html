@@ -70,10 +70,12 @@
             <!-- {{schedules | json}} -->
             <ng-container *ngIf="slotData.slots.length">
                 <button *ngFor="let slot of slotData.slots" (click)="selectSlot(slot.id, slotData.scheduleId)"
-                    class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100" [ngClass]="{
-                                'border-2 border-blue-500': isSelectedSlot(slot.id),
-                                'border border-gray-300': !isSelectedSlot(slot.id)
-                            }">
+                    class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100"
+                    [disabled]="slot.takenBy" [ngClass]="{
+                     'border-2 border-blue-500': isSelectedSlot(slot.id),
+                     'border border-gray-300': !isSelectedSlot(slot.id),
+                     'cursor-not-allowed opacity-50': slot.takenBy
+                    }">
                     {{ slot.from }} - {{ slot.to }}
                 </button>
             </ng-container>

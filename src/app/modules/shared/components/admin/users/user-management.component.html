@@ -1,7 +1,7 @@
+
 <div class="mb-6 shadow-md">
     <app-filters (filterEvents)="filterEvent($event)" (roleChanged)="onRoleChange($event)"></app-filters>
 </div>
-
 <!-- <ng-container *ngIf="vm$ | async as vm">
     <app-table *ngIf="vm.customerTable.rows.length" [tableData]="vm.customerTable"
         (actionTriggered)="onActionFromTable($event, 'customer')">

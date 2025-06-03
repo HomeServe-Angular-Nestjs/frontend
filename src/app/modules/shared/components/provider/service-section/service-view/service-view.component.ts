@@ -24,6 +24,7 @@ export class ServiceViewComponent {
   }
 
   updateService(updateData: Partial<IOfferedService>) {
+    console.log(updateData)
     this.store.dispatch(offeredServiceActions.updateOfferedService({ updateData }));
   }
 

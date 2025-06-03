@@ -2,12 +2,11 @@ import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { API_KEY } from '../../../../../../environments/api.environments';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { ISchedule, ISlot, ISlotData } from '../../../../../../core/models/schedules.model';
+import { ISchedule, ISlotData } from '../../../../../../core/models/schedules.model';
 import { FormsModule } from '@angular/forms';
 import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { OtpService } from '../../../../../../core/services/public/otp.service';
-import { CustomerBookingService } from '../../../../../../core/services/booking.service';
-import { Address } from '../../../../../../core/models/user.model';
+import { BookingService } from '../../../../../../core/services/booking.service';
 import { CustomerLocationType } from '../../../../../../core/models/booking.model';
 
 @Component({
@@ -20,7 +19,7 @@ import { CustomerLocationType } from '../../../../../../core/models/booking.mode
 export class CustomerScheduleBookingDetailsComponent {
   private readonly _notyf = inject(NotificationService);
   private readonly _otpService = inject(OtpService);
-  private readonly _bookingService = inject(CustomerBookingService)
+  private readonly _bookingService = inject(BookingService)
 
   @Input({ required: true }) schedules!: ISchedule[] | null;
 

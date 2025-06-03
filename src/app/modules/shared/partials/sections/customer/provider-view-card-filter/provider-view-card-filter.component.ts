@@ -24,10 +24,10 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
 
     @Output() filterEvents = new EventEmitter<IFilter>();
 
-    searchQuery = '';
-    certifiedOnly = true;
-    ratingFilter = 0;
-    sortOption = 'rating';
+    searchQuery: string = '';
+    certifiedOnly: boolean = false;
+    ratingFilter: number = 0;
+    sortOption: string = 'rating';
 
     ngOnInit(): void {
         this._filters$
@@ -60,7 +60,7 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
         this.searchQuery = '';
         // this.ratingFilter = 0;
         // this.sortOption = 'rating';
-        this._emitFilter(); 
+        this._emitFilter();
     }
 
     private _emitFilter() {
