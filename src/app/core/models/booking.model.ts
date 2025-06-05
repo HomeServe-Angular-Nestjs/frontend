@@ -80,7 +80,7 @@ export interface IProviderBookingLists {
         email: string;
     },
     bookingId: string;
-    expectedArrivalTime: Date;
+    expectedArrivalTime: string;
     totalAmount: number;
     createdAt: Date;
     paymentStatus: PaymentStatus;
@@ -88,3 +88,39 @@ export interface IProviderBookingLists {
     totalBookings: number;
 }
 
+export interface IPagination {
+    page: number;
+    limit: number;
+    total: number;
+}
+
+export interface IResponseProviderBookingLists {
+    bookingData: IProviderBookingLists[],
+    paginationData: IPagination;
+}
+
+
+export interface IBookingFilter {
+    search?: string;
+    bookingStatus?: BookingStatus | '';
+    paymentStatus?: PaymentStatus | '';
+    date?: string;
+    sort?: string;
+}
+
+interface IBookingOverviewChanges {
+    totalBookingsChange: number;
+    pendingRequestsChange: number;
+    completedJobsChange: number;
+    pendingPaymentsChange: number;
+    cancelledBookingsChange: number;
+}
+
+export interface IBookingOverviewData {
+    pendingRequests: number;
+    completedJobs: number;
+    pendingPayments: number;
+    cancelledBookings: number;
+    totalBookings: number;
+    changes?: IBookingOverviewChanges;
+}

@@ -32,8 +32,8 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
-
-      })),
+      })
+    ),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore({
       [authFeature.name]: authFeature.reducer,

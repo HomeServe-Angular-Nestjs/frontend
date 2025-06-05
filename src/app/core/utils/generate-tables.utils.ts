@@ -3,7 +3,6 @@ import { ICustomer, IProvider } from "../models/user.model";
 export const createUserTable = (users: (ICustomer | IProvider)[]) => {
     const filteredUser = users.filter(user => !user.isDeleted);
     return {
-        // label: t,
         columns: ['id', 'username', 'email', 'contact', 'status', 'joined', 'actions'],
         rows: filteredUser.map(user => ({
             id: user.id,
@@ -40,4 +39,25 @@ export const createUserTable = (users: (ICustomer | IProvider)[]) => {
             ]
         }))
     };
-}
+};
+
+export const createProviderBookingTables = (columns: string[], data: Record<string, any>[]) => {
+    const rows = data.map(item => {
+        const row: Record<string, any> = {};
+
+        data.map(d => {
+            console.log(d)
+        })
+        return row;
+    });
+
+
+    console.log('columns: ', columns)
+    console.log('rows: ', rows)
+
+    return {
+        columns,
+        rows
+    };
+};
+

@@ -1,8 +1,8 @@
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
-import { CustomerLocationType, IBookingData, IBookingResponse, IPriceBreakup, IPriceBreakupData, IProviderBookingLists } from "../models/booking.model";
+import { CustomerLocationType, IBookingData, IBookingFilter, IBookingOverviewData, IBookingResponse, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
 import { ISlotSource } from "../models/schedules.model";
 
 
@@ -58,8 +58,26 @@ export class BookingService {
 
     //*** ********************************************[PROVIDER APIs]*************************************************** ***//
 
-    fetchBookingList():Observable<IProviderBookingLists[]> {
-        return this._http.get<IProviderBookingLists[]>(`${this._providerApi}/bookings`).pipe(
+    fetchBookingList(page: number = 1, filter: IBookingFilter): Observable<IResponseProviderBookingLists> {
+        let params = new HttpParams()
+            .set('page', page.toString());
+
+        Object.entries(filter).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                params = params.set(key, value);
+            }
+        });
+
+        return this._http.get<IResponseProviderBookingLists>(`${this._providerApi}/bookings`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    fetchBookingOverviewData(): Observable<IBookingOverviewData> {
+        return this._http.get<IBookingOverviewData>(`${this._providerApi}/bookings/overview_data`).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

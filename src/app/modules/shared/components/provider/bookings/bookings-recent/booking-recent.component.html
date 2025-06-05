@@ -1,82 +1,104 @@
-<div class="mt-8">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">Recent Bookings</h2>
-    <div class="bg-white rounded-lg shadow">
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Booking ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Customer</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Service</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date & Time</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Payment</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    <!-- Sample booking row -->
-                    <ng-container *ngFor="let booking of bookingLists">
-
-
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-sm text-gray-900">#{{booking.bookingId.toUpperCase()}}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <img src="assets/images/profile_placeholder.jpg" alt="" class="h-8 w-8 rounded-full" loading="lazy">
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900">{{booking.customer.name}}</p>
-                                        <p class="text-sm text-gray-500">{{booking.customer.email}}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-sm text-gray-900">{{booking.services[0].title}}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">Mar 25, 2024</div>
-                                <div class="text-sm text-gray-500">10:00 AM</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
-                                    {{booking.bookingStatus}}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
-                                   {{booking.paymentStatus}}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <div class="flex items-center gap-2">
-                                    <button class="text-blue-600 hover:text-blue-800" aria-label="View details">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="text-green-600 hover:text-green-800" aria-label="Message customer">
-                                        <i class="fas fa-comment"></i>
-                                    </button>
-                                    <button class="text-gray-600 hover:text-gray-800" aria-label="More options">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </ng-container>
-                    <!-- Add more booking rows as needed -->
-                </tbody>
-            </table>
+<section class="max-w-full">
+    <div class="flex justify-between items-start">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Recent Bookings</h2>
+        <div class="relative">
+            <label for="searchInput" class="sr-only">Search</label>
+            <input id="searchInput" type="text" placeholder="Search..." aria-label="Search" [(ngModel)]="searchTerm"
+                (ngModelChange)="onSearchTriggered()"
+                class="w-64 px-4 py-2 text-sm text-gray-700 bg-gray-50 rounded-lg border border-gray-200 outline-none" />
+            <i class="fas fa-search absolute right-3 top-2.5 text-gray-400" aria-hidden="true"></i>
         </div>
-
-        <!-- Pagination -->
-        <app-provider-pagination></app-provider-pagination>
     </div>
-</div>
+
+    <div class="bg-white rounded-lg shadow max-w-full">
+        <ng-container *ngIf="bookingResponseData$ | async as bookingResponseData">
+            <div class="overflow-x-auto bg-white shadow rounded-lg">
+                <table class="min-w-full table-auto text-sm text-left text-gray-700">
+                    <thead class="bg-gray-100 text-xs uppercase text-gray-500">
+                        <tr>
+                            <th class="px-4 py-3">Booking ID</th>
+                            <th class="px-4 py-3">Customer</th>
+                            <th class="px-4 py-3">Service</th>
+                            <th class="px-4 py-3">Date & Time</th>
+                            <th class="px-4 py-3">Status</th>
+                            <th class="px-4 py-3">Payment</th>
+                            <th class="px-4 py-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <ng-container *ngFor="let booking of bookingResponseData.bookingData">
+                            <tr class="hover:bg-gray-50">
+                                <!-- Booking ID -->
+                                <td class="px-4 py-3 max-w-[120px] truncate text-gray-900">
+                                    #{{ booking.bookingId.toUpperCase() }}
+                                </td>
+
+                                <!-- Customer -->
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center space-x-3 max-w-[200px]">
+                                        <img [src]="booking.customer.avatar" alt=""
+                                            class="h-8 w-8 rounded-full object-cover" loading="lazy"
+                                            (error)="onImageError($event)">
+                                        <div class="truncate">
+                                            <p class="font-medium truncate">{{ booking.customer.name }}</p>
+                                            <p class="text-gray-500 text-xs truncate">{{ booking.customer.email }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Service -->
+                                <td class="px-4 py-3 max-w-[160px] truncate">
+                                    {{ booking.services[0].title }}
+                                </td>
+
+                                <!-- Date & Time -->
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div>{{ getDate(booking.expectedArrivalTime) }}</div>
+                                    <div class="text-gray-500 text-xs">{{ getTime(booking.expectedArrivalTime) }}</div>
+                                </td>
+
+                                <!-- Status -->
+                                <td class="px-4 py-3">
+                                    <span
+                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">
+                                        {{ booking.bookingStatus }}
+                                    </span>
+                                </td>
+
+                                <!-- Payment -->
+                                <td class="px-4 py-3">
+                                    <span
+                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
+                                        {{ booking.paymentStatus }}
+                                    </span>
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3 text-lg">
+                                        <button class="text-blue-600 hover:text-blue-800" aria-label="View details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="text-green-600 hover:text-green-800"
+                                            aria-label="Message customer">
+                                            <i class="fas fa-comment"></i>
+                                        </button>
+                                        <button class="text-gray-600 hover:text-gray-800" aria-label="More options">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <!-- Pagination -->
+            <app-provider-pagination [pagination]="bookingResponseData.paginationData"
+                (pageChange)="loadBookings($event)"></app-provider-pagination>
+        </ng-container>
+
+    </div>
+</section>

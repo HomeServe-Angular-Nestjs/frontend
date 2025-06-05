@@ -1,23 +1,23 @@
-<div class="p-8">
+<div class="max-w-screen-xl mx-auto p-8">
     <!-- Filters and Controls -->
-    <div class="mb-8 bg-white rounded-lg shadow p-4">
-        <app-provider-booking-filter></app-provider-booking-filter>
+    <div class="mb-8">
+        <app-provider-booking-filter (filtersChanged)="onFiltersChanged($event)"></app-provider-booking-filter>
     </div>
 
     <!-- Statistics Cards -->
     <app-provider-booking-overview></app-provider-booking-overview>
 
     <!-- View Toggle -->
-    <!-- <div class="mb-8 flex justify-end">
-        <div class="inline-flex rounded-lg border border-gray-200 p-1 bg-white shadow-sm">
-            <button class="px-4 py-2 text-sm bg-green-700 text-white rounded-lg" aria-label="List view">
-                <i class="fas fa-list-ul mr-2"></i>List View
-            </button>
-            <button class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 rounded-lg transition-colors"
-                aria-label="Calendar view">
-                <i class="fas fa-calendar-alt mr-2"></i>Calendar View
-            </button>
-        </div>
+    <!-- <div class=" mb-8 flex justify-end">
+            <div class="inline-flex rounded-lg border border-gray-200 p-1 bg-white shadow-sm">
+                <button class="px-4 py-2 text-sm bg-green-700 text-white rounded-lg" aria-label="List view">
+                    <i class="fas fa-list-ul mr-2"></i>List View
+                </button>
+                <button class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 rounded-lg transition-colors"
+                    aria-label="Calendar view">
+                    <i class="fas fa-calendar-alt mr-2"></i>Calendar View
+                </button>
+            </div>
     </div> -->
 
     <!-- List View Section -->
@@ -54,5 +54,5 @@
     </div> -->
 
     <!-- Recent Bookings Section -->
-    <app-provider-booking-recent></app-provider-booking-recent>
+    <app-provider-booking-recent [filters]="filters"></app-provider-booking-recent>
 </div>

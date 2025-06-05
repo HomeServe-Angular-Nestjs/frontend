@@ -1,84 +1,28 @@
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-    <!-- Total Bookings -->
-    <div class="bg-white rounded-lg shadow p-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-gray-600">Total Bookings</p>
-                <p class="text-2xl font-bold text-gray-800">248</p>
-            </div>
-            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-calendar text-green-700"></i>
-            </div>
-        </div>
-        <div class="mt-2 flex items-center text-sm">
-            <span class="text-green-700"><i class="fas fa-arrow-up"></i> 12%</span>
-            <span class="text-gray-500 ml-2">vs last month</span>
-        </div>
-    </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+    <ng-container *ngFor="let overview of overviewTemplateItems">
+        <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col items-center text-center h-full">
 
-    <!-- Pending Requests -->
-    <div class="bg-white rounded-lg shadow p-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-gray-600">Pending Requests</p>
-                <p class="text-2xl font-bold text-gray-800">15</p>
+            <!-- Icon Centered Below -->
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+                [ngClass]="getIconBgColor(overview.label)">
+                <i [class]="overview.icon + ' text-white text-lg'"></i>
             </div>
-            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-clock text-blue-700"></i>
-            </div>
-        </div>
-        <div class="mt-2 flex items-center text-sm">
-            <span class="text-blue-700">New requests</span>
-        </div>
-    </div>
 
-    <!-- Ongoing Services -->
-    <div class="bg-white rounded-lg shadow p-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-gray-600">Ongoing Services</p>
-                <p class="text-2xl font-bold text-gray-800">8</p>
-            </div>
-            <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-spinner text-yellow-700"></i>
-            </div>
-        </div>
-        <div class="mt-2 flex items-center text-sm">
-            <span class="text-yellow-700">Active jobs</span>
-        </div>
-    </div>
+            <!-- Label -->
+            <p class="text-sm font-medium text-gray-500 mb-1">{{ overview.label }}</p>
 
-    <!-- Completed Jobs -->
-    <div class="bg-white rounded-lg shadow p-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-gray-600">Completed Jobs</p>
-                <p class="text-2xl font-bold text-gray-800">195</p>
-            </div>
-            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-check-circle text-green-700"></i>
-            </div>
-        </div>
-        <div class="mt-2 flex items-center text-sm">
-            <span class="text-green-700"><i class="fas fa-arrow-up"></i> 8%</span>
-            <span class="text-gray-500 ml-2">vs last month</span>
-        </div>
-    </div>
+            <!-- Value -->
+            <p class="text-3xl font-bold text-gray-900 ">{{ overview.value }}</p>
 
-    <!-- Canceled Bookings -->
-    <div class="bg-white rounded-lg shadow p-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-gray-600">Canceled Bookings</p>
-                <p class="text-2xl font-bold text-gray-800">30</p>
-            </div>
-            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-times-circle text-red-700"></i>
+            <!-- Meta Section -->
+            <div *ngIf="overview.meta" class="flex items-center text-xs text-gray-500">
+                <span class="flex items-center font-medium"
+                    [ngClass]="overview.meta.value >= 0 ? 'text-green-600' : 'text-red-600'">
+                    <i [class]="overview.meta.icon + ' mr-1'"></i>
+                    {{ overview.meta.value }}%
+                </span>
+                <span class="ml-2">{{ overview.meta.desc }}</span>
             </div>
         </div>
-        <div class="mt-2 flex items-center text-sm">
-            <span class="text-red-700"><i class="fas fa-arrow-down"></i> 5%</span>
-            <span class="text-gray-500 ml-2">vs last month</span>
-        </div>
-    </div>
+    </ng-container>
 </div>
