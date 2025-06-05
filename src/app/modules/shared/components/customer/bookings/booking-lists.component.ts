@@ -2,23 +2,22 @@ import { Component, inject, OnInit } from "@angular/core";
 import { BookingService } from "../../../../../core/services/booking.service";
 import { CommonModule } from "@angular/common";
 import { FullDateWithTimePipe } from "../../../../../core/pipes/to-full-date-with-time.pipe";
-import { IBookingResponse } from "../../../../../core/models/booking.model";
+import { IBookingResponse, IBookingWithPagination } from "../../../../../core/models/booking.model";
+import { CustomerPaginationComponent } from "../../../partials/sections/customer/pagination/pagination.component";
+import { Observable } from "rxjs";
 
 @Component({
     selector: 'app-customer-booking-lists',
     templateUrl: './booking-lists.component.html',
-    imports: [CommonModule, FullDateWithTimePipe]
+    imports: [CommonModule, FullDateWithTimePipe, CustomerPaginationComponent]
 })
 export class CustomerBookingListsComponent implements OnInit {
     private readonly _bookingService = inject(BookingService);
 
-    bookingLists: IBookingResponse[] = [];
+    bookingsData$!: Observable<IBookingWithPagination>;
 
     ngOnInit(): void {
-        this._bookingService.fetchBookings().subscribe(data => {
-            console.log(data)
-            this.bookingLists = data;
-        });
+        this.fetchBookings(1);
     }
 
     canBeCancelled(date: any): boolean {
@@ -32,5 +31,13 @@ export class CustomerBookingListsComponent implements OnInit {
         const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
 
         return (now.getTime() - bookingDate.getTime()) <= twentyFourHoursInMs;
+    }
+
+    onPageChange(newPage: number) {
+        this.fetchBookings(newPage); // Or however you load your data
+    }
+
+    fetchBookings(page: number) {
+        this.bookingsData$ = this._bookingService.fetchBookings(page);
     }
 }

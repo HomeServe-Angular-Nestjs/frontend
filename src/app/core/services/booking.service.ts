@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
-import { CustomerLocationType, IBookingData, IBookingFilter, IBookingOverviewData, IBookingResponse, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
+import { CustomerLocationType, IBookingData, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
 import { ISlotSource } from "../models/schedules.model";
 
 
@@ -46,8 +46,11 @@ export class BookingService {
         );
     }
 
-    fetchBookings(): Observable<IBookingResponse[]> {
-        return this._http.get<IBookingResponse[]>(`${this._customerApi}/booking/fetch`).pipe(
+    fetchBookings(page: number = 1): Observable<IBookingWithPagination> {
+        const params = new HttpParams()
+            .set('page', page);
+
+        return this._http.get<IBookingWithPagination>(`${this._customerApi}/booking/fetch`, { params }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

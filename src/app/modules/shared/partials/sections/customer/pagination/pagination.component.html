@@ -1,0 +1,26 @@
+<section class="mt-10">
+    <nav class="flex justify-center mt-6 space-x-1" *ngIf="totalPages > 1">
+
+        <!-- Prev Button -->
+        <button class="px-3 py-1 border rounded disabled:opacity-50" [disabled]="currentPage === 1"
+            (click)="goToPage(currentPage - 1)">
+            Prev
+        </button>
+
+        <!-- Page Numbers -->
+        <ng-container *ngFor="let page of pages">
+            <button class="px-3 py-1 border rounded" [class.bg-blue-600]="currentPage === page"
+                [class.text-white]="currentPage === page" [class.font-bold]="currentPage === page"
+                (click)="goToPage(page)">
+                {{ page }}
+            </button>
+        </ng-container>
+
+        <!-- Next Button -->
+        <button class="px-3 py-1 border rounded disabled:opacity-50" [disabled]="currentPage === totalPages"
+            (click)="goToPage(currentPage + 1)">
+            Next
+        </button>
+
+    </nav>
+</section>

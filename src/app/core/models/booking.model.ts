@@ -52,18 +52,23 @@ export interface IBookingResponse {
     provider: {
         id: string;
         name: string;
-        phone: string;
         email: string;
+        phone: string;
     };
     services: {
         id: string;
         name: string;
     }[];
     expectedArrivalTime: Date | string;
-    bookingStatus: string;
-    paymentStatus: string;
+    bookingStatus: BookingStatus;
+    paymentStatus: PaymentStatus;
     totalAmount: number;
     createdAt: Date;
+}
+
+export interface IBookingWithPagination {
+    bookingData: IBookingResponse[];
+    paginationData: IPagination;
 }
 
 
@@ -85,7 +90,6 @@ export interface IProviderBookingLists {
     createdAt: Date;
     paymentStatus: PaymentStatus;
     bookingStatus: BookingStatus;
-    totalBookings: number;
 }
 
 export interface IPagination {

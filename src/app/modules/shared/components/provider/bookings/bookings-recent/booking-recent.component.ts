@@ -25,7 +25,7 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
     private _destroy$ = new Subject<void>();
     private _filters$ = new BehaviorSubject<IBookingFilter>({});
 
-    bookingResponseData$!: Observable<IResponseProviderBookingLists | null>;
+    bookingResponseData$!: Observable<IResponseProviderBookingLists>;
     searchTerm: string = '';
 
     ngOnInit(): void {

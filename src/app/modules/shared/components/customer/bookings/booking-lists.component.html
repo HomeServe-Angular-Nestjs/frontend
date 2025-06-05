@@ -1,126 +1,125 @@
-<section>
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">My Bookings</h1>
+<section class="h-full flex flex-col justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 mb-8">Your Booking History</h1>
 
-    <div class="space-y-6">
-        <div class="bg-white rounded-lg shadow-sm p-6 min-h-96">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Confirmed Bookings</h2>
-            <div class="space-y-4">
-                <ng-container *ngIf="bookingLists && bookingLists.length">
-                    <ng-container *ngFor="let list of bookingLists">
-                        <div class="border rounded-xl p-6 mb-6 shadow-md bg-white space-y-6">
-                            <!-- Booking Header Section -->
-                            <div class="flex justify-between gap-6 min-h-[140px]">
-                                <!-- Left Section -->
-                                <div class="space-y-3 flex-1">
-                                    <!-- Booking ID -->
-                                    <h2 class="text-lg font-semibold text-gray-700 tracking-wide">
-                                        Booking ID:
-                                        <span class="text-gray-500 font-normal">#{{ list.bookingId.toUpperCase()
-                                            }}</span>
-                                    </h2>
+        <ng-container *ngIf="bookingsData$ | async as bookingLists; else noBookings">
 
-                                    <!-- Ordered Services -->
-                                    <div>
-                                        <h3 class="text-sm font-semibold text-gray-700 uppercase mb-1 tracking-wide">
-                                            Ordered Services
-                                        </h3>
-                                        <ul class="list-disc list-inside space-y-1 text-gray-600 text-base pl-2">
-                                            <li *ngFor="let service of list.services">{{ service.name }}</li>
-                                        </ul>
-                                    </div>
+            <div *ngIf="bookingLists.bookingData; else noBookings">
+                <div *ngFor="let list of bookingLists.bookingData" class="border rounded-xl shadow-sm bg-white mb-6">
 
-                                    <!-- Arrival Time -->
-                                    <p class="text-sm text-gray-500">
-                                        Expected Arrival:
-                                        <span class="font-medium text-gray-700">
-                                            {{ list.expectedArrivalTime | toFullDateWithTime }}
-                                        </span>
-                                    </p>
+                    <!-- Booking Header -->
+                    <div class="bg-gray-100 px-6 py-4 flex flex-wrap justify-between items-center rounded-t-xl">
+                        <div class="text-sm text-gray-700">
+                            <span class="font-semibold">Booking ID:</span> #{{ list.bookingId.toUpperCase() }}
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span class="font-semibold">Ordered On:</span>
+                            {{ list.createdAt | toFullDateWithTime }}
+                        </div>
+                    </div>
 
-                                    <!-- Cancel Button -->
-                                    <div class="pt-2">
-                                        <button *ngIf="canBeCancelled(list.createdAt)"
-                                            class="px-3 py-1 text-sm font-medium rounded-lg bg-red-100 text-red-600 hover:text-red-700">
-                                            Cancel service
-                                        </button>
-                                        <span class="pl-2 text-sm text-gray-400">Cancellation possible within
-                                            24hrs</span>
-                                    </div>
-                                </div>
+                    <!-- Booking Body -->
+                    <div class="px-6 py-4 flex flex-col lg:flex-row gap-6">
 
-                                <!-- Right Section: Status & Amount -->
-                                <div class="flex flex-col justify-between items-end">
-                                    <div class="space-x-2">
-                                        <!-- Booking Status -->
-                                        <span
-                                            class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">
-                                            {{ list.bookingStatus === 'pending' ? 'In Progress' : list.bookingStatus }}
-                                        </span>
-
-                                        <!-- Payment Status -->
-                                        <span
-                                            class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 capitalize">
-                                            {{ list.paymentStatus }}
-                                        </span>
-                                    </div>
-
-                                    <!-- Amount at Bottom -->
-                                    <span class="text-md font-semibold text-gray-800 mt-auto">
-                                        Amount: ₹{{ list.totalAmount }}
-                                    </span>
-                                </div>
+                        <!-- Service Summary -->
+                        <div class="flex-1">
+                            <div>
+                                <h3 class="font-medium text-gray-800 mb-2">Services Booked</h3>
+                                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                                    <li *ngFor="let service of list.services">{{ service.name }}</li>
+                                </ul>
                             </div>
 
-                            <!-- Service Provider Info -->
-                            <div class="border-t border-gray-200 pt-4 flex justify-between">
-                                <div>
-                                    <h4 class="text-sm font-semibold text-gray-700 uppercase mb-2 tracking-wide">
-                                        Service Provider
-                                    </h4>
-                                    <div class="space-y-1 text-gray-600 text-base">
-                                        <p>{{ list.provider.name }}</p>
-                                        <p>{{ list.provider.email }}</p>
-                                        <p>{{ list.provider.phone }}</p>
-                                    </div>
-                                </div>
+                            <div class="mt-4 text-sm text-gray-600">
+                                <span class="font-semibold">Expected Arrival:</span>
+                                {{ list.expectedArrivalTime | toFullDateWithTime }}
+                            </div>
 
-                                <!-- Complete Payment Button -->
-                                <div>
-                                    <button *ngIf="list.paymentStatus === 'unpaid'"
-                                        class="px-3 py-1 text-sm font-semibold rounded-lg bg-green-100 text-green-600 hover:text-green-700">
-                                        Complete Payment
-                                    </button>
-                                </div>
+                            <div class="mt-4 text-sm text-gray-600">
+                                <span class="font-semibold">Provider:</span> {{ list.provider.name }} |
+                                {{ list.provider.email }} | {{ list.provider.phone }}
+                            </div>
+                        </div>
+
+                        <!-- Right Actions and Summary -->
+                        <div class="flex flex-col justify-between items-end text-right space-y-4">
+                            <div>
+                                <span
+                                    class="inline-block px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800 capitalize mr-2">
+                                    {{ list.bookingStatus === 'pending' ? 'In Progress' : list.bookingStatus }}
+                                </span>
+                                <span
+                                    class="inline-block px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 capitalize">
+                                    {{ list.paymentStatus }}
+                                </span>
+                            </div>
+
+                            <div class="text-base font-semibold text-gray-900">
+                                Amount: ₹{{ list.totalAmount }}
                             </div>
 
                             <!-- Action Buttons -->
-                            <div class="border-t border-gray-200 pt-4 flex items-center justify-between">
-                                <div class="flex gap-4">
-                                    <button
-                                        class="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium transition">
-                                        <i class="fas fa-comments mr-2"></i>Live Chat
-                                    </button>
-                                    <button
-                                        class="flex items-center text-green-600 hover:text-green-700 text-sm font-medium transition">
-                                        <i class="fas fa-map-marker-alt mr-2"></i>Track Location
-                                    </button>
-                                </div>
+                            <div class="space-y-2">
+                                <button *ngIf="list.paymentStatus === 'unpaid'"
+                                    class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
+                                    <i class="fas fa-credit-card mr-2"></i> Complete Payment
+                                </button>
 
-                                <button
-                                    class="flex items-center text-gray-600 hover:text-gray-700 text-sm font-medium transition">
-                                    <i class="fas fa-eye mr-2"></i>View Details
+                                <button *ngIf="canBeCancelled(list.createdAt)"
+                                    class="w-full px-4 py-2 text-sm font-medium text-red-600 border border-red-500 rounded hover:bg-red-50">
+                                    Cancel Booking
+                                </button>
+
+                                <button class="w-full px-4 py-2 text-sm text-gray-700 border rounded hover:bg-gray-100">
+                                    View Details
                                 </button>
                             </div>
                         </div>
-                    </ng-container>
-                </ng-container>
+                    </div>
+
+                    <!-- Footer Actions -->
+                    <div class="border-t px-6 py-3 bg-gray-50 flex justify-between items-center text-sm text-gray-500">
+                        <div class="flex gap-4">
+                            <button class="flex items-center hover:text-indigo-600">
+                                <i class="fas fa-comments mr-2"></i> Chat with Provider
+                            </button>
+                            <button class="flex items-center hover:text-green-600">
+                                <i class="fas fa-map-marker-alt mr-2"></i> Track Location
+                            </button>
+                        </div>
+
+                        <button class="text-indigo-600 font-medium hover:underline">Reorder</button>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <ng-template #noBookings>
+        <div class="flex flex-col items-center justify-center mt-16 text-center text-gray-600">
+            <!-- Optional Icon -->
+            <div class="text-6xl text-gray-300 mb-4">
+                <i class="fas fa-calendar-times"></i>
             </div>
 
-            <div class="mt-4 text-center">
-                <button class="text-gray-400 hover:text-gray-500 text-sm font-medium">
-                    View More Active Bookings <i class="fas fa-chevron-down ml-1"></i>
-                </button>
-            </div>
+            <!-- Message -->
+            <p class="text-lg font-semibold mb-2">You have no bookings yet.</p>
+            <p class="text-sm text-gray-500 mb-6">
+                Start exploring our services and book your first appointment today!
+            </p>
+
+            <!-- CTA Button -->
+            <a routerLink="/services"
+                class="inline-block px-6 py-2 text-sm font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 transition">
+                Explore Services
+            </a>
         </div>
-    </div>
+    </ng-template>
+
+    <ng-container *ngIf="bookingsData$ | async as bookingLists">
+        <div class=" pb-6">
+            <app-customer-pagination [pagination]="bookingLists.paginationData"
+                (pageChanged)="onPageChange($event)"></app-customer-pagination>
+        </div>
+    </ng-container>
 </section>
