@@ -98,6 +98,27 @@ export interface IPagination {
     total: number;
 }
 
+export interface IBookingDetails {
+    bookingId: string;
+    bookingStatus: BookingStatus;
+    paymentStatus: PaymentStatus;
+    createdAt: string;
+    expectedArrivalTime: string;
+    totalAmount: number;
+
+    provider: {
+        name: string;
+        email: string;
+        phone: string;
+    };
+
+    orderedServices: {
+        title: string;
+        price: string;
+        estimatedTime: string;
+    }[];
+}
+
 export interface IResponseProviderBookingLists {
     bookingData: IProviderBookingLists[],
     paginationData: IPagination;

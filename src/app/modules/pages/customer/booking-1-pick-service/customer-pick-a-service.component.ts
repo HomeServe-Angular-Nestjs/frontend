@@ -52,6 +52,7 @@ export class CustomerPickAServiceComponent {
   /**
   * On initialization, fetch route params and query params, then load services.
   */
+  //!TODO - Not properly wrote (paramMap refactor)  
   constructor(private route: ActivatedRoute) {
     // Capture provider ID from route params
     this.route.paramMap.subscribe(param => {

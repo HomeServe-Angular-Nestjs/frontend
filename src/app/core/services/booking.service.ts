@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
-import { CustomerLocationType, IBookingData, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
+import { CustomerLocationType, IBookingData, IBookingDetails, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
 import { ISlotSource } from "../models/schedules.model";
 
 
@@ -47,8 +47,7 @@ export class BookingService {
     }
 
     fetchBookings(page: number = 1): Observable<IBookingWithPagination> {
-        const params = new HttpParams()
-            .set('page', page);
+        const params = new HttpParams().set('page', page);
 
         return this._http.get<IBookingWithPagination>(`${this._customerApi}/booking/fetch`, { params }).pipe(
             catchError((error: HttpErrorResponse) =>
@@ -58,12 +57,22 @@ export class BookingService {
         );
     }
 
+    fetchBookingDetails(bookingId: string): Observable<IBookingDetails> {
+        const params = new HttpParams().set('bookingId', bookingId);
+
+        return this._http.get<IBookingDetails>(`${this._customerApi}/booking/view_details`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        )
+    }
+
 
     //*** ********************************************[PROVIDER APIs]*************************************************** ***//
 
     fetchBookingList(page: number = 1, filter: IBookingFilter): Observable<IResponseProviderBookingLists> {
-        let params = new HttpParams()
-            .set('page', page.toString());
+        let params = new HttpParams().set('page', page.toString());
 
         Object.entries(filter).forEach(([key, value]) => {
             if (value !== undefined && value !== null) {

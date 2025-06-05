@@ -77,6 +77,7 @@ export const customerRoutes: Routes = [
             {
                 path: 'profile',
                 component: CustomerProfileLayout,
+                canActivate: [AuthGuard],
                 children: [
                     {
                         path: '',
@@ -85,8 +86,13 @@ export const customerRoutes: Routes = [
                     },
                     {
                         path: 'bookings',
-                        loadComponent: () => import('../../shared/components/customer/bookings/booking-lists.component')
+                        loadComponent: () => import('../../shared/components/customer/bookings/order-history/booking-lists.component')
                             .then(c => c.CustomerBookingListsComponent)
+                    },
+                    {
+                        path: 'bookings/:id',
+                        loadComponent: () => import('../../shared/components/customer/bookings/view-details/booking-details.component')
+                            .then(c => c.CustomerViewBookingDetailsComponent)
                     }
                 ],
             }

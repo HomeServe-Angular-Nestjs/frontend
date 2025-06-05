@@ -1,15 +1,16 @@
 import { Component, inject, OnInit } from "@angular/core";
-import { BookingService } from "../../../../../core/services/booking.service";
+import { BookingService } from "../../../../../../core/services/booking.service";
 import { CommonModule } from "@angular/common";
-import { FullDateWithTimePipe } from "../../../../../core/pipes/to-full-date-with-time.pipe";
-import { IBookingResponse, IBookingWithPagination } from "../../../../../core/models/booking.model";
-import { CustomerPaginationComponent } from "../../../partials/sections/customer/pagination/pagination.component";
+import { FullDateWithTimePipe } from "../../../../../../core/pipes/to-full-date-with-time.pipe";
+import { IBookingResponse, IBookingWithPagination } from "../../../../../../core/models/booking.model";
+import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
 import { Observable } from "rxjs";
+import { RouterLink } from "@angular/router";
 
 @Component({
     selector: 'app-customer-booking-lists',
     templateUrl: './booking-lists.component.html',
-    imports: [CommonModule, FullDateWithTimePipe, CustomerPaginationComponent]
+    imports: [CommonModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink]
 })
 export class CustomerBookingListsComponent implements OnInit {
     private readonly _bookingService = inject(BookingService);

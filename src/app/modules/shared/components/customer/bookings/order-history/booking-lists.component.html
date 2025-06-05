@@ -70,7 +70,8 @@
                                     Cancel Booking
                                 </button>
 
-                                <button class="w-full px-4 py-2 text-sm text-gray-700 border rounded hover:bg-gray-100">
+                                <button [routerLink]="[list.bookingId]"
+                                    class="w-full px-4 py-2 text-sm text-gray-700 border rounded hover:bg-gray-100">
                                     View Details
                                 </button>
                             </div>
@@ -109,10 +110,10 @@
             </p>
 
             <!-- CTA Button -->
-            <a routerLink="/services"
+            <div
                 class="inline-block px-6 py-2 text-sm font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 transition">
                 Explore Services
-            </a>
+            </div>
         </div>
     </ng-template>
 

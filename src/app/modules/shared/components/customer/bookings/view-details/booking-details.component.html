@@ -1,0 +1,85 @@
+<section *ngIf="bookingDetails$ | async as bookingDetails"
+    class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md mb-2">
+    <!-- Header -->
+    <div class="mb-6 border-b pb-4">
+        <h1 class="text-2xl font-bold text-gray-800">Booking Details</h1>
+        <p class="text-sm text-gray-500 mt-1">Booking ID: <span
+                class="font-medium text-gray-700">#{{bookingDetails.bookingId.toUpperCase()}}</span></p>
+    </div>
+
+    <!-- Booking Summary -->
+    <div class="grid sm:grid-cols-2 gap-6 mb-8">
+        <div>
+            <p class="text-sm text-gray-500">Booking Status</p>
+            <p class="text-base font-semibold text-blue-600 capitalize">{{bookingDetails.bookingStatus}}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Payment Status</p>
+            <p class="text-base font-semibold text-green-600 capitalize">{{bookingDetails.paymentStatus}}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Booking Date</p>
+            <p class="text-base font-medium text-gray-800">{{formatDate(bookingDetails.createdAt)}}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Expected Arrival</p>
+            <p class="text-base font-medium text-gray-800">{{formatDate(bookingDetails.expectedArrivalTime)}}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Total Amount</p>
+            <p class="text-lg font-bold text-gray-900">₹{{bookingDetails.totalAmount}}</p>
+        </div>
+    </div>
+
+    <!-- Provider Info -->
+    <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">Service Provider</h2>
+        <div class="bg-gray-50 p-4 rounded border text-sm text-gray-700 space-y-1">
+            <p><span class="font-medium">Name:</span> {{bookingDetails.provider.name}}</p>
+            <p><span class="font-medium">Email:</span> {{bookingDetails.provider.email}}</p>
+            <p><span class="font-medium">Phone:</span> {{bookingDetails.provider.phone || 'N/A'}}</p>
+        </div>
+    </div>
+
+    <!-- Services Booked -->
+    <div class="mb-10">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Services Booked</h2>
+
+        <div class="border rounded-lg divide-y divide-gray-200">
+            <div class="px-4 py-2 bg-gray-100 font-medium text-sm text-gray-600 grid grid-cols-3">
+                <span>Title</span>
+                <span class="text-center">Estimated Time</span>
+                <span class="text-right">Price</span>
+            </div>
+
+            <ul *ngFor="let service of bookingDetails.orderedServices">
+                <li class="px-4 py-3 grid grid-cols-3 items-center text-sm text-gray-700">
+                    <span>{{ service.title }}</span>
+                    <span class="text-center">{{ service.estimatedTime }}</span>
+                    <span class="text-right font-semibold text-gray-900">₹{{ service.price }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!-- Payment Details -->
+    <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">Payment Details</h2>
+        <div class="bg-gray-50 p-4 rounded border text-sm text-gray-700 space-y-1">
+            <p><span class="font-medium">Transaction ID:</span> N/A</p>
+            <p><span class="font-medium">Payment Method:</span>N/A</p>
+            <p><span class="font-medium">Payment Date:</span> N/A</p>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap gap-4 mt-6 border-t pt-6">
+        <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">Download
+            Invoice</button>
+        <button class="px-4 py-2 text-sm font-medium text-red-600 border border-red-500 rounded hover:bg-red-50">Cancel
+            Booking</button>
+        <button class="px-4 py-2 text-sm font-medium text-gray-700 border rounded hover:bg-gray-100">Rebook
+            Service</button>
+    </div>
+</section>
