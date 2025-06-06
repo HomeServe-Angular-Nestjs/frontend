@@ -1,0 +1,90 @@
+<section *ngIf="bookingData$ | async as bookingDetails"
+    class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
+
+    <!-- Header -->
+    <div class="mb-6 border-b pb-4">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">Order Details</h1>
+                <div class="text-sm text-gray-600 space-y-1">
+                    <p><span class="font-semibold">Booking ID:</span> #{{ bookingDetails.bookingId.toUpperCase() }}</p>
+                    <p><span class="font-semibold">Booking Date:</span> {{ formateData(bookingDetails.createdAt) }}</p>
+                    <p><span class="font-semibold">Expected Arrival:</span> {{
+                        formateData(bookingDetails.expectedArrivalTime) }}</p>
+                    <p><span class="font-semibold">Total Amount:</span> ₹{{ bookingDetails.totalAmount }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 text-gray-600 text-xl">
+                <i class="fas fa-comments hover:text-black cursor-pointer" title="Chat"></i>
+                <i class="fas fa-bell hover:text-black cursor-pointer" title="Send Notification"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Badges -->
+    <div class="flex flex-wrap items-center gap-4 mb-6">
+        <span [ngClass]="getBookingBadgeClass(bookingDetails.bookingStatus)"
+            class="inline-flex items-center gap-2 transition duration-300 ease-in-out">
+            {{ bookingDetails.bookingStatus }}
+        </span>
+
+        <span [ngClass]="getPaymentBadgeClass(bookingDetails.paymentStatus)"
+            class="inline-flex items-center gap-2 transition duration-300 ease-in-out">
+            {{ bookingDetails.paymentStatus }}
+        </span>
+    </div>
+
+    <!-- Customer Info -->
+    <div class="mb-6 mt-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">Customer Information</h2>
+        <div class="text-sm text-gray-600 space-y-1">
+            <p><span class="font-medium">Name:</span> {{ bookingDetails.customer.name || 'N/A' }}</p>
+            <p><span class="font-medium">Email:</span> {{ bookingDetails.customer.email || 'N/A' }}</p>
+            <p><span class="font-medium">Address:</span> {{ bookingDetails.customer.location || 'N/A' }}</p>
+            <p><span class="font-medium">Phone:</span> {{ bookingDetails.customer.phone || 'N/A' }}</p>
+        </div>
+    </div>
+
+    <!-- Services Booked -->
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">Services Booked</h2>
+        <div class="bg-gray-50 rounded-lg p-4 divide-y divide-gray-200">
+            <div class="grid grid-cols-3 text-sm font-semibold text-gray-700 pb-2">
+                <span>Service</span>
+                <span>Price</span>
+                <span>Estimated Time</span>
+            </div>
+            <div *ngFor="let service of bookingDetails.orderedServices" class="py-3 grid grid-cols-3 gap-4 text-sm">
+                <span class="text-gray-800">{{ service.title }}</span>
+                <span class="text-gray-900 font-medium">₹{{ service.price }}</span>
+                <span class="text-gray-600">{{ service.estimatedTime }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Controls -->
+    <div class="flex flex-wrap justify-between items-center mt-6">
+        <div class="flex items-center gap-2">
+            <label for="bookingStatus" class="text-sm font-medium text-gray-700">Update Status:</label>
+            <select id="bookingStatus" [(ngModel)]="bookingDetails.bookingStatus"
+                (change)="changeBookingStatus(bookingDetails.bookingId, bookingDetails.bookingStatus)"
+                class="text-sm border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-gray-300">
+
+                <option *ngFor="let status of bookingSelectOption" [value]="status.value"
+                    [disabled]="isStatusDisabled(status.value, bookingDetails.bookingStatus)">
+                    {{ status.label }}
+                </option>
+            </select>
+        </div>
+        <div class="flex gap-3 mt-4 sm:mt-0">
+            <!-- <button *ngIf="!['cancelled', 'completed'].includes(bookingDetails.bookingStatus)"
+                (click)="updateStatus('cancelled')"
+                class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700">
+                Cancel Booking
+            </button> -->
+            <button class="px-4 py-2 border border-gray-300 text-sm rounded hover:bg-gray-100">
+                Download Invoice
+            </button>
+        </div>
+    </div>
+</section>

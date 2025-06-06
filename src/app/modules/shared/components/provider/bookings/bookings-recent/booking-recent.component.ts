@@ -8,11 +8,12 @@ import { BookingService } from "../../../../../../core/services/booking.service"
 import { IBookingFilter, IResponseProviderBookingLists } from "../../../../../../core/models/booking.model";
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { DebounceService } from "../../../../../../core/services/public/debounce.service";
+import { RouterLink } from "@angular/router";
 
 @Component({
     selector: 'app-provider-booking-recent',
     templateUrl: './booking-recent.component.html',
-    imports: [CommonModule, ProviderPaginationComponent, FormsModule],
+    imports: [CommonModule, ProviderPaginationComponent, FormsModule, RouterLink],
     providers: [DebounceService]
 })
 export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDestroy {
@@ -51,7 +52,7 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
     }
 
     loadBookings(page: number, filter: IBookingFilter = {}) {
-        this.bookingResponseData$ = this._bookingService.fetchBookingList(page, filter);
+        this.bookingResponseData$ = this._bookingService.getBookingList(page, filter);
     }
 
     sanitizeImageUrl(imageUrl: string): SafeUrl {

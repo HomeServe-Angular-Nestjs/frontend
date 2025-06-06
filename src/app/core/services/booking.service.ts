@@ -2,8 +2,9 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
-import { CustomerLocationType, IBookingData, IBookingDetails, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
+import { CustomerLocationType, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
 import { ISlotSource } from "../models/schedules.model";
+import { BookingStatus } from "../enums/enums";
 
 
 
@@ -27,6 +28,10 @@ export class BookingService {
     setSelectedSlot(data: ISlotSource) {
         this._slotSource.next(data);
     }
+
+    // ------------------------------------------------------------------------------------------------------------------------------
+    // **************************************************[Customer Related APIs]*******************************************************
+    // ------------------------------------------------------------------------------------------------------------------------------
 
     fetchPriceBreakup(data: IPriceBreakup[]): Observable<IPriceBreakupData> {
         return this._http.post<IPriceBreakupData>(`${this._customerApi}/booking/price_breakup`, data).pipe(
@@ -57,10 +62,10 @@ export class BookingService {
         );
     }
 
-    fetchBookingDetails(bookingId: string): Observable<IBookingDetails> {
+    fetchBookingDetails(bookingId: string): Observable<IBookingDetailCustomer> {
         const params = new HttpParams().set('bookingId', bookingId);
 
-        return this._http.get<IBookingDetails>(`${this._customerApi}/booking/view_details`, { params }).pipe(
+        return this._http.get<IBookingDetailCustomer>(`${this._customerApi}/booking/view_details`, { params }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -69,9 +74,11 @@ export class BookingService {
     }
 
 
-    //*** ********************************************[PROVIDER APIs]*************************************************** ***//
+    // ------------------------------------------------------------------------------------------------------------------------------
+    // **************************************************[Provider Related APIs]*******************************************************
+    // ------------------------------------------------------------------------------------------------------------------------------
 
-    fetchBookingList(page: number = 1, filter: IBookingFilter): Observable<IResponseProviderBookingLists> {
+    getBookingList(page: number = 1, filter: IBookingFilter): Observable<IResponseProviderBookingLists> {
         let params = new HttpParams().set('page', page.toString());
 
         Object.entries(filter).forEach(([key, value]) => {
@@ -88,8 +95,28 @@ export class BookingService {
         );
     }
 
-    fetchBookingOverviewData(): Observable<IBookingOverviewData> {
+    getBookingOverviewData(): Observable<IBookingOverviewData> {
         return this._http.get<IBookingOverviewData>(`${this._providerApi}/bookings/overview_data`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    getBookingDetails(bookingId: string): Observable<IBookingDetailProvider> {
+        const params = new HttpParams().set('bookingId', bookingId);
+
+        return this._http.get<IBookingDetailProvider>(`${this._providerApi}/bookings/fetch_details`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        )
+    }
+
+    changeBookingStatus(bookingId: string, newStatus: BookingStatus): Observable<boolean> {
+        return this._http.patch<boolean>(`${this._providerApi}/bookings/b_status`, { bookingId, newStatus }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

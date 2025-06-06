@@ -15,7 +15,7 @@
 //     bookingLists: IProviderBookingLists[] = [];
 
 //     // ngOnInit(): void {
-//     //     this._bookingService.fetchBookingList().subscribe(data => {
+//     //     this._bookingService.getBookingList().subscribe(data => {
 //     //         console.log(data);
 //     //         this.bookingLists = data;
 //     //     });

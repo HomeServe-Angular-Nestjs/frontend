@@ -78,7 +78,15 @@ export const providerRoutes: Routes = [
             },
             {
                 path: 'bookings',
-                component: ProviderBookingsComponent
+                canActivate: [AuthGuard],
+                loadComponent: () => import('../../pages/provider/bookings/bookings.component')
+                    .then(c => c.ProviderBookingsComponent)
+            },
+            {
+                path: 'bookings/:id',
+                canActivate: [AuthGuard],
+                loadComponent: () => import('../../shared/components/provider/bookings/booking-details/booking-details.component')
+                    .then(c => c.ProviderViewBookingDetailsComponents)
             }
         ],
     },

@@ -38,7 +38,7 @@ export class ProviderBookingOverviewComponent implements OnInit {
             value: 0,
             icon: 'fas fa-hourglass-half text-blue-700',
             meta: {
-                icon: 'fas fa-arrow-up text-blue-600',  
+                icon: 'fas fa-arrow-up text-blue-600',
                 value: 0,
                 desc: 'vs last month',
             }
@@ -58,7 +58,7 @@ export class ProviderBookingOverviewComponent implements OnInit {
             value: 0,
             icon: 'fas fa-credit-card text-yellow-700',
             meta: {
-                icon: 'fas fa-arrow-up text-yellow-600',  
+                icon: 'fas fa-arrow-up text-yellow-600',
                 value: 0,
                 desc: 'vs last month',
             }
@@ -77,7 +77,7 @@ export class ProviderBookingOverviewComponent implements OnInit {
 
 
     ngOnInit(): void {
-        this._bookingService.fetchBookingOverviewData().subscribe(data => {
+        this._bookingService.getBookingOverviewData().subscribe(data => {
             if (data) {
                 this.overviewTemplateItems = this.overviewTemplateItems.map(items => {
                     let updatedValue = 0;

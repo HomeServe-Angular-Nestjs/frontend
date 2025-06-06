@@ -3,9 +3,19 @@ import { BookingStatus, PaymentStatus } from "../enums/enums";
 import { ISlotSource } from "./schedules.model";
 import { Address } from "./user.model";
 
+// --------------------
+// Shared Interfaces
+// --------------------
+
+export interface IPagination {
+    page: number;
+    limit: number;
+    total: number;
+}
+
 export interface IPriceBreakup {
     serviceId: string;
-    subServiceIds: string[]
+    subServiceIds: string[];
 }
 
 export interface IPriceBreakupData {
@@ -17,6 +27,24 @@ export interface IPriceBreakupData {
 
 export type CustomerLocationType = Omit<Address, 'type'>;
 
+export interface IBookingDetailsBase {
+    bookingId: string;
+    bookingStatus: BookingStatus;
+    paymentStatus: PaymentStatus;
+    createdAt: string;
+    expectedArrivalTime: string;
+    totalAmount: number;
+    orderedServices: {
+        title: string;
+        price: string;
+        estimatedTime: string;
+    }[];
+}
+
+// --------------------
+// Customer Related Interfaces
+// --------------------
+
 export interface IBookingData {
     providerId: string;
     total: number;
@@ -24,6 +52,7 @@ export interface IBookingData {
     slotData: ISlotSource;
     serviceIds: SelectedServiceIdsType[];
 }
+
 export interface IBooking {
     customerId: string;
     providerId: string;
@@ -71,59 +100,13 @@ export interface IBookingWithPagination {
     paginationData: IPagination;
 }
 
-
-export interface IProviderBookingLists {
-    services: {
-        id: string;
-        title: string;
-        image: string;
-    }[];
-    customer: {
-        id: string;
-        name: string;
-        avatar: string;
-        email: string;
-    },
-    bookingId: string;
-    expectedArrivalTime: string;
-    totalAmount: number;
-    createdAt: Date;
-    paymentStatus: PaymentStatus;
-    bookingStatus: BookingStatus;
-}
-
-export interface IPagination {
-    page: number;
-    limit: number;
-    total: number;
-}
-
-export interface IBookingDetails {
-    bookingId: string;
-    bookingStatus: BookingStatus;
-    paymentStatus: PaymentStatus;
-    createdAt: string;
-    expectedArrivalTime: string;
-    totalAmount: number;
-
+export interface IBookingDetailCustomer extends IBookingDetailsBase {
     provider: {
         name: string;
         email: string;
         phone: string;
     };
-
-    orderedServices: {
-        title: string;
-        price: string;
-        estimatedTime: string;
-    }[];
 }
-
-export interface IResponseProviderBookingLists {
-    bookingData: IProviderBookingLists[],
-    paginationData: IPagination;
-}
-
 
 export interface IBookingFilter {
     search?: string;
@@ -133,7 +116,7 @@ export interface IBookingFilter {
     sort?: string;
 }
 
-interface IBookingOverviewChanges {
+export interface IBookingOverviewChanges {
     totalBookingsChange: number;
     pendingRequestsChange: number;
     completedJobsChange: number;
@@ -148,4 +131,42 @@ export interface IBookingOverviewData {
     cancelledBookings: number;
     totalBookings: number;
     changes?: IBookingOverviewChanges;
+}
+
+// --------------------
+// Provider Related Interfaces
+// --------------------
+
+export interface IProviderBookingLists {
+    services: {
+        id: string;
+        title: string;
+        image: string;
+    }[];
+    customer: {
+        id: string;
+        name: string;
+        avatar: string;
+        email: string;
+    };
+    bookingId: string;
+    expectedArrivalTime: string;
+    totalAmount: number;
+    createdAt: Date;
+    paymentStatus: PaymentStatus;
+    bookingStatus: BookingStatus;
+}
+
+export interface IResponseProviderBookingLists {
+    bookingData: IProviderBookingLists[];
+    paginationData: IPagination;
+}
+
+export interface IBookingDetailProvider extends IBookingDetailsBase {
+    customer: {
+        name: string;
+        email: string;
+        phone: string;
+        location: string;
+    };
 }

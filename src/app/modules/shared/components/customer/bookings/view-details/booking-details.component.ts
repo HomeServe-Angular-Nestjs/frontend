@@ -3,8 +3,8 @@ import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { filter, map, Observable, switchMap } from "rxjs";
 import { BookingService } from "../../../../../../core/services/booking.service";
-import { IBookingDetails } from "../../../../../../core/models/booking.model";
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
+import { IBookingDetailCustomer } from "../../../../../../core/models/booking.model";
 
 @Component({
     selector: 'app-customer-view-booking-details',
@@ -15,7 +15,7 @@ export class CustomerViewBookingDetailsComponent implements OnInit {
     private readonly _bookingService = inject(BookingService);
     private _route = inject(ActivatedRoute);
 
-    bookingDetails$!: Observable<IBookingDetails>;
+    bookingDetails$!: Observable<IBookingDetailCustomer >;
 
     ngOnInit(): void {
         this.bookingDetails$ = this._route.paramMap.pipe(
