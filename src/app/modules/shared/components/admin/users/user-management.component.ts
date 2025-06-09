@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { map, Observable, switchMap } from 'rxjs';
-import { IUpdateUserStatus, UType } from '../../../../../core/models/user.model';
+import { filter, map, Observable, switchMap } from 'rxjs';
+import { IUpdateUserStatus, IUserData, UType } from '../../../../../core/models/user.model';
 import { createAdminTableUI } from '../../../../../core/utils/generate-tables.utils';
 import { TableData } from '../../../../../core/models/table.model';
 import { TableComponent } from '../../../partials/sections/admin/tables/table.component';
@@ -26,6 +26,14 @@ export class UserManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this._loadTableData({});
+    this.tableData$ = this._userManagementService.userData$.pipe(
+      filter((users): users is IUserData[] => users !== null),
+      map(users => {
+
+        const filtered = users.filter(user => !user.isDeleted);
+        return createAdminTableUI(this.column, filtered);
+      })
+    );
   }
 
   filterEvent(filter: IFilter) {
@@ -37,138 +45,41 @@ export class UserManagementComponent implements OnInit {
   }
 
   onActionFromTable(updateData: IUpdateUserStatus) {
-    this._userManagementService.role$.pipe(
-      switchMap(role =>
-        this._userManagementService.updateStatus({ ...updateData, role })
-      )
-    ).subscribe({
-      next: (success) => {
-        if (success) {
-          const action = updateData.status ? 'blocked' : 'unblocked';
-          this._toastr.success(`User ${action}`)
+    const role = this._userManagementService.currentRole;
+    const { action, ...rest } = updateData;
+    const payload = { ...rest, role };
+
+    if (action === 'status') {
+      this._userManagementService.updateStatus(payload).subscribe({
+        next: (success) => {
+          if (success) {
+            const action = updateData.status ? 'blocked' : 'unblocked';
+            this._toastr.success(`User ${action}`);
+          }
+        },
+        error: (err) => {
+          this._toastr.error('Oops, ', err);
         }
-      },
-      error: (err) => {
-        this._toastr.error('Oops, ', err);
-      }
-    });
+      });
+    } else if (action === 'delete') {
+      this._userManagementService.removeUser(payload).subscribe({
+        next: (success) => {
+          if (success) {
+            const filtered = (this._userManagementService.users ?? []).filter(user => user.id !== rest.userId);
+            this._userManagementService.setUserData(filtered);
+            this._toastr.success('User Removed');
+          }
+        },
+        error: (err) => {
+          this._toastr.error('Oops, ', err);
+        }
+      })
+    }
   }
 
   private _loadTableData(filter: IFilter): void {
-    this.tableData$ = this._userManagementService.role$.pipe(
-      switchMap(role => {
-        return this._userManagementService.getUsers(role, filter).pipe(
-          map(users => createAdminTableUI(this.column, users))
-        );
-      })
-    );
+    this._userManagementService.role$.pipe(
+      switchMap(role => this._userManagementService.getUsers(role, filter))
+    ).subscribe();
   }
-
-  // constructor() {
-  //   this._store.dispatch(userActions.fetchUsers());
-  // }
-
-  // customers$: Observable<ICustomer[]> = this._store.select(selectAllCustomers).pipe(startWith([]));
-  // providers$: Observable<IProvider[]> = this._store.select(selectAllProviderEntities).pipe(startWith([]));
-
-  // vm$ = combineLatest([this.customers$, this.providers$]).pipe(
-  //   map(([customers, providers]) => ({
-  //     customerTable: createAdminTableUI(customers),
-  //     providerTable: createAdminTableUI(providers),
-  //   }))
-  // );
-
-  // filteredData$ = combineLatest([this.vm$, this.role$]).pipe(
-  //   map(([vm, role]) => ({
-  //     tableData: role === 'customer' ? vm.customerTable : vm.providerTable,
-  //     currentRole: role,
-  //   }))
-  // );
-
-
-  // /**
-  //  * Handles actions emitted from the UI table, such as toggling status or deleting a user.
-  //  * @param event - Object containing the `action` type and corresponding `row` data.
-  //  */
-  // onActionFromTable(event: { actions: TableAction, row: TableRow }) {
-  //   const { actions, row } = event;
-  //   const userType = this._roleSubject$.value;
-  //   const id = row.id;
-  //   if (!id) {
-  //     this._notyf.error('Missing id in row data');
-  //   }
-
-  //   switch (actions.action) {
-  //     case "toggleStatus":
-  //       this._handleToggleStatus(userType, id, actions.value as boolean);
-  //       break;
-  //     case "delete":
-  //       console.log('delete');
-  //       this._handleDelete(userType, id, actions.value as boolean);
-  //       break;
-  //     case "view":
-  //       console.log('view');
-  //       break;
-  //     default:
-  //       console.warn('Unknown actions')
-  //   }
-  // }
-
-  // /**
-  //  * Handles filtering of Table data.
-  //  * @param filter - The filter data contains search input, user status
-  //  */
-  // filterEvent(filter: IFilter) {
-  //   this.role$.subscribe(role => {
-  //     if (role === 'customer') {
-  //       this._store.dispatch(userActions.filterCustomer({ filter }));
-  //     } else if (role === 'provider') {
-  //       console.log(filter)
-  //       this._store.dispatch(userActions.filterProvider({ filter }));
-  //     }
-  //   });
-  // }
-
-  // /**
-  // * Changes the currently selected user role.
-  // * @param newRole - The new role to set ('customer' or 'provider').
-  // */
-  // onRoleChange(newRole: UType) {
-  //   this._roleSubject$.next(newRole);
-  // }
-
-  // /**
-  //  * Handles toggling the active status of a user.
-  //  * @param userType - The type of user ('customer' or 'provider').
-  //  * @param id - The ID of the user to update.
-  //  * @param status - The current active status (true for active, false for inactive).
-  //  */
-  // private _handleToggleStatus(userType: UType, id: string, status: boolean) {
-  //   const data = { id, isActive: !status };
-  //   this._dispatchAction(userType, data);
-  // }
-
-  // /**
-  //  * Handles toggling the deleted status of a user.
-  //  * @param userType - The type of user ('customer' or 'provider').
-  //  * @param id - The ID of the user to update.
-  //  * @param status - The current deleted status (true for deleted, false for not deleted).
-  //  */
-  // private _handleDelete(userType: UType, id: string, status: boolean) {
-  //   const data = { id, isDeleted: !status };
-  //   this._dispatchAction(userType, data);
-  // }
-
-  // /**
-  // * Dispatches the correct partial update action based on the user type.
-  // * @param userType - The type of user ('customer' or 'provider').
-  // * @param data - Partial user data containing fields to update.
-  // */
-  // private _dispatchAction(userType: UType, data: Partial<ICustomer> | Partial<IProvider>) {
-  //   if (userType === 'customer') {
-  //     this._store.dispatch(userActions.partialUpdateCustomer({ updateData: data }))
-  //   } else if (userType === 'provider') {
-  //     this._store.dispatch(userActions.partialUpdateProvider({ updateData: data }));
-  //   }
-  // }
 }

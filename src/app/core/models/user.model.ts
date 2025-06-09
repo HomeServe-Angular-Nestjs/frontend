@@ -134,7 +134,13 @@ export interface IUserData {
 }
 
 export interface IUpdateUserStatus {
+    action: string,
     status: boolean;
+    userId: string;
+    role: UType;
+}
+
+export interface IRemoveData {
     userId: string;
     role: UType;
 }

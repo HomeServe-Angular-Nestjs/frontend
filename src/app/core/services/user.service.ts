@@ -1,8 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
-import { IUpdateUserStatus, IUserData, UType } from "../models/user.model";
-import { BehaviorSubject, catchError, forkJoin, Observable, of, throwError } from "rxjs";
+import { IRemoveData, IUpdateUserStatus, IUserData, UType } from "../models/user.model";
+import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
@@ -14,15 +14,23 @@ export class UserManagementService {
     private _roleSource = new BehaviorSubject<UType>("customer");
     role$ = this._roleSource.asObservable();
 
-    private _userDataSource = new BehaviorSubject(null);
+    private _userDataSource = new BehaviorSubject<IUserData[] | null>(null);
     userData$ = this._userDataSource.asObservable();
+
+    get currentRole(): UType {
+        return this._roleSource.getValue();
+    }
+
+    get users(): IUserData[] | null {
+        return this._userDataSource.getValue();
+    }
 
     setRole(role: UType) {
         this._roleSource.next(role);
     }
 
-    setUserData(data: any) {
-        this._userDataSource.next(data);
+    setUserData(users: IUserData[]) {
+        this._userDataSource.next(users);
     }
 
     getUsers(role: UType, filter: IFilter): Observable<IUserData[]> {
@@ -35,6 +43,9 @@ export class UserManagementService {
         });
 
         return this._http.get<IUserData[]>(`${this._adminUrl}/users`, { params }).pipe(
+            tap(users => {
+                this._userDataSource.next(users)
+            }),
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -42,8 +53,17 @@ export class UserManagementService {
         );
     }
 
-    updateStatus(updateData: IUpdateUserStatus): Observable<boolean> {
-        return this._http.patch<boolean>(`${this._adminUrl}/status`, updateData).pipe(
+    updateStatus(updateData: Omit<IUpdateUserStatus, 'action'>): Observable<boolean> {
+        return this._http.patch<boolean>(`${this._adminUrl}/users/status`, updateData).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    removeUser(removeData: IRemoveData): Observable<boolean> {
+        return this._http.patch<boolean>(`${this._adminUrl}/users/remove`, removeData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

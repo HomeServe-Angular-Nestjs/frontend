@@ -9,7 +9,7 @@
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
-            <tr *ngFor="let row of tableData.rows; let i = index">
+            <tr *ngFor="let row of tableData.rows | filterDeletedUser; let i = index">
                 <td *ngFor="let column of tableData.columns" class="px-6 py-4 whitespace-nowrap text-sm text-[#4B5563]">
                     <ng-container *ngIf="column !== 'actions'; else actionsBlock">
                         <span [ngClass]="{ 'uppercase': column === 'id' }">
@@ -20,7 +20,7 @@
                         <div class="flex items-center justify-center space-x-2">
                             <ng-container *ngFor="let action of row.actions">
                                 <button class="p-2 rounded-full hover:bg-gray-200 transition-colors"
-                                    [title]="action.toolTip" (click)="emitAction(action.action, action.value, row)">
+                                    [title]="action.toolTip" (click)="emitAction(action.action, row)">
                                     <i class="fa text-[#64748B] hover:text-[#334155]"
                                         [ngClass]="[action.icon, action.styles]"></i>
                                 </button>
