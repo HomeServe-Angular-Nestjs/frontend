@@ -1,5 +1,6 @@
 import { EntityState } from '@ngrx/entity';
 import { ISlot, SlotType } from './schedules.model';
+import { IPagination } from './booking.model';
 
 export type UType = 'customer' | 'provider';
 
@@ -131,6 +132,11 @@ export interface IUserData {
     isActive: boolean;
     isBlocked: boolean;
     isDeleted: boolean;
+}
+
+export interface IUserDataWithPagination {
+    data: IUserData[],
+    pagination: IPagination
 }
 
 export interface IUpdateUserStatus {

@@ -17,4 +17,6 @@
     </div>
 </ng-template>
 
-<app-admin-pagination></app-admin-pagination>
+<ng-container *ngIf="pagination">
+    <app-admin-pagination [pagination]="pagination" (pageChange)="onPageChange($event)"></app-admin-pagination>
+</ng-container>

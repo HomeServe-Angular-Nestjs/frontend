@@ -1,5 +1,6 @@
 import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { IPagination } from "../../../../../../core/models/booking.model";
 
 @Component({
     selector: 'app-admin-pagination',
@@ -7,17 +8,26 @@ import { Component } from "@angular/core";
     imports: [CommonModule]
 })
 export class AdminPaginationComponent {
-    currentPage = 1;
-    rowsPerPage = 5; // Customize as needed
-    tableData = { rows: [1, 2, 3, 4, 5] }
+    @Input({ required: true }) pagination!: IPagination;
+    @Output() pageChange = new EventEmitter<number>();
 
-    get paginatedRows() {
-        const start = (this.currentPage - 1) * this.rowsPerPage;
-        const end = start + this.rowsPerPage;
-        return this.tableData.rows.slice(start, end);
+    get currentPage() {
+        return this.pagination.page;
     }
 
-    get totalPages() {
-        return Math.ceil(this.tableData.rows.length / this.rowsPerPage);
+    get totalPages(): number {
+        return Math.ceil(this.pagination.total / this.pagination.limit);
+    }
+
+    nextPage() {
+        if (this.currentPage < this.totalPages) {
+            this.pageChange.emit(this.currentPage + 1);
+        }
+    }
+
+    prevPage() {
+        if (this.currentPage > 1) {
+            this.pageChange.emit(this.currentPage - 1);
+        }
     }
 }

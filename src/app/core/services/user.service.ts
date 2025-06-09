@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
-import { IRemoveData, IUpdateUserStatus, IUserData, UType } from "../models/user.model";
+import { IRemoveData, IUpdateUserStatus, IUserData, IUserDataWithPagination, UType } from "../models/user.model";
 import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 
@@ -33,8 +33,10 @@ export class UserManagementService {
         this._userDataSource.next(users);
     }
 
-    getUsers(role: UType, filter: IFilter): Observable<IUserData[]> {
-        let params = new HttpParams().set('role', role);
+    getUsers(role: UType, filter: IFilter, page: number): Observable<IUserDataWithPagination> {
+        let params = new HttpParams()
+            .set('page', page)
+            .set('role', role);
 
         Object.entries(filter).forEach(([key, value]) => {
             if (value !== undefined && value !== null) {
@@ -42,9 +44,9 @@ export class UserManagementService {
             }
         });
 
-        return this._http.get<IUserData[]>(`${this._adminUrl}/users`, { params }).pipe(
-            tap(users => {
-                this._userDataSource.next(users)
+        return this._http.get<IUserDataWithPagination>(`${this._adminUrl}/users`, { params }).pipe(
+            tap(usersData => {
+                this._userDataSource.next(usersData.data);
             }),
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>

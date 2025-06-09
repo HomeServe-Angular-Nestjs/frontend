@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { filter, map, Observable, switchMap } from 'rxjs';
+import { filter, map, Observable, switchMap, tap } from 'rxjs';
 import { IUpdateUserStatus, IUserData, UType } from '../../../../../core/models/user.model';
 import { createAdminTableUI } from '../../../../../core/utils/generate-tables.utils';
 import { TableData } from '../../../../../core/models/table.model';
@@ -10,6 +10,7 @@ import { IFilter } from '../../../../../core/models/filter.model';
 import { AdminPaginationComponent } from "../../../partials/sections/admin/pagination/pagination.component";
 import { UserManagementService } from '../../../../../core/services/user.service';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
+import { IPagination } from '../../../../../core/models/booking.model';
 
 
 @Component({
@@ -22,14 +23,15 @@ export class UserManagementComponent implements OnInit {
   private _toastr = inject(ToastNotificationService);
 
   tableData$!: Observable<TableData>;
+  pagination!: IPagination;
   column: string[] = ['id', 'username', 'email', 'contact', 'status', 'joined', 'actions'];
+  lastFilterUsed: IFilter = {};
 
   ngOnInit(): void {
     this._loadTableData({});
     this.tableData$ = this._userManagementService.userData$.pipe(
       filter((users): users is IUserData[] => users !== null),
       map(users => {
-
         const filtered = users.filter(user => !user.isDeleted);
         return createAdminTableUI(this.column, filtered);
       })
@@ -77,9 +79,17 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  private _loadTableData(filter: IFilter): void {
+  onPageChange(newPage: number) {
+    console.log(newPage)
+    this._loadTableData(this.lastFilterUsed, newPage);
+  }
+
+  private _loadTableData(filter: IFilter, page: number = 1): void {
+    this.lastFilterUsed = filter;
+
     this._userManagementService.role$.pipe(
-      switchMap(role => this._userManagementService.getUsers(role, filter))
+      switchMap(role => this._userManagementService.getUsers(role, filter, page)),
+      tap(userData => this.pagination = userData.pagination)
     ).subscribe();
   }
 }
