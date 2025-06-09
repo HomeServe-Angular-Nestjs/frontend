@@ -17,45 +17,45 @@ export const userEffects = {
     * Fetches users (customers and providers) when 'fetchUsers' is dispatched.
     * On success, dispatches 'fetchUsersSuccess'. On error, shows a notification and dispatches 'fetchUsersFailure'.
     */
-    fetchUsers$: createEffect(() => {
-        const actions$ = inject(Actions);
-        const userService = inject(UserManagementService);
-        const notyf = inject(NotificationService);
+    // fetchUsers$: createEffect(() => {
+    //     const actions$ = inject(Actions);
+    //     const userService = inject(UserManagementService);
+    //     const notyf = inject(NotificationService);
 
-        return actions$.pipe(
-            ofType(userActions.fetchUsers),
-            switchMap(() =>
-                userService.getUsers().pipe(
-                    map((response) => userActions.fetchUsersSuccess({ customers: response.customers, providers: response.providers })),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.fetchUsersFailure, notyf);
-                    })
-                )
-            )
-        );
-    }, { functional: true }),
+    //     return actions$.pipe(
+    //         ofType(userActions.fetchUsers),
+    //         switchMap(() =>
+    //             userService.getUsers().pipe(
+    //                 map((response) => userActions.fetchUsersSuccess({ customers: response.customers, providers: response.providers })),
+    //                 catchError((error: HttpErrorResponse) => {
+    //                     return handleApiError(error, userActions.fetchUsersFailure, notyf);
+    //                 })
+    //             )
+    //         )
+    //     );
+    // }, { functional: true }),
 
     /**
      * Fetches providers when 'fetchProviders' is dispatched.
      * On success, dispatches 'fetchProvidersSuccess'. On error, shows a notification and dispatches 'fetchProvidersFailure'.
      */
-    fetchProviders$: createEffect(() => {
-        const actions$ = inject(Actions);
-        const providerService = inject(ProviderService);
-        const notyf = inject(NotificationService);
+    // fetchProviders$: createEffect(() => {
+    //     const actions$ = inject(Actions);
+    //     const providerService = inject(ProviderService);
+    //     const notyf = inject(NotificationService);
 
-        return actions$.pipe(
-            ofType(userActions.fetchProviders),
-            switchMap(() =>
-                providerService.getProviders().pipe(
-                    map((response) => userActions.fetchProvidersSuccess({ providers: response })),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.fetchProvidersFailure, notyf);
-                    })
-                )
-            )
-        );
-    }, { functional: true }),
+    //     return actions$.pipe(
+    //         ofType(userActions.fetchProviders),
+    //         switchMap(() =>
+    //             providerService.getProviders().pipe(
+    //                 map((response) => userActions.fetchProvidersSuccess({ providers: response })),
+    //                 catchError((error: HttpErrorResponse) => {
+    //                     return handleApiError(error, userActions.fetchProvidersFailure, notyf);
+    //                 })
+    //             )
+    //         )
+    //     );
+    // }, { functional: true }),
 
     /**
      * Partially updates a provider when 'partialUpdateProvider' is dispatched.

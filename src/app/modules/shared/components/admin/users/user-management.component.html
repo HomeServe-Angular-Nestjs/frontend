@@ -1,15 +1,20 @@
+<app-filters (filterEvents)="filterEvent($event)" (roleChanged)="onRoleChange($event)"></app-filters>
 
-<div class="mb-6 shadow-md">
-    <app-filters (filterEvents)="filterEvent($event)" (roleChanged)="onRoleChange($event)"></app-filters>
-</div>
-<!-- <ng-container *ngIf="vm$ | async as vm">
-    <app-table *ngIf="vm.customerTable.rows.length" [tableData]="vm.customerTable"
-        (actionTriggered)="onActionFromTable($event, 'customer')">
-    </app-table> -->
-<!-- <app-table *ngIf="vm.providerTable.rows.length" [tableData]="vm.providerTable">
-    </app-table> -->
-<!-- </ng-container> -->
-
-<ng-container *ngIf="filteredData$ | async as data">
-    <app-table [tableData]="data.tableData" (actionTriggeredEvent)="onActionFromTable($event)"></app-table>
+<ng-container *ngIf="tableData$ | async as tableData; else noData">
+    <app-table [tableData]="tableData" (actionTriggeredEvent)="onActionFromTable($event)"></app-table>
 </ng-container>
+
+<ng-template #noData>
+    <div
+        class="flex flex-col items-center justify-center min-h-[300px] text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300 p-6">
+        <svg class="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9.75 9.75h4.5m-4.5 4.5h4.5M4.5 6.75h15M6.75 6.75v10.5A2.25 2.25 0 009 19.5h6a2.25 2.25 0 002.25-2.25V6.75" />
+        </svg>
+        <p class="text-lg font-medium">No data found</p>
+        <p class="text-sm text-gray-400 mt-1">Try adjusting your filters or check back later.</p>
+    </div>
+</ng-template>
+
+<app-admin-pagination></app-admin-pagination>

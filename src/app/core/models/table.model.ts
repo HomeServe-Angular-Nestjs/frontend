@@ -1,8 +1,8 @@
 export interface TableAction {
-    id: string | number;
-    value: boolean | string | number;
+    id: string;
+    value: boolean | string;
     toolTip: string;
-    action: 'toggleStatus' | 'delete' | 'view' | string;
+    action: 'toggle' | 'delete' | 'view' | string;
     icon?: string;
     styles?: string;
 }

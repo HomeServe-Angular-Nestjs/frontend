@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DebounceService } from '../../../../../core/services/public/debounce.service';
+import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
-import { IFilter, ToggleType } from '../../../../../core/models/filter.model';
+import { IFilter, ToggleType } from '../../../../../../core/models/filter.model';
 
 @Component({
   selector: 'app-filters',

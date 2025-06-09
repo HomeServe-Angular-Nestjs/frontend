@@ -1,0 +1,21 @@
+<div class="max-w-md p-6 rounded-lg bg-white shadow-lg">
+    <h2 class="flex items-center text-xl font-semibold text-gray-800">
+        <mat-icon class="text-red-500 mr-2">warning</mat-icon>
+        {{ data.title }}
+    </h2>
+
+    <mat-dialog-content class="mt-4 text-gray-700">
+        <p>{{ data.message }}</p>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="mt-6 flex justify-end gap-3">
+        <button mat-stroked-button (click)="dialogRef.close(false)"
+            class="border border-gray-400 text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-md transition">
+            Cancel
+        </button>
+        <button mat-raised-button color="primary" (click)="dialogRef.close(true)"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
+            Confirm
+        </button>
+    </mat-dialog-actions>
+</div>

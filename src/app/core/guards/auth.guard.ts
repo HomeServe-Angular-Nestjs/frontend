@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import * as authSelector from '../../store/auth/auth.selector';
 import { combineLatest, map, Observable, take } from 'rxjs';
 import { NotificationService } from '../services/public/notification.service';
+import { ToastNotificationService } from '../services/public/toastr.service';
 
 /**
  * Guard that controls access to routes based on authentication status and user role.
@@ -38,6 +39,7 @@ export const AuthGuard: CanActivateFn =
     const store = inject(Store);
     const router = inject(Router);
     const notyf = inject(NotificationService);
+    const toastr = inject(ToastNotificationService);
 
     return combineLatest([
       store.select(authSelector.selectCheckStatus),
@@ -59,7 +61,8 @@ export const AuthGuard: CanActivateFn =
           });
         }
 
-        notyf.error('Please login first.');
+        // notyf.error('Please login first.');
+        toastr.info('Please login first.', 'Info', { positionClass: "top-10px" });
         return router.createUrlTree([redirectPath], {
           queryParams: { return: state.url }
         });

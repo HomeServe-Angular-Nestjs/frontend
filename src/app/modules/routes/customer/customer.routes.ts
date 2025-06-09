@@ -93,6 +93,11 @@ export const customerRoutes: Routes = [
                         path: 'bookings/:id',
                         loadComponent: () => import('../../shared/components/customer/bookings/view-details/booking-details.component')
                             .then(c => c.CustomerViewBookingDetailsComponent)
+                    },
+                    {
+                        path: 'view',
+                        loadComponent: () => import('../../shared/components/customer/profile/profile.component')
+                            .then(c => c.CustomerProfileViewComponent)
                     }
                 ],
             }

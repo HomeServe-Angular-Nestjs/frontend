@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import "notyf/notyf.min.css";
+@import '../node_modules/ngx-toastr/toastr.css';
 
 // Customize notification appearance
 .notyf__toast {
@@ -55,6 +56,7 @@ body {
   height: 100%;
   scroll-behavior: smooth;
 }
+
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
@@ -70,29 +72,42 @@ body {
 
 /* Style the flag container (country selector) */
 .iti__flag-container {
-  flex-shrink: 0; /* Prevent it from shrinking */
-  padding: 0.7rem; /* Match Tailwind's p-2 */
-  border: 1px solid #d1d5db; /* Tailwind's border-gray-300 */
-  border-right: none; /* Remove right border to blend with input */
-  border-radius: 0.375rem 0 0 0.375rem; /* Tailwind's rounded, left side only */
-  background-color: #f9fafb; /* Tailwind's bg-gray-50 */
+  flex-shrink: 0;
+  /* Prevent it from shrinking */
+  padding: 0.7rem;
+  /* Match Tailwind's p-2 */
+  border: 1px solid #d1d5db;
+  /* Tailwind's border-gray-300 */
+  border-right: none;
+  /* Remove right border to blend with input */
+  border-radius: 0.375rem 0 0 0.375rem;
+  /* Tailwind's rounded, left side only */
+  background-color: #f9fafb;
+  /* Tailwind's bg-gray-50 */
 }
 
 /* Style the input to align with the flag container */
 .custom-phone-input {
-  flex-grow: 1; /* Take up remaining space */
-  border-radius: 0 0.375rem 0.375rem 0; /* Rounded on right side only */
-  border-left: none; /* Remove left border to blend with flag */
-  border: 1px solid #d1d5db; /* Tailwind's border-gray-300 */
+  flex-grow: 1;
+  /* Take up remaining space */
+  border-radius: 0 0.375rem 0.375rem 0;
+  /* Rounded on right side only */
+  border-left: none;
+  /* Remove left border to blend with flag */
+  border: 1px solid #d1d5db;
+  /* Tailwind's border-gray-300 */
   padding: 0.4rem;
   width: 280px;
 }
 
 /* Adjust dropdown styling (optional) */
 .iti__country-list {
-  border: 1px solid #d1d5db; /* Tailwind's border-gray-300 */
-  border-radius: 0.375rem; /* Tailwind's rounded */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Tailwind's shadow-md */
+  border: 1px solid #d1d5db;
+  /* Tailwind's border-gray-300 */
+  border-radius: 0.375rem;
+  /* Tailwind's rounded */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  /* Tailwind's shadow-md */
   max-height: 200px;
   overflow-y: auto;
 }
@@ -104,8 +119,10 @@ body {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .custom-geocoder {
@@ -149,4 +166,82 @@ body {
       transition: opacity 0.3s ease-in-out; // Add smooth transition
     }
   }
+}
+
+/* Custom container positioning */
+.toast-top-offset {
+  top: 30px !important;
+  right: 0;
+  left: 0;
+  margin: auto;
+  position: fixed;
+  z-index: 9999;
+  width: fit-content;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Toast appearance & animation */
+.toast-custom {
+  font-size: 0.85rem;
+  min-width: 200px !important;
+  max-width: 300px !important;
+  background-color: #a5b4fc !important;
+  color: #003366 !important;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 51, 102, 0.25);
+  animation: slideFromTop 0.5s ease-out forwards;
+}
+
+.top-10px {
+  top: 10px !important;
+  right: 0;
+  left: 0;
+  margin: auto;
+  position: fixed;
+  z-index: 9999;
+  width: fit-content;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Optional leave animation */
+.toast-custom.ng-animating.ng-leave {
+  animation: slideOutToTop 0.5s ease-in forwards;
+}
+
+@keyframes slideFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOutToTop {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }

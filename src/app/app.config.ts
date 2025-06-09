@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, RouterConfigOptions, withInMemoryScrolling, withRouterConfig, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
@@ -22,10 +22,18 @@ import { metaReducers } from './store/auth/meta.reducer';
 import { scheduleEffects } from './store/schedules/schedule.effects';
 import { customerFeature } from './store/customer/customer.feature';
 import { customerEffects } from './store/customer/customer.effects';
+import { ToastrModule } from 'ngx-toastr';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
+    importProvidersFrom(ToastrModule.forRoot({
+      positionClass: 'toast-top-center',
+      timeOut: 3000,
+      progressBar: true,
+      closeButton: true
+    })),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes,
       withViewTransitions(), // optional
@@ -45,6 +53,5 @@ export const appConfig: ApplicationConfig = {
     }, { metaReducers }),
     provideEffects(authEffects, userEffects, offeredServiceEffects, providerEffects, scheduleEffects, customerEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: true, autoPause: true }),
-    provideAnimations()
   ]
 };

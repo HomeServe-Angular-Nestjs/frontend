@@ -1,6 +1,8 @@
 import { EntityState } from '@ngrx/entity';
 import { ISlot, SlotType } from './schedules.model';
 
+export type UType = 'customer' | 'provider';
+
 export type AdditionalDocs = {
     type: string;
     fileUrl: string;
@@ -92,12 +94,6 @@ export interface IUserState {
     error: string | null;
 }
 
-// export interface ICustomerState {
-//     customers: EntityState<ICustomer>;
-//     loading: boolean;
-//     error: string | null;
-// }
-
 export interface IProviderState {
     provider: IProvider | null;
     loading: boolean;
@@ -125,3 +121,20 @@ export interface UsersViewModel {
 }
 
 export type UserUpdationType = Partial<ICustomer> | Partial<IProvider>;
+
+export interface IUserData {
+    id: string;
+    username: string;
+    email: string;
+    contact: string;
+    createdAt: Date;
+    isActive: boolean;
+    isBlocked: boolean;
+    isDeleted: boolean;
+}
+
+export interface IUpdateUserStatus {
+    status: boolean;
+    userId: string;
+    role: UType;
+}

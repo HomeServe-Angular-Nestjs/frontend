@@ -1,37 +1,62 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
-import { ICustomer, IProvider } from "../models/user.model";
-import { catchError, forkJoin, Observable } from "rxjs";
+import { IUpdateUserStatus, IUserData, UType } from "../models/user.model";
+import { BehaviorSubject, catchError, forkJoin, Observable, of, throwError } from "rxjs";
+import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
 export class UserManagementService {
     private _http = inject(HttpClient);
 
-    private readonly adminUrl = API_ENV.admin;
+    private readonly _adminUrl = API_ENV.admin;
 
-    getCustomers(): Observable<ICustomer[]> {
-        return this._http.get<ICustomer[]>(`${this.adminUrl}/customers`).pipe(
-            catchError((err) => {
-                throw err
-            })
-        );
+    private _roleSource = new BehaviorSubject<UType>("customer");
+    role$ = this._roleSource.asObservable();
+
+    private _userDataSource = new BehaviorSubject(null);
+    userData$ = this._userDataSource.asObservable();
+
+    setRole(role: UType) {
+        this._roleSource.next(role);
     }
 
-    getProviders(): Observable<IProvider[]> {
-        return this._http.get<IProvider[]>(`${this.adminUrl}/providers`).pipe(
-            catchError((err) => {
-                console.log(err)
-                throw err
-            })
-        );
+    setUserData(data: any) {
+        this._userDataSource.next(data);
     }
 
-    getUsers(): Observable<{ customers: ICustomer[], providers: IProvider[] }> {
-        return forkJoin({
-            customers: this.getCustomers(),
-            providers: this.getProviders()
+    getUsers(role: UType, filter: IFilter): Observable<IUserData[]> {
+        let params = new HttpParams().set('role', role);
+
+        Object.entries(filter).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                params = params.set(key, value);
+            }
         });
+
+        return this._http.get<IUserData[]>(`${this._adminUrl}/users`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
     }
 
+    updateStatus(updateData: IUpdateUserStatus): Observable<boolean> {
+        return this._http.patch<boolean>(`${this._adminUrl}/status`, updateData).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    /**
+     * Extracts a readable error message from an HTTP error.
+     * @param error - The HTTP error response.
+     * @returns A user-friendly error message.
+     */
+    private getErrorMessage(error: HttpErrorResponse): string {
+        return error?.error?.message || 'something went wrong';
+    }
 }

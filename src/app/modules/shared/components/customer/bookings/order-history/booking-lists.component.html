@@ -4,7 +4,7 @@
 
         <ng-container *ngIf="bookingsData$ | async as bookingLists; else noBookings">
 
-            <div *ngIf="bookingLists.bookingData; else noBookings">
+            <div *ngIf="bookingLists.bookingData && bookingLists.bookingData.length; else noBookings">
                 <div *ngFor="let list of bookingLists.bookingData" class="border rounded-xl shadow-sm bg-white mb-6">
 
                     <!-- Booking Header -->
