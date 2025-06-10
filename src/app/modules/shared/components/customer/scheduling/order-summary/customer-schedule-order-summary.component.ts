@@ -1,29 +1,33 @@
 import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
-import { BookingService } from '../../../../../../core/services/booking.service';
-import { CustomerLocationType, IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
-import { NotificationService } from '../../../../../../core/services/public/notification.service';
-import { ISlotSource } from '../../../../../../core/models/schedules.model';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { AlertService } from '../../../../../../core/services/public/alert.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
+import { CustomerLocationType, IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
+import { BookingService } from '../../../../../../core/services/booking.service';
+import { ISlotSource } from '../../../../../../core/models/schedules.model';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
+import { PaymentService } from '../../../../../../core/services/payment.service';
+import { RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
+import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
+import { ITransaction } from '../../../../../../core/models/transaction.model';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
   standalone: true,
-  imports: [CommonModule],
   templateUrl: './customer-schedule-order-summary.component.html',
+  imports: [CommonModule],
+  providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy {
   private readonly _bookingService = inject(BookingService);
-  private readonly _notyf = inject(NotificationService);
+  private readonly _toastr = inject(ToastNotificationService);
+  private readonly _paymentService = inject(PaymentService);
+  private readonly _razorpayWrapper = inject(RazorpayWrapperService);
   private _route = inject(ActivatedRoute);
-  private _alertService = inject(AlertService);
   private _router = inject(Router);
 
   private _subscriptions: Subscription[] = [];
-
 
   @Input({ required: true }) selectedServiceData: SelectedServiceType[] = [];
 
@@ -34,7 +38,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     visitingFee: 0.00,
     total: 0.00
   };
-  location: CustomerLocationType | null = null;
+  location!: CustomerLocationType;
   selectedSlot: ISlotSource | null = null;
 
   /**
@@ -47,7 +51,9 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     });
 
     const locationSub = this._bookingService.address$.subscribe(address => {
-      this.location = address;
+      if (address) {
+        this.location = address;
+      }
     });
 
     const slotSub = this._bookingService.slot$.subscribe(slotData => {
@@ -60,21 +66,31 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     this._fetchPriceBreakup(priceData);
   }
 
+  InitiatePayment() {
+    if (!this._isAllDataAvailable()) {
+      this._toastr.info('Incomplete booking information.');
+      return;
+    }
+
+    const totalAmount = this.priceBreakup.total;
+    this._paymentService.createRazorpayOrder(totalAmount).subscribe(({
+      next: (order) => {
+        this._razorpayWrapper.openCheckout(order,
+          (paymentResponse: RazorpayPaymentResponse) => this._verifyPaymentAndConfirmBooking(paymentResponse, order),
+          () => this._toastr.warning('payment dismissed')
+        );
+      },
+      error: (err) => this._toastr.error('payment failed')
+    }));
+  }
+
+
   /**
    * Confirms booking if all required data is valid.
    * Otherwise, displays an error notification.
    */
-  confirmBooking() {
-    if (!this._isAllDataAvailable()) {
-      this._notyf.error('Incomplete booking information. Please check services, slot, or location.');
-      return;
-    }
-
-    if (!this.location || this.location.address === '' || !Array.isArray(this.location.coordinates)) {
-      this._notyf.error('Please select a location.');
-      return;
-    }
-
+  saveBooking(transactionData: ITransaction) {
+    console.log(transactionData)
     const serviceIds: SelectedServiceIdsType[] = this.selectedServiceData.map(item => {
       return {
         id: item.id,
@@ -87,27 +103,25 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       total: Number(this.priceBreakup.total.toFixed()),
       location: this.location,
       slotData: this.selectedSlot!,
-      serviceIds
+      serviceIds,
+      transactionId: transactionData.id ? transactionData.id : null
     };
 
     this._bookingService.postBookingData(bookingData).subscribe({
       next: (success) => {
         if (success) {
-          this._alertService.showToast('Service booked successfully!', 'success');
+          this._toastr.success('Service booked successfully!');
           localStorage.removeItem('selectedServiceData');
           this._router.navigate(['profile', 'bookings'])
         } else {
-          // TODO - write an alert confirm.
-          console.log('Sorry, booking failed due to some technical issues. If occurs again contact the admin.')
-          this._alertService.showToast('Sorry, booking failed due to some technical issues. If occurs again contact the admin.', 'error', 'center')
-
+          this._toastr.success('Sorry, booking failed due to some technical issues. Contact the admin for further steps.');
         }
       },
       error: (err) => {
-        this._alertService.showToast(err, 'error');
+        this._toastr.error(err);
         console.log(err)
       }
-    })
+    });
   }
 
   /**
@@ -115,6 +129,34 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
    */
   ngOnDestroy(): void {
     this._subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+
+  private _verifyPaymentAndConfirmBooking(response: RazorpayPaymentResponse, order: RazorpayOrder) {
+    console.log('response: ', response);
+    console.log('order: ', order);
+    const orderData: RazorpayOrder = {
+      id: order.id,
+      entity: order.entity,
+      amount: order.amount,
+      currency: order.currency,
+      status: order.status,
+      method: 'debit',
+      receipt: order.receipt,
+      offer_id: order.offer_id,
+      created_at: order.created_at,
+    };
+
+    this._paymentService.verifyPaymentSignature(response, orderData, 'customer').subscribe({
+      next: (response) => {
+        if (response.verified) {
+          this.saveBooking(response.transaction);
+        } else {
+          this._toastr.error('Payment verification failed');
+        }
+      },
+      error: (err) => this._toastr.error('Server verification failed.')
+    })
   }
 
   /**
@@ -137,13 +179,13 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
    */
   private _fetchPriceBreakup(data: IPriceBreakup[]): void {
     if (!data.length || !this.providerId) {
-      this._notyf.error('Cannot fetch price without services or provider.');
+      this._toastr.error('Cannot fetch price without services or provider.');
       return;
     }
 
     this._bookingService.fetchPriceBreakup(data).subscribe({
       next: (priceBreakup) => this.priceBreakup = priceBreakup,
-      error: (err) => this._notyf.error(err)
+      error: (err) => this._toastr.error(err)
     });
   }
 

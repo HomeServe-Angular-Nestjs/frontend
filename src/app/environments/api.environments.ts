@@ -6,9 +6,10 @@ export const API_ENV = {
     admin: `${domainName}/admin`,
     customer: `${domainName}`,
     provider: `${domainName}/provider`,
+    payment: `${domainName}/payment`,
 }
 
 export const API_KEY = {
-    mapbox: 'pk.eyJ1Ijoic2FqaWRtdWhhbW1lZCIsImEiOiJjbTl3b25hZDMxMHB0Mmlwc3ZlcnV3MmMwIn0.zMhfdAfDTgodZvIu0tbglw'
+    mapbox: 'pk.eyJ1Ijoic2FqaWRtdWhhbW1lZCIsImEiOiJjbTl3b25hZDMxMHB0Mmlwc3ZlcnV3MmMwIn0.zMhfdAfDTgodZvIu0tbglw',
+    razorpay: 'rzp_test_OZVJGxiPWQgDaM'
 }
-

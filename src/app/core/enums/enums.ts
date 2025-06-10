@@ -26,3 +26,11 @@ export enum SortBy {
     NAME_ASCENDING = 'nameAsc',
     NAME_DESCENDING = 'nameDesc'
 }
+
+export enum TransactionStatus {
+    CREATED = 'created',
+    ATTEMPTED = 'attempted',
+    PAID = 'paid',
+    FAILED = 'failed',
+    REFUNDED = 'refunded'
+}

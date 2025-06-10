@@ -51,6 +51,7 @@ export interface IBookingData {
     location: CustomerLocationType;
     slotData: ISlotSource;
     serviceIds: SelectedServiceIdsType[];
+    transactionId: string | null;
 }
 
 export interface IBooking {
