@@ -1,15 +1,25 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
-import { catchError, Observable, pipe, throwError } from "rxjs";
+import { BehaviorSubject, catchError, Observable, pipe, throwError } from "rxjs";
 import { IOfferedService, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
 import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
 export class OfferedServicesService {
     private _http = inject(HttpClient);
+    private readonly _apiUrl = API_ENV.provider;
 
-    private _apiUrl = API_ENV.provider;
+    private _serviceDataSource = new BehaviorSubject<IOfferedService[]>([]);
+    storedServiceData$ = this._serviceDataSource.asObservable();
+
+    setServiceData(data: IOfferedService[]) {
+        this._serviceDataSource.next(data);
+    }
+
+    getServiceData(): IOfferedService[] {
+        return this._serviceDataSource.getValue();
+    }
 
     uploadImage(formData: FormData): Observable<{ imageUrl: string }> {
         return this._http.post<{ imageUrl: string }>(`${this._apiUrl}/uploadImage`, formData).pipe(
@@ -20,7 +30,7 @@ export class OfferedServicesService {
         );
     }
 
-    sendFormData(formData: FormData) {
+    sendServiceData(formData: FormData) {
         return this._http.post(`${this._apiUrl}/create_service`, formData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
@@ -56,8 +66,8 @@ export class OfferedServicesService {
         )
     }
 
-    updateService(updateData: Partial<IOfferedService> | FormData): Observable<IOfferedService> {
-        return this._http.patch<IOfferedService>(`${this._apiUrl}/offered_service`, updateData).pipe(
+    updateService(updateData: FormData): Observable<IOfferedService> {
+        return this._http.put<IOfferedService>(`${this._apiUrl}/service`, updateData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

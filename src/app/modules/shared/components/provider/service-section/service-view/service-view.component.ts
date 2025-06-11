@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -16,14 +16,16 @@ import { ToastNotificationService } from '../../../../../../core/services/public
   imports: [CommonModule, RouterLink, ServiceListViewComponent, FilterDeletedSubservicePipe],
   templateUrl: './service-view.component.html',
 })
-export class ServiceViewComponent {
+export class ServiceViewComponent implements OnInit {
   private readonly _serviceManagementService = inject(OfferedServicesService);
   private readonly _toastr = inject(ToastNotificationService);
 
   offeredServices$!: Observable<IOfferedService[]>;
 
-  constructor(private store: Store) {
-    this.offeredServices$ = this._loadServices();
+  ngOnInit() {
+    this._loadServices();
+    this.offeredServices$ = this._serviceManagementService.storedServiceData$;
+
   }
 
   toggleStatus(updateData: IToggleServiceStatus) {
@@ -57,6 +59,8 @@ export class ServiceViewComponent {
   }
 
   private _loadServices() {
-    return this._serviceManagementService.fetchOfferedServices();
+    this._serviceManagementService.fetchOfferedServices().subscribe((serviceData) => {
+      this._serviceManagementService.setServiceData(serviceData);
+    })
   }
 }

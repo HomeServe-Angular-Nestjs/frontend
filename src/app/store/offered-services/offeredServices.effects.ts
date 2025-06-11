@@ -28,28 +28,28 @@ export const offeredServiceEffects = {
         );
     }, { functional: true }),
 
-    updateOfferedService$: createEffect(() => {
-        const actions$ = inject(Actions);
-        const serviceOfferedService = inject(OfferedServicesService);
-        const toastr = inject(ToastNotificationService);
-        const router = inject(Router);
+    // updateOfferedService$: createEffect(() => {
+    //     const actions$ = inject(Actions);
+    //     const serviceOfferedService = inject(OfferedServicesService);
+    //     const toastr = inject(ToastNotificationService);
+    //     const router = inject(Router);
 
-        return actions$.pipe(
-            ofType(offeredServiceActions.updateOfferedService),
-            switchMap(({ updateData }) =>
-                serviceOfferedService.updateService(updateData).pipe(
-                    map((updatedService) => {
-                        router.navigate(['provider', 'profiles', 'service_offered']);
-                        return offeredServiceActions.updateOfferedServiceSuccess({ updatedService })
-                    }),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, toastr
-                        );
-                    })
-                )
-            )
-        );
-    }, { functional: true }),
+    //     return actions$.pipe(
+    //         ofType(offeredServiceActions.updateOfferedService),
+    //         switchMap(({ updateData }) =>
+    //             serviceOfferedService.updateService(updateData).pipe(
+    //                 map((updatedService) => {
+    //                     router.navigate(['provider', 'profiles', 'service_offered']);
+    //                     return offeredServiceActions.updateOfferedServiceSuccess({ updatedService })
+    //                 }),
+    //                 catchError((error: HttpErrorResponse) => {
+    //                     return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, toastr
+    //                     );
+    //                 })
+    //             )
+    //         )
+    //     );
+    // }, { functional: true }),
 
     updateSubService$: createEffect(() => {
         const actions$ = inject(Actions);

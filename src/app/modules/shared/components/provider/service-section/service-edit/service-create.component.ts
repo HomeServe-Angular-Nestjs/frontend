@@ -1,25 +1,11 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, ViewportScroller } from '@angular/common';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
-import { NotificationService } from '../../../../../../core/services/public/notification.service';
-import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { IOfferedService, ISubService } from '../../../../../../core/models/offeredService.model';
-import { Store } from '@ngrx/store';
-import { offeredServiceActions } from '../../../../../../store/offered-services/offeredService.action';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
-
-export interface SubService {
-  id?: number;
-  title: string;
-  description: string;
-  price: string;
-  time: string;
-  tag: string;
-  image?: string;
-  imageFile?: File;
-}
+import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
+import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
+import { IOfferedService } from '../../../../../../core/models/offeredService.model';
 
 @Component({
   selector: 'app-service-create',
@@ -28,14 +14,13 @@ export interface SubService {
   templateUrl: './service-create.component.html',
   styleUrl: './service-create.component.scss'
 })
-export class ServiceCreateComponent {
-  private _fb = inject(FormBuilder);
-  private _serviceOfferedService = inject(OfferedServicesService);
+export class ServiceCreateComponent implements OnInit {
+  private readonly _serviceOfferedService = inject(OfferedServicesService);
   private readonly _toastr = inject(ToastNotificationService);
-
-  private _store = inject(Store);
+  private _fb = inject(FormBuilder);
   private _scroller = inject(ViewportScroller);
   private _router = inject(Router);
+  private _route = inject(ActivatedRoute);
 
   @ViewChild('addSubServiceBtn', { static: false }) buttonElementRef!: ElementRef<HTMLButtonElement>;
 
@@ -55,13 +40,13 @@ export class ServiceCreateComponent {
     subServices: this._fb.array<FormGroup>([]),
   });
 
-  constructor(private route: ActivatedRoute) {
+  ngOnInit() {
     // Subscribe to route param to get service ID (edit mode)
-    this.route.paramMap.subscribe(param => {
+    this._route.paramMap.subscribe(param => {
       this.serviceId = param.get('id');
     });
 
-    this.route.queryParams.subscribe(params => {
+    this._route.queryParams.subscribe(params => {
       if (params['subIdx'] !== undefined) {
         setTimeout(() => {
           this.scrollToSubService(+params['subIdx']);
@@ -195,56 +180,65 @@ export class ServiceCreateComponent {
       }
     }
 
-    const formData = this.buildServiceFormData(isEditMode);
+    const formData = this._buildServiceFormData(isEditMode);
 
     if (isEditMode) {
-      formData.append('id', this.service.id);
-      this._store.dispatch(offeredServiceActions.updateOfferedService({ updateData: formData }));
+      this._editService(formData);
     } else {
-      this._serviceOfferedService.sendFormData(formData).subscribe({
-        next: () => {
-          this._toastr
-            .success('Creation Success')
-          this._router.navigate(['provider', 'profiles', 'service_offered'])
-        },
-        error: (err) => this._toastr
-          .error(err)
-      });
+
     }
   }
 
+  private _editService(formData: FormData) {
+    formData.append('id', this.serviceId ?? '');
+
+    this._serviceOfferedService.updateService(formData).subscribe({
+      next: (success) => {
+        if (success) {
+          this._toastr.success('Service updated.');
+          this._router.navigate(['provider', 'profiles', 'service_offered'])
+        } else {
+          this._toastr.error('failed to update service.');
+        }
+      },
+      error: (err) => {
+        this._toastr.error('Oops, Something happened');
+        console.error(err)
+      }
+    });
+  }
+
   /**
- * Builds and returns a FormData object from the service form.
- */
-  private buildServiceFormData(isEditMode: boolean): FormData {
+   * Builds and returns a FormData object from the service form.
+   */
+  private _buildServiceFormData(isEditMode: boolean): FormData {
     const formData = new FormData();
     const formValue = this.serviceForm.value;
 
     // Main service fields
-    formData.append('serviceTitle', formValue.serviceTitle);
-    formData.append('serviceDesc', formValue.serviceDesc);
+    formData.append('title', formValue.serviceTitle);
+    formData.append('desc', formValue.serviceDesc);
 
     // Append new image file only if it's newly uploaded
     if (this.serviceImageFile) {
-      formData.append('serviceImageFile', this.serviceImageFile);
+      formData.append('image', this.serviceImageFile);
     }
 
     // Sub-services handling
     formValue.subServices.forEach((sub: any, index: number) => {
-      formData.append(`subServices[${index}][title]`, sub.title);
-      formData.append(`subServices[${index}][desc]`, sub.desc);
-      formData.append(`subServices[${index}][price]`, sub.price);
-      formData.append(`subServices[${index}][estimatedTime]`, sub.estimatedTime);
-      formData.append(`subServices[${index}][tag]`, sub.tag || '');
+      formData.append(`subService[${index}][title]`, sub.title);
+      formData.append(`subService[${index}][desc]`, sub.desc);
+      formData.append(`subService[${index}][price]`, sub.price);
+      formData.append(`subService[${index}][estimatedTime]`, sub.estimatedTime);
 
       // Append image only if user uploaded a new file
       if (sub.imageFile) {
-        formData.append(`subServices[${index}][imageFile]`, sub.imageFile);
+        formData.append(`subService[${index}][image]`, sub.imageFile);
       }
 
       // Optionally include existing image URL for backend to keep or update
       if (isEditMode && sub.image && !sub.imageFile) {
-        formData.append(`subServices[${index}][image]`, sub.image);
+        formData.append(`subService[${index}][image]`, sub.image);
       }
     });
 
@@ -257,16 +251,14 @@ export class ServiceCreateComponent {
   }
 
   /**
-  * Creates a new empty sub-service form group with validation
-  */
+    * Creates a new empty sub-service form group with validation
+    */
   private _createSubServiceGroup(): FormGroup {
     return this._fb.group({
       title: ['', Validators.required],
       desc: ['', Validators.required],
       price: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
       estimatedTime: ['', Validators.required],
-      tag: ['',],
-      availability: ['',],
       image: [null],
       imageFile: [null]
     });
@@ -310,8 +302,6 @@ export class ServiceCreateComponent {
         desc: sub.desc,
         price: sub.price,
         estimatedTime: sub.estimatedTime,
-        tag: sub.tag,
-        availability: sub.availability,
         image: sub.image || null,
         imageFile: null
       });
