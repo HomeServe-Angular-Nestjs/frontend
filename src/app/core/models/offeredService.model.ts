@@ -38,3 +38,8 @@ export interface IToggleServiceStatus {
 }
 
 export type UpdateSubserviceType = { id: string, subService: Partial<ISubService> };
+
+export interface IUpdateSubservice {
+    id: string;
+    subService: IToggleServiceStatus;
+};

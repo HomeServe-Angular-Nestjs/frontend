@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { catchError, Observable, pipe, throwError } from "rxjs";
-import { IOfferedService, ISubService, IToggleServiceStatus } from "../models/offeredService.model";
+import { IOfferedService, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
 import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
@@ -91,6 +91,16 @@ export class OfferedServicesService {
                     new Error(this.getErrorMessage(error)))
             )
         );
+    }
+
+    toggleSubServiceStatus(data: IUpdateSubservice): Observable<boolean> {
+        return this._http.patch<boolean>(`${this._apiUrl}/service/sub_status`, data).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+
     }
 
     /**

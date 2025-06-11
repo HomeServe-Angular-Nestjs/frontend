@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { offeredServiceActions } from '../../../../../../store/offered-services/offeredService.action';
 import { ServiceListViewComponent } from '../../../../partials/sections/provider/service-list-view/service-list-view.component';
 import { Observable } from 'rxjs';
-import { IOfferedService, IToggleServiceStatus, UpdateSubserviceType } from '../../../../../../core/models/offeredService.model';
+import { IOfferedService, IToggleServiceStatus, IUpdateSubservice } from '../../../../../../core/models/offeredService.model';
 import { FilterDeletedSubservicePipe } from '../../../../../../core/pipes/filter-deleted-sub-services.pipe';
 import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
@@ -38,12 +38,22 @@ export class ServiceViewComponent {
       error: (err) => {
         this._toastr.error(err);
       }
-    })
-    // this.store.dispatch(offeredServiceActions.updateOfferedService({ updateData }));
+    });
   }
 
-  updateSubservice(updateData: UpdateSubserviceType) {
-    this.store.dispatch(offeredServiceActions.updateSubService({ updateData }));
+  updateSubservice(updateData: IUpdateSubservice) {
+    this._serviceManagementService.toggleSubServiceStatus(updateData).subscribe({
+      next: (success) => {
+        if (success) {
+          this._toastr.success('Status updated');
+        } else {
+          this._toastr.error('Failed to update status');
+        }
+      },
+      error: (err) => {
+        this._toastr.error(err);
+      }
+    });
   }
 
   private _loadServices() {

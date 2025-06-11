@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Input, Output } from "@angular/core";
-import { IOfferedService, ISubService, IToggleServiceStatus, UpdateSubserviceType } from "../../../../../../core/models/offeredService.model";
+import { IOfferedService, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../../../../../../core/models/offeredService.model";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
 import { Store } from "@ngrx/store";
@@ -16,7 +16,7 @@ export class ServiceListViewComponent {
 
     @Input({ required: true }) offeredServices!: IOfferedService[];
     @Output() updateEvent = new EventEmitter<IToggleServiceStatus>();
-    @Output() updateSubServiceEvent = new EventEmitter<UpdateSubserviceType>();
+    @Output() updateSubServiceEvent = new EventEmitter<IUpdateSubservice>();
 
     expandedSubServices: Record<string, boolean> = {};
 
@@ -24,7 +24,8 @@ export class ServiceListViewComponent {
         this.updateEvent.emit(updateData);
     }
 
-    updateSubservice(updateData: UpdateSubserviceType) {
+    updateSubservice(updateData: IUpdateSubservice) {
+        console.log(updateData)
         this.updateSubServiceEvent.emit(updateData);
     }
 
