@@ -32,6 +32,9 @@ export interface IOfferedServiceState {
     error: string | null;
 }
 
-
+export interface IToggleServiceStatus {
+    id: string;
+    isActive: boolean;
+}
 
 export type UpdateSubserviceType = { id: string, subService: Partial<ISubService> };

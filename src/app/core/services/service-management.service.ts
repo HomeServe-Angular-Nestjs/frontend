@@ -2,17 +2,17 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { catchError, Observable, pipe, throwError } from "rxjs";
-import { IOfferedService, ISubService } from "../models/offeredService.model";
+import { IOfferedService, ISubService, IToggleServiceStatus } from "../models/offeredService.model";
 import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
 export class OfferedServicesService {
-    private http = inject(HttpClient);
+    private _http = inject(HttpClient);
 
-    private apiUrl = API_ENV.provider;
+    private _apiUrl = API_ENV.provider;
 
     uploadImage(formData: FormData): Observable<{ imageUrl: string }> {
-        return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/uploadImage`, formData).pipe(
+        return this._http.post<{ imageUrl: string }>(`${this._apiUrl}/uploadImage`, formData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -21,7 +21,7 @@ export class OfferedServicesService {
     }
 
     sendFormData(formData: FormData) {
-        return this.http.post(`${this.apiUrl}/create_service`, formData).pipe(
+        return this._http.post(`${this._apiUrl}/create_service`, formData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -30,7 +30,7 @@ export class OfferedServicesService {
     }
 
     fetchOfferedServices(): Observable<IOfferedService[]> {
-        return this.http.get<IOfferedService[]>(`${this.apiUrl}/offered_services`).pipe(
+        return this._http.get<IOfferedService[]>(`${this._apiUrl}/offered_services`).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -39,7 +39,7 @@ export class OfferedServicesService {
     }
 
     fetchOneService(id: string): Observable<IOfferedService> {
-        return this.http.get<IOfferedService>(`${this.apiUrl}/offered_service?id=${id}`).pipe(
+        return this._http.get<IOfferedService>(`${this._apiUrl}/offered_service?id=${id}`).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -48,7 +48,7 @@ export class OfferedServicesService {
     }
 
     fetchSubservice(id: string): Observable<ISubService> {
-        return this.http.get<ISubService>(`${this.apiUrl}/fetch_subservice?id=${id}`).pipe(
+        return this._http.get<ISubService>(`${this._apiUrl}/fetch_subservice?id=${id}`).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -57,7 +57,7 @@ export class OfferedServicesService {
     }
 
     updateService(updateData: Partial<IOfferedService> | FormData): Observable<IOfferedService> {
-        return this.http.patch<IOfferedService>(`${this.apiUrl}/offered_service`, updateData).pipe(
+        return this._http.patch<IOfferedService>(`${this._apiUrl}/offered_service`, updateData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -66,7 +66,7 @@ export class OfferedServicesService {
     }
 
     updateSubService(updateData: Partial<ISubService>): Observable<{ id: string, subService: ISubService }> {
-        return this.http.patch<{ id: string, subService: ISubService }>(`${this.apiUrl}/subservice`, updateData).pipe(
+        return this._http.patch<{ id: string, subService: ISubService }>(`${this._apiUrl}/subservice`, updateData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -76,7 +76,16 @@ export class OfferedServicesService {
 
     fetchFilteredServices(providerId: string, filter: IFilter): Observable<IOfferedService[]> {
         const params = this._buildFilterParams(filter);
-        return this.http.get<IOfferedService[]>(`${this.apiUrl}/filter_service?id=${providerId}`, { params }).pipe(
+        return this._http.get<IOfferedService[]>(`${this._apiUrl}/filter_service?id=${providerId}`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    toggleServiceStatus(data: IToggleServiceStatus): Observable<boolean> {
+        return this._http.patch<boolean>(`${this._apiUrl}/service/status`, data).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

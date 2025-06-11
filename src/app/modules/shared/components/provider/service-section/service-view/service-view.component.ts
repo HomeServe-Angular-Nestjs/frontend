@@ -4,10 +4,11 @@ import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { offeredServiceActions } from '../../../../../../store/offered-services/offeredService.action';
 import { ServiceListViewComponent } from '../../../../partials/sections/provider/service-list-view/service-list-view.component';
-import { selectAllOfferedServices } from '../../../../../../store/offered-services/offeredService.selector';
 import { Observable } from 'rxjs';
-import { IOfferedService, UpdateSubserviceType } from '../../../../../../core/models/offeredService.model';
+import { IOfferedService, IToggleServiceStatus, UpdateSubserviceType } from '../../../../../../core/models/offeredService.model';
 import { FilterDeletedSubservicePipe } from '../../../../../../core/pipes/filter-deleted-sub-services.pipe';
+import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 @Component({
   selector: 'app-service-view',
@@ -16,18 +17,36 @@ import { FilterDeletedSubservicePipe } from '../../../../../../core/pipes/filter
   templateUrl: './service-view.component.html',
 })
 export class ServiceViewComponent {
+  private readonly _serviceManagementService = inject(OfferedServicesService);
+  private readonly _toastr = inject(ToastNotificationService);
+
   offeredServices$!: Observable<IOfferedService[]>;
 
   constructor(private store: Store) {
-    this.store.dispatch(offeredServiceActions.fetchOfferedServices());
-    this.offeredServices$ = this.store.select(selectAllOfferedServices);
+    this.offeredServices$ = this._loadServices();
   }
 
-  updateService(updateData: Partial<IOfferedService>) {
-    this.store.dispatch(offeredServiceActions.updateOfferedService({ updateData }));
+  toggleStatus(updateData: IToggleServiceStatus) {
+    this._serviceManagementService.toggleServiceStatus(updateData).subscribe({
+      next: (success) => {
+        if (success) {
+          this._toastr.success('Status updated');
+        } else {
+          this._toastr.error('Failed to update status');
+        }
+      },
+      error: (err) => {
+        this._toastr.error(err);
+      }
+    })
+    // this.store.dispatch(offeredServiceActions.updateOfferedService({ updateData }));
   }
 
   updateSubservice(updateData: UpdateSubserviceType) {
     this.store.dispatch(offeredServiceActions.updateSubService({ updateData }));
+  }
+
+  private _loadServices() {
+    return this._serviceManagementService.fetchOfferedServices();
   }
 }
