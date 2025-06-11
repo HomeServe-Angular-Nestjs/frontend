@@ -3,7 +3,6 @@ import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, Url
 import { Store } from '@ngrx/store';
 import * as authSelector from '../../store/auth/auth.selector';
 import { combineLatest, map, Observable, take } from 'rxjs';
-import { NotificationService } from '../services/public/notification.service';
 import { ToastNotificationService } from '../services/public/toastr.service';
 
 /**
@@ -38,7 +37,6 @@ export const AuthGuard: CanActivateFn =
     : Observable<boolean | UrlTree> => {
     const store = inject(Store);
     const router = inject(Router);
-    const notyf = inject(NotificationService);
     const toastr = inject(ToastNotificationService);
 
     return combineLatest([
@@ -55,13 +53,12 @@ export const AuthGuard: CanActivateFn =
             return true;
           }
 
-          notyf.error('Access denied: Unauthorized');
+          toastr.error('Access denied: Unauthorized');
           return router.createUrlTree([redirectPath], {
             queryParams: { return: state.url }
           });
         }
 
-        // notyf.error('Please login first.');
         toastr.info('Please login first.', 'Info', { positionClass: "top-10px" });
         return router.createUrlTree([redirectPath], {
           queryParams: { return: state.url }

@@ -16,7 +16,8 @@ import { IUser, UserType } from "../../../models/user.model";
 export class EmailInputComponent {
     private fb = inject(FormBuilder);
     private loginService = inject(LoginAuthService);
-    private notyf = inject(NotificationService);
+    private toastr
+ = inject(NotificationService);
 
     @Input({ required: true }) userType!: UserType;
     messages = MESSAGES_ENV;
@@ -47,7 +48,8 @@ export class EmailInputComponent {
         if (control?.errors) {
             Object.keys(control.errors).forEach((key) => {
                 if (this.messages['errorMessages'][fieldName]?.[key]) {
-                    this.notyf.error(this.messages['errorMessages'][fieldName][key]);
+                    this.toastr
+.error(this.messages['errorMessages'][fieldName][key]);
                 }
             });
             return true;

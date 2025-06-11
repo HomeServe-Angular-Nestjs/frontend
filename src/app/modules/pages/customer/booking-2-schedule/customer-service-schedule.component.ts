@@ -1,17 +1,17 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { SharedDataService } from '../../../../core/services/public/shared-data.service';
+import { ISchedule } from '../../../../core/models/schedules.model';
 import { CustomerScheduleBookingDetailsComponent } from "../../../shared/components/customer/scheduling/booking-details/customer-schedule-booking-details.component";
 import { CustomerScheduleOrderSummaryComponent } from "../../../shared/components/customer/scheduling/order-summary/customer-schedule-order-summary.component";
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { NotificationService } from '../../../../core/services/public/notification.service';
-import { SharedDataService } from '../../../../core/services/public/shared-data.service';
 import { SelectedServiceIdsType, SelectedServiceType } from '../booking-1-pick-service/customer-pick-a-service.component';
-import { ISchedule } from '../../../../core/models/schedules.model';
-import { Store } from '@ngrx/store';
 import { selectAllSchedules } from '../../../../store/schedules/schedule.selector';
 import { scheduleActions } from '../../../../store/schedules/schedule.action';
+import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
 
 @Component({
   selector: 'app-customer-service-schedule',
@@ -25,7 +25,7 @@ import { scheduleActions } from '../../../../store/schedules/schedule.action';
   templateUrl: './customer-service-schedule.component.html',
 })
 export class CustomerServiceScheduleComponent implements OnInit {
-  private readonly _notyf = inject(NotificationService);
+  private readonly _toastr = inject(ToastNotificationService);
   private _router = inject(Router);
 
   schedules$!: Observable<ISchedule[]> | null;
@@ -73,7 +73,7 @@ export class CustomerServiceScheduleComponent implements OnInit {
 
     // If still empty, notify user and redirect
     if (this.selectedServiceData.length <= 0) {
-      this._notyf.error('Your cart is empty. Pick a service');
+      this._toastr.error('Your cart is empty. Pick a service');
       this._router.navigate(['homepage']);
       return;
     }
@@ -84,7 +84,7 @@ export class CustomerServiceScheduleComponent implements OnInit {
     // Prepare data structure needed for calculation
     this.preparedDataForCalculation = this.prepareTheDataForPriceCalculation(this.selectedServiceData);
   }
-  
+
   /**
     * Transforms selected service data into a simplified ID structure
     * for downstream calculations (pricing, scheduling).

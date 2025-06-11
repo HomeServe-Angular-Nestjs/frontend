@@ -7,12 +7,13 @@ import { Router } from "@angular/router";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { NotificationService } from "../../core/services/public/notification.service";
 import { HttpErrorResponse } from "@angular/common/http";
+import { ToastNotificationService } from "../../core/services/public/toastr.service";
 
 export const providerEffects = {
     fetchOneProvider$: createEffect(() => {
         const actions$ = inject(Actions);
         const providerService = inject(ProviderService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(providerActions.fetchOneProvider),
@@ -20,7 +21,8 @@ export const providerEffects = {
                 providerService.getOneProvider().pipe(
                     map((provider) => providerActions.fetchOneProviderSuccess({ provider })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, providerActions.fetchOneProviderFailure, notyf);
+                        return handleApiError(error, providerActions.fetchOneProviderFailure, toastr
+                        );
                     })
                 )
             )
@@ -31,7 +33,7 @@ export const providerEffects = {
         const actions$ = inject(Actions);
         const providerService = inject(ProviderService);
         const router = inject(Router);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(providerActions.updateProvider),
@@ -39,11 +41,13 @@ export const providerEffects = {
                 providerService.bulkUpdate(updateProviderData).pipe(
                     map((updatedProviderData) => {
                         router.navigate(['provider', 'profiles', 'overview']);
-                        notyf.success('Update Success');
+                        toastr
+                            .success('Update Success');
                         return providerActions.updateProviderSuccess({ updatedProviderData });
                     }),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, providerActions.updateProviderFailure, notyf);
+                        return handleApiError(error, providerActions.updateProviderFailure, toastr
+                        );
                     })
                 )
             )

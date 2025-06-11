@@ -7,9 +7,9 @@ import { IProvider } from '../../../../../../core/models/user.model';
 import { IOfferedService } from '../../../../../../core/models/offeredService.model';
 import { ProviderService } from '../../../../../../core/services/provider.service';
 import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
-import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { IFilter, IPriceRange, IServiceDurationRange, ServiceDurationKey, SortOption } from '../../../../../../core/models/filter.model';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 @Component({
   selector: 'app-customer-provider-profile-services',
@@ -22,7 +22,7 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
   private _providerService = inject(ProviderService);
   private _serviceOfferedService = inject(OfferedServicesService);
   private _debounceService = inject(DebounceService)
-  private _notyf = inject(NotificationService);
+  private _toastr = inject(ToastNotificationService);
   private _router = inject(Router);
   private _route = inject(ActivatedRoute);
 
@@ -90,7 +90,7 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
         this.serviceData = service;
         service.forEach(s => this.serviceCategories.push(s.title));
       },
-      error: (err) => this._notyf.error(err)
+      error: (err) => this._toastr.error(err)
     });
 
   }
@@ -121,12 +121,12 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
     const { min, max } = this.priceRange;
 
     if ((min !== undefined && min < 0) || (max !== undefined && max < 0)) {
-      this._notyf.error("Price cannot be negative.");
+      this._toastr.error("Price cannot be negative.");
       return;
     }
 
     if (min !== undefined && max !== undefined && min > max) {
-      this._notyf.error("Minimum price should be less than maximum price.");
+      this._toastr.error("Minimum price should be less than maximum price.");
       return;
     }
     this._emitFilters();

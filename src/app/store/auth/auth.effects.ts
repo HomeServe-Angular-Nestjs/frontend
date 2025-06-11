@@ -6,19 +6,19 @@ import { Router } from "@angular/router";
 import { authActions } from "./auth.actions";
 import { catchError, first, map, of, switchMap, tap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
-import { NotificationService } from "../../core/services/public/notification.service";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { loginNavigation, navigationAfterLogin } from "../../core/utils/navigation.utils";
 import { Store } from "@ngrx/store";
 import { selectAuthUserType } from "./auth.selector";
 import { UserType } from "../../modules/shared/models/user.model";
+import { ToastNotificationService } from "../../core/services/public/toastr.service";
 
 export const authEffects = {
     login$: createEffect(() => {
         const actions$ = inject(Actions);
         const loginService = inject(LoginAuthService);
         const router = inject(Router);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(authActions.login),
@@ -30,7 +30,8 @@ export const authEffects = {
                         router.navigate([url]);
                     }),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, authActions.loginFailure, notyf);
+                        return handleApiError(error, authActions.loginFailure, toastr
+                        );
                     })
                 )
             )
@@ -40,7 +41,7 @@ export const authEffects = {
     googleLogin$: createEffect(() => {
         const actions$ = inject(Actions);
         const loginService = inject(LoginAuthService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(authActions.googleLogin),
@@ -48,7 +49,8 @@ export const authEffects = {
                 loginService.initializeGoogleAuth(userType).pipe(
                     tap((response) => window.location.href = response.data),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, authActions.loginFailure, notyf);
+                        return handleApiError(error, authActions.loginFailure, toastr
+                        );
                     })
                 )
             )
@@ -60,7 +62,6 @@ export const authEffects = {
         const loginService = inject(LoginAuthService);
         const router = inject(Router);
         const store = inject(Store);
-        const notyf = inject(NotificationService);
 
         return actions$.pipe(
             ofType(authActions.logout),
@@ -70,7 +71,6 @@ export const authEffects = {
                     switchMap((userType) => {
                         if (fromInterceptor) {
                             router.navigate([loginNavigation(userType as UserType)]);
-                            notyf.error('session expired!');
                             return of(authActions.logoutSuccess());
                         }
 

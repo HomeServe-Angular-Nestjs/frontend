@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
-import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { Day, IProvider } from '../../../../../../core/models/user.model';
 import { firstValueFrom, Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -11,6 +10,7 @@ import { selectProvider } from '../../../../../../store/provider/provider.select
 import { providerActions } from '../../../../../../store/provider/provider.action';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
 import { API_KEY } from '../../../../../../environments/api.environments';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 export interface profile {
   fullName: string,
@@ -42,7 +42,7 @@ export class ProviderEditOverviewComponent implements OnInit {
 
   private _router = inject(Router);
   private _fb = inject(FormBuilder);
-  private _notyf = inject(NotificationService);
+  private _toastr = inject(ToastNotificationService);
 
   previewImage: string | undefined = '';
   emergency = false;
@@ -152,7 +152,7 @@ export class ProviderEditOverviewComponent implements OnInit {
       for (const [key, control] of Object.entries(controls)) {
         const message = getValidationMessage(control, key);
         if (message) {
-          this._notyf.error(message);
+          this._toastr.error(message);
           return;
         }
       }

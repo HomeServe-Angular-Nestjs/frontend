@@ -1,62 +1,14 @@
 import { inject } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { UserManagementService } from "../../core/services/user.service";
 import { userActions } from "./user.actions";
 import { catchError, map, of, switchMap, tap, throwError } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
-import { NotificationService } from "../../core/services/public/notification.service";
 import { ProviderService } from "../../core/services/provider.service";
-import { providerActions } from "../provider/provider.action";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { CustomerService } from "../../core/services/customer.service";
-import { Store } from "@ngrx/store";
-import { authActions } from "../auth/auth.actions";
+import { ToastNotificationService } from "../../core/services/public/toastr.service";
 
 export const userEffects = {
-    /**
-    * Fetches users (customers and providers) when 'fetchUsers' is dispatched.
-    * On success, dispatches 'fetchUsersSuccess'. On error, shows a notification and dispatches 'fetchUsersFailure'.
-    */
-    // fetchUsers$: createEffect(() => {
-    //     const actions$ = inject(Actions);
-    //     const userService = inject(UserManagementService);
-    //     const notyf = inject(NotificationService);
-
-    //     return actions$.pipe(
-    //         ofType(userActions.fetchUsers),
-    //         switchMap(() =>
-    //             userService.getUsers().pipe(
-    //                 map((response) => userActions.fetchUsersSuccess({ customers: response.customers, providers: response.providers })),
-    //                 catchError((error: HttpErrorResponse) => {
-    //                     return handleApiError(error, userActions.fetchUsersFailure, notyf);
-    //                 })
-    //             )
-    //         )
-    //     );
-    // }, { functional: true }),
-
-    /**
-     * Fetches providers when 'fetchProviders' is dispatched.
-     * On success, dispatches 'fetchProvidersSuccess'. On error, shows a notification and dispatches 'fetchProvidersFailure'.
-     */
-    // fetchProviders$: createEffect(() => {
-    //     const actions$ = inject(Actions);
-    //     const providerService = inject(ProviderService);
-    //     const notyf = inject(NotificationService);
-
-    //     return actions$.pipe(
-    //         ofType(userActions.fetchProviders),
-    //         switchMap(() =>
-    //             providerService.getProviders().pipe(
-    //                 map((response) => userActions.fetchProvidersSuccess({ providers: response })),
-    //                 catchError((error: HttpErrorResponse) => {
-    //                     return handleApiError(error, userActions.fetchProvidersFailure, notyf);
-    //                 })
-    //             )
-    //         )
-    //     );
-    // }, { functional: true }),
-
     /**
      * Partially updates a provider when 'partialUpdateProvider' is dispatched.
      * On success, dispatches 'partialUpdateProviderSuccess'. On error, handles it and dispatches 'partialUpdateProviderFailure'.
@@ -64,7 +16,7 @@ export const userEffects = {
     partialUpdateProvider$: createEffect(() => {
         const actions$ = inject(Actions);
         const providerService = inject(ProviderService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(userActions.partialUpdateProvider),
@@ -72,7 +24,8 @@ export const userEffects = {
                 providerService.partialUpdate(updateData).pipe(
                     map((provider) => userActions.partialUpdateProviderSuccess({ provider })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.partialUpdateProviderFailure, notyf);
+                        return handleApiError(error, userActions.partialUpdateProviderFailure, toastr
+                        );
                     })
                 )
             )
@@ -86,7 +39,7 @@ export const userEffects = {
     partialUpdateCustomer$: createEffect(() => {
         const actions$ = inject(Actions);
         const customerService = inject(CustomerService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(userActions.partialUpdateCustomer),
@@ -94,7 +47,8 @@ export const userEffects = {
                 customerService.partialUpdate(updateData).pipe(
                     map((customer) => userActions.partialUpdateCustomerSuccess({ customer })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.partialUpdateCustomerFailure, notyf);
+                        return handleApiError(error, userActions.partialUpdateCustomerFailure, toastr
+                        );
                     })
                 )
             )
@@ -108,7 +62,7 @@ export const userEffects = {
     filterCustomers$: createEffect(() => {
         const actions$ = inject(Actions);
         const customerService = inject(CustomerService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(userActions.filterCustomer),
@@ -116,7 +70,8 @@ export const userEffects = {
                 customerService.getCustomers(filter).pipe(
                     map((customers) => userActions.filterCustomerSuccess({ customers })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.filterCustomerFailure, notyf);
+                        return handleApiError(error, userActions.filterCustomerFailure, toastr
+                        );
                     })
                 )
             )
@@ -130,7 +85,7 @@ export const userEffects = {
     filterProviders$: createEffect(() => {
         const actions$ = inject(Actions);
         const providerService = inject(ProviderService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(userActions.filterProvider),
@@ -138,7 +93,8 @@ export const userEffects = {
                 providerService.getProviders(filter).pipe(
                     map((providers) => userActions.filterProviderSuccess({ providers })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.filterProviderFailure, notyf);
+                        return handleApiError(error, userActions.filterProviderFailure, toastr
+                        );
                     })
                 )
             )

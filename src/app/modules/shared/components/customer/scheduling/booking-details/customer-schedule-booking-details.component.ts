@@ -4,10 +4,10 @@ import { API_KEY } from '../../../../../../environments/api.environments';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
 import { ISchedule, ISlotData } from '../../../../../../core/models/schedules.model';
 import { FormsModule } from '@angular/forms';
-import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { OtpService } from '../../../../../../core/services/public/otp.service';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { CustomerLocationType } from '../../../../../../core/models/booking.model';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 @Component({
   selector: 'app-customer-schedule-booking-details',
@@ -17,7 +17,7 @@ import { CustomerLocationType } from '../../../../../../core/models/booking.mode
   providers: [OtpService]
 })
 export class CustomerScheduleBookingDetailsComponent {
-  private readonly _notyf = inject(NotificationService);
+  private readonly _toastr = inject(ToastNotificationService);
   private readonly _otpService = inject(OtpService);
   private readonly _bookingService = inject(BookingService)
 
@@ -69,11 +69,11 @@ export class CustomerScheduleBookingDetailsComponent {
           console.log(isSent)
         },
         error: (err) => {
-          this._notyf.error(err);
+          this._toastr.error(err);
         }
       })
     } else {
-      this._notyf.error('Invalid phone number');
+      this._toastr.error('Invalid phone number');
     }
   }
 

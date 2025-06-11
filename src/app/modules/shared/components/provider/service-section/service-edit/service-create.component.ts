@@ -8,6 +8,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IOfferedService, ISubService } from '../../../../../../core/models/offeredService.model';
 import { Store } from '@ngrx/store';
 import { offeredServiceActions } from '../../../../../../store/offered-services/offeredService.action';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 export interface SubService {
   id?: number;
@@ -30,7 +31,8 @@ export interface SubService {
 export class ServiceCreateComponent {
   private _fb = inject(FormBuilder);
   private _serviceOfferedService = inject(OfferedServicesService);
-  private _notyf = inject(NotificationService);
+  private readonly _toastr = inject(ToastNotificationService);
+
   private _store = inject(Store);
   private _scroller = inject(ViewportScroller);
   private _router = inject(Router);
@@ -80,7 +82,7 @@ export class ServiceCreateComponent {
           this.service = service;
           this._patchServiceForm();
         },
-        error: (err) => this._notyf.error(err)
+        error: (err) => this._toastr.error(err)
       });
     }
   }
@@ -124,7 +126,8 @@ export class ServiceCreateComponent {
           const control = group.get(fieldName) as AbstractControl;
           const errorMessage = getValidationMessage(control, fieldName);
           if (errorMessage) {
-            this._notyf.error(errorMessage);
+            this._toastr
+              .error(errorMessage);
             return;
           }
         }
@@ -177,7 +180,8 @@ export class ServiceCreateComponent {
     const isEditMode = !!this.service?.id;
 
     if (!this.serviceImageFile && !this.service?.image && !isEditMode) {
-      this._notyf.error('Service image must be uploaded before submitting.');
+      this._toastr
+        .error('Service image must be uploaded before submitting.');
       return;
     }
 
@@ -185,7 +189,8 @@ export class ServiceCreateComponent {
       const control = this.serviceForm.get(field) as AbstractControl;
       const errorMessage = getValidationMessage(control, field);
       if (errorMessage) {
-        this._notyf.error(errorMessage);
+        this._toastr
+          .error(errorMessage);
         return;
       }
     }
@@ -198,10 +203,12 @@ export class ServiceCreateComponent {
     } else {
       this._serviceOfferedService.sendFormData(formData).subscribe({
         next: () => {
-          this._notyf.success('Creation Success')
+          this._toastr
+            .success('Creation Success')
           this._router.navigate(['provider', 'profiles', 'service_offered'])
         },
-        error: (err) => this._notyf.error(err)
+        error: (err) => this._toastr
+          .error(err)
       });
     }
   }

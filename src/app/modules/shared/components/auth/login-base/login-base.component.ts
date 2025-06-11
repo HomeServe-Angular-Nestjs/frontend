@@ -1,17 +1,16 @@
 import { Component, inject, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { REGEXP_ENV } from "../../../../../environments/regex.environments";
 import { ILoginConfig } from "../../../../config/login.config";
-import { MESSAGES_ENV } from "../../../../../environments/messages.environments";
 import { IUser, UserType } from "../../../models/user.model";
-import { NotificationService } from "../../../../../core/services/public/notification.service";
 import { API_ENV } from "../../../../../environments/api.environments";
 import { authActions } from "../../../../../store/auth/auth.actions";
 import { EmailInputComponent } from "../../../partials/auth/email-input/email-input.component";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
+import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
 
 @Component({
     selector: 'app-login-base',
@@ -22,7 +21,7 @@ import { getValidationMessage } from "../../../../../core/utils/form-validation.
 export class LoginBaseComponent {
     private _fb = inject(FormBuilder);
     private _store = inject(Store);
-    private _notyf = inject(NotificationService);
+    private _toastr = inject(ToastNotificationService);
 
     @Input({ required: true }) config!: ILoginConfig;
     regexp = REGEXP_ENV;
@@ -56,7 +55,7 @@ export class LoginBaseComponent {
             for (const [key, control] of Object.entries(controls)) {
                 const message = getValidationMessage(control, key);
                 if (message) {
-                    this._notyf.error(message);
+                    this._toastr.error(message);
                     return;
                 }
             }

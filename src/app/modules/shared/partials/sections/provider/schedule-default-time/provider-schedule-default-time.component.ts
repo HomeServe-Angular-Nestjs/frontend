@@ -3,13 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SlotType } from '../../../../../../core/models/schedules.model';
 import { ProviderService } from '../../../../../../core/services/provider.service';
-import { NotificationService } from '../../../../../../core/services/public/notification.service';
 import { IProvider } from '../../../../../../core/models/user.model';
-import { ScheduleService } from '../../../../../../core/services/schedule.service';
 import { Store } from '@ngrx/store';
-import { scheduleActions } from '../../../../../../store/schedules/schedule.action';
 import { selectDefaultSlots } from '../../../../../../store/provider/provider.selector';
 import { providerActions } from '../../../../../../store/provider/provider.action';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 @Component({
   selector: 'app-provider-schedule-default-time',
@@ -21,7 +19,8 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _store = inject(Store);
   private readonly _providerService = inject(ProviderService);
-  private readonly _notyf = inject(NotificationService);
+  private readonly _toastr = inject(ToastNotificationService);
+
 
   @Input({ required: true }) providerData!: IProvider | null;
   @Input({ required: true }) addNewSlots!: boolean;
@@ -56,7 +55,8 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
         this._store.dispatch(providerActions.clearDefaultSlot());
         this.defaultSlots = [];
       },
-      error: (err) => this._notyf.error(err)
+      error: (err) => this._toastr
+        .error(err)
     });
   }
 
@@ -76,14 +76,16 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
     const toMinutes = this.timeToMinutes(toValue);
 
     if (fromMinutes >= toMinutes) {
-      this._notyf.error('Start time must be earlier than end time.');
+      this._toastr
+        .error('Start time must be earlier than end time.');
       return;
     }
 
     const slotsToCheck = this.addNewSlots ? this.newSlots : this.defaultSlots;
 
     if (this.hasOverlap(slotsToCheck, fromMinutes, toMinutes)) {
-      this._notyf.error('This time range overlaps with an existing slot.');
+      this._toastr
+        .error('This time range overlaps with an existing slot.');
       return;
     }
 
@@ -94,7 +96,8 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
         next: () => {
           this._store.dispatch(providerActions.addDefaultSlot({ slot: { from: from12, to: to12 } }))
         },
-        error: (err) => this._notyf.error(err)
+        error: (err) => this._toastr
+          .error(err)
       });
     }
 
@@ -108,7 +111,8 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
         this.newSlotEvent.emit({ from: slot.from, to: slot.to });
       }
     } else {
-      this._notyf.error('No slots in default');
+      this._toastr
+        .error('No slots in default');
     }
   }
 

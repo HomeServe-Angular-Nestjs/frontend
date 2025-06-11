@@ -5,14 +5,13 @@ import { catchError, map, of, switchMap } from "rxjs";
 import { ScheduleService } from "../../core/services/schedule.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
-import { NotificationService } from "../../core/services/public/notification.service";
-import { providerActions } from "../provider/provider.action";
+import { ToastNotificationService } from "../../core/services/public/toastr.service";
 
 export const scheduleEffects = {
     fetchScheduleEffect$: createEffect(() => {
         const actions$ = inject(Actions);
         const scheduleService = inject(ScheduleService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(scheduleActions.fetchSchedules),
@@ -20,7 +19,8 @@ export const scheduleEffects = {
                 scheduleService.fetchSchedules(providerId).pipe(
                     map((schedules) => scheduleActions.fetchSchedulesSuccess({ schedules })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, scheduleActions.fetchSchedulesFailure, notyf);
+                        return handleApiError(error, scheduleActions.fetchSchedulesFailure, toastr
+                        );
                     })
                 )
             )
@@ -30,7 +30,7 @@ export const scheduleEffects = {
     updateSchedule$: createEffect(() => {
         const actions$ = inject(Actions);
         const scheduleService = inject(ScheduleService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(scheduleActions.updateSchedule),
@@ -41,7 +41,8 @@ export const scheduleEffects = {
                         updatedProvider: response.provider //ToDo Not finished
                     })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, scheduleActions.updateSchedulesFailure, notyf);
+                        return handleApiError(error, scheduleActions.updateSchedulesFailure, toastr
+                        );
                     })
                 )
             )
@@ -51,14 +52,15 @@ export const scheduleEffects = {
     removeSchedule$: createEffect(() => {
         const actions$ = inject(Actions);
         const scheduleService = inject(ScheduleService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(scheduleActions.removeSchedule),
             switchMap(({ date, id }) => scheduleService.removeSchedule(date, id).pipe(
                 map((response) => scheduleActions.removeScheduleSuccess({ removedScheduleId: response.id })),
                 catchError((error: HttpErrorResponse) => {
-                    return handleApiError(error, scheduleActions.removeScheduleFailure, notyf)
+                    return handleApiError(error, scheduleActions.removeScheduleFailure, toastr
+                    )
                 })
             ))
         );

@@ -4,12 +4,11 @@ import { CommonModule } from "@angular/common";
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
 import { SignupAuthService } from "../../../../../core/services/signup-auth.service";
 import { Router, RouterLink } from "@angular/router";
-import { AlertService } from "../../../../../core/services/public/alert.service";
 import { IUser, UserType } from "../../../models/user.model";
 import { OtpComponent } from "../../../partials/auth/otp/otp.component";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
-import { NotificationService } from "../../../../../core/services/public/notification.service";
 import { REGEXP_ENV } from "../../../../../environments/regex.environments";
+import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
 
 @Component({
     selector: 'app-signup-base',
@@ -22,7 +21,7 @@ export class SignupBaseComponent {
     private signupAuthService = inject(SignupAuthService);
     private router = inject(Router);
     private fb = inject(FormBuilder);
-    private notyf = inject(NotificationService);
+    private _toastr = inject(ToastNotificationService);
 
     @Input({ required: true }) config!: ISignupConfig;
 
@@ -62,7 +61,7 @@ export class SignupBaseComponent {
                 || getValidationMessage(this.form.get('password'), 'password')
 
             if (errorMessage) {
-                this.notyf.error(errorMessage);
+                this._toastr.error(errorMessage);
                 return;
             }
         }
@@ -71,7 +70,7 @@ export class SignupBaseComponent {
     verifyOtp(code: string) {
         this.signupAuthService.verifyOtp(this.user.email, code).subscribe({
             next: () => this.finalizeSignup(this.user),
-            error: (err) => this.notyf.error(err),
+            error: (err) => this._toastr.error(err),
         });
     }
 
@@ -81,7 +80,7 @@ export class SignupBaseComponent {
                 const url: string = this.user.type === 'customer' ? 'login' : `${this.user.type}/login`;
                 this.router.navigate([url]);
             },
-            error: (err) => this.notyf.error(err)
+            error: (err) => this._toastr.error(err)
         });
     }
 
@@ -92,7 +91,7 @@ export class SignupBaseComponent {
     private initializeSignup(email: string, type: UserType) {
         this.signupAuthService.initiateSignup(email, type).subscribe({
             next: () => this.isValidForm = true,
-            error: (err) => this.notyf.error(err)
+            error: (err) => this._toastr.error(err)
         })
     }
 }

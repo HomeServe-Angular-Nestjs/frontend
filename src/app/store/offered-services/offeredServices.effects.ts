@@ -1,18 +1,18 @@
 import { inject } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { offeredServiceActions } from "./offeredService.action";
-import { catchError, map, mergeMap, of, switchMap, throwError } from "rxjs";
+import { catchError, map, switchMap } from "rxjs";
 import { OfferedServicesService } from "../../core/services/service-management.service";
 import { HttpErrorResponse } from "@angular/common/http";
-import { NotificationService } from "../../core/services/public/notification.service";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { Router } from "@angular/router";
+import { ToastNotificationService } from "../../core/services/public/toastr.service";
 
 export const offeredServiceEffects = {
     fetchOfferedServices$: createEffect(() => {
         const actions$ = inject(Actions);
         const serviceOfferedService = inject(OfferedServicesService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(offeredServiceActions.fetchOfferedServices),
@@ -20,7 +20,8 @@ export const offeredServiceEffects = {
                 serviceOfferedService.fetchOfferedServices().pipe(
                     map((response) => offeredServiceActions.fetchOfferedServicesSuccess({ offeredServices: response })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, offeredServiceActions.fetchOfferedServiceFailure, notyf);
+                        return handleApiError(error, offeredServiceActions.fetchOfferedServiceFailure, toastr
+                        );
                     })
                 )
             )
@@ -30,7 +31,7 @@ export const offeredServiceEffects = {
     updateOfferedService$: createEffect(() => {
         const actions$ = inject(Actions);
         const serviceOfferedService = inject(OfferedServicesService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
         const router = inject(Router);
 
         return actions$.pipe(
@@ -42,7 +43,8 @@ export const offeredServiceEffects = {
                         return offeredServiceActions.updateOfferedServiceSuccess({ updatedService })
                     }),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, notyf);
+                        return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, toastr
+                        );
                     })
                 )
             )
@@ -52,7 +54,7 @@ export const offeredServiceEffects = {
     updateSubService$: createEffect(() => {
         const actions$ = inject(Actions);
         const serviceOfferedService = inject(OfferedServicesService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(offeredServiceActions.updateSubService),
@@ -63,34 +65,11 @@ export const offeredServiceEffects = {
                         subService: response.subService
                     })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, notyf);
+                        return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, toastr
+                        );
                     })
                 )
             )
         );
     }, { functional: true }),
-
-    // deleteSubService$: createEffect(() => {
-    //     const actions$ = inject(Actions);
-    //     const serviceOfferedService = inject(OfferedServicesService);
-    //     const notyf = inject(NotificationService);
-
-    //     return actions$.pipe(
-    //         ofType(offeredServiceActions.deleteSubService),
-    //         switchMap(({ serviceId, subId }) =>
-    //             serviceOfferedService.deleteSubService(serviceId, subId).pipe(
-    //                 mergeMap((success) => {
-    //                     if (success) {
-    //                         return of(offeredServiceActions.deleteSubServiceSuccess({ serviceId, subId }));
-    //                     } else {
-    //                         return throwError(() => new Error('Failed to delete sub service'));
-    //                     }
-    //                 }),
-    //                 catchError((error: HttpErrorResponse) => {
-    //                     return handleApiError(error, offeredServiceActions.deleteSubServiceFailure, notyf);
-    //                 }))
-    //         )
-    //     )
-    // }, { functional: true })
-
 }

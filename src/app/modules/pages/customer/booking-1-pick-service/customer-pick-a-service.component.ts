@@ -1,16 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
-import { CustomerPickServiceCategoryListComponent } from "../../../shared/components/customer/pick-service/categories/customer-pick-service-category-list.component";
-import { CustomerPickServiceListComponent, SelectedServiceIdType } from "../../../shared/components/customer/pick-service/service-list/customer-pick-service-list.component";
-import { CustomerServiceSelectedListComponent } from "../../../shared/components/customer/pick-service/selected-service-list/customer-pick-service-selected-list.component";
-import { ReassuranceComponent } from "../../../shared/partials/sections/customer/reassurance/reassurance.component";
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { IOfferedService, ISubService } from '../../../../core/models/offeredService.model';
 import { OfferedServicesService } from '../../../../core/services/service-management.service';
-import { NotificationService } from '../../../../core/services/public/notification.service';
-import { forkJoin } from 'rxjs';
 import { SharedDataService } from '../../../../core/services/public/shared-data.service';
+import { CustomerPickServiceListComponent, SelectedServiceIdType } from "../../../shared/components/customer/pick-service/service-list/customer-pick-service-list.component";
+import { CustomerPickServiceCategoryListComponent } from "../../../shared/components/customer/pick-service/categories/customer-pick-service-category-list.component";
+import { CustomerServiceSelectedListComponent } from "../../../shared/components/customer/pick-service/selected-service-list/customer-pick-service-selected-list.component";
+import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
+import { ReassuranceComponent } from "../../../shared/partials/sections/customer/reassurance/reassurance.component";
+import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
 
 export type SelectedServiceType = {
   id: string,
@@ -38,7 +38,7 @@ export type SelectedServiceIdsType = {
 })
 export class CustomerPickAServiceComponent {
   private readonly _serviceOfferedServices = inject(OfferedServicesService);
-  private readonly _notyf = inject(NotificationService);
+  private readonly _toastr = inject(ToastNotificationService);
   private readonly _sharedDataService = inject(SharedDataService);
   private _router = inject(Router);
 
@@ -89,7 +89,7 @@ export class CustomerPickAServiceComponent {
           });
         })
       },
-      error: (err) => this._notyf.error(err)
+      error: (err) => this._toastr.error(err)
     })
   }
 
@@ -119,7 +119,7 @@ export class CustomerPickAServiceComponent {
   addSelectedService(data: SelectedServiceIdType) {
     const { id } = this.servicesOfSelectedCategory;
     if (!id || id !== data.id) {
-      this._notyf.error('Invalid category selection.');
+      this._toastr.error('Invalid category selection.');
       return;
     }
 

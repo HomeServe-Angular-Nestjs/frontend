@@ -2,14 +2,12 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { catchError, Observable, pipe, throwError } from "rxjs";
-import { NotificationService } from "./public/notification.service";
 import { IOfferedService, ISubService } from "../models/offeredService.model";
 import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
 export class OfferedServicesService {
     private http = inject(HttpClient);
-    private notyf = inject(NotificationService);
 
     private apiUrl = API_ENV.provider;
 

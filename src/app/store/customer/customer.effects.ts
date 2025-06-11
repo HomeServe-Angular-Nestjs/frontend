@@ -6,12 +6,13 @@ import { CustomerService } from "../../core/services/customer.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { NotificationService } from "../../core/services/public/notification.service";
+import { ToastNotificationService } from "../../core/services/public/toastr.service";
 
 export const customerEffects = {
     fetchOneCustomer$: createEffect(() => {
         const actions$ = inject(Actions);
         const customerService = inject(CustomerService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(customerActions.fetchOneCustomer),
@@ -19,7 +20,8 @@ export const customerEffects = {
                 customerService.fetchOneCustomer().pipe(
                     map((customer) => customerActions.customerSuccessAction({ customer })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, customerActions.customerFailureAction, notyf)
+                        return handleApiError(error, customerActions.customerFailureAction, toastr
+                        )
                     })
                 )
             )
@@ -29,7 +31,7 @@ export const customerEffects = {
     updateCustomer$: createEffect(() => {
         const actions$ = inject(Actions);
         const customerService = inject(CustomerService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(customerActions.updateCustomer),
@@ -37,7 +39,8 @@ export const customerEffects = {
                 customerService.partialUpdate(updateData).pipe(
                     map((customer) => customerActions.customerSuccessAction({ customer })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, customerActions.customerFailureAction, notyf)
+                        return handleApiError(error, customerActions.customerFailureAction, toastr
+                        )
                     })
                 )
             )
@@ -47,7 +50,7 @@ export const customerEffects = {
     updateAddToSaved$: createEffect(() => {
         const actions$ = inject(Actions);
         const customerService = inject(CustomerService);
-        const notyf = inject(NotificationService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(customerActions.updateAddToSaved),
@@ -55,7 +58,8 @@ export const customerEffects = {
                 customerService.updateAddToSaved(providerId).pipe(
                     map((customer) => customerActions.customerSuccessAction({ customer })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, customerActions.customerFailureAction, notyf)
+                        return handleApiError(error, customerActions.customerFailureAction, toastr
+                        )
                     })
                 )
             )

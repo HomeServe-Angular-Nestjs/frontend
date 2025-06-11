@@ -19,7 +19,8 @@ export class ChangePasswordComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private loginService = inject(LoginAuthService);
     private fb = inject(FormBuilder);
-    private notyf = inject(NotificationService);
+    private toastr
+ = inject(NotificationService);
 
     regexp = REGEXP_ENV;
     messages = MESSAGES_ENV;
@@ -100,7 +101,8 @@ export class ChangePasswordComponent implements OnInit {
         if (control?.errors) {
             Object.keys(control.errors).forEach((key) => {
                 if (this.messages['errorMessages'][fieldName]?.[key]) {
-                    this.notyf.error(this.messages['errorMessages'][fieldName][key]);
+                    this.toastr
+.error(this.messages['errorMessages'][fieldName][key]);
                 }
             });
             return true;
