@@ -48,43 +48,52 @@
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-sm text-gray-400">{{ date.split(' ')[2] }}</span>
                     <ng-container *ngIf="schedules$ | async as schedules">
-                        <span *ngIf="schedules.length > 0"
-                            class="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">
-                            {{ schedules.length }} slots
-                        </span>
+                        <ng-container *ngFor="let item of schedules">
+                            <ng-container *ngIf="item.scheduleDate === date">
+                                <span *ngIf="item.slots.length > 0"
+                                    class="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">
+                                    {{ item.slots.length }} slots
+                                </span>
+                            </ng-container>
+                        </ng-container>
                     </ng-container>
                 </div>
 
                 <div class="space-y-1">
-                    <ng-container *ngIf="schedules$ | async as schedules; else loading">
-                        <ng-container *ngFor="let item of schedules">
-                            <ng-container *ngIf="item.scheduleDate === date">
-                                <div *ngFor="let slot of item.slots"
-                                    class="text-xs px-1 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
-                                    {{ slot.from }} - {{ slot.to }}
-                                </div>
+                    <ng-container *ngIf="(loading$ | async) === false; else loading">
+                        <ng-container *ngIf="schedules$ | async as schedules; else loading">
+                            <ng-container *ngFor="let item of schedules">
+                                <ng-container *ngIf="item.scheduleDate === date">
+                                    <div *ngFor="let slot of item.slots"
+                                        class="text-xs px-1 py-1 bg-green-50 text-[#16A34A] rounded group-hover:bg-green-100 transition-colors">
+                                        {{ slot.from }} - {{ slot.to }}
+                                    </div>
+                                </ng-container>
                             </ng-container>
                         </ng-container>
                     </ng-container>
 
                     <ng-template #loading>
-                        <div>Loading...</div>
+                        <div class="absolute inset-0 flex justify-center items-center bg-white/50 backdrop-blur-sm">
+                            <div class="text-gray-600 text-sm animate-pulse">Loading schedules...</div>
+                        </div>
                     </ng-template>
                 </div>
+                <ng-container *ngIf="!(loading$ | async)">
+                    <button type="button" (click)="addSlots(date)"
+                        class="w-full mt-2 py-1 text-xs text-[#16A34A] opacity-0 group-hover:opacity-100 hover:bg-green-50 rounded transition-all">
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add Slots
+                    </button>
 
-                <button type="button" (click)="addSlots(date)"
-                    class="w-full mt-2 py-1 text-xs text-[#16A34A] opacity-0 group-hover:opacity-100 hover:bg-green-50 rounded transition-all">
-                    <i class="fas fa-plus" aria-hidden="true"></i> Add Slots
-                </button>
-
-                <ng-container *ngIf="schedules$ | async as schedules">
-                    <ng-container *ngFor="let item of schedules">
-                        <ng-container *ngIf="item.scheduleDate === date && item.slots.length > 0">
-                            <button *ngIf="item.scheduleDate && item.id" type="button"
-                                (click)="clearSlots(item.scheduleDate, item.id, $event)"
-                                class="w-full mt-2 py-1 text-xs text-[#16A34A] opacity-0 group-hover:opacity-100 hover:bg-green-50 rounded transition-all">
-                                <i class="fas fa-trash" aria-hidden="true"></i> Clear
-                            </button>
+                    <ng-container *ngIf="schedules$ | async as schedules">
+                        <ng-container *ngFor="let item of schedules">
+                            <ng-container *ngIf="item.scheduleDate === date && item.slots.length > 0">
+                                <button *ngIf="item.scheduleDate && item.id" type="button"
+                                    (click)="clearSlots(item.scheduleDate, item.id, $event)"
+                                    class="w-full mt-2 py-1 text-xs text-[#16A34A] opacity-0 group-hover:opacity-100 hover:bg-green-50 rounded transition-all">
+                                    <i class="fas fa-trash" aria-hidden="true"></i> Clear
+                                </button>
+                            </ng-container>
                         </ng-container>
                     </ng-container>
                 </ng-container>

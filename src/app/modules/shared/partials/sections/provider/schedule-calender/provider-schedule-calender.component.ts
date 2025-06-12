@@ -1,14 +1,15 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProviderScheduleDefaultTimeComponent } from "../schedule-default-time/provider-schedule-default-time.component";
 import { IProvider } from '../../../../../../core/models/user.model';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { catchError, combineLatest, filter, map, Observable, of, shareReplay, startWith, Subject, switchMap, takeUntil, timer } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectProvider } from '../../../../../../store/provider/provider.selector';
 import { ISchedule, SlotType } from '../../../../../../core/models/schedules.model';
 import { scheduleActions } from '../../../../../../store/schedules/schedule.action';
-import { selectAllSchedules } from '../../../../../../store/schedules/schedule.selector';
+import { ScheduleService } from '../../../../../../core/services/schedule.service';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 @Component({
   selector: 'app-provider-schedule-calender',
@@ -17,14 +18,16 @@ import { selectAllSchedules } from '../../../../../../store/schedules/schedule.s
   templateUrl: './provider-schedule-calender.component.html',
 })
 export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
-  providerData$!: Observable<IProvider | null>;
-  schedules$!: Observable<ISchedule[]>;
+  private readonly _store = inject(Store);
+  private readonly _scheduleService = inject(ScheduleService);
+  private readonly _toastr = inject(ToastNotificationService);
 
   private _destroy$ = new Subject<void>();
 
-  constructor(private _store: Store) { }
+  providerData$!: Observable<IProvider | null>;
+  schedules$!: Observable<ISchedule[]>;
+  loading$!: Observable<boolean>;
 
-  loading: boolean = false;
   currentDate: Date = new Date();
   dateInput: string = '';
   visibleDates: string[] = [];
@@ -35,28 +38,44 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.providerData$ = this._store.select(selectProvider);
+    const delayed$ = timer(3000); // min 3 sec delay
 
-    // Dispatch an action to fetch schedules once provider ID is available
-    this.providerData$.pipe(
+    const fetchedSchedules$ = this.providerData$.pipe(
       takeUntil(this._destroy$),
-      filter((provider): provider is IProvider => !!provider && !!provider.id)
-    ).subscribe(provider => {
-      this._store.dispatch(scheduleActions.fetchSchedules({ providerId: provider.id }));
-    })
+      filter((provider): provider is IProvider => !!provider && !!provider.id),
+      switchMap(provider =>
+        this._scheduleService.fetchSchedules(provider.id).pipe(
+          catchError(err => {
+            this._toastr.error('Failed to load schedules');
+            console.error(err);
+            return of([]);
+          })
+        )
+      ),
+      shareReplay(1)
+    );
 
-    this.schedules$ = this._store.select(selectAllSchedules);
+    this.schedules$ = fetchedSchedules$;
+
+    this.loading$ = combineLatest([fetchedSchedules$, delayed$]).pipe(
+      takeUntil(this._destroy$),
+      map(() => false),
+      startWith(true)
+    );
 
     this._syncDateInputToCurrent();
     this._generateWeek(this.currentDate);
   }
 
   prev() {
+    this.currentDate = new Date(this.currentDate);
     this.currentDate.setDate(this.currentDate.getDate() - 7);
     this._syncDateInputToCurrent();
     this._generateWeek(this.currentDate);
   }
 
   next() {
+    this.currentDate = new Date(this.currentDate);
     this.currentDate.setDate(this.currentDate.getDate() + 7);
     this._syncDateInputToCurrent();
     this._generateWeek(this.currentDate);
@@ -72,23 +91,14 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   }
 
   isSelected(dateStr: string): boolean {
-    const [weekday, month, day, year] = dateStr.split(' ');
-    const localDate = new Date(Number(year), this._getMonthNumber(month), Number(day));
-    const formatted = this._formatDateInput(localDate);
-    return formatted === this.dateInput;
+    const parsed = this._parseDateString(dateStr);
+    return this._formatDateInput(parsed) === this.dateInput;
   }
 
   selectDate(dateStr: string) {
-    const [weekday, month, day, year] = dateStr.split(' ');
-    const localDate = new Date(Number(year), this._getMonthNumber(month), Number(day));
-
-    // Update the dateInput (for the input field)
-    this.dateInput = this._formatDateInput(localDate);
-
-    // Update currentDate (for the week view and month/year heading)
-    this.currentDate = localDate;
-
-    // Regenerate the week based on the selected date
+    const parsed = this._parseDateString(dateStr);
+    this.dateInput = this._formatDateInput(parsed);
+    this.currentDate = parsed;
     this._generateWeek(this.currentDate);
   }
 
@@ -111,7 +121,6 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
     this._store.dispatch(scheduleActions.removeSchedule({ date, id }));
   }
 
-
   setDefaultHours() {
     this.modal = true;
     this.addNewSlots = false;
@@ -121,10 +130,14 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
     this.modal = event;
   }
 
-  private _getMonthNumber(monthName: string): number {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    return months.indexOf(monthName);
+  // shouldShowActions(loading: boolean, schedules: ISchedule[], date: string): boolean {
+  //   if (loading) return false;
+  //   return schedules.some(s => s.scheduleDate === date && s.slots.length > 0);
+  // }
+
+  getSlotCountForDate(schedules: ISchedule[], date: string): number {
+    const match = schedules.find(item => item.scheduleDate === date);
+    return match ? match.slots.length : 0;
   }
 
   private _syncDateInputToCurrent() {
@@ -141,25 +154,32 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   private _generateWeek(baseDate: Date) {
     const startOfWeek = this._getStartOfWeek(baseDate);
     const dates: string[] = [];
-
     for (let i = 0; i < 7; i++) {
       const day = new Date(startOfWeek);
       day.setDate(startOfWeek.getDate() + i);
       dates.push(day.toDateString());
     }
-
     this.visibleDates = dates;
   }
 
   private _getStartOfWeek(date: Date): Date {
     const start = new Date(date);
-    const day = start.getDay(); // 0 = Sun, 1 = Mon, ...
+    const day = start.getDay();
     start.setDate(start.getDate() - day);
     return start;
   }
 
+  private _parseDateString(dateStr: string): Date {
+    const [_, month, day, year] = dateStr.split(' ');
+    return new Date(Number(year), this._getMonthNumber(month), Number(day));
+  }
+
+  private _getMonthNumber(monthName: string): number {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return months.indexOf(monthName);
+  }
+
   ngOnDestroy(): void {
-    // Complete the destroy$ subject to clean up subscriptions
     this._destroy$.next();
     this._destroy$.complete();
   }

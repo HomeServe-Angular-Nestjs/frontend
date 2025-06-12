@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { API_ENV } from '../../environments/api.environments';
 import { catchError, Observable, throwError } from 'rxjs';
 import { ISchedule, SlotType } from '../models/schedules.model';
@@ -17,10 +17,9 @@ interface IUpdateSchedule {
 
 @Injectable({ providedIn: 'root', })
 export class ScheduleService {
+  private readonly _http = inject(HttpClient);
 
-  constructor(private _http: HttpClient) { }
-
-  private _apiUrl = API_ENV.provider;
+  private readonly _apiUrl = API_ENV.provider;
 
   fetchSchedules(providerId?: string): Observable<ISchedule[]> {
     return this._http.get<ISchedule[]>(`${this._apiUrl}/schedules?id=${providerId}`).pipe(

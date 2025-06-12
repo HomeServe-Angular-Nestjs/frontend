@@ -16,8 +16,8 @@ import { ToastNotificationService } from '../../../../../../core/services/public
   templateUrl: './provider-schedule-default-time.component.html',
 })
 export class ProviderScheduleDefaultTimeComponent implements OnInit {
-  private _fb = inject(FormBuilder);
-  private _store = inject(Store);
+  private readonly _fb = inject(FormBuilder);
+  private readonly _store = inject(Store);
   private readonly _providerService = inject(ProviderService);
   private readonly _toastr = inject(ToastNotificationService);
 
@@ -69,11 +69,11 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
     const fromValue = this.defaultForm.get('from')?.value;
     const toValue = this.defaultForm.get('to')?.value;
 
-    const from12 = this.convertTo12HourFormat(fromValue);
-    const to12 = this.convertTo12HourFormat(toValue);
+    const from12 = this._convertTo12HourFormat(fromValue);
+    const to12 = this._convertTo12HourFormat(toValue);
 
-    const fromMinutes = this.timeToMinutes(fromValue);
-    const toMinutes = this.timeToMinutes(toValue);
+    const fromMinutes = this._timeToMinutes(fromValue);
+    const toMinutes = this._timeToMinutes(toValue);
 
     if (fromMinutes >= toMinutes) {
       this._toastr
@@ -83,25 +83,27 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
 
     const slotsToCheck = this.addNewSlots ? this.newSlots : this.defaultSlots;
 
-    if (this.hasOverlap(slotsToCheck, fromMinutes, toMinutes)) {
+    if (this._hasOverlap(slotsToCheck, fromMinutes, toMinutes)) {
       this._toastr
         .error('This time range overlaps with an existing slot.');
       return;
     }
 
+    console.log(from12, to12)
+
     if (this.addNewSlots) {
       this.newSlotEvent.emit({ from: from12, to: to12 });
-    } else {
-      this._providerService.updateDefaultSlot({ from: from12, to: to12 }).subscribe({
-        next: () => {
-          this._store.dispatch(providerActions.addDefaultSlot({ slot: { from: from12, to: to12 } }))
-        },
-        error: (err) => this._toastr
-          .error(err)
-      });
+      // } else {
+      //   this._providerService.updateDefaultSlot({ from: from12, to: to12 }).subscribe({
+      //     next: () => {
+      //       this._store.dispatch(providerActions.addDefaultSlot({ slot: { from: from12, to: to12 } }))
+      //     },
+      //     error: (err) => this._toastr
+      //       .error(err)
+      //   });
     }
 
-    this.defaultForm.reset();
+    // this.defaultForm.reset();
   }
 
   setDefaultSlots() {
@@ -116,12 +118,12 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
     }
   }
 
-  private timeToMinutes(time: string): number {
+  private _timeToMinutes(time: string): number {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   }
 
-  private convertTo12HourFormat(time24: string): string {
+  private _convertTo12HourFormat(time24: string): string {
     const [hourStr, minute] = time24.split(':');
     let hour = parseInt(hourStr, 10);
     const format = hour >= 12 ? 'PM' : 'AM';
@@ -129,7 +131,7 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
     return `${hour}:${minute} ${format}`;
   }
 
-  private convertTo24HourFormat(time12h: string): string {
+  private _convertTo24HourFormat(time12h: string): string {
     const [time, modifier] = time12h.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
 
@@ -143,12 +145,12 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
-  private hasOverlap(slots: SlotType[], fromMinutes: number, toMinutes: number): boolean {
+  private _hasOverlap(slots: SlotType[], fromMinutes: number, toMinutes: number): boolean {
     return slots.some(slot => {
-      const existingFrom24 = this.convertTo24HourFormat(slot.from);
-      const existingTo24 = this.convertTo24HourFormat(slot.to);
-      const existingFromMinutes = this.timeToMinutes(existingFrom24);
-      const existingToMinutes = this.timeToMinutes(existingTo24);
+      const existingFrom24 = this._convertTo24HourFormat(slot.from);
+      const existingTo24 = this._convertTo24HourFormat(slot.to);
+      const existingFromMinutes = this._timeToMinutes(existingFrom24);
+      const existingToMinutes = this._timeToMinutes(existingTo24);
 
       return (fromMinutes < existingToMinutes && toMinutes > existingFromMinutes);
     });

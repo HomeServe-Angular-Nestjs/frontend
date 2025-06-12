@@ -68,12 +68,13 @@ export class ProviderService {
      * @returns An observable of the response.
      */
     updateDefaultSlot(slot: SlotType) {
-        return this._http.patch(`${this._apiUrl}/default_slots`, slot).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        );
+        console.log(slot);
+        // return this._http.patch(`${this._apiUrl}/default_slots`, slot).pipe(
+        //     catchError((error: HttpErrorResponse) =>
+        //         throwError(() =>
+        //             new Error(this.getErrorMessage(error)))
+        //     )
+        // );
     }
 
     /**
