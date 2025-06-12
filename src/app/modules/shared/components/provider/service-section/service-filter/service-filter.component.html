@@ -1,0 +1,72 @@
+<div class="bg-gray-50 border border-gray-200 rounded-xl shadow-sm">
+    <!-- Header with Collapse Toggle -->
+    <div class="flex items-center justify-between p-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-700">Service Filters</h2>
+        <button (click)="showFilters = !showFilters"
+            class="text-sm text-green-600 hover:text-green-800 font-medium flex items-center gap-1 transition duration-150">
+            <span>{{ showFilters ? 'Hide' : 'Show' }}</span>
+            <svg *ngIf="!showFilters" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <svg *ngIf="showFilters" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div *ngIf="showFilters" class="p-6 space-y-6">
+
+        <!-- Filter Fields -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- Search -->
+            <div class="col-span-full">
+                <label for="search" class="block text-sm font-medium text-gray-600 mb-1">Search</label>
+                <input id="search" type="text" [(ngModel)]="searchText" (ngModelChange)="onSearchChange()"
+                    placeholder="Title"
+                    class="w-full px-4 py-2 rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+            </div>
+
+            <!-- Service Status -->
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-600 mb-1">Service Status</label>
+                <select id="status" [(ngModel)]="selectedServiceStatus" (ngModelChange)="onStatusChange()"
+                    class="w-full px-3 py-2 rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    <option *ngFor="let option of serviceStatusOptions" [value]="option.value">{{option.label}}</option>
+                </select>
+            </div>
+
+            <!-- Verification Status -->
+            <div>
+                <label for="verification" class="block text-sm font-medium text-gray-600 mb-1">Verification
+                    Status</label>
+                <select id="verification" [(ngModel)]="selectedVerification" (ngModelChange)="onVerificationChange()"
+                    class="w-full px-3 py-2 rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    <option *ngFor="let option of serviceIsVerifiedOptions" [value]="option.value">{{option.label}}
+                    </option>
+
+                </select>
+            </div>
+
+            <!-- Sort By -->
+            <div>
+                <label for="sortBy" class="block text-sm font-medium text-gray-600 mb-1">Sort By</label>
+                <select id="sortBy" [(ngModel)]="selectedSortOption" (ngModelChange)="onSortChange()"
+                    class="w-full px-3 py-2 rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    <option *ngFor="let option of serviceSortOptions" [value]="option.value">{{option.label}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="flex justify-end">
+            <button (click)="resetServiceFilters()"
+                class="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-800 transition-colors duration-200">
+                🔄 Reset Filters
+            </button>
+        </div>
+    </div>
+</div>

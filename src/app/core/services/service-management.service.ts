@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { BehaviorSubject, catchError, Observable, pipe, throwError } from "rxjs";
-import { IOfferedService, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
+import { IOfferedService, IServiceFilter, IServicesWithPagination, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
 import { IFilter } from "../models/filter.model";
 
 @Injectable({ providedIn: 'root' })
@@ -21,14 +21,43 @@ export class OfferedServicesService {
         return this._serviceDataSource.getValue();
     }
 
-    uploadImage(formData: FormData): Observable<{ imageUrl: string }> {
-        return this._http.post<{ imageUrl: string }>(`${this._apiUrl}/uploadImage`, formData).pipe(
+    fetchOneService(id: string): Observable<IOfferedService> {
+        return this._http.get<IOfferedService>(`${this._apiUrl}/offered_service?id=${id}`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        )
+    }
+
+    // ToDo - remove
+    updateSubService(updateData: Partial<ISubService>): Observable<{ id: string, subService: ISubService }> {
+        return this._http.patch<{ id: string, subService: ISubService }>(`${this._apiUrl}/subservice`, updateData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
             )
         );
     }
+
+    // ------------------------------------------------------------------------------------------------------------------------------
+    // **************************************************[Customer Related APIs]*******************************************************
+    // ------------------------------------------------------------------------------------------------------------------------------
+
+    fetchFilteredServices(providerId: string, filter: IFilter): Observable<IOfferedService[]> {
+        const params = this._buildFilterParams(filter);
+        return this._http.get<IOfferedService[]>(`${this._apiUrl}/filter_service?id=${providerId}`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------
+    // **************************************************[Provider Related APIs]*******************************************************
+    // ------------------------------------------------------------------------------------------------------------------------------
 
     sendServiceData(formData: FormData) {
         return this._http.post(`${this._apiUrl}/create_service`, formData).pipe(
@@ -39,54 +68,24 @@ export class OfferedServicesService {
         );
     }
 
-    fetchOfferedServices(): Observable<IOfferedService[]> {
-        return this._http.get<IOfferedService[]>(`${this._apiUrl}/offered_services`).pipe(
+    fetchOfferedServices(filters: IServiceFilter, page: number): Observable<IServicesWithPagination> {
+        let params = new HttpParams().set('page', page);
+
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                params = params.set(key, value);
+            }
+        });
+        return this._http.get<IServicesWithPagination>(`${this._apiUrl}/service`, { params }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
             )
         );
-    }
-
-    fetchOneService(id: string): Observable<IOfferedService> {
-        return this._http.get<IOfferedService>(`${this._apiUrl}/offered_service?id=${id}`).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        )
-    }
-
-    fetchSubservice(id: string): Observable<ISubService> {
-        return this._http.get<ISubService>(`${this._apiUrl}/fetch_subservice?id=${id}`).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        )
     }
 
     updateService(updateData: FormData): Observable<IOfferedService> {
         return this._http.put<IOfferedService>(`${this._apiUrl}/service`, updateData).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        );
-    }
-
-    updateSubService(updateData: Partial<ISubService>): Observable<{ id: string, subService: ISubService }> {
-        return this._http.patch<{ id: string, subService: ISubService }>(`${this._apiUrl}/subservice`, updateData).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        );
-    }
-
-    fetchFilteredServices(providerId: string, filter: IFilter): Observable<IOfferedService[]> {
-        const params = this._buildFilterParams(filter);
-        return this._http.get<IOfferedService[]>(`${this._apiUrl}/filter_service?id=${providerId}`, { params }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -110,8 +109,12 @@ export class OfferedServicesService {
                     new Error(this.getErrorMessage(error)))
             )
         );
-
     }
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------
+    // **************************************************[Private Methods]*******************************************************
+    // ------------------------------------------------------------------------------------------------------------------------------
 
     /**
      * Converts a plain filter object into HttpParams by omitting null or undefined values.

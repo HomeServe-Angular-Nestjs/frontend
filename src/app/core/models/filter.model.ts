@@ -4,12 +4,11 @@ export type SortOption =
     | 'price-asc'
     | 'price-desc'
     | 'duration-asc'
-    | 'duration-desc'
-    | 'popular';
-
+    | 'duration-desc';
+    
 export interface IPriceRange {
-    min?: number,
-    max?: number
+    min?: number;
+    max?: number;
 }
 
 export interface IServiceDurationRange {
@@ -20,11 +19,11 @@ export interface IServiceDurationRange {
 export type ServiceDurationKey = "Quick Service" | "Half Day" | "Full Day" | "Multi-day";
 
 export interface IFilter {
-    search?: string,
-    status?: ToggleType,
-    isCertified?: boolean,
-    sort?: SortOption,
-    category?: string,
-    priceRange?: IPriceRange,
-    duration?: IServiceDurationRange
+    search?: string;
+    status?: ToggleType;
+    isCertified?: boolean;
+    sort?: SortOption;
+    category?: string;
+    priceRange?: IPriceRange;
+    duration?: IServiceDurationRange;
 };

@@ -9,24 +9,24 @@ import { Router } from "@angular/router";
 import { ToastNotificationService } from "../../core/services/public/toastr.service";
 
 export const offeredServiceEffects = {
-    fetchOfferedServices$: createEffect(() => {
-        const actions$ = inject(Actions);
-        const serviceOfferedService = inject(OfferedServicesService);
-        const toastr = inject(ToastNotificationService);
+    // fetchOfferedServices$: createEffect(() => {
+    //     const actions$ = inject(Actions);
+    //     const serviceOfferedService = inject(OfferedServicesService);
+    //     const toastr = inject(ToastNotificationService);
 
-        return actions$.pipe(
-            ofType(offeredServiceActions.fetchOfferedServices),
-            switchMap(() =>
-                serviceOfferedService.fetchOfferedServices().pipe(
-                    map((response) => offeredServiceActions.fetchOfferedServicesSuccess({ offeredServices: response })),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, offeredServiceActions.fetchOfferedServiceFailure, toastr
-                        );
-                    })
-                )
-            )
-        );
-    }, { functional: true }),
+    //     return actions$.pipe(
+    //         ofType(offeredServiceActions.fetchOfferedServices),
+    //         switchMap(() =>
+    //             serviceOfferedService.fetchOfferedServices().pipe(
+    //                 map((response) => offeredServiceActions.fetchOfferedServicesSuccess({ offeredServices: response })),
+    //                 catchError((error: HttpErrorResponse) => {
+    //                     return handleApiError(error, offeredServiceActions.fetchOfferedServiceFailure, toastr
+    //                     );
+    //                 })
+    //             )
+    //         )
+    //     );
+    // }, { functional: true }),
 
     // updateOfferedService$: createEffect(() => {
     //     const actions$ = inject(Actions);

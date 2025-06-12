@@ -34,3 +34,10 @@ export enum TransactionStatus {
     FAILED = 'failed',
     REFUNDED = 'refunded'
 }
+
+export enum ServiceSort {
+    LATEST = 'latest',
+    OLDEST = 'oldest',
+    A_Z = 'a-z',
+    Z_A = 'z-a'
+}

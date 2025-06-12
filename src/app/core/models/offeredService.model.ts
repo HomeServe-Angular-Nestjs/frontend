@@ -1,4 +1,9 @@
 import { EntityState } from "@ngrx/entity";
+import { IPagination } from "./booking.model";
+import { ServiceSort } from "../enums/enums";
+import { ToggleType } from "./filter.model";
+
+export type ServiceToggleType = 'true' | 'false' | 'all';
 
 export interface ISubService {
     id: string;
@@ -41,3 +46,15 @@ export interface IUpdateSubservice {
     id: string;
     subService: IToggleServiceStatus;
 };
+
+export interface IServicesWithPagination {
+    services: IOfferedService[];
+    pagination: IPagination;
+}
+
+export interface IServiceFilter {
+    status?: ServiceToggleType;
+    isVerified?: ServiceToggleType;
+    sort?: ServiceSort;
+    search?: string;
+}
