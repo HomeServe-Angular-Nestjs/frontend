@@ -1,10 +1,11 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, Output } from "@angular/core";
+import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ToggleType } from "../../../../../../core/models/filter.model";
 import { DebounceService } from "../../../../../../core/services/public/debounce.service";
 import { IServiceFilter, ServiceToggleType } from "../../../../../../core/models/offeredService.model";
 import { ServiceSort } from "../../../../../../core/enums/enums";
+import { Subject, takeUntil } from "rxjs";
 
 @Component({
     selector: 'app-provider-service-filter',
@@ -12,7 +13,11 @@ import { ServiceSort } from "../../../../../../core/enums/enums";
     imports: [CommonModule, FormsModule],
     providers: [DebounceService]
 })
-export class ProviderServiceFilterComponent {
+export class ProviderServiceFilterComponent implements OnInit, OnDestroy {
+    private readonly _debounceService = inject(DebounceService);
+
+    private _destroy = new Subject<void>();
+
     @Output() filtersChanged = new EventEmitter<IServiceFilter>();
 
     serviceStatusOptions: { value: ServiceToggleType, label: string }[] = [
@@ -41,8 +46,21 @@ export class ProviderServiceFilterComponent {
 
     showFilters = false;
 
+    ngOnInit(): void {
+        this._debounceService.onSearch(400)
+            .pipe(takeUntil(this._destroy))
+            .subscribe(() => {
+                this._emitChanges();
+            });
+    }
+
+    ngOnDestroy(): void {
+        this._destroy.next();
+        this._destroy.complete();
+    }
+
     onSearchChange() {
-        this._emitChanges();
+        this._debounceService.delay(this.searchText);
     }
 
     onStatusChange() {
