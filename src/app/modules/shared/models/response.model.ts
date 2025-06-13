@@ -8,16 +8,16 @@ export interface IVerifyTokenResponse {
     type: UserType
 }
 
-export interface IResponse {
+export interface IResponse<T = any> {
     success: boolean,
     message: string,
-    data?: any
+    data?: T
 }
 
-export interface ResponseInterface<T = any> {
+export interface ResponseInterface {
     success: boolean;
     message: string;
-    data?: T;
+    data?: any;
     error?: {
         code?: string;
         details?: any;

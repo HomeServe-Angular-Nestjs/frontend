@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core';
 import { API_ENV } from '../../environments/api.environments';
 import { catchError, Observable, throwError } from 'rxjs';
-import { IResponse, ISchedule, SlotType } from '../models/schedules.model';
+import { IMonthSchedule, IResponse, ISchedule, IScheduleList, SlotType } from '../models/schedules.model';
 import { IProvider } from '../models/user.model';
 
 interface IRemoveSchedule {
@@ -60,13 +60,20 @@ export class ScheduleService {
   // ------------------------------------------------------------------------------------------------------------------------------
 
 
-  createSchedules(schedules: any): Observable<IResponse> {
+  createSchedules(schedules: IMonthSchedule): Observable<IResponse> {
     return this._http.post<IResponse>(`${this._scheduleApi}`, schedules).pipe(
       catchError((error: HttpErrorResponse) =>
         throwError(() => new Error(this.getErrorMessage(error)))
       )
     );
+  }
 
+  fetchSchduleList(): Observable<IResponse<IScheduleList[]>> {
+    return this._http.get<IResponse<IScheduleList[]>>(`${this._scheduleApi}`).pipe(
+      catchError((error: HttpErrorResponse) =>
+        throwError(() => new Error(this.getErrorMessage(error)))
+      )
+    );
   }
 
   private getErrorMessage(error: HttpErrorResponse): string {

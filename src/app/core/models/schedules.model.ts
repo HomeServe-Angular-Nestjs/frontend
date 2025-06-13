@@ -56,8 +56,17 @@ export interface IMonthSchedule {
     month: string; // "2025-06"
     days: IDaySlot[];
 }
-export interface IResponse {
+export interface IResponse<T = any> {
     success: boolean,
     message: string,
-    data?: any
+    data?: T
+}
+
+
+export interface IScheduleList {
+    id: string;
+    month: string;
+    totalDays: number;
+    isActive: boolean;
+    createdAt: Date;
 }

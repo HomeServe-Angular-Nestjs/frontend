@@ -1,9 +1,9 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { ScheduleService } from '../../../../../../core/services/schedule.service';
-import { scheduleActions } from '../../../../../../store/schedules/schedule.action';
+import { map, Observable } from 'rxjs';
+import { IScheduleList } from '../../../../../../core/models/schedules.model';
 
 @Component({
   selector: 'app-provider-schedule-view',
@@ -11,12 +11,20 @@ import { scheduleActions } from '../../../../../../store/schedules/schedule.acti
   imports: [CommonModule, RouterLink],
   templateUrl: './provider-schedule-view.component.html',
 })
-export class ProviderScheduleViewComponent {
-  private scheduleService = inject(ScheduleService);
+export class ProviderScheduleViewComponent implements OnInit {
+  private readonly _scheduleService = inject(ScheduleService);
 
-  constructor(private store: Store) {
-    // this.store.dispatch(scheduleActions.fetchSchedules({}));
+  scheduleList$!: Observable<IScheduleList[]>
+
+  ngOnInit(): void {
+    this.scheduleList$ = this._scheduleService.fetchSchduleList().pipe(
+      map((response) => response.data ?? [])
+    )
   }
-  newSchedule() { }
+
+
+  formatMonthYear(monthString: string): Date {
+    return new Date(`${monthString}-01`);
+  }
 }
 
