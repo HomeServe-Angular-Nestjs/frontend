@@ -67,14 +67,13 @@ export class ProviderService {
      * @param slot - The slot data to update.
      * @returns An observable of the response.
      */
-    updateDefaultSlot(slot: SlotType) {
-        console.log(slot);
-        // return this._http.patch(`${this._apiUrl}/default_slots`, slot).pipe(
-        //     catchError((error: HttpErrorResponse) =>
-        //         throwError(() =>
-        //             new Error(this.getErrorMessage(error)))
-        //     )
-        // );
+    updateDefaultSlot(slot: SlotType): Observable<SlotType[]> {
+        return this._http.patch<SlotType[]>(`${this._apiUrl}/default_slots`, slot).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
     }
 
     /**

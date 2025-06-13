@@ -1,17 +1,17 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, JsonPipe } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule, } from '@angular/common';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ProviderScheduleCalenderComponent } from "../../../../partials/sections/provider/schedule-calender/provider-schedule-calender.component";
 import { IProvider } from '../../../../../../core/models/user.model';
 import { Store } from '@ngrx/store';
 import { providerActions } from '../../../../../../store/provider/provider.action';
 import { selectProvider } from '../../../../../../store/provider/provider.selector';
+import { ProviderSlotCreationComponent } from "../slot-creation/provider-slot-creation.component";
 
 @Component({
   selector: 'app-provider-schedule-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProviderScheduleCalenderComponent, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule, ProviderSlotCreationComponent],
   templateUrl: './provider-schedule-create.component.html',
 })
 export class ProviderScheduleCreateComponent implements OnInit {

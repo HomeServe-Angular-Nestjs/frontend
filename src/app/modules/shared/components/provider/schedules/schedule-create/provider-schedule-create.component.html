@@ -1,8 +1,8 @@
 <div class="p-8">
     <div class="max-w-7xl space-y-6">
-        <!-- Calendar View -->
-        <app-provider-schedule-calender></app-provider-schedule-calender>
 
+        <app-provider-slot-creation></app-provider-slot-creation>
+        
         <!-- Booking Limits -->
         <form [formGroup]="scheduleForm" (ngSubmit)="saveData()">
             <div class="bg-white rounded-lg shadow-sm p-6">

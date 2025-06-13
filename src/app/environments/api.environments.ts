@@ -7,6 +7,7 @@ export const API_ENV = {
     customer: `${domainName}`,
     provider: `${domainName}/provider`,
     payment: `${domainName}/payment`,
+    schedule: `${domainName}/schedule`,
 }
 
 export const API_KEY = {

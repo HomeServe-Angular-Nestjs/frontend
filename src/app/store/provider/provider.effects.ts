@@ -5,7 +5,6 @@ import { providerActions } from "./provider.action";
 import { ProviderService } from "../../core/services/provider.service";
 import { Router } from "@angular/router";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
-import { NotificationService } from "../../core/services/public/notification.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ToastNotificationService } from "../../core/services/public/toastr.service";
 

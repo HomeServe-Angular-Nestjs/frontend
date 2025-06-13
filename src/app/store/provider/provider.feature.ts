@@ -38,14 +38,13 @@ export const providerFeature = createFeature({
             error: null
         })),
 
-        on(providerActions.addDefaultSlot, (state, { slot }) => ({
+        on(providerActions.updateDefaultSlot, (state, { defaultSlots }) => ({
             ...state,
             provider: state.provider
                 ? {
                     ...state.provider,
-                    defaultSlots: [...state.provider.defaultSlots, slot]
-                }
-                : null
+                    defaultSlots
+                } : null
         })),
 
         on(providerActions.clearDefaultSlot, (state) => ({

@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core';
 import { API_ENV } from '../../environments/api.environments';
 import { catchError, Observable, throwError } from 'rxjs';
-import { ISchedule, SlotType } from '../models/schedules.model';
+import { IResponse, ISchedule, SlotType } from '../models/schedules.model';
 import { IProvider } from '../models/user.model';
 
 interface IRemoveSchedule {
@@ -20,6 +20,7 @@ export class ScheduleService {
   private readonly _http = inject(HttpClient);
 
   private readonly _apiUrl = API_ENV.provider;
+  private readonly _scheduleApi = API_ENV.schedule;
 
   fetchSchedules(providerId?: string): Observable<ISchedule[]> {
     return this._http.get<ISchedule[]>(`${this._apiUrl}/schedules?id=${providerId}`).pipe(
@@ -51,6 +52,21 @@ export class ScheduleService {
         throwError(() => new Error(this.getErrorMessage(error)))
       )
     );
+  }
+
+
+  // ------------------------------------------------------------------------------------------------------------------------------
+  // **************************************************[Related APIs]*******************************************************
+  // ------------------------------------------------------------------------------------------------------------------------------
+
+
+  createSchedules(schedules: any): Observable<IResponse> {
+    return this._http.post<IResponse>(`${this._scheduleApi}`, schedules).pipe(
+      catchError((error: HttpErrorResponse) =>
+        throwError(() => new Error(this.getErrorMessage(error)))
+      )
+    );
+
   }
 
   private getErrorMessage(error: HttpErrorResponse): string {

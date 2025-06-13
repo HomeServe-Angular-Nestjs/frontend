@@ -1,0 +1,11 @@
+<div class="relative w-full">
+    <input [type]="type" [placeholder]="label"
+        class="peer w-full h-12 border border-gray-300 rounded-lg px-3 pt-4 text-sm placeholder-transparent focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-500"
+        [(ngModel)]="model" [attr.id]="label" [attr.name]="label" />
+    <label [for]="label" class="absolute left-3 top-2 text-sm text-gray-500 transition-all
+      peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base
+      peer-placeholder-shown:text-gray-400 peer-focus:top-2
+      peer-focus:text-sm peer-focus:text-green-600">
+        {{ label }}
+    </label>
+</div>

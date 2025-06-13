@@ -14,7 +14,7 @@ import { ToastNotificationService } from '../../../../../../core/services/public
 @Component({
   selector: 'app-provider-schedule-calender',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProviderScheduleDefaultTimeComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './provider-schedule-calender.component.html',
 })
 export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
@@ -108,7 +108,7 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
     this.pickedDate = date;
   }
 
-  addToNewSlot(slot: SlotType) {
+  addToDefaultSlot(slot: SlotType) {
     this._store.dispatch(scheduleActions.updateSchedule({
       updateData: {
         scheduleDate: this.pickedDate,

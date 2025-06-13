@@ -1,61 +1,82 @@
-<div class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md relative">
-        <button class="absolute top-3 right-5" (click)="close()">X</button>
-        <!-- Modal Title -->
-        <h2 class="text-2xl font-semibold mb-6 text-center">Add Time Range</h2>
+<div class="bg-white p-6 rounded-xl shadow-md space-y-6 max-w-3xl mx-auto">
 
-        <!-- Time Range Form -->
-        <form [formGroup]=" defaultForm" (ngSubmit)="submit()">
-            <div class="flex space-x-4 mb-6">
-                <div class="w-1/2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">From:</label>
-                    <input type="time" formControlName="from"
-                        class="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-green-300" />
-                    <span class="text-red-500 text-xs"
-                        *ngIf="defaultForm.get('from')?.touched && defaultForm.get('from')?.errors">*required</span>
-                </div>
+  <!-- Section Title -->
+  <h2 class="text-2xl font-bold text-gray-800 text-center">Generate Slots</h2>
 
-                <div class="w-1/2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">To:</label>
-                    <input type="time" formControlName="to"
-                        class="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-green-300" />
-                    <span class="text-red-500 text-xs"
-                        *ngIf="defaultForm.get('to')?.touched && defaultForm.get('to')?.errors">*required</span>
-                </div>
-            </div>
+  <!-- Mode Selector -->
+  <div class="flex justify-center gap-6">
+    <label class="flex items-center gap-2">
+      <input type="radio" name="mode" [(ngModel)]="mode" value="month" class="form-radio text-green-600">
+      <span>Month-wise</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="radio" name="mode" [(ngModel)]="mode" value="per-day" class="form-radio text-green-600">
+      <span>Per Day</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="radio" name="mode" [(ngModel)]="mode" value="custom" class="form-radio text-green-600">
+      <span>Custom</span>
+    </label>
+  </div>
 
-            <!-- Action Button -->
-            <div class="flex justify-end gap-4">
-                <button *ngIf="!addNewSlots" type="button" (click)="clearSlots()"
-                    class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
-                    Clear All
-                </button>
-                <button *ngIf="!addNewSlots" type="submit"
-                    class="px-5 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-                    Add
-                </button>
-                <button *ngIf="addNewSlots" type="button" (click)="setDefaultSlots()"
-                    class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
-                    Default
-                </button>
-                <button *ngIf="addNewSlots" type="submit"
-                    class="px-5 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-                    Add
-                </button>
-            </div>
-        </form>
-
-        <!-- Divider -->
-        <hr *ngIf="!addNewSlots" class="mt-6 mb-1 border-gray-300" />
-
-        <!-- Created Slots List -->
-        <div *ngIf="!addNewSlots" class="max-h-48 overflow-auto px-3 space-y-3">
-            <div *ngFor="let slot of defaultSlots; let i = index"
-                class="flex items-center justify-between p-3 bg-gray-100 rounded-md">
-                <div class="text-gray-700 font-medium">
-                    {{slot.from}} - {{slot.to}}
-                </div>
-            </div>
-        </div>
+  <!-- Month-wise Mode -->
+  <div *ngIf="mode === 'month'" class="space-y-4">
+    <h3 class="text-lg font-semibold text-gray-700">Month-wise Settings</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <input type="date" class="form-input" placeholder="Start Date">
+      <input type="date" class="form-input" placeholder="End Date">
     </div>
+
+    <div class="flex flex-wrap gap-4">
+      <label *ngFor="let day of weekDays" class="flex items-center gap-2">
+        <input type="checkbox" [value]="day" class="form-checkbox text-green-600">
+        <span>{{ day }}</span>
+      </label>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <input type="time" class="form-input" placeholder="From">
+      <input type="time" class="form-input" placeholder="To">
+      <input type="number" class="form-input" placeholder="Slot Duration (mins)">
+      <input type="number" class="form-input" placeholder="Buffer Time (mins)">
+    </div>
+
+    <button class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Generate</button>
+  </div>
+
+  <!-- Per Day Mode -->
+  <div *ngIf="mode === 'per-day'" class="space-y-4">
+    <h3 class="text-lg font-semibold text-gray-700">Per Day Slot Creation</h3>
+
+    <div class="space-y-2">
+      <label class="text-sm font-medium text-gray-600">Select Dates:</label>
+      <input type="date" multiple class="form-input w-full">
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <input type="time" class="form-input" placeholder="From">
+      <input type="time" class="form-input" placeholder="To">
+      <input type="number" class="form-input" placeholder="Slot Duration (mins)">
+      <input type="number" class="form-input" placeholder="Buffer Time (mins)">
+    </div>
+
+    <button class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Generate</button>
+  </div>
+
+  <!-- Custom Mode -->
+  <div *ngIf="mode === 'custom'" class="space-y-4">
+    <h3 class="text-lg font-semibold text-gray-700">Custom Slots</h3>
+
+    <div *ngFor="let slot of customSlots; let i = index" class="grid grid-cols-3 gap-4 items-center">
+      <input type="date" [(ngModel)]="slot.date" class="form-input">
+      <input type="time" [(ngModel)]="slot.from" class="form-input">
+      <input type="time" [(ngModel)]="slot.to" class="form-input">
+    </div>
+
+    <button (click)="addNewCustomSlot()" class="text-green-600 text-sm hover:underline">
+      + Add Another Slot
+    </button>
+
+    <button class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Save All</button>
+  </div>
 </div>

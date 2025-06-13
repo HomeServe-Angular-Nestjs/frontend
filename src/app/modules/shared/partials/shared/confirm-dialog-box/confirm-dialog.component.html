@@ -9,13 +9,21 @@
     </mat-dialog-content>
 
     <mat-dialog-actions align="end" class="mt-6 flex justify-end gap-3">
-        <button mat-stroked-button (click)="dialogRef.close(false)"
-            class="border border-gray-400 text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-md transition">
-            Cancel
-        </button>
-        <button mat-raised-button color="primary" (click)="dialogRef.close(true)"
-            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
-            Confirm
-        </button>
+        <ng-container *ngIf="data.isConfirm; else okOnly">
+            <button mat-stroked-button (click)="dialogRef.close(false)"
+                class="border border-gray-400 text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-md transition">
+                Cancel
+            </button>
+            <button mat-raised-button color="primary" (click)="dialogRef.close(true)"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
+                Confirm
+            </button>
+        </ng-container>
+        <ng-template #okOnly>
+            <button mat-raised-button color="primary" (click)="dialogRef.close(true)"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
+                OK
+            </button>
+        </ng-template>
     </mat-dialog-actions>
 </div>
