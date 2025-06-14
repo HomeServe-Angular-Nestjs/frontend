@@ -1,4 +1,6 @@
 import { EntityState } from "@ngrx/entity";
+import { ServiceToggleType } from "./offeredService.model";
+import { IPagination } from "./booking.model";
 
 export interface ISchedule {
     id: string,
@@ -56,11 +58,11 @@ export interface IMonthSchedule {
     month: string; // "2025-06"
     days: IDaySlot[];
 }
-export interface IResponse<T = any> {
-    success: boolean,
-    message: string,
-    data?: T
-}
+// export interface IResponse<T = any> {
+//     success: boolean,
+//     message: string,
+//     data?: T
+// }
 
 
 export interface IScheduleList {
@@ -69,4 +71,57 @@ export interface IScheduleList {
     totalDays: number;
     isActive: boolean;
     createdAt: Date;
+}
+
+export interface IScheduleListWithPagination {
+    scheduleList: IScheduleList[];
+    pagination: IPagination;
+}
+export interface ISlotDetails extends ISlot {
+    id: string;
+    isActive: boolean;
+}
+
+export interface IDaysDetails extends IDaySlot {
+    id: string;
+    isActive: boolean;
+    slots: ISlotDetails[];
+}
+
+export interface IScheduleDetails {
+    id: string;
+    providerID: string;
+    month: string;
+    days: IDaysDetails;
+    isActive: boolean;
+    isDeleted: string;
+    createdAt: Date;
+}
+
+export interface IUpdateScheduleStatus {
+    scheduleId: string;
+    status: boolean;
+}
+
+export interface IUpdateScheduleDateStatus {
+    scheduleId: string;
+    dayId: string;
+    month: string;
+    status: boolean;
+}
+
+export interface IUpdateScheduleDateSlotStatus {
+    scheduleId: string;
+    month: string;
+    dayId: string;
+    slotId: string;
+    status: boolean;
+}
+
+export type AvailabilityType = 'all' | 'booked' | 'available';
+
+export interface IScheduleDetailFilters {
+    status?: ServiceToggleType;
+    date?: string;
+    availableType?: AvailabilityType;
 }

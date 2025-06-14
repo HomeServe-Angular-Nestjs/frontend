@@ -8,7 +8,12 @@ import { IPagination } from "../../../../../../core/models/booking.model";
     imports: [CommonModule]
 })
 export class ProviderPaginationComponent implements OnChanges {
-    @Input({ required: true }) pagination!: IPagination;
+    @Input({ required: true }) pagination: IPagination = {
+        limit: 1,
+        page: 1,
+        total: 1,
+    };
+    
     @Output() pageChange = new EventEmitter<number>();
 
     currentPage: number = 1;
@@ -19,7 +24,7 @@ export class ProviderPaginationComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['pagination'] && this.pagination) {
             this.currentPage = this.pagination.page;
-            this.totalPages = Math.ceil(this.pagination.total / this.pagination.limit);
+            this.totalPages = Math.ceil(this.pagination?.total / this.pagination.limit);
             this.calculateItemRange();
         }
     }

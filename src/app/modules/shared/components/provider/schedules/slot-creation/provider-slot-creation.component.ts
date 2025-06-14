@@ -10,6 +10,7 @@ import { selectBufferTime } from '../../../../../../store/provider/provider.sele
 import { ConfirmDialogComponent } from '../../../../partials/shared/confirm-dialog-box/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, Subject, switchMap, tap, timer } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-provider-slot-creation',
@@ -21,6 +22,7 @@ export class ProviderSlotCreationComponent {
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _store = inject(Store);
     private readonly _dialog = inject(MatDialog)
+    private readonly _router = inject(Router);
 
     private defaultBuffer = 0;
 
@@ -82,6 +84,7 @@ export class ProviderSlotCreationComponent {
                         next: (response) => {
                             if (response.success) {
                                 this._toastr.success(response.message);
+                                this._router.navigate(['provider', 'profiles', 'schedule']);
                             } else {
                                 const message = this._formatScheduledDates(response.data)
                                 this._openConfirmationDialog(message, 'Schedule already exists')

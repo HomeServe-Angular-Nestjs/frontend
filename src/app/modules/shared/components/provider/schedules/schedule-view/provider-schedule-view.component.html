@@ -39,33 +39,34 @@
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50 ">
-                    <tr class="">
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Schedule id
-                        </th>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Scheduled Month
-                        </th>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Total Allotted Days
-                        </th>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Created At
-                        </th>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Status
-                        </th>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    <ng-container *ngIf="(scheduleList$ | async) as scheduleList">
+    <ng-container *ngIf="(scheduleList$ | async) as scheduleList">
+
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 ">
+                        <tr class="">
+                            <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Schedule id
+                            </th>
+                            <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Scheduled Month
+                            </th>
+                            <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Total Allotted Days
+                            </th>
+                            <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Created At
+                            </th>
+                            <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
                         <ng-container *ngIf="scheduleList.length > 0; else noData">
                             <tr *ngFor="let list of scheduleList" class="hover:bg-gray-50 text-center">
                                 <td class="px-6 py-4 text-sm text-gray-700">
@@ -88,14 +89,21 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3 justify-end">
-                                        <button class="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
-                                            title="View Details">
+                                        <label
+                                            class="inline-flex items-center cursor-pointer text-yellow-600 hover:bg-yellow-100 p-1 rounded">
+                                            <input type="checkbox" class="sr-only peer"
+                                                (change)="toggleStatus(list.id, list.isActive)" />
+                                            <i class="text-2xl transition-colors fas" [ngClass]="{
+                                                'fa-toggle-on text-green-600': list.isActive,
+                                                'fa-toggle-off text-green-400': !list.isActive
+                                                }"></i>
+                                        </label>
+                                        <button (click)="openDrawer(list.id, list.month)"
+                                            class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="p-1.5 text-red-600 hover:bg-red-50 rounded" title="Cancel">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                        <button class="p-1.5 text-red-600 hover:bg-red-50 rounded" title="Delete">
+                                        <button (click)="removeSchedule(list.id)"
+                                            class="p-1.5 text-red-600 hover:bg-red-50 rounded" title="Delete">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </div>
@@ -103,14 +111,45 @@
                             </tr>
 
                         </ng-container>
-                    </ng-container>
 
-                    <ng-template #noData>
-                        <!-- ❌ Show message when list is empty -->
-                        <p>No schedules found.</p>
-                    </ng-template>
-                </tbody>
-            </table>
+                        <ng-template #noData>
+                            <!-- ❌ Show message when list is empty -->
+                            <p>No schedules found.</p>
+                        </ng-template>
+                    </tbody>
+                </table>
+                <ng-container *ngIf="pagination">
+                    <app-provider-pagination [pagination]="pagination"
+                        (pageChange)="changePage($event)"></app-provider-pagination>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+
+<ng-container *ngIf="isDrawerOpen">
+    <div class="fixed inset-0 bg-black bg-opacity-30 z-40" (click)="closeDrawer()"></div>
+
+    <!-- Side Drawer -->
+    <div class="fixed top-0 right-0 w-full sm:w-3/4 md:w-1/2 h-full bg-white z-50 shadow-xl transform transition-transform duration-300"
+        [class.translate-x-full]="!isDrawerOpen" [class.translate-x-0]="isDrawerOpen">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b">
+            <div class="flex items-center gap-4">
+                <button (click)="closeDrawer()" class="text-gray-500 hover:text-black">
+                    <i class="fas fa-angle-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold">
+                    Schedule Details of {{ formatMonthYear(selectedSchedule) | date: 'MMMM yyyy' }}
+                </h2>
+            </div>
+        </div>
+
+        <!-- Drawer Body -->
+        <div class="p-6 overflow-y-auto h-[calc(100%-4rem)]">
+            <app-provider-schedule-list-details [scheduleId]="selectedScheduleId"
+                [scheduleMonth]="selectedSchedule"></app-provider-schedule-list-details>
         </div>
     </div>
-</div>
+</ng-container>

@@ -3,10 +3,8 @@ import { AuthGuard } from "../../../core/guards/auth.guard";
 import { ProviderLayoutComponent } from "../../pages/provider/layout/provider-layout.component";
 import { ProfilesLayoutComponent } from "../../pages/provider/profiles/profiles-layout.component";
 import { ProviderProfileOverviewLayoutComponent } from "../../shared/components/provider/profile-overview/layout/provider-profile-overview-layout.component";
-import { ProviderKycComponent } from "../../shared/components/provider/kyc/provider-kyc.component";
 import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
-import { ProviderBookingsComponent } from "../../pages/provider/bookings/bookings.component";
 
 export const providerRoutes: Routes = [
     {

@@ -1,7 +1,6 @@
 import { EntityState } from "@ngrx/entity";
 import { IPagination } from "./booking.model";
 import { ServiceSort } from "../enums/enums";
-import { ToggleType } from "./filter.model";
 
 export type ServiceToggleType = 'true' | 'false' | 'all';
 

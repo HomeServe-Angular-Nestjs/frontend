@@ -68,7 +68,7 @@
 
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
             <!-- {{schedules | json}} -->
-            <ng-container *ngIf="slotData.slots.length">
+            <!-- <ng-container *ngIf="slotData.slots.length">
                 <button *ngFor="let slot of slotData.slots" (click)="selectSlot(slot.id, slotData.scheduleId)"
                     class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100"
                     [disabled]="slot.takenBy" [ngClass]="{
@@ -78,7 +78,7 @@
                     }">
                     {{ slot.from }} - {{ slot.to }}
                 </button>
-            </ng-container>
+            </ng-container> -->
         </div>
 
         <div class="bg-blue-50 p-4 rounded-md border border-blue-200 shadow-sm">

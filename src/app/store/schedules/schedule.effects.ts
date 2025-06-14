@@ -49,21 +49,21 @@ export const scheduleEffects = {
         );
     }, { functional: true }),
 
-    removeSchedule$: createEffect(() => {
-        const actions$ = inject(Actions);
-        const scheduleService = inject(ScheduleService);
-        const toastr = inject(ToastNotificationService);
+    // removeSchedule$: createEffect(() => {
+    //     const actions$ = inject(Actions);
+    //     const scheduleService = inject(ScheduleService);
+    //     const toastr = inject(ToastNotificationService);
 
-        return actions$.pipe(
-            ofType(scheduleActions.removeSchedule),
-            switchMap(({ date, id }) => scheduleService.removeSchedule(date, id).pipe(
-                map((response) => scheduleActions.removeScheduleSuccess({ removedScheduleId: response.id })),
-                catchError((error: HttpErrorResponse) => {
-                    return handleApiError(error, scheduleActions.removeScheduleFailure, toastr
-                    )
-                })
-            ))
-        );
-    }, { functional: true }),
+    //     return actions$.pipe(
+    //         ofType(scheduleActions.removeSchedule),
+    //         switchMap(({ date, id }) => scheduleService.removeSchedule(date, id).pipe(
+    //             map((response) => scheduleActions.removeScheduleSuccess({ removedScheduleId: response.id })),
+    //             catchError((error: HttpErrorResponse) => {
+    //                 return handleApiError(error, scheduleActions.removeScheduleFailure, toastr
+    //                 )
+    //             })
+    //         ))
+    //     );
+    // }, { functional: true }),
 
 }
