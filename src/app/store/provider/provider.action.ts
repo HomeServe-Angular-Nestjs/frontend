@@ -11,7 +11,7 @@ export const providerActions = {
     updateProviderSuccess: createAction('[Provider] Update provider Success', props<{ updatedProviderData: IProvider }>()),
     updateProviderFailure: createAction('[Provider] Update provider Failure', props<{ error: string }>()),
 
+    updateProviderOfferedServices: createAction('[Provider] Update provider offered service', props<{ offeredServices: string[] }>()),
     updateDefaultSlot: createAction('[Provider] Update default slot', props<{ defaultSlots: SlotType[] }>()),
-    // addDefaultSlot: createAction('[Provider] Add Default Slot', props<{ slot: SlotType }>()),
     clearDefaultSlot: createAction('[Provider] Clear Default Slot'),
 }

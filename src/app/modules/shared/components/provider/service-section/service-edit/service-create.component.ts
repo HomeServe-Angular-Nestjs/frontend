@@ -6,6 +6,8 @@ import { ToastNotificationService } from '../../../../../../core/services/public
 import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
 import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
 import { IOfferedService } from '../../../../../../core/models/offeredService.model';
+import { Store } from '@ngrx/store';
+import { providerActions } from '../../../../../../store/provider/provider.action';
 
 @Component({
   selector: 'app-service-create',
@@ -17,17 +19,18 @@ import { IOfferedService } from '../../../../../../core/models/offeredService.mo
 export class ServiceCreateComponent implements OnInit {
   private readonly _serviceOfferedService = inject(OfferedServicesService);
   private readonly _toastr = inject(ToastNotificationService);
-  private _fb = inject(FormBuilder);
-  private _scroller = inject(ViewportScroller);
-  private _router = inject(Router);
-  private _route = inject(ActivatedRoute);
+  private readonly _fb = inject(FormBuilder);
+  private readonly _scroller = inject(ViewportScroller);
+  private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _store = inject(Store);
 
   @ViewChild('addSubServiceBtn', { static: false }) buttonElementRef!: ElementRef<HTMLButtonElement>;
 
   serviceImagePreview?: string;
   serviceImageFile?: File;
   serviceUrl?: string;
-  serviceId: string | null = null;
+  serviceId!: string
   service!: IOfferedService;
 
   /**
@@ -43,7 +46,7 @@ export class ServiceCreateComponent implements OnInit {
   ngOnInit() {
     // Subscribe to route param to get service ID (edit mode)
     this._route.paramMap.subscribe(param => {
-      this.serviceId = param.get('id');
+      this.serviceId = param.get('id') ?? '';
     });
 
     this._route.queryParams.subscribe(params => {
@@ -174,8 +177,7 @@ export class ServiceCreateComponent implements OnInit {
       const control = this.serviceForm.get(field) as AbstractControl;
       const errorMessage = getValidationMessage(control, field);
       if (errorMessage) {
-        this._toastr
-          .error(errorMessage);
+        this._toastr.error(errorMessage);
         return;
       }
     }
@@ -185,18 +187,34 @@ export class ServiceCreateComponent implements OnInit {
     if (isEditMode) {
       this._editService(formData);
     } else {
-
+      this._createService(formData);
     }
   }
 
+  private _createService(formData: FormData) {
+    this._serviceOfferedService.createService(formData).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this._afterSuccess(response.message);
+          this._store.dispatch(providerActions.updateProviderOfferedServices({ offeredServices: response.data ?? [] }));
+        } else {
+          this._toastr.error(response.message);
+        }
+      },
+      error: (err) => {
+        this._toastr.error('Oops, something went wrong.');
+        console.error(err);
+      }
+    });
+  }
+
   private _editService(formData: FormData) {
-    formData.append('id', this.serviceId ?? '');
+    formData.append('id', this.serviceId);
 
     this._serviceOfferedService.updateService(formData).subscribe({
-      next: (success) => {
-        if (success) {
-          this._toastr.success('Service updated.');
-          this._router.navigate(['provider', 'profiles', 'service_offered'])
+      next: (response: any) => {
+        if (response.success) {
+          this._afterSuccess(response.message);
         } else {
           this._toastr.error('failed to update service.');
         }
@@ -309,5 +327,10 @@ export class ServiceCreateComponent implements OnInit {
     });
 
     this.serviceImagePreview = this.service.image;
+  }
+
+  private _afterSuccess(message: string) {
+    this._toastr.success(message);
+    this._router.navigate(['provider', 'profiles', 'service_offered'])
   }
 }

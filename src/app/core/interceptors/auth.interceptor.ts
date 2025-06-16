@@ -22,12 +22,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
             return next(modifiedRequest).pipe(
                 catchError((error: HttpErrorResponse) => {
-                    const status = new Set([401, 403]);
+                    // const status = new Set([401, 403]);
 
-                    if (status.has(401) || status.has(403)) {
+                    // if (status.has(401) || status.has(403)) {
+                    //     store.dispatch(authActions.logout({ fromInterceptor: true }));
+
+                    //     return throwError(() => error);
+                    // }
+
+                    if (error.status === 401) {
                         store.dispatch(authActions.logout({ fromInterceptor: true }));
-
-                        return throwError(() => error);
+                        return of();
+                    } else if (error.status === 403) {
+                        console.log(error);
+                        return of();
                     }
 
                     return throwError(() => {

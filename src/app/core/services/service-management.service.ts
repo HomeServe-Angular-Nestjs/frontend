@@ -4,6 +4,7 @@ import { API_ENV } from "../../environments/api.environments";
 import { BehaviorSubject, catchError, Observable, pipe, throwError } from "rxjs";
 import { IOfferedService, IServiceFilter, IServicesWithPagination, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
 import { IFilter } from "../models/filter.model";
+import { IResponse } from "../../modules/shared/models/response.model";
 
 @Injectable({ providedIn: 'root' })
 export class OfferedServicesService {
@@ -59,8 +60,8 @@ export class OfferedServicesService {
     // **************************************************[Provider Related APIs]*******************************************************
     // ------------------------------------------------------------------------------------------------------------------------------
 
-    sendServiceData(formData: FormData) {
-        return this._http.post(`${this._apiUrl}/create_service`, formData).pipe(
+    createService(formData: FormData): Observable<IResponse<string[]>> {
+        return this._http.post<IResponse<string[]>>(`${this._apiUrl}/service`, formData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

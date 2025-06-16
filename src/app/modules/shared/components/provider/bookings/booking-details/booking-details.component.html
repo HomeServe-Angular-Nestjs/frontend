@@ -7,7 +7,9 @@
             <div>
                 <h1 class="text-2xl font-bold text-gray-800 mb-2">Order Details</h1>
                 <div class="text-sm text-gray-600 space-y-1">
-                    <p><span class="font-semibold">Booking ID:</span> #{{ bookingDetails.bookingId.toUpperCase() }}</p>
+                    <p><span class="font-semibold">Booking ID:</span>
+                        #{{ bookingDetails.bookingId.toUpperCase() | slice:0:10 }}
+                    </p>
                     <p><span class="font-semibold">Booking Date:</span> {{ formateData(bookingDetails.createdAt) }}</p>
                     <p><span class="font-semibold">Expected Arrival:</span> {{
                         formateData(bookingDetails.expectedArrivalTime) }}</p>
