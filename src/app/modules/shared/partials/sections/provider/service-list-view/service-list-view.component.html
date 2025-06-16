@@ -2,7 +2,6 @@
     <!-- Loop through offered services -->
     <div *ngFor="let service of offeredServices" class="bg-white rounded-xl shadow-sm border border-gray-100">
 
-        <!-- Service Header -->
         <div class="p-6 border-b">
             <div class="flex items-center justify-between">
                 <!-- Left: Info -->
@@ -23,12 +22,16 @@
                 </div>
 
                 <!-- Right: Actions -->
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
                     <a [routerLink]="['/provider/profiles/service_offered/edit/', service.id]"
-                        class="text-gray-600 hover:text-[#16A34A] p-2 rounded-lg hover:bg-gray-50"
+                        class="text-gray-600 hover:text-[#16A34A] rounded-lg hover:bg-gray-50"
                         aria-label="Edit main service">
                         <i class="fas fa-edit"></i>
                     </a>
+                    <button (click)="removeService(service.id)" class=" text-red-600 hover:text-red-700 p-2 rounded-lg"
+                        aria-label="Edit main service">
+                        <i class="fas fa-trash"></i>
+                    </button>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" class="sr-only peer" [checked]="service.isActive"
                             (change)="updateService({ id: service.id, isActive: !service.isActive })">

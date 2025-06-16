@@ -112,6 +112,14 @@ export class OfferedServicesService {
         );
     }
 
+    removeService(serviceId: string): Observable<IResponse<string[]>> {
+        return this._http.patch<IResponse<string[]>>(`${this._apiUrl}/remove`, { serviceId }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
 
     // ------------------------------------------------------------------------------------------------------------------------------
     // **************************************************[Private Methods]*******************************************************

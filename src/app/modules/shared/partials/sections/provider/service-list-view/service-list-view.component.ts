@@ -4,6 +4,10 @@ import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { offeredServiceActions } from "../../../../../../store/offered-services/offeredService.action";
+import { OfferedServicesService } from "../../../../../../core/services/service-management.service";
+import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
+import { MatDialog } from "@angular/material/dialog";
+import { ConfirmDialogComponent } from "../../../shared/confirm-dialog-box/confirm-dialog.component";
 
 @Component({
     selector: "app-service-list-view",
@@ -11,8 +15,11 @@ import { offeredServiceActions } from "../../../../../../store/offered-services/
     templateUrl: './service-list-view.component.html'
 })
 export class ServiceListViewComponent {
-    private _router = inject(Router);
-    private _store = inject(Store);
+    private readonly _serviceService = inject(OfferedServicesService);
+    private readonly _toastr = inject(ToastNotificationService);
+    private readonly _dialog = inject(MatDialog);
+    private readonly _router = inject(Router);
+    private readonly _store = inject(Store);
 
     @Input({ required: true }) offeredServices!: IOfferedService[];
     @Output() updateEvent = new EventEmitter<IToggleServiceStatus>();
@@ -25,7 +32,6 @@ export class ServiceListViewComponent {
     }
 
     updateSubservice(updateData: IUpdateSubservice) {
-        console.log(updateData)
         this.updateSubServiceEvent.emit(updateData);
     }
 
@@ -55,7 +61,37 @@ export class ServiceListViewComponent {
         }));
     }
 
+    removeService(id: string) {
+        this._openConfirmationBox(
+            'Are you sure you want to continue?',
+            'Deleting this item may result in temporary data loss. Proceed with caution.'
+        ).afterClosed()
+            .subscribe(confirm => {
+                if (!confirm) return;
+                this._serviceService.removeService(id).subscribe({
+                    next: (response) => {
+                        if (response.success) {
+                            this.offeredServices = this.offeredServices.filter(service => service.id !== id);
+                            this._toastr.success(response.message);
+                        } else {
+                            this._toastr.error(response.message);
+                        }
+                    },
+                    error: (err) => {
+                        this._toastr.error('Oops, something went wrong.');
+                        console.error(err);
+                    }
+                });
+            });
+    }
+
     toggleSub(serviceId: string): void {
         this.expandedSubServices[serviceId] = !this.expandedSubServices[serviceId];
+    }
+
+    private _openConfirmationBox(title: string, message: string) {
+        return this._dialog.open(ConfirmDialogComponent, {
+            data: { title, message }
+        });
     }
 }
