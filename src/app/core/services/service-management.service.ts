@@ -32,14 +32,14 @@ export class OfferedServicesService {
     }
 
     // ToDo - remove
-    updateSubService(updateData: Partial<ISubService>): Observable<{ id: string, subService: ISubService }> {
-        return this._http.patch<{ id: string, subService: ISubService }>(`${this._apiUrl}/subservice`, updateData).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        );
-    }
+    // updateSubService(updateData: Partial<ISubService>): Observable<{ id: string, subService: ISubService }> {
+    //     return this._http.patch<{ id: string, subService: ISubService }>(`${this._apiUrl}/subservice`, updateData).pipe(
+    //         catchError((error: HttpErrorResponse) =>
+    //             throwError(() =>
+    //                 new Error(this.getErrorMessage(error)))
+    //         )
+    //     );
+    // }
 
     // ------------------------------------------------------------------------------------------------------------------------------
     // **************************************************[Customer Related APIs]*******************************************************
@@ -85,8 +85,8 @@ export class OfferedServicesService {
         );
     }
 
-    updateService(updateData: FormData): Observable<IOfferedService> {
-        return this._http.put<IOfferedService>(`${this._apiUrl}/service`, updateData).pipe(
+    updateService(updateData: FormData): Observable<IResponse<IOfferedService>> {
+        return this._http.put<IResponse<IOfferedService>>(`${this._apiUrl}/service`, updateData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -113,7 +113,16 @@ export class OfferedServicesService {
     }
 
     removeService(serviceId: string): Observable<IResponse<string[]>> {
-        return this._http.patch<IResponse<string[]>>(`${this._apiUrl}/remove`, { serviceId }).pipe(
+        return this._http.patch<IResponse<string[]>>(`${this._apiUrl}/service/remove`, { serviceId }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    removeSubService(serviceId: string, subId: string): Observable<IResponse> {
+        return this._http.patch<IResponse>(`${this._apiUrl}/service/remove_sub`, { serviceId, subId }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

@@ -51,25 +51,25 @@ export const offeredServiceEffects = {
     //     );
     // }, { functional: true }),
 
-    updateSubService$: createEffect(() => {
-        const actions$ = inject(Actions);
-        const serviceOfferedService = inject(OfferedServicesService);
-        const toastr = inject(ToastNotificationService);
+    // updateSubService$: createEffect(() => {
+    //     const actions$ = inject(Actions);
+    //     const serviceOfferedService = inject(OfferedServicesService);
+    //     const toastr = inject(ToastNotificationService);
 
-        return actions$.pipe(
-            ofType(offeredServiceActions.updateSubService),
-            switchMap(({ updateData }) =>
-                serviceOfferedService.updateSubService(updateData).pipe(
-                    map((response) => offeredServiceActions.updateSubServiceSuccess({
-                        id: response.id,
-                        subService: response.subService
-                    })),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, toastr
-                        );
-                    })
-                )
-            )
-        );
-    }, { functional: true }),
+    //     return actions$.pipe(
+    //         ofType(offeredServiceActions.updateSubService),
+    //         switchMap(({ updateData }) =>
+    //             serviceOfferedService.updateSubService(updateData).pipe(
+    //                 map((response) => offeredServiceActions.updateSubServiceSuccess({
+    //                     id: response.id,
+    //                     subService: response.subService
+    //                 })),
+    //                 catchError((error: HttpErrorResponse) => {
+    //                     return handleApiError(error, offeredServiceActions.updateOfferedServiceFailure, toastr
+    //                     );
+    //                 })
+    //             )
+    //         )
+    //     );
+    // }, { functional: true }),
 }

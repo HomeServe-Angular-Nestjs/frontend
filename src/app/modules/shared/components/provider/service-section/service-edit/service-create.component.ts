@@ -8,6 +8,7 @@ import { getValidationMessage } from '../../../../../../core/utils/form-validati
 import { IOfferedService } from '../../../../../../core/models/offeredService.model';
 import { Store } from '@ngrx/store';
 import { providerActions } from '../../../../../../store/provider/provider.action';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-service-create',
@@ -65,7 +66,12 @@ export class ServiceCreateComponent implements OnInit {
 
     // If editing, fetch the existing service details
     if (this.serviceId) {
-      this._serviceOfferedService.fetchOneService(this.serviceId).subscribe({
+      this._serviceOfferedService.fetchOneService(this.serviceId).pipe(
+        map(service => ({
+          ...service,
+          subService: service.subService.filter(sub => !sub.isDeleted)
+        }))
+      ).subscribe({
         next: (service) => {
           this.service = service;
           this._patchServiceForm();
@@ -212,7 +218,7 @@ export class ServiceCreateComponent implements OnInit {
     formData.append('id', this.serviceId);
 
     this._serviceOfferedService.updateService(formData).subscribe({
-      next: (response: any) => {
+      next: (response) => {
         if (response.success) {
           this._afterSuccess(response.message);
         } else {

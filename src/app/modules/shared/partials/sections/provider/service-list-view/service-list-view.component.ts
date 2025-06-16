@@ -8,6 +8,7 @@ import { OfferedServicesService } from "../../../../../../core/services/service-
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../shared/confirm-dialog-box/confirm-dialog.component";
+import { IResponse } from "../../../../models/response.model";
 
 @Component({
     selector: "app-service-list-view",
@@ -48,17 +49,28 @@ export class ServiceListViewComponent {
     }
 
     deleteSub(serviceId: string, subId: string) {
-        // this.offeredServices = this.offeredServices.map((service: IOfferedService) => ({
-        //     ...service,
-        //     subService: service.subService.filter((sub: ISubService) => sub.id !== subId)
-        // }));
+        this._openConfirmationBox(
+            'Are you sure you want to continue?',
+            'Deleting this item may result in temporary data loss. Proceed with caution.'
+        ).afterClosed()
+            .subscribe(confirm => {
+                if (!confirm) return;
+                console.log(serviceId, subId)
 
-        this._store.dispatch(offeredServiceActions.updateSubService({
-            updateData: {
-                id: serviceId,
-                subService: { id: subId, isDeleted: true }
-            }
-        }));
+                this._serviceService.removeSubService(serviceId, subId).subscribe({
+                    next: (response) => {
+                        this.offeredServices = this.offeredServices.map(service => ({
+                            ...service,
+                            subService: service.subService.filter(sub => sub.id !== subId)
+                        }));
+                        this._afterApiCall(response);
+                    },
+                    error: (err) => {
+                        this._toastr.error(err);
+                        console.error(err);
+                    }
+                });
+            });
     }
 
     removeService(id: string) {
@@ -87,6 +99,14 @@ export class ServiceListViewComponent {
 
     toggleSub(serviceId: string): void {
         this.expandedSubServices[serviceId] = !this.expandedSubServices[serviceId];
+    }
+
+    private _afterApiCall(response: IResponse) {
+        if (response.success) {
+            this._toastr.success(response.message);
+        } else {
+            this._toastr.error(response.message);
+        }
     }
 
     private _openConfirmationBox(title: string, message: string) {
