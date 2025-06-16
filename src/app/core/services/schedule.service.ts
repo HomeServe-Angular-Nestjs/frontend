@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core';
 import { API_ENV } from '../../environments/api.environments';
 import { catchError, Observable, throwError } from 'rxjs';
-import { IDaysDetails, IMonthSchedule, ISchedule, IScheduleDetailFilters, IScheduleList, IScheduleListWithPagination, IUpdateScheduleDateSlotStatus, IUpdateScheduleDateStatus, IUpdateScheduleStatus, } from '../models/schedules.model';
+import { IDaysDetails, IMonthSchedule, ISchedule, IScheduleDetailFilters, IScheduleList, IScheduleListWithPagination, ISchedules, IUpdateScheduleDateSlotStatus, IUpdateScheduleDateStatus, IUpdateScheduleStatus, } from '../models/schedules.model';
 import { IProvider } from '../models/user.model';
 import { IResponse } from '../../modules/shared/models/response.model';
 
@@ -22,14 +22,6 @@ export class ScheduleService {
 
   private readonly _apiUrl = API_ENV.provider;
   private readonly _scheduleApi = API_ENV.schedule;
-
-  fetchSchedules(providerId?: string): Observable<ISchedule[]> {
-    return this._http.get<ISchedule[]>(`${this._apiUrl}/schedules?id=${providerId}`).pipe(
-      catchError((error: HttpErrorResponse) =>
-        throwError(() =>
-          new Error(this.getErrorMessage(error)))
-      ));
-  }
 
   updateSchedule(data: Partial<ISchedule>): Observable<IUpdateSchedule> {
     return this._http.put<IUpdateSchedule>(`${this._apiUrl}/schedules`, data).pipe(
@@ -55,11 +47,9 @@ export class ScheduleService {
   //   );
   // }
 
-
   // ------------------------------------------------------------------------------------------------------------------------------
-  // **************************************************[Related APIs]*******************************************************
+  // **************************************************[Provider APIs]*******************************************************
   // ------------------------------------------------------------------------------------------------------------------------------
-
 
   createSchedules(schedules: IMonthSchedule): Observable<IResponse> {
     return this._http.post<IResponse>(`${this._scheduleApi}`, schedules).pipe(
@@ -130,6 +120,28 @@ export class ScheduleService {
       )
     );
   }
+
+  // ------------------------------------------------------------------------------------------------------------------------------
+  // **************************************************[Customer APIs]*******************************************************
+  // ------------------------------------------------------------------------------------------------------------------------------
+
+  fetchSchedules(providerId: string): Observable<IResponse<ISchedules[]>> {
+    const params = new HttpParams().set('providerId', providerId);
+
+    return this._http.get<IResponse<ISchedules[]>>(`${this._scheduleApi}`, { params }).pipe(
+      catchError((error: HttpErrorResponse) =>
+        throwError(() =>
+          new Error(this.getErrorMessage(error)))
+      ));
+  }
+
+
+
+
+
+
+
+
 
   private getErrorMessage(error: HttpErrorResponse): string {
     return error?.error?.message || 'something went wrong';

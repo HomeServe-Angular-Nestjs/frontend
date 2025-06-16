@@ -26,6 +26,8 @@ import { ToastNotificationService } from '../../../../core/services/public/toast
 })
 export class CustomerServiceScheduleComponent implements OnInit {
   private readonly _toastr = inject(ToastNotificationService);
+  // private readonly _route = inject(ActivatedRoute);
+  private readonly _sharedDataService = inject(SharedDataService)
   private _router = inject(Router);
 
   schedules$!: Observable<ISchedule[]> | null;
@@ -33,28 +35,22 @@ export class CustomerServiceScheduleComponent implements OnInit {
   selectedServiceData: SelectedServiceType[] = [];
   preparedDataForCalculation: SelectedServiceIdsType[] = [];
 
-  constructor(
-    private _store: Store,
-    private _route: ActivatedRoute,
-    private readonly _sharedDataService: SharedDataService,
-  ) {
-    // Extract provider ID from URL
-    this._route.paramMap.subscribe(param => {
-      this.providerId = param.get('id');
-
-      if (this.providerId) {
-        // Dispatch schedule fetch action only when provider ID is available
-        this._store.dispatch(scheduleActions.fetchSchedules({ providerId: this.providerId }));
-        this.schedules$ = this._store.select(selectAllSchedules);
-      }
-    });
-  }
-
   /**
     * Angular lifecycle hook that runs after component is initialized.
     * It loads selected service data, validates the state, and prepares calculation data.
     */
   ngOnInit(): void {
+    // Extract provider ID from URL
+    // this._route.paramMap.subscribe(param => {
+    //   this.providerId = param.get('id');
+
+    //   if (this.providerId) {
+    //     // Dispatch schedule fetch action only when provider ID is available
+    //     // this._store.dispatch(scheduleActions.fetchSchedules({ providerId: this.providerId }));
+    //     // this.schedules$ = this._store.select(selectAllSchedules);
+    //   }
+    // });
+
     // Try fetching from shared data service
     this.selectedServiceData = this._sharedDataService.getSelectedServiceData();
 

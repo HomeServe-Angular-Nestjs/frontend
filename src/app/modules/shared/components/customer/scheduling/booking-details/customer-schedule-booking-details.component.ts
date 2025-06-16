@@ -1,13 +1,16 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { API_KEY } from '../../../../../../environments/api.environments';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { ISchedule, ISlotData } from '../../../../../../core/models/schedules.model';
+import { ISchedules, } from '../../../../../../core/models/schedules.model';
 import { FormsModule } from '@angular/forms';
 import { OtpService } from '../../../../../../core/services/public/otp.service';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { CustomerLocationType } from '../../../../../../core/models/booking.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
+import { map, Observable, switchMap } from 'rxjs';
+import { ScheduleService } from '../../../../../../core/services/schedule.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-customer-schedule-booking-details',
@@ -16,80 +19,73 @@ import { ToastNotificationService } from '../../../../../../core/services/public
   templateUrl: './customer-schedule-booking-details.component.html',
   providers: [OtpService]
 })
-export class CustomerScheduleBookingDetailsComponent {
+export class CustomerScheduleBookingDetailsComponent implements OnInit {
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _bookingService = inject(BookingService);
+  private readonly _scheduleService = inject(ScheduleService);
   private readonly _toastr = inject(ToastNotificationService);
-  private readonly _otpService = inject(OtpService);
-  private readonly _bookingService = inject(BookingService)
 
-  @Input({ required: true }) schedules!: ISchedule[] | null;
+  readonly mapboxToken = API_KEY.mapbox;
+
+  schedules$!: Observable<ISchedules[]>;
 
   mapVisible = false;
   center: [number, number] = [76.9560, 8.5010];
   zoom = 12;
   selectedAddress: string | null = null;
   selectedDate: string = '';
-  slotData: ISlotData = { scheduleId: '', slots: [] };
-  selectedSlot: string | null = null;
+  phoneNumber: string | null = null;
 
-  readonly mapboxToken = API_KEY.mapbox;
+  ngOnInit(): void {
+    this.schedules$ = this._route.paramMap.pipe(
+      map(params => params.get('id') ?? ''),
+      switchMap(providerId =>
+        this._scheduleService.fetchSchedules(providerId).pipe(
+          map(response => response.data ?? [])
+        )
+      )
+    );
+  }
 
-  phoneNumber: number | null = null;
+  getMonth(dateStr: string): string {
+    return dateStr?.slice(0, 7);
+  }
 
   toggleMap() {
     this.mapVisible = !this.mapVisible;
   }
 
-  handleDateChange() {
-    const formattedDate = new Date(this.selectedDate).toDateString();
-    const matchedSchedule = this.schedules?.find(
-      (schedule: ISchedule) => schedule.scheduleDate === formattedDate
-    );
-
-    if (matchedSchedule) {
-      this.slotData = {
-        scheduleId: matchedSchedule.id,
-        slots: matchedSchedule.slots
-      };
-    }
-  }
-
-  selectSlot(slotId: string, scheduleId: string) {
-    this.selectedSlot = slotId;
-    this._bookingService.setSelectedSlot({ slotId, scheduleId });
-  }
-
-  isSelectedSlot(slotId: string): boolean {
-    return this.selectedSlot === slotId;
-  }
-
-  sendOtp() {
-    if (this.phoneNumber && this.phoneNumber.toString().length === 10) {
-      this._otpService.sendOtpToPhone(this.phoneNumber).subscribe({
-        next: (isSent) => {
-          console.log(isSent)
-        },
-        error: (err) => {
-          this._toastr.error(err);
-        }
-      })
-    } else {
-      this._toastr.error('Invalid phone number');
-    }
+  afterSlotSelection(slotId: string, dayId: string, scheduleId: string) {
+    this._bookingService.setSelectedSlot({
+      slotId,
+      dayId,
+      month: this.getMonth(this.selectedDate),
+      scheduleId
+    });
   }
 
   async onMapLocationChanged(newCenter: [number, number]) {
     this.center = newCenter;
     const [lng, lat] = newCenter;
+
     const response = await fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${this.mapboxToken}`
     );
+
     const data = await response.json();
     this.selectedAddress = data.features[0]?.place_name || 'No address found';
+
+    if (!this.selectedAddress) {
+      this._toastr.success('Address not found.');
+      return;
+    }
 
     const location: CustomerLocationType = {
       address: this.selectedAddress ?? '',
       coordinates: this.center,
+      phone: this.phoneNumber ?? ''
     }
+
     this._bookingService.setSelectedAddress(location);
   }
 }

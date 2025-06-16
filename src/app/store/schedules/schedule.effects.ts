@@ -8,24 +8,24 @@ import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { ToastNotificationService } from "../../core/services/public/toastr.service";
 
 export const scheduleEffects = {
-    fetchScheduleEffect$: createEffect(() => {
-        const actions$ = inject(Actions);
-        const scheduleService = inject(ScheduleService);
-        const toastr = inject(ToastNotificationService);
+    // fetchScheduleEffect$: createEffect(() => {
+    //     const actions$ = inject(Actions);
+    //     const scheduleService = inject(ScheduleService);
+    //     const toastr = inject(ToastNotificationService);
 
-        return actions$.pipe(
-            ofType(scheduleActions.fetchSchedules),
-            switchMap(({ providerId }) =>
-                scheduleService.fetchSchedules(providerId).pipe(
-                    map((schedules) => scheduleActions.fetchSchedulesSuccess({ schedules })),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, scheduleActions.fetchSchedulesFailure, toastr
-                        );
-                    })
-                )
-            )
-        );
-    }, { functional: true }),
+    //     return actions$.pipe(
+    //         ofType(scheduleActions.fetchSchedules),
+    //         switchMap(({ providerId }) =>
+    //             scheduleService.fetchSchedules(providerId).pipe(
+    //                 map((schedules) => scheduleActions.fetchSchedulesSuccess({ schedules })),
+    //                 catchError((error: HttpErrorResponse) => {
+    //                     return handleApiError(error, scheduleActions.fetchSchedulesFailure, toastr
+    //                     );
+    //                 })
+    //             )
+    //         )
+    //     );
+    // }, { functional: true }),
 
     updateSchedule$: createEffect(() => {
         const actions$ = inject(Actions);

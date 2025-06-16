@@ -2,9 +2,10 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
-import { CustomerLocationType, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
-import { ISlotSource } from "../models/schedules.model";
+import { CustomerLocationType, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
+import { ISelectedSlot, ISlotSource } from "../models/schedules.model";
 import { BookingStatus } from "../enums/enums";
+import { IResponse } from "../../modules/shared/models/response.model";
 
 
 
@@ -15,7 +16,7 @@ export class BookingService {
     private _addressSource = new BehaviorSubject<CustomerLocationType | null>(null);
     address$ = this._addressSource.asObservable();
 
-    private _slotSource = new BehaviorSubject<ISlotSource | null>(null);
+    private _slotSource = new BehaviorSubject<ISelectedSlot | null>(null);
     slot$ = this._slotSource.asObservable();
 
     private _customerApi = API_ENV.customer;
@@ -25,7 +26,7 @@ export class BookingService {
         this._addressSource.next(newAddress);
     }
 
-    setSelectedSlot(data: ISlotSource) {
+    setSelectedSlot(data: ISelectedSlot) {
         this._slotSource.next(data);
     }
 
@@ -42,8 +43,8 @@ export class BookingService {
         );
     }
 
-    postBookingData(data: IBookingData): Observable<boolean> {
-        return this._http.post<boolean>(`${this._customerApi}/booking/confirm`, data).pipe(
+    postBookingData(data: IBookingData): Observable<IResponse> {
+        return this._http.post<IResponse>(`${this._customerApi}/booking/confirm`, data).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

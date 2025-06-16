@@ -64,6 +64,25 @@ export interface IMonthSchedule {
 //     data?: T
 // }
 
+export interface ISchedules {
+    id: string;
+    providerId: string;
+    month: string;
+    days: {
+        id: string;
+        date: string;
+        slots: {
+            id: string;
+            from: string;
+            to: string;
+            takenBy?: string;
+            isActive: boolean;
+        }[];
+    }[];
+    isActive: boolean;
+    createdAt: Date;
+    isDeleted: boolean;
+}
 
 export interface IScheduleList {
     id: string;
@@ -124,4 +143,11 @@ export interface IScheduleDetailFilters {
     status?: ServiceToggleType;
     date?: string;
     availableType?: AvailabilityType;
+}
+
+export interface ISelectedSlot {
+    scheduleId: string,
+    month: string;
+    dayId: string;
+    slotId: string;
 }

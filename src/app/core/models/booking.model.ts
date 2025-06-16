@@ -25,7 +25,7 @@ export interface IPriceBreakupData {
     total: number;
 }
 
-export type CustomerLocationType = Omit<Address, 'type'>;
+export type CustomerLocationType = Omit<Address, 'type'> & { phone: string };
 
 export interface IBookingDetailsBase {
     bookingId: string;

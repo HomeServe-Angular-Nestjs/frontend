@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
 import { CustomerLocationType, IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
-import { ISlotSource } from '../../../../../../core/models/schedules.model';
+import { ISelectedSlot } from '../../../../../../core/models/schedules.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { PaymentService } from '../../../../../../core/services/payment.service';
 import { RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
@@ -24,8 +24,8 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _paymentService = inject(PaymentService);
   private readonly _razorpayWrapper = inject(RazorpayWrapperService);
-  private _route = inject(ActivatedRoute);
-  private _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
 
   private _subscriptions: Subscription[] = [];
 
@@ -39,7 +39,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     total: 0.00
   };
   location!: CustomerLocationType;
-  selectedSlot: ISlotSource | null = null;
+  selectedSlot: ISelectedSlot | null = null;
 
   /**
     * Angular lifecycle hook that initializes component logic,
@@ -66,6 +66,13 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     this._fetchPriceBreakup(priceData);
   }
 
+  /**
+   * Angular lifecycle hook to clean up subscriptions to prevent memory leaks.
+   */
+  ngOnDestroy(): void {
+    this._subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
   InitiatePayment() {
     if (!this._isAllDataAvailable()) {
       this._toastr.info('Incomplete booking information.');
@@ -90,13 +97,12 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
    * Otherwise, displays an error notification.
    */
   saveBooking(transactionData: ITransaction) {
-    console.log(transactionData)
     const serviceIds: SelectedServiceIdsType[] = this.selectedServiceData.map(item => {
       return {
         id: item.id,
         selectedIds: item.subService.map(sub => sub.id)
       }
-    })
+    });
 
     const bookingData: IBookingData = {
       providerId: this.providerId!,
@@ -108,8 +114,8 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     };
 
     this._bookingService.postBookingData(bookingData).subscribe({
-      next: (success) => {
-        if (success) {
+      next: (response) => {
+        if (response.success) {
           this._toastr.success('Service booked successfully!');
           localStorage.removeItem('selectedServiceData');
           this._router.navigate(['profile', 'bookings'])
@@ -124,17 +130,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     });
   }
 
-  /**
-   * Angular lifecycle hook to clean up subscriptions to prevent memory leaks.
-   */
-  ngOnDestroy(): void {
-    this._subscriptions.forEach(sub => sub.unsubscribe());
-  }
-
-
   private _verifyPaymentAndConfirmBooking(response: RazorpayPaymentResponse, order: RazorpayOrder) {
-    console.log('response: ', response);
-    console.log('order: ', order);
     const orderData: RazorpayOrder = {
       id: order.id,
       entity: order.entity,

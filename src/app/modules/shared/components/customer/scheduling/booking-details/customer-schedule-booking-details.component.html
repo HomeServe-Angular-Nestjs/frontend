@@ -16,7 +16,7 @@
                         class="w-full px-4 py-2 border-t border-b border-r border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
-            <button (click)="sendOtp()"
+            <button 
                 class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md whitespace-nowrap">
                 Send Code
             </button>
@@ -60,26 +60,34 @@
     <div class="mb-8">
         <label class="block text-gray-800 text-sm font-semibold mb-3">Select Date & Time</label>
 
+        <!-- Date Picker -->
         <div class="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
             <input type="date" id="date" [(ngModel)]="selectedDate"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                (change)="handleDateChange()" />
+                class="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-            <!-- {{schedules | json}} -->
-            <!-- <ng-container *ngIf="slotData.slots.length">
-                <button *ngFor="let slot of slotData.slots" (click)="selectSlot(slot.id, slotData.scheduleId)"
-                    class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100"
-                    [disabled]="slot.takenBy" [ngClass]="{
-                     'border-2 border-blue-500': isSelectedSlot(slot.id),
-                     'border border-gray-300': !isSelectedSlot(slot.id),
-                     'cursor-not-allowed opacity-50': slot.takenBy
-                    }">
-                    {{ slot.from }} - {{ slot.to }}
-                </button>
-            </ng-container> -->
+        <!-- Slot Display -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4" *ngIf="schedules$ | async as schedules">
+            <ng-container *ngFor="let schedule of schedules">
+                <ng-container *ngIf="schedule.month === getMonth(selectedDate)">
+                    <ng-container *ngFor="let day of schedule.days">
+                        <ng-container *ngIf="day.date === selectedDate">
+                            <ng-container *ngFor="let slot of day.slots">
+                                <button (click)="afterSlotSelection(slot.id, day.id,schedule.id)"
+                                    class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100 border border-gray-300"
+                                    [disabled]="!slot.isActive"
+                                    [attr.aria-label]="'Slot from ' + slot.from + ' to ' + slot.to">
+                                    {{ slot.from }} - {{ slot.to }}
+                                    <span *ngIf="!slot.isActive" class="text-red-500 text-xs ml-2">(Inactive)</span>
+                                </button>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
         </div>
+
+
 
         <div class="bg-blue-50 p-4 rounded-md border border-blue-200 shadow-sm">
             <p class="text-blue-700 text-sm">
