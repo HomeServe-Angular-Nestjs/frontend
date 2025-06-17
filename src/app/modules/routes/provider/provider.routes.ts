@@ -85,6 +85,12 @@ export const providerRoutes: Routes = [
                 canActivate: [AuthGuard],
                 loadComponent: () => import('../../shared/components/provider/bookings/booking-details/booking-details.component')
                     .then(c => c.ProviderViewBookingDetailsComponents)
+            },
+            {
+                path: 'chat',
+                canActivate: [AuthGuard],
+                loadComponent: () => import('../../pages/provider/chat/provider-chat.component')
+                    .then(c => c.ProviderChatComponent)
             }
         ],
     },

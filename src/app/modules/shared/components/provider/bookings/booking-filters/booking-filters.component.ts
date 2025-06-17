@@ -44,7 +44,7 @@ export class ProviderBookingFilterComponent {
 
     selectedBookingStatus: BookingStatus | '' = '';
     selectedPaymentStatus: PaymentStatus | '' = '';
-    selectedDateRange: DateRange | '' = '';
+    selectedDateRange: DateRange = DateRange.TODAY;
     selectedSortBy: SortBy = SortBy.NEWEST;
 
 

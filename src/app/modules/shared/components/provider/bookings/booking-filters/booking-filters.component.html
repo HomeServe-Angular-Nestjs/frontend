@@ -24,7 +24,6 @@
             <label for="dateRange" class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
             <select [(ngModel)]="selectedDateRange" (ngModelChange)="changeDateRange($event)" id="dateRange"
                 class="w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
-                <option value="">Select</option>
                 <option *ngFor="let option of dateRangeSelectOption" [value]="option.value">{{option.label}}</option>
 
             </select>

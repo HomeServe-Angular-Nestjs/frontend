@@ -3,6 +3,7 @@ import { authRoutes } from './modules/routes/auth/auth.routes';
 import { customerRoutes } from './modules/routes/customer/customer.routes';
 import { providerRoutes } from './modules/routes/provider/provider.routes';
 import { adminRoute } from './modules/routes/admin/admin.route';
+import { ChatComponent } from './modules/shared/partials/shared/chat/chat.component';
 
 export const routes: Routes = [
     ...authRoutes,
