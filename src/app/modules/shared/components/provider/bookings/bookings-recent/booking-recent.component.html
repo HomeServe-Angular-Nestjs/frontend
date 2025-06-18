@@ -80,8 +80,8 @@
                                             aria-label="View details">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <button class="text-green-600 hover:text-green-800"
-                                            aria-label="Message customer">
+                                        <button (click)="goToChat(booking.customer.id)"
+                                            class="text-green-600 hover:text-green-800" aria-label="Message customer">
                                             <i class="fas fa-comment"></i>
                                         </button>
                                         <button class="text-gray-600 hover:text-gray-800" aria-label="More options">

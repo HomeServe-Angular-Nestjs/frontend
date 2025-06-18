@@ -105,7 +105,6 @@ export class ScheduleService {
   }
 
   toggleScheduleDateSlotStatus(updateData: IUpdateScheduleDateSlotStatus): Observable<IResponse> {
-    console.log(updateData)
     return this._http.patch<IResponse>(`${this._scheduleApi}/slot_status`, updateData).pipe(
       catchError((error: HttpErrorResponse) =>
         throwError(() => new Error(this.getErrorMessage(error)))
@@ -134,13 +133,6 @@ export class ScheduleService {
           new Error(this.getErrorMessage(error)))
       ));
   }
-
-
-
-
-
-
-
 
 
   private getErrorMessage(error: HttpErrorResponse): string {

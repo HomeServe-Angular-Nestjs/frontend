@@ -39,6 +39,8 @@ export class ProviderScheduleListDetailsComponent implements OnInit, OnDestroy {
     selectedAvailability: AvailabilityType = 'all';
     selectedDate: string = '';
 
+    filters: IScheduleDetailFilters = {};
+
     ngOnInit(): void {
         this._filters$
             .pipe(takeUntil(this._destroy$))
@@ -53,14 +55,16 @@ export class ProviderScheduleListDetailsComponent implements OnInit, OnDestroy {
     }
 
     toggleActive(dayId: string, status: boolean) {
-        this.scheduleDates$ = this._scheduleService.toggleScheduleDateStatus({
+        this._scheduleService.toggleScheduleDateStatus({
             scheduleId: this.scheduleId,
             month: this.scheduleMonth,
             dayId,
             status: !status
-        }).pipe(
-            map(response => response.data?.map(date => ({ ...date, expanded: false })) ?? [])
-        );
+        }).subscribe(response => {
+            if (response.success) {
+                this._loadScheduleDetails(this.filters);
+            }
+        })
     }
 
     toggleSlotStatus(dayId: string, slotId: string, status: boolean) {
@@ -70,7 +74,9 @@ export class ProviderScheduleListDetailsComponent implements OnInit, OnDestroy {
             dayId,
             slotId,
             status: false
-        }).subscribe();
+        }).subscribe(response => {
+            this._loadScheduleDetails(this.filters);
+        });
     }
 
     changeStatus() {
@@ -86,6 +92,9 @@ export class ProviderScheduleListDetailsComponent implements OnInit, OnDestroy {
     }
 
     resetFilters() {
+        this.selectedStatus = 'all';
+        this.selectedAvailability = 'all';
+        this.selectedDate = '';
         this._filters$.next({});
     }
 
@@ -97,12 +106,12 @@ export class ProviderScheduleListDetailsComponent implements OnInit, OnDestroy {
     }
 
     private _emitFilters() {
-        const filters: IScheduleDetailFilters = {
+        this.filters = {
             status: this.selectedStatus,
             availableType: this.selectedAvailability,
             date: this.selectedDate
         };
 
-        this._filters$.next(filters);
+        this._filters$.next(this.filters);
     }
 }

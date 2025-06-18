@@ -67,9 +67,12 @@
     <div class="mb-8">
         <h2 class="text-lg font-semibold text-gray-800 mb-2">Payment Details</h2>
         <div class="bg-gray-50 p-4 rounded border text-sm text-gray-700 space-y-1">
-            <p><span class="font-medium">Transaction ID:</span> N/A</p>
-            <p><span class="font-medium">Payment Method:</span>N/A</p>
-            <p><span class="font-medium">Payment Date:</span> N/A</p>
+            <p><span class="font-medium">Transaction ID:</span>
+                {{bookingDetails.transaction?.id || 'N/A'}}</p>
+            <p><span class="font-medium">Payment Method:</span>
+                {{bookingDetails.transaction?.paymentMethod || 'N/A'}}</p>
+            <p><span class="font-medium">Payment Date:</span>
+                {{(bookingDetails.transaction?.paymentDate | date) || 'N/A'}}</p>
         </div>
     </div>
 

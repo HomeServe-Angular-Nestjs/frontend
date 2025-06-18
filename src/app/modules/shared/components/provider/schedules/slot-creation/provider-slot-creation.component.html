@@ -10,12 +10,12 @@
     <div *ngIf="isOpen" class="space-y-6">
 
         <!-- Mode Switcher -->
-        <div class="flex gap-6">
+        <!-- <div class="flex gap-6">
             <label *ngFor="let opt of ['month', 'per-day', 'custom']" class="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="mode" [(ngModel)]="mode" [value]="opt" class="form-radio text-green-600" />
                 <span class="capitalize text-sm font-medium text-gray-700">{{ opt.replace('-', ' ') }}</span>
             </label>
-        </div>
+        </div> -->
 
         <!-- Month Mode -->
         <div *ngIf="mode === 'month'" class="space-y-6">
@@ -95,7 +95,7 @@
         <!-- Per-Day Mode -->
         <div *ngIf="mode === 'per-day'" class="space-y-6">
 
-            <!-- Day Selector -->
+            Day Selector
             <label class="block text-sm font-medium text-gray-700 mb-2">Select Days of Current Month</label>
             <div class="grid grid-cols-6 gap-2">
                 <label *ngFor="let day of currentMonthDays" class="flex items-center gap-1 text-sm">
@@ -105,7 +105,7 @@
                 </label>
             </div>
 
-            <!-- Time Range -->
+            Time Range
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="relative w-full">
                     <input type="time" placeholder="Start Time"

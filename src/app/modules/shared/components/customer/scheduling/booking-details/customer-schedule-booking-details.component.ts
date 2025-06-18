@@ -35,6 +35,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   selectedAddress: string | null = null;
   selectedDate: string = '';
   phoneNumber: string | null = null;
+  selectedSlot: string = '';
 
   ngOnInit(): void {
     this.schedules$ = this._route.paramMap.pipe(
@@ -56,6 +57,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   }
 
   afterSlotSelection(slotId: string, dayId: string, scheduleId: string) {
+    this.selectedSlot = slotId;
     this._bookingService.setSelectedSlot({
       slotId,
       dayId,

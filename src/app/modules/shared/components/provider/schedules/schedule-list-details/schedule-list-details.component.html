@@ -1,6 +1,5 @@
 <div class="px-4 space-y-4">
-    <ng-container *ngIf="(scheduleDates$ | async) as scheduleDate">
-
+    <ng-container *ngIf="(scheduleDates$ | async) as scheduleDate;else noDates">
         <div class="bg-white rounded-lg shadow-sm px-4">
             <div class="flex flex-wrap gap-4 items-end">
 
@@ -39,65 +38,71 @@
             </div>
         </div>
 
-
-
-        <div *ngFor="let date of scheduleDate" class="border p-4 rounded shadow-sm">
-            <!-- Date Header -->
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <h3 class="text-md font-semibold">{{ date.date| date: 'dd MMM yyyy (EEEE)' }}</h3>
-                    <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                        {{date.isActive ? 'Active' : 'Inactive'}}
-                    </span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <label
-                        class="inline-flex items-center cursor-pointer text-yellow-600 hover:bg-yellow-100 p-1 rounded">
-                        <input type="checkbox" class="sr-only peer" (change)="toggleActive(date.id, date.isActive)" />
-                        <i class="text-lg transition-colors fas" [ngClass]="{
+        <ng-container *ngIf="scheduleDate.length > 0; else noDates">
+            <div *ngFor="let date of scheduleDate" class="border p-4 rounded shadow-sm">
+                <!-- Date Header -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-md font-semibold">{{ date.date| date: 'dd MMM yyyy (EEEE)' }}</h3>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+                            {{date.isActive ? 'Active' : 'Inactive'}}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label
+                            class="inline-flex items-center cursor-pointer text-yellow-600 hover:bg-yellow-100 p-1 rounded">
+                            <input type="checkbox" class="sr-only peer"
+                                (change)="toggleActive(date.id, date.isActive)" />
+                            <i class="text-lg transition-colors fas" [ngClass]="{
                             'fa-toggle-on text-green-600': date.isActive,
                             'fa-toggle-off text-green-400': !date.isActive
                             }"></i>
-                    </label>
+                        </label>
 
-                    <!-- <button (click)="deleteDate(date.id)" title="Delete Date"
-                        class="text-red-600 hover:bg-red-100 p-1 rounded">
-                        <i class="fas fa-trash-alt"></i>
-                    </button> -->
-                    <button (click)="date.expanded = !date.expanded" title="Expand/Collapse"
-                        class="text-gray-600 hover:bg-gray-100 p-1 rounded">
-                        <i [ngClass]="date.expanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Slots -->
-            <div *ngIf="date.expanded" class="mt-4 space-y-2">
-                <div *ngFor="let slot of date.slots"
-                    class="flex items-center justify-between px-4 py-2 bg-gray-50 rounded border">
-                    <div>
-                        <span class="font-medium">{{ slot.from }} – {{ slot.to }}</span>
-                        <span class="ml-3 px-2 py-0.5 text-xs rounded"
-                            [ngClass]="slot.takenBy ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
-                            {{ slot.takenBy ? 'Booked' : 'Available' }}
-                        </span>
+                        <button (click)="date.expanded = !date.expanded" title="Expand/Collapse"
+                            class="text-gray-600 hover:bg-gray-100 p-1 rounded">
+                            <i [ngClass]="date.expanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+                        </button>
                     </div>
-                    <div class="flex gap-4 items-center justify-end">
-                        <label
-                            class="inline-flex items-center cursor-pointer text-yellow-600 hover:bg-yellow-100 p-.5 rounded">
-                            <input type="checkbox" class="sr-only peer"
-                                (click)="toggleSlotStatus(date.id, slot.id, slot.isActive)" />
-                            <i class="text-lg transition-colors fas" [ngClass]="{
+                </div>
+
+                <!-- Slots -->
+                <div *ngIf="date.expanded" class="mt-4 space-y-2">
+                    <ng-container *ngIf="date.slots.length > 0; else noSlots">
+                        <div *ngFor="let slot of date.slots"
+                            class="flex items-center justify-between px-4 py-2 bg-gray-50 rounded border">
+                            <div>
+                                <span class="font-medium">{{ slot.from }} – {{ slot.to }}</span>
+                                <span class="ml-3 px-2 py-0.5 text-xs rounded"
+                                    [ngClass]="slot.takenBy ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
+                                    {{ slot.takenBy ? 'Booked' : 'Available' }}
+                                </span>
+                            </div>
+                            <div class="flex gap-4 items-center justify-end">
+                                <label
+                                    class="inline-flex items-center cursor-pointer text-yellow-600 hover:bg-yellow-100 p-.5 rounded">
+                                    <input type="checkbox" class="sr-only peer"
+                                        (click)="toggleSlotStatus(date.id, slot.id, slot.isActive)" />
+                                    <i class="text-lg transition-colors fas" [ngClass]="{
                             'fa-toggle-on text-green-600': slot.isActive,
                             'fa-toggle-off text-green-400': !slot.isActive
                             }"></i>
-                        </label>
-                        <!-- <button (click)="deleteSlot()" class="text-red-600 hover:bg-red-100 p-1 rounded">
-                            <i class="fas fa-trash"></i>
-                        </button> -->
-                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </ng-container>
                 </div>
+                <ng-template #noSlots>
+                    <div class="text-sm text-gray-400 italic text-center py-2">
+                        No slots available for this date.
+                    </div>
+                </ng-template>
             </div>
-        </div>
+        </ng-container>
     </ng-container>
+    <ng-template #noDates>
+        <div class="text-center text-gray-500 py-6">
+            No schedule dates available.
+        </div>
+    </ng-template>
 </div>

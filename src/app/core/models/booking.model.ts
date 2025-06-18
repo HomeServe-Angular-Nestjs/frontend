@@ -39,6 +39,11 @@ export interface IBookingDetailsBase {
         price: string;
         estimatedTime: string;
     }[];
+    transaction: {
+        id: string;
+        paymentMethod: string;
+        paymentDate: Date
+    } | null;
 }
 
 // --------------------

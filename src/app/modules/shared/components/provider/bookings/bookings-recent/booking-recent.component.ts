@@ -9,6 +9,7 @@ import { IBookingFilter, IResponseProviderBookingLists } from "../../../../../..
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { DebounceService } from "../../../../../../core/services/public/debounce.service";
 import { RouterLink } from "@angular/router";
+import { ChatService } from "../../../../../../core/services/chat.service";
 
 @Component({
     selector: 'app-provider-booking-recent',
@@ -19,7 +20,8 @@ import { RouterLink } from "@angular/router";
 export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDestroy {
     private readonly _bookingService = inject(BookingService);
     private readonly _debounceService = inject(DebounceService);
-    private _sanitizer = inject(DomSanitizer);
+    private readonly _sanitizer = inject(DomSanitizer);
+    private readonly _chatService = inject(ChatService);
 
     @Input() filters: IBookingFilter = {};
 
@@ -49,6 +51,11 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
         if (changes['filters'] && changes['filters'].currentValue) {
             this._emitFilters();
         }
+    }
+
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
     }
 
     loadBookings(page: number, filter: IBookingFilter = {}) {
@@ -81,6 +88,10 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
         this._debounceService.delay(this.searchTerm);
     }
 
+    goToChat(customerId: string) {
+        this._chatService.createChat(customerId).subscribe(data => console.log(data));
+    }
+
     private _emitFilters(): void {
         const filter: IBookingFilter = {
             search: this.searchTerm,
@@ -88,10 +99,5 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
         };
 
         this._filters$.next(filter);
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
     }
 }

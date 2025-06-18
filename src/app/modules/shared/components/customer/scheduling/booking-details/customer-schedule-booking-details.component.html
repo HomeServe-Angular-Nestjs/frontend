@@ -6,20 +6,20 @@
         <div class="flex items-end space-x-4">
             <div class="flex-1">
                 <div class="flex">
-                    <select
+                    <!-- <select
                         class="border border-gray-300 rounded-l-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option>+1</option>
                         <option>+91</option>
                         <option>+44</option>
-                    </select>
+                    </select> -->
                     <input type="tel" placeholder="Enter your mobile number" [(ngModel)]="phoneNumber"
-                        class="w-full px-4 py-2 border-t border-b border-r border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
-            <button 
+            <!-- <button 
                 class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md whitespace-nowrap">
                 Send Code
-            </button>
+            </button> -->
         </div>
         <div class="mt-4 space-x-4 hidden" id="verificationCodeSection">
             <div class="flex-1">
@@ -73,9 +73,11 @@
                     <ng-container *ngFor="let day of schedule.days">
                         <ng-container *ngIf="day.date === selectedDate">
                             <ng-container *ngFor="let slot of day.slots">
-                                <button (click)="afterSlotSelection(slot.id, day.id,schedule.id)"
-                                    class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100 border border-gray-300"
-                                    [disabled]="!slot.isActive"
+                                <button (click)="afterSlotSelection(slot.id, day.id, schedule.id)" [ngClass]="{
+    'ring-2 ring-blue-500 ring-offset-2 bg-blue-100': selectedSlot === slot.id,
+    'opacity-50 cursor-not-allowed': !slot.isActive || slot.takenBy
+  }" class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100 border border-gray-300 transition-all duration-200"
+                                    [disabled]="!slot.isActive || slot.takenBy"
                                     [attr.aria-label]="'Slot from ' + slot.from + ' to ' + slot.to">
                                     {{ slot.from }} - {{ slot.to }}
                                     <span *ngIf="!slot.isActive" class="text-red-500 text-xs ml-2">(Inactive)</span>
@@ -89,11 +91,11 @@
 
 
 
-        <div class="bg-blue-50 p-4 rounded-md border border-blue-200 shadow-sm">
+        <!-- <div class="bg-blue-50 p-4 rounded-md border border-blue-200 shadow-sm">
             <p class="text-blue-700 text-sm">
                 <i class="fas fa-info-circle mr-2"></i>
                 Next available slot: <strong id="nextSlot">Today, 2:00 PM</strong>
             </p>
-        </div>
+        </div> -->
     </div>
 </div>
