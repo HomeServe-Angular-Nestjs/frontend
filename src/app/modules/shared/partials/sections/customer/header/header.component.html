@@ -28,6 +28,25 @@
             <input type="text" id="service-search"
               class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition-all outline-none peer"
               placeholder=" " />
+            <ul *ngIf="!isLoadingServices && fetchedServices?.length && serviceSearch.trim()"
+              class="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto text-sm text-gray-800">
+              <li *ngFor="let service of fetchedServices" (click)="handleServiceClick(service)"
+                class="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0">
+
+                <!-- Avatar -->
+                <div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
+                  <img [src]="service.avatar || 'https://via.placeholder.com/48'" alt="Avatar"
+                    class="w-full h-full object-cover" />
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium truncate">{{ service.name }}</p>
+                  <p class="text-xs text-gray-500 leading-tight line-clamp-2">{{ service.address }}</p>
+                </div>
+
+              </li>
+            </ul>
             <label for="service-search"
               class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-10 pointer-events-none">
               Search services
@@ -73,7 +92,7 @@
 
             <label for="location-search"
               class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-10 pointer-events-none">
-              Your location
+              Search location
             </label>
           </div>
         </div>

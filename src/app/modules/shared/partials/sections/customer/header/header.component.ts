@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { authActions } from '../../../../../../store/auth/auth.actions';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
@@ -23,9 +23,11 @@ export class CustomerHeaderComponent implements OnInit {
   private readonly _store = inject(Store);
   private readonly _debounceService = inject(DebounceService);
   private readonly _customerService = inject(CustomerService);
+  private readonly _router = inject(Router);
 
-  private _destroy$ = new Subject<void>();
+  private readonly _destroy$ = new Subject<void>();
 
+  // User observables
   userStatus$!: Observable<StatusType>;
   email$!: Observable<string>;
   username$!: Observable<string>;
@@ -34,9 +36,15 @@ export class CustomerHeaderComponent implements OnInit {
   fallbackChar$!: Observable<string>;
   fallbackColor$!: Observable<string>;
 
+  // Provider Search
   providerSearch = '';
-  fetchedProviders: any;
+  fetchedProviders: any[] = [];
   isLoadingProviders = false;
+
+  // Service Search
+  serviceSearch = '';
+  fetchedServices: any[] = [];
+  isLoadingServices = false;
 
   ngOnInit(): void {
     this.userStatus$ = this._store.select(selectCheckStatus);
@@ -44,86 +52,94 @@ export class CustomerHeaderComponent implements OnInit {
 
     const customer$ = this._store.select(selectCustomer);
 
-    this.avatar$ = customer$.pipe(
-      map(customer => customer?.avatar ?? null)
-    );
-
-    this.email$ = customer$.pipe(
-      map((customer) => {
-        if (customer && customer.email) {
-          return customer.email
-        }
-        return ''
-      })
-    );
-
-    this.username$ = customer$.pipe(
-      map((customer) => {
-        if (customer && customer.username) {
-          return customer.username
-        }
-        return ''
-      })
-    );
-
-    this.fullname$ = customer$.pipe(
-      map((customer) => {
-        if (customer && customer.fullname) {
-          return customer.fullname
-        }
-        return ''
-      })
-    );
-
-    this.fallbackChar$ = customer$.pipe(
-      map(customer => {
-        if (customer && customer.username) {
-          return customer.username.charAt(0).toUpperCase();
-        }
-        return '';
-      })
-    );
-
-    this.fallbackColor$ = this.fallbackChar$.pipe(
-      map(char => char ? getColorFromChar(char) : '#4f46e5')
-    );
+    this.avatar$ = customer$.pipe(map(c => c?.avatar ?? null));
+    this.email$ = customer$.pipe(map(c => c?.email ?? ''));
+    this.username$ = customer$.pipe(map(c => c?.username ?? ''));
+    this.fullname$ = customer$.pipe(map(c => c?.fullname ?? ''));
+    this.fallbackChar$ = customer$.pipe(map(c => c?.username?.charAt(0).toUpperCase() ?? ''));
+    this.fallbackColor$ = this.fallbackChar$.pipe(map(char => char ? getColorFromChar(char) : '#4f46e5'));
 
     this._debounceService.onSearch(700)
       .pipe(takeUntil(this._destroy$))
-      .subscribe(() => {
-        this._customerService.searchProviders(this.providerSearch).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.fetchedProviders = response.data;
-            }
-            this.isLoadingProviders = false;
-          },
-          error: (err) => {
-            console.error(err);
-            this.isLoadingProviders = false;
-          }
-        });
+      .subscribe((search: any) => {
+        if (search.type === 'provider') {
+          this.fetchProviders(search.search);
+        } else if (search.type === 'service') {
+          this.fetchServices(search.search);
+        }
       });
   }
 
-  searchProviders() {
-    this._debounceService.delay(this.providerSearch);
+  private fetchProviders(search: string): void {
+    this.isLoadingProviders = true;
+    this._customerService.searchProviders(search).subscribe({
+      next: (res) => {
+        if (res.success) this.fetchedProviders = res.data;
+        this.isLoadingProviders = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoadingProviders = false;
+      }
+    });
   }
 
-  handleProviderClick(provider: any) {
-    this.isLoadingProviders = true
+  private fetchServices(search: string): void {
+    this.isLoadingServices = true;
+    this._customerService.searchService(search).subscribe({
+      next: (res) => {
+        if (res.success) this.fetchedServices = res.data;
+        this.isLoadingServices = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoadingServices = false;
+      }
+    });
+  }
+
+  searchProviders(): void {
+    this._debounceService.delay({ search: this.providerSearch, type: 'provider' });
+  }
+
+  searchServices(): void {
+    this._debounceService.delay({ search: this.serviceSearch, type: 'service' });
+  }
+
+  handleProviderClick(provider: any): void {
     this.providerSearch = provider.address || '';
     this.fetchedProviders = [];
-    this.onProviderSelected(provider.id); // or provider._id
+    this.onProviderSelected(provider.id);
   }
 
-  onProviderSelected(id: string) {
-    console.log('Selected Provider ID:', id);
-    // You can now call any service or logic based on the selected provider
+  onProviderSelected(id: string): void {
+    this.isLoadingProviders = false;
+    this.providerSearch = '';
+    this.fetchedProviders = [];
+    this._router.navigate(['provider_details', id, 'about']);
+  }
+
+  handleServiceClick(service: any): void {
+    this.serviceSearch = '';
+    this.fetchedServices = [];
+    this.onServiceSelected(service.id);
+  }
+
+  onServiceSelected(id: string): void {
+    this.isLoadingServices = false;
+    this.serviceSearch = '';
+    this.fetchedServices = [];
+    // TODO: Navigate if needed
+    this._router.navigate(['service_details', id, 'service']);
   }
 
   logout(): void {
     this._store.dispatch(authActions.logout({ fromInterceptor: false }));
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 
 }

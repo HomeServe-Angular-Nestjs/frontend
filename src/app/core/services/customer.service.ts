@@ -72,6 +72,16 @@ export class CustomerService {
         );
     }
 
+    searchService(search: string): Observable<IResponse> {
+        const params = new HttpParams().set('search', search);
+        return this._http.get<IResponse>(`${this._apiUrl}/search_services`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
     /**
      * Converts a plain filter object into HttpParams by omitting null or undefined values.
      * @param {IFilter} filter - The filter criteria to convert.

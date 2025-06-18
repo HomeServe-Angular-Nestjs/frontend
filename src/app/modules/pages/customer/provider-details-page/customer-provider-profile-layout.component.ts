@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { CustomerProviderProfileOverviewComponent } from "../../../shared/components/customer/provider-details/profile-overview/customer-provider-profile-overview.component";
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
 import { CustomerProviderProfileNavigationComponent } from "../../../shared/components/customer/provider-details/profile-nav/customer-provider-profile-nav.component";
@@ -20,25 +20,28 @@ import { NotificationService } from "../../../../core/services/public/notificati
     ],
     standalone: true
 })
-export class CustomerProviderProfileLayoutComponent {
+export class CustomerProviderProfileLayoutComponent implements OnInit {
+    private readonly _route = inject(ActivatedRoute);
+    private readonly _router = inject(Router);
+    private readonly _providerService = inject(ProviderService);
+
     providerId: string | null = null;
 
-    constructor(
-        private _route: ActivatedRoute,
-        private _router: Router,
-        private readonly _providerService: ProviderService,
-    ) {
-        this.providerId = this._route.snapshot.paramMap.get('id');
-        if (this.providerId) {
-            this._providerService.getOneProvider(this.providerId).subscribe({
-                next: (provider) => this._providerService.setProviderData(provider),
-                error: () => {
-                    this._router.navigate(['not_found'], {
-                        state: { type: 'data' }
-                    });
-                }
-            });
-        }
+    ngOnInit() {
+        this._route.paramMap.subscribe(paramMap => {
+            const id = paramMap.get('id');
+            if (id) {
+                this.providerId = id;
+                this._providerService.getOneProvider(id).subscribe({
+                    next: (provider) => this._providerService.setProviderData(provider),
+                    error: () => {
+                        this._router.navigate(['not_found'], {
+                            state: { type: 'data' }
+                        });
+                    }
+                });
+            }
+        });
     }
 
 }   
