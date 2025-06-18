@@ -4,6 +4,7 @@ import { API_ENV } from "../../environments/api.environments";
 import { ICustomer } from "../models/user.model";
 import { catchError, Observable, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
+import { IResponse } from "../../modules/shared/models/response.model";
 
 @Injectable({ providedIn: 'root' })
 export class CustomerService {
@@ -61,7 +62,15 @@ export class CustomerService {
         );
     }
 
-    // verifyPhoneNumber(phone: number):Observable<boolean>
+    searchProviders(search: string): Observable<IResponse> {
+        const params = new HttpParams().set('search', search);
+        return this._http.get<IResponse>(`${this._apiUrl}/search_providers`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
 
     /**
      * Converts a plain filter object into HttpParams by omitting null or undefined values.
