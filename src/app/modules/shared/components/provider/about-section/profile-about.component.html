@@ -1,0 +1,291 @@
+<!-- Container -->
+<div class="space-y-8 p-6 bg-gray-50 rounded-xl shadow-md">
+
+    <!-- Professional Introduction -->
+    <section class="relative bg-white p-6 rounded-lg shadow space-y-2">
+        <h2 class="text-xl font-semibold text-gray-800">Professional Introduction</h2>
+
+        <!-- View Mode -->
+        <p *ngIf="!isEditingIntro" class="text-gray-700 leading-relaxed">
+            {{ professionalIntro }}
+        </p>
+
+        <!-- Edit Mode -->
+        <textarea *ngIf="isEditingIntro" [(ngModel)]="professionalIntro"
+            class="w-full h-40 p-3 border border-gray-300 rounded-md text-gray-700 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+
+        <!-- Toggle Button (Edit <-> Save) -->
+        <button aria-label="Toggle Edit" (click)="toggleIntroEdit()"
+            class="absolute bottom-4 right-4 text-gray-500 hover:text-blue-600 transition">
+            <i [ngClass]="isEditingIntro ? 'fas fa-check' : 'fas fa-pen'"></i>
+        </button>
+    </section>
+
+
+    <!-- Specializations & Expertise -->
+    <section class="relative bg-white p-6 rounded-lg shadow space-y-4">
+        <h2 class="text-xl font-semibold text-gray-800">Specializations & Expertise</h2>
+
+        <!-- main -->
+        <div class="flex flex-wrap gap-4">
+            <div class="relative bg-green-50 border border-green-200 text-green-800 px-4 py-2 rounded-lg">
+                <!-- Delete Button -->
+                <button (click)="deleteSpecialization('Deep Cleaning')"
+                    class="absolute top-1 right-3 text-red-400 hover:text-red-600" aria-label="Remove Deep Cleaning">
+                    <i class="fas fa-trash-alt text-xs"></i>
+                </button>
+
+                <div class="font-semibold">Deep Cleaning</div>
+                <div class="text-sm text-gray-500">Residential & Commercial</div>
+            </div>
+            <div class="relative bg-green-50 border border-green-200 text-green-800 px-4 py-2 rounded-lg">
+                <!-- Delete Button -->
+                <button (click)="deleteSpecialization('Deep Cleaning')"
+                    class="absolute top-1 right-3 text-red-400 hover:text-red-600" aria-label="Remove Deep Cleaning">
+                    <i class="fas fa-trash-alt text-xs"></i>
+                </button>
+
+                <div class="font-semibold">Deep Cleaning</div>
+                <div class="text-sm text-gray-500">Residential & Commercial</div>
+            </div>
+        </div>
+
+        <!-- additional -->
+        <div>
+            <h3 class="text-sm font-semibold text-gray-600 mb-2">Additional Skills</h3>
+            <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1 text-sm bg-gray-100 rounded-full">Carpet Cleaning</span>
+                <span class="px-3 py-1 text-sm bg-gray-100 rounded-full">Window Washing</span>
+                <span class="px-3 py-1 text-sm bg-gray-100 rounded-full">Floor Maintenance</span>
+                <span class="px-3 py-1 text-sm bg-gray-100 rounded-full">Sanitization</span>
+            </div>
+        </div>
+
+        <!-- Edit Button -->
+        <button (click)="openSpecializationsModal()" aria-label="Edit Specializations"
+            class="absolute bottom-4 right-4 text-gray-500 hover:text-blue-600">
+            <i class="fas fa-pen"></i>
+        </button>
+    </section>
+
+    <!-- Awards & Recognition -->
+    <section class="relative bg-white p-6 rounded-lg shadow space-y-3">
+        <h2 class="text-xl font-semibold text-gray-800">Awards & Recognition</h2>
+        <div class="flex items-start gap-3">
+            <div class="text-yellow-500 text-2xl">🏆</div>
+            <div>
+                <div class="font-medium text-gray-700">Best Service Provider 2023</div>
+                <div class="text-sm text-gray-500">HomeServe Annual Awards</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Active Certifications -->
+    <section class="relative bg-white p-6 rounded-lg shadow space-y-4">
+        <h2 class="text-xl font-semibold text-gray-800">Active Certifications</h2>
+
+        <div class="bg-green-50 border border-green-200 px-4 py-3 rounded-md space-y-1">
+            <div class="text-green-700 font-semibold">Professional Cleaning</div>
+            <div class="text-sm text-gray-500">Expires: Dec 2024</div>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="mt-3">
+            <label class="block text-sm font-medium text-gray-600 mb-1">Uploaded Certificate</label>
+            <img [src]="certificateImage || 'https://via.placeholder.com/150x100?text=No+Image'"
+                alt="Certificate Preview" class="w-40 h-auto border rounded-md shadow-sm" />
+        </div>
+
+        <p class="text-sm text-blue-600 leading-relaxed">
+            Please provide a valid PCC (Police Clearance Certificate) to receive the verified certification badge.
+        </p>
+
+        <button (click)="openCertificationModal()" aria-label="Edit Certifications"
+            class="absolute bottom-4 right-4 text-gray-500 hover:text-blue-600">
+            <i class="fas fa-pen"></i>
+        </button>
+    </section>
+
+    <!-- Languages -->
+    <section class="relative bg-white p-6 rounded-lg shadow space-y-4">
+        <h2 class="text-xl font-semibold text-gray-800">Languages</h2>
+
+        <!-- Language Tags -->
+        <div class="flex flex-wrap gap-2">
+            <span class="flex items-center gap-2 bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                English <span class="text-gray-500 text-xs">(Native)</span>
+            </span>
+            <span class="flex items-center gap-2 bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                Spanish <span class="text-gray-500 text-xs">(Conversational)</span>
+            </span>
+        </div>
+
+        <!-- Edit Button -->
+        <button (click)="openLanguageModal()" aria-label="Edit Languages"
+            class="absolute bottom-4 right-4 text-gray-500 hover:text-blue-600">
+            <i class="fas fa-pen"></i>
+        </button>
+    </section>
+
+
+</div>
+
+<div *ngIf="isSpecializationsModalOpen"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-xl shadow-lg space-y-4">
+        <h3 class="text-lg font-semibold text-gray-800">Edit Specializations & Expertise</h3>
+
+        <!-- Specialization Input -->
+        <div class="space-y-3">
+            <label class="block">
+                <span class="text-sm text-gray-600">Specialization</span>
+                <input type="text" [(ngModel)]="specializationInput"
+                    class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-400"
+                    placeholder="e.g., Deep Cleaning" />
+            </label>
+
+            <label class="block">
+                <span class="text-sm text-gray-600">Skill Tags</span>
+                <input type="text" [(ngModel)]="skillTagsInput"
+                    class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-400"
+                    placeholder="e.g., Carpet Cleaning, Sanitization" />
+            </label>
+
+            <!-- Additional Skills -->
+            <label class="block">
+                <span class="text-sm text-gray-600">Add Additional Skill</span>
+                <div class="flex items-center gap-2 mt-1">
+                    <input type="text" [(ngModel)]="additionalSkillInput"
+                        class="flex-1 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-400"
+                        placeholder="e.g., Window Washing" />
+                    <button (click)="addAdditionalSkill()"
+                        class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Add</button>
+                </div>
+            </label>
+
+            <!-- List Existing Skills -->
+            <div *ngIf="additionalSkills.length > 0" class="mt-3">
+                <span class="text-sm text-gray-600">Existing Additional Skills:</span>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    <div *ngFor="let skill of additionalSkills"
+                        class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-sm">
+                        {{ skill }}
+                        <button (click)="removeAdditionalSkill(skill)" aria-label="Remove skill"
+                            class="text-red-400 hover:text-red-600">
+                            <i class="fas fa-times-circle text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3 mt-4">
+            <button (click)="closeSpecializationsModal()"
+                class="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-sm">
+                Cancel
+            </button>
+            <button (click)="saveSpecializations()"
+                class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 text-sm">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isCertificationModalOpen"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg space-y-4">
+
+        <h3 class="text-lg font-semibold text-gray-800">Upload Certification</h3>
+
+        <!-- Certification Name -->
+        <div>
+            <label class="block text-sm text-gray-600 mb-1">Certification Title</label>
+            <input type="text" [(ngModel)]="certificationTitle"
+                class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-400"
+                placeholder="e.g., Professional Cleaning" />
+        </div>
+
+        <!-- Image Upload -->
+        <div>
+            <label class="block text-sm text-gray-600 mb-1">Upload Certificate</label>
+            <div class="border border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer">
+                <input type="file" (change)="handleFileInput($event)" class="hidden" #fileInput />
+                <div (click)="fileInput.click()" class="text-gray-500">
+                    Click to upload or drag and drop
+                </div>
+                <div *ngIf="certificateImage" class="mt-2">
+                    <img [src]="certificateImage" alt="Preview" class="mx-auto w-40 rounded shadow" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-3">
+            <button (click)="closeCertificationModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm">
+                Cancel
+            </button>
+            <button (click)="saveCertification()"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">
+                Save
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div *ngIf="isLanguageModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md space-y-4 shadow-lg">
+
+        <h3 class="text-lg font-semibold text-gray-800">Manage Languages</h3>
+
+        <!-- Input Fields -->
+        <div class="space-y-3">
+            <label class="block text-sm text-gray-600">
+                Language
+                <input type="text" [(ngModel)]="newLanguage" placeholder="e.g., German"
+                    class="w-full mt-1 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-400">
+            </label>
+
+            <label class="block text-sm text-gray-600">
+                Proficiency
+                <select [(ngModel)]="newProficiency"
+                    class="w-full mt-1 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-400">
+                    <option value="" disabled selected>Select Proficiency</option>
+                    <option>Native</option>
+                    <option>Fluent</option>
+                    <option>Conversational</option>
+                    <option>Basic</option>
+                </select>
+            </label>
+            <button (click)="addLanguage()"
+                class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 text-sm">
+                Add Language
+            </button>
+        </div>
+
+        <!-- Existing Languages List -->
+        <div *ngIf="languages.length > 0" class="pt-2">
+            <h4 class="text-sm font-semibold text-gray-700 mb-1">Added Languages:</h4>
+            <ul class="space-y-2">
+                <li *ngFor="let lang of languages; let i = index"
+                    class="flex items-center justify-between text-sm bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
+                    <span>{{ lang.name }} <span class="text-gray-500 text-xs">({{ lang.level }})</span></span>
+                    <button (click)="removeLanguage(i)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex justify-end gap-3 pt-4">
+            <button (click)="closeLanguageModal()"
+                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm">Cancel</button>
+            <button (click)="saveLanguages()"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">Save</button>
+        </div>
+
+    </div>
+</div>

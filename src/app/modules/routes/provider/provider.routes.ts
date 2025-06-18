@@ -47,6 +47,11 @@ export const providerRoutes: Routes = [
                         ]
                     },
                     {
+                        path: 'about',
+                        loadComponent: () => import('../../shared/components/provider/about-section/profile-about.component')
+                            .then(c => c.ProviderProfileAboutComponent)
+                    },
+                    {
                         path: 'service_offered',
                         loadComponent: () => import('../../shared/components/provider/service-section/service-view/service-view.component')
                             .then(c => c.ServiceViewComponent),
