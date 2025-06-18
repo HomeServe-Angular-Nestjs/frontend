@@ -1,29 +1,62 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { IDocs, IExpertise, ILanguage, IProvider } from '../../../../../core/models/user.model';
+import { selectProvider } from '../../../../../store/provider/provider.selector';
+import { providerActions } from '../../../../../store/provider/provider.action';
 
 @Component({
     selector: 'app-provider-profile-about',
     templateUrl: './profile-about.component.html',
-    imports: [CommonModule, FormsModule]
+    imports: [CommonModule, FormsModule, ReactiveFormsModule]
 })
-export class ProviderProfileAboutComponent {
+export class ProviderProfileAboutComponent implements OnInit {
+    private readonly _store = inject(Store);
+    private readonly _fb = inject(FormBuilder)
+
     isEditingIntro = false;
+    isSpecializationsModalOpen = false;
+    isCertificationModalOpen = false;
+    isLanguageModalOpen = false;
 
-    professionalIntro: string = `With over 5 years of experience in professional cleaning services, I specialize in residential and
-commercial cleaning solutions. My approach combines traditional cleaning methods with modern, eco-friendly techniques
-to deliver exceptional results.`;
+    newExpertise: IExpertise = { label: '', specialization: '' };
 
-    toggleIntroEdit() {
-        this.isEditingIntro = !this.isEditingIntro;
+    providerBio: string = '';
+    expertises: IExpertise[] = [];
+    additionalSkills: Set<string> = new Set();
+    docs: IDocs[] = [];
+    languages: ILanguage[] = []
 
-        // Optional: Save logic here when switching from edit to view
-        if (!this.isEditingIntro) {
-            console.log('Saved intro:', this.professionalIntro);
-        }
+    expertiseForm: FormGroup = this._fb.group({
+        label: ['', Validators.required],
+        specialization: ['', Validators.required],
+        additionalSkills: ['']
+    });
+
+
+    ngOnInit(): void {
+        this._store.select(selectProvider).subscribe(provider => {
+            console.log(provider)
+            this.providerBio = provider?.bio ?? '';
+            this.expertises = provider?.expertise ?? [];
+            this.additionalSkills = new Set(provider?.additionalSkills);
+            this.docs = provider?.docs ?? [];
+            this.languages = provider?.languages ?? [];
+        });
     }
 
-    isSpecializationsModalOpen = false;
+    toggleIntroEdit() {
+        if (this.isEditingIntro) {
+            this._store.dispatch(providerActions.updateBio({
+                updateData: {
+                    providerBio: this.providerBio,
+                }
+            }));
+        }
+        this.isEditingIntro = !this.isEditingIntro;
+    }
 
     openSpecializationsModal() {
         this.isSpecializationsModalOpen = true;
@@ -33,51 +66,41 @@ to deliver exceptional results.`;
         this.isSpecializationsModalOpen = false;
     }
 
-    // You can later call this to update your data
-    saveSpecializations() {
-        // Save logic here
-        this.closeSpecializationsModal();
-    }
+    saveExpertise() {
+        if (this.isSpecializationsModalOpen) {
+            const { label, specialization, additionalSkills } = this.expertiseForm.value;
 
-    specializations = [
-        {
-            title: 'Deep Cleaning',
-            description: 'Residential & Commercial',
-            featured: true
-        },
-        {
-            title: 'Eco-Friendly Cleaning',
-            description: 'Green Certified Products',
-            featured: false
+            if (additionalSkills.trim()) {
+                this.additionalSkills.add(additionalSkills.trim());
+            }
+
+            this.newExpertise = { label, specialization };
+
+            // this._store.dispatch(providerActions.updateBio({
+            //     updateData: {
+            //         additionalSkills: additionalSkills
+            //         expertises: specialization.trim() && label.trim() ? {
+            //             label,
+            //             specialization
+            //         } : undefined,
+            //     }
+            // }));
         }
-    ];
-
-    deleteSpecialization(title: string) {
-        this.specializations = this.specializations.filter(
-            s => s.title !== title
-        );
     }
 
-    specializationInput: string = '';
-    skillTagsInput: string = '';
-    additionalSkillInput: string = '';
-    additionalSkills: string[] = ['Carpet Cleaning', 'Window Washing', 'Sanitization', 'Floor Maintenance'];
+
+    deleteSpecialization(title: any) {
+
+    }
+
 
     addAdditionalSkill() {
-        const skill = this.additionalSkillInput.trim();
-        if (skill && !this.additionalSkills.includes(skill)) {
-            this.additionalSkills.push(skill);
-            this.additionalSkillInput = '';
-        }
+
     }
 
     removeAdditionalSkill(skill: string) {
-        this.additionalSkills = this.additionalSkills.filter(s => s !== skill);
     }
 
-    isCertificationModalOpen = false;
-    certificationTitle = '';
-    certificateImage: string | null = null;
 
     openCertificationModal() {
         this.isCertificationModalOpen = true;
@@ -88,14 +111,7 @@ to deliver exceptional results.`;
     }
 
     handleFileInput(event: Event) {
-        const file = (event.target as HTMLInputElement).files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                this.certificateImage = reader.result as string;
-            };
-            reader.readAsDataURL(file);
-        }
+
     }
 
     saveCertification() {
@@ -103,11 +119,7 @@ to deliver exceptional results.`;
         this.closeCertificationModal();
     }
 
-    isLanguageModalOpen = false;
-    languages = [
-        { name: 'English', level: 'Native' },
-        { name: 'Spanish', level: 'Conversational' }
-    ];
+
 
     newLanguage = '';
     newProficiency = '';
@@ -121,11 +133,7 @@ to deliver exceptional results.`;
     }
 
     addLanguage() {
-        if (this.newLanguage && this.newProficiency) {
-            this.languages.push({ name: this.newLanguage, level: this.newProficiency });
-            this.newLanguage = '';
-            this.newProficiency = '';
-        }
+
     }
 
     removeLanguage(index: number) {

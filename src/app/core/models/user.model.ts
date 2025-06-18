@@ -4,18 +4,10 @@ import { IPagination } from './booking.model';
 
 export type UType = 'customer' | 'provider';
 
-export type AdditionalDocs = {
-    type: string;
+export interface IDocs {
+    label: string;
     fileUrl: string;
     uploadedAt: Date;
-}
-
-export type Verification = {
-    pcc: {
-        fileUrl: string;
-        uploadedAt: Date;
-    };
-    additionalDocs: AdditionalDocs[];
     verificationStatus: 'pending' | 'verified' | 'rejected';
     verifiedAt?: Date;
 };
@@ -26,11 +18,15 @@ export type Address = {
     coordinates: [number, number];
 };
 
-export type Expertise = {
+export interface IExpertise {
     specialization: string;
     label: string;
-    tag: string;
 };
+
+export interface ILanguage {
+    language: string;
+    proficiency: string;
+}
 
 export type Day = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thur' | 'Fri' | 'Sat';
 
@@ -67,14 +63,14 @@ export interface ICustomer extends IBaseUser {
 
 export interface IProvider extends IBaseUser {
     bio?: string;
-    expertise?: Expertise[];
+    expertise?: IExpertise[];
     additionalSkills?: string[];
-    languages?: string[];
+    languages?: ILanguage[];
     location?: Address;
     workImages?: string[];
     awards?: string[];
     isCertified: boolean;
-    verification: Verification;
+    docs: IDocs[];
     schedules: string[];
     subscriptionID: string;
     profession: string;
@@ -149,4 +145,12 @@ export interface IUpdateUserStatus {
 export interface IRemoveData {
     userId: string;
     role: UType;
+}
+
+export interface IProviderUpdateBio {
+    providerBio?: string;
+    expertises?: IExpertise;
+    additionalSkills?: string[];
+    docs?: IDocs[];
+    languages?: ILanguage[];
 }

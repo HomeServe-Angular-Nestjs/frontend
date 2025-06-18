@@ -13,23 +13,23 @@ export const providerFeature = createFeature({
     reducer: createReducer(
         initialProviderState,
 
-        on(providerActions.fetchOneProvider, (state) => ({
-            ...state,
-            loading: true,
-            error: null
-        })),
-
-        on(providerActions.fetchOneProviderSuccess, (state, { provider }) => ({
+        on(providerActions.successAction, (state, { provider }) => ({
             ...state,
             provider,
             loading: false,
             error: null
         })),
 
-        on(providerActions.fetchOneProviderFailure, (state, { error }) => ({
+        on(providerActions.failureAction, (state, { error }) => ({
             ...state,
             loading: false,
             error
+        })),
+
+        on(providerActions.fetchOneProvider, (state) => ({
+            ...state,
+            loading: true,
+            error: null
         })),
 
         on(providerActions.updateProvider, (state) => ({

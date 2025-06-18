@@ -18,9 +18,9 @@ export const providerEffects = {
             ofType(providerActions.fetchOneProvider),
             switchMap(() =>
                 providerService.getOneProvider().pipe(
-                    map((provider) => providerActions.fetchOneProviderSuccess({ provider })),
+                    map((provider) => providerActions.successAction({ provider })),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, providerActions.fetchOneProviderFailure, toastr
+                        return handleApiError(error, providerActions.failureAction, toastr
                         );
                     })
                 )
@@ -38,18 +38,43 @@ export const providerEffects = {
             ofType(providerActions.updateProvider),
             switchMap(({ updateProviderData }) =>
                 providerService.bulkUpdate(updateProviderData).pipe(
-                    map((updatedProviderData) => {
+                    map((provider) => {
                         router.navigate(['provider', 'profiles', 'overview']);
-                        toastr
-                            .success('Update Success');
-                        return providerActions.updateProviderSuccess({ updatedProviderData });
+                        toastr.success('Update Success');
+                        return providerActions.successAction({ provider });
                     }),
                     catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, providerActions.updateProviderFailure, toastr
+                        return handleApiError(error, providerActions.failureAction, toastr
                         );
                     })
                 )
             )
         );
     }, { functional: true }),
+
+    updateBio$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const providerService = inject(ProviderService);
+        const toastr = inject(ToastNotificationService);
+
+        return actions$.pipe(
+            ofType(providerActions.updateBio),
+            switchMap(({ updateData }) =>
+                providerService.updateBio(updateData).pipe(
+                    map(response => {
+                        if (!response.success || !response.data) {
+                            toastr.error('Failed to update.');
+                            return;
+                        } else {
+                            toastr.success(response.message);
+                            return providerActions.successAction({ provider: response.data });
+                        }
+                    }),
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, providerActions.failureAction, toastr);
+                    })
+                )
+            )
+        )
+    }, { functional: true })
 }

@@ -1,10 +1,11 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
-import { IProvider } from "../models/user.model";
+import { IProvider, IProviderUpdateBio } from "../models/user.model";
 import { API_ENV } from "../../environments/api.environments";
 import { SlotType } from "../models/schedules.model";
 import { IFilter } from "../models/filter.model";
+import { IResponse } from "../../modules/shared/models/response.model";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
@@ -69,6 +70,15 @@ export class ProviderService {
      */
     updateDefaultSlot(slot: SlotType): Observable<SlotType[]> {
         return this._http.patch<SlotType[]>(`${this._apiUrl}/default_slots`, slot).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    updateBio(updateData: IProviderUpdateBio): Observable<IResponse<IProvider>> {
+        return this._http.patch<IResponse<IProvider>>(`${this._apiUrl}/bio`, updateData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

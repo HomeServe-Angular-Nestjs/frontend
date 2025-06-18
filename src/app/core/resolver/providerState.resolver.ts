@@ -24,12 +24,12 @@ export class ProviderResolver implements Resolve<boolean> {
 
                 return this.actions$.pipe(
                     ofType(
-                        providerActions.fetchOneProviderSuccess,
-                        providerActions.fetchOneProviderFailure
+                        providerActions.successAction,
+                        providerActions.failureAction
                     ),
                     take(1),
                     switchMap(({ type }) => {
-                        if (type === providerActions.fetchOneProviderFailure.type) {
+                        if (type === providerActions.failureAction.type) {
                             this.router.navigate(['provider', 'dashboard'])
                             return of(false);
                         }
