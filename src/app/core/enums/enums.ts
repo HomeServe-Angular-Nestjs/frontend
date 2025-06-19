@@ -41,3 +41,10 @@ export enum ServiceSort {
     A_Z = 'a-z',
     Z_A = 'z-a'
 }
+
+export enum Language {
+    NATIVE = 'native',
+    FLUENT = 'fluent',
+    CONVERSATIONAL = 'conversational',
+    BASIC = 'basic'
+}

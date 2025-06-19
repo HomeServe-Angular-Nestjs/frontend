@@ -78,7 +78,16 @@ export class ProviderService {
     }
 
     updateBio(updateData: IProviderUpdateBio): Observable<IResponse<IProvider>> {
-        return this._http.patch<IResponse<IProvider>>(`${this._apiUrl}/bio`, updateData).pipe(
+        return this._http.put<IResponse<IProvider>>(`${this._apiUrl}/bio`, updateData).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    uploadCertificate(formData: FormData): Observable<IResponse<IProvider>> {
+        return this._http.put<IResponse<IProvider>>(`${this._apiUrl}/cert_upload`, formData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

@@ -6,7 +6,7 @@
         <h2 class="text-xl font-semibold text-gray-800">Professional Introduction</h2>
 
         <!-- View Mode -->
-        <ng-container *ngIf="!isEditingIntro">
+        <ng-container *ngIf="!isEditingBio">
             <p *ngIf="providerBio && providerBio.trim().length > 0; else emptyBio"
                 class="text-gray-700 leading-relaxed">
                 {{ providerBio }}
@@ -17,15 +17,15 @@
         </ng-container>
 
         <!-- Edit Mode -->
-        <textarea *ngIf="isEditingIntro" [(ngModel)]="providerBio" placeholder="Type something..."
+        <textarea *ngIf="isEditingBio" [(ngModel)]="providerBio" placeholder="Type something..."
             class="w-full h-40 p-3 border border-gray-300 rounded-md text-gray-700 resize-none focus:outline-none focus:ring-2 focus:ring-green-400"></textarea>
 
         <!-- Toggle Button (Edit <-> Save) -->
-        <button aria-label="Toggle Edit" (click)="toggleIntroEdit()" [ngClass]="[
+        <button aria-label="Toggle Edit" (click)="toggleBioEdit()" [ngClass]="[
             'absolute right-4 text-gray-500 hover:text-green-600 transition',
-            isEditingIntro ? 'bottom-1' : 'bottom-4'
+            isEditingBio ? 'bottom-1' : 'bottom-4'
             ]">
-            <i [ngClass]="isEditingIntro ? 'fas fa-check' : 'fas fa-pen'"></i>
+            <i [ngClass]="isEditingBio ? 'fas fa-check' : 'fas fa-pen'"></i>
         </button>
     </section>
 
@@ -37,17 +37,17 @@
         <!-- Main Expertises -->
         <div class="flex flex-wrap gap-4">
             <ng-container *ngIf="expertises.length > 0; else noExpertise">
-                <div *ngFor="let expertise of expertises"
-                    class="relative bg-green-50 border border-green-200 text-green-800 px-4 py-2 rounded-lg">
+                <div *ngFor="let expertise of expertises; let i = index"
+                    class="w-full relative bg-green-50 border border-green-200 text-green-800 px-4 py-2 pr-8 rounded-lg">
 
                     <!-- Delete Button -->
-                    <button (click)="deleteSpecialization(expertise)"
+                    <button (click)="deleteSpecialization(i)"
                         class="absolute top-1 right-2 text-red-400 hover:text-red-600">
                         <i class="fas fa-trash-alt text-xs"></i>
                     </button>
 
-                    <div class="font-semibold">{{ expertise.label }}</div>
-                    <div class="text-sm text-gray-500">{{ expertise.specialization }}</div>
+                    <div class="font-semibold">{{ expertise.specialization }}</div>
+                    <div class="text-sm text-gray-500">{{ expertise.label }}</div>
                 </div>
             </ng-container>
 
@@ -61,12 +61,15 @@
         <div>
             <h3 class="text-sm font-semibold text-gray-600 mb-2">Additional Skills</h3>
             <ng-container *ngIf="additionalSkills.size > 0; else noAdditionalSkills">
-                <div *ngFor="let skill of additionalSkills"
-                    class="relative bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                    {{ skill }}
-                    <button (click)="removeAdditionalSkill(skill)" class="text-red-400 hover:text-red-600">
-                        <i class="fas fa-times-circle text-xs"></i>
-                    </button>
+                <div class="flex flex-wrap gap-3">
+                    <div *ngFor="let skill of additionalSkills"
+                        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 text-gray-800 text-sm shadow-sm">
+                        <span class="font-medium capitalize">{{ skill }}</span>
+                        <button (click)="removeAdditionalSkill(skill)"
+                            class="text-red-400 hover:text-red-600 transition-colors" aria-label="Remove skill">
+                            <i class="fas fa-times-circle text-xs"></i>
+                        </button>
+                    </div>
                 </div>
             </ng-container>
 
@@ -77,7 +80,7 @@
         </div>
 
         <!-- Edit Button -->
-        <button (click)="openSpecializationsModal()" aria-label="Edit Specializations"
+        <button (click)="openExpertiseModal()" aria-label="Edit Specializations"
             class="absolute bottom-4 right-4 text-gray-500 hover:text-green-600">
             <i class="fas fa-pen"></i>
         </button>
@@ -131,7 +134,7 @@
                     <button class="text-green-500 hover:text-green-700" title="Edit">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="text-red-500 hover:text-red-700" title="Delete">
+                    <button (click)="removeCertificate()" class="text-red-500 hover:text-red-700" title="Delete">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
@@ -156,17 +159,22 @@
         <h2 class="text-xl font-semibold text-gray-800">Languages</h2>
 
         <!-- Language Tags -->
-        <div *ngIf="languages.length > 0; else noLanguages" class="flex flex-wrap gap-2">
-            <div *ngFor="let lang of languages" class="relative">
-                <span class="flex items-center gap-2 bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full pr-8">
-                    {{ lang.language }}
-                    <span class="text-gray-500 text-xs">({{ lang.proficiency }})</span>
+        <div *ngIf="languages.length > 0; else noLanguages" class="flex flex-wrap gap-3">
+            <div *ngFor="let lang of languages; let i = index">
+                <span
+                    class="inline-flex items-center gap-2 px-4 py-1.5 pr-6 rounded-full bg-emerald-100 text-emerald-800 shadow-sm relative">
+                    <p class="font-medium capitalize">{{ lang.language }}</p>
+                    <span class="text-xs text-gray-600 bg-white px-2 py-0.5 rounded-md border border-gray-200">
+                        {{ lang.proficiency }}
+                    </span>
+
+                    <!-- Remove Button -->
+                    <button (click)="removeLanguage(i)" class="absolute top-1 right-2 text-red-400 hover:text-red-600"
+                        aria-label="Remove language">
+                        <i class="fas fa-times-circle text-xs"></i>
+                    </button>
                 </span>
 
-                <!-- Remove Button -->
-                <button class="absolute top-1 right-1 text-red-400 hover:text-red-600" aria-label="Remove language">
-                    <i class="fas fa-times-circle text-xs"></i>
-                </button>
             </div>
         </div>
 
@@ -189,76 +197,80 @@
 <!--* Modals -->
 <div *ngIf="isSpecializationsModalOpen"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <form [formGroup]="expertiseForm" (submit)="saveExpertise()"
-        class="bg-white rounded-lg p-6 w-full max-w-xl shadow-lg space-y-4">
-        <h3 class="text-lg font-semibold text-gray-800">Edit Specializations & Expertise</h3>
+    <div class="bg-white rounded-lg p-6 w-full max-w-xl shadow-lg space-y-4 relative">
+        <div class="absolute right-6 top-6">
+            <button type="button" (click)="closeExpertiseModal()"
+                class="px-2 py-1 rounded-full text-sm hover:bg-gray-100">
+                <i class="fas fa-remove"></i>
+            </button>
+        </div>
+        <form [formGroup]="expertiseForm" (submit)="saveExpertise()" class="bg-white space-y-4">
+            <h3 class="text-lg font-semibold text-gray-800">Edit Specializations & Expertise</h3>
 
-        <!-- Specialization Input -->
-        <div class="space-y-3">
-            <label class="block">
-                <span class="text-sm text-gray-600">Specialization</span>
-                <input type="text" formControlName="specialization"
-                    class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-green-400"
-                    placeholder="e.g., Deep Cleaning" />
-            </label>
+            <!-- Specialization Input -->
+            <div class="space-y-3">
+                <label class="block">
+                    <p class="text-sm text-gray-600">Specialization </p>
+                    <input type="text" formControlName="specialization"
+                        class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-green-400"
+                        placeholder="e.g., Deep Cleaning" />
+                </label>
 
-            <label class="block">
-                <span class="text-sm text-gray-600">Label</span>
-                <input type="text" formControlName="label"
-                    class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-green-400"
-                    placeholder="e.g., Carpet Cleaning, Sanitization" />
-            </label>
+                <label class="block">
+                    <span class="text-sm text-gray-600">Label</span>
+                    <input type="text" formControlName="label"
+                        class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-green-400"
+                        placeholder="e.g., Carpet Cleaning, Sanitization" />
+                </label>
 
-            <!-- Additional Skills -->
-            <label class="block">
-                <span class="text-sm text-gray-600">Add Additional Skill</span>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="text" formControlName="additionalSkills" class=" flex-1 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring
-                        focus:ring-green-400" placeholder="e.g., Window Washing" />
-                    <button type="button" (click)="addAdditionalSkill()"
-                        class="px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm">Add</button>
-                </div>
-            </label>
-
-            <!-- List Existing Skills -->
-            <div *ngIf="additionalSkills.size > 0" class="mt-3">
-                <span class="text-sm text-gray-600">Existing Additional Skills:</span>
-                <div class="flex flex-wrap gap-2 mt-2">
-                    <div *ngFor="let skill of additionalSkills"
-                        class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-sm">
-                        {{ skill }}
-                        <button (click)="removeAdditionalSkill(skill)" aria-label="Remove skill"
-                            class="text-red-400 hover:text-red-600">
-                            <i class="fas fa-times-circle text-xs"></i>
-                        </button>
-                    </div>
+                <div class="flex justify-end gap-3 mt-4">
+                    <button type="submit"
+                        class="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 text-sm">
+                        Save
+                    </button>
                 </div>
             </div>
+        </form>
+
+        <!-- Additional Skills -->
+        <label class="block">
+            <span class="text-sm text-gray-600">Add Additional Skill</span>
+            <div class="flex items-center gap-2 mt-1 relative">
+                <input type="text" [(ngModel)]="newAdditioanlSkill" class="flex-1 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring
+                        focus:ring-green-400" placeholder="e.g., Window Washing" />
+                <button type="button" (click)="addAdditionalSkill()"
+                    class="absolute right-3 px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm">Add</button>
+            </div>
+        </label>
+
+        <!-- List Existing Skills -->
+        <div *ngIf="additionalSkills.size > 0" class="mt-4">
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">Added Additional Skills</h4>
+            <ul class="space-y-2">
+                <li *ngFor="let skill of additionalSkills"
+                    class="flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm">
+                    <span>{{ skill }}</span>
+                    <button (click)="removeAdditionalSkill(skill)" class="text-red-500 hover:text-red-700"
+                        aria-label="Remove Skill">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </li>
+            </ul>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex justify-end gap-3 mt-4">
-            <button (click)="closeSpecializationsModal()"
-                class="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-sm">
-                Cancel
-            </button>
-            <button type="submit" class="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 text-sm">
-                Save
-            </button>
-        </div>
-    </form>
+    </div>
 </div>
 
 <div *ngIf="isCertificationModalOpen"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg space-y-4">
+    <form [formGroup]="certificateForm" class="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg space-y-4">
 
         <h3 class="text-lg font-semibold text-gray-800">Upload Certification</h3>
 
         <!-- Certification Name -->
         <div>
-            <label class="block text-sm text-gray-600 mb-1">Certification Title</label>
-            <input type="text"
+            <label class="block text-sm text-gray-600 mb-1">Certification Label</label>
+            <input type="text" formControlName="label"
                 class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-green-400"
                 placeholder="e.g., Professional Cleaning" />
         </div>
@@ -271,8 +283,15 @@
                 <div (click)="fileInput.click()" class="text-gray-500">
                     Click to upload or drag and drop
                 </div>
-                <div *ngIf="" class="mt-2">
-                    <img [src]="" alt="Preview" class="mx-auto w-40 rounded shadow" />
+
+                <!-- Loading Spinner -->
+                <div *ngIf="isCertificateLoading" class="flex justify-center mt-4">
+                    <div class="h-6 w-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+
+                <!-- Preview Image -->
+                <div *ngIf="!isCertificateLoading && certificatePreview" class="mt-2">
+                    <img [src]="certificatePreview" alt="Preview" class="mx-auto w-40 rounded shadow" />
                 </div>
             </div>
         </div>
@@ -288,11 +307,17 @@
             </button>
         </div>
 
-    </div>
+    </form>
 </div>
 
 <div *ngIf="isLanguageModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md space-y-4 shadow-lg">
+    <form [formGroup]="languageForm" class="bg-white rounded-lg p-6 w-full max-w-md space-y-4 shadow-lg relative">
+        <div class="absolute right-6 top-6">
+            <button type="button" (click)="closeLanguageModal()"
+                class="px-2 py-1 rounded-full text-sm hover:bg-gray-100">
+                <i class="fas fa-remove"></i>
+            </button>
+        </div>
 
         <h3 class="text-lg font-semibold text-gray-800">Manage Languages</h3>
 
@@ -300,48 +325,41 @@
         <div class="space-y-3">
             <label class="block text-sm text-gray-600">
                 Language
-                <input type="text" placeholder="e.g., German"
+                <input type="text" placeholder="e.g., German" formControlName="language"
                     class="w-full mt-1 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-green-400">
             </label>
 
             <label class="block text-sm text-gray-600">
                 Proficiency
-                <select
+                <select formControlName="proficiency"
                     class="w-full mt-1 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-green-400">
                     <option value="" disabled selected>Select Proficiency</option>
-                    <option>Native</option>
-                    <option>Fluent</option>
-                    <option>Conversational</option>
-                    <option>Basic</option>
+                    <option *ngFor="let option of langaugeOptions" [value]="option.value">{{option.label}}</option>
                 </select>
             </label>
-            <button (click)="addLanguage()"
+            <button (click)=" addLanguage()"
                 class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 text-sm">
                 Add Language
             </button>
         </div>
 
         <!-- Existing Languages List -->
-        <div *ngIf="languages.length > 0" class="pt-2">
-            <h4 class="text-sm font-semibold text-gray-700 mb-1">Added Languages:</h4>
+        <div *ngIf="languages.length > 0" class="pt-3">
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">Added Languages</h4>
             <ul class="space-y-2">
                 <li *ngFor="let lang of languages; let i = index"
-                    class="flex items-center justify-between text-sm bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
-                    <span>{{ lang.language }} <span class="text-gray-500 text-xs">({{ lang.proficiency }})</span></span>
-                    <button (click)="removeLanguage(i)" class="text-red-500 hover:text-red-700">
-                        <i class="fas fa-trash-alt"></i>
+                    class="flex items-center justify-between px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div class="flex items-center gap-1 text-sm text-gray-800">
+                        <span class="font-medium">{{ lang.language }}</span>
+                        <span class="text-gray-500 text-xs">({{ lang.proficiency }})</span>
+                    </div>`
+                    <button (click)="removeLanguage(i)" class="text-red-500 hover:text-red-700 transition-colors"
+                        aria-label="Remove language">
+                        <i class="fas fa-trash-alt text-sm"></i>
                     </button>
                 </li>
             </ul>
         </div>
 
-        <!-- Modal Actions -->
-        <div class="flex justify-end gap-3 pt-4">
-            <button (click)="closeLanguageModal()"
-                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm">Cancel</button>
-            <button (click)="saveLanguages()"
-                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm">Save</button>
-        </div>
-
-    </div>
+    </form>
 </div>

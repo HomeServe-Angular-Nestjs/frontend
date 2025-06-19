@@ -7,9 +7,7 @@ export const providerActions = {
     failureAction: createAction('[Provider] Failed', props<{ error: string }>()),
 
     fetchOneProvider: createAction('[Provider] Fetches One Provider'),
-
     updateProvider: createAction('[Provider] Update provider', props<{ updateProviderData: FormData | Partial<IProvider> }>()),
-
     updateBio: createAction('[Provider] update bio', props<{ updateData: IProviderUpdateBio }>()),
 
     updateProviderOfferedServices: createAction('[Provider] Update provider offered service', props<{ offeredServices: string[] }>()),

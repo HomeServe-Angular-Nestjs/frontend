@@ -75,6 +75,6 @@ export const providerEffects = {
                     })
                 )
             )
-        )
+        );
     }, { functional: true })
 }

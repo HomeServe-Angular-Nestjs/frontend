@@ -5,11 +5,13 @@ import { IPagination } from './booking.model';
 export type UType = 'customer' | 'provider';
 
 export interface IDocs {
+    id: string;
     label: string;
     fileUrl: string;
     uploadedAt: Date;
     verificationStatus: 'pending' | 'verified' | 'rejected';
     verifiedAt?: Date;
+    isDeleted: boolean;
 };
 
 export type Address = {
@@ -149,8 +151,7 @@ export interface IRemoveData {
 
 export interface IProviderUpdateBio {
     providerBio?: string;
-    expertises?: IExpertise;
+    expertises?: IExpertise[];
     additionalSkills?: string[];
-    docs?: IDocs[];
     languages?: ILanguage[];
 }
