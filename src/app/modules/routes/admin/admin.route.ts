@@ -18,6 +18,11 @@ export const adminRoute: Routes = [
                 path: 'users',
                 loadComponent: () => import('../../shared/components/admin/users/user-management.component').then(c => c.UserManagementComponent),
                 canActivate: [AuthGuard]
+            },
+            {
+                path: 'approvals',
+                loadComponent: () => import('../../shared/components/admin/approvals/layout/approval-layout.component')
+                    .then(c => c.AdminApprovalLayoutComponent)
             }
         ]
     }

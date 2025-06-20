@@ -236,12 +236,16 @@ body {
   }
 }
 
-html,
-body {
-  height: 100%;
-}
+@layer components {
+  .toggle-base {
+    @apply px-4 py-1.5 text-sm font-medium rounded-full focus:outline-none transition-colors;
+  }
 
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  .toggle-active {
+    @apply bg-blue-500 text-white shadow;
+  }
+
+  .toggle-inactive {
+    @apply text-gray-600 hover:bg-gray-200;
+  }
 }

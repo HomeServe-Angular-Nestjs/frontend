@@ -1,22 +1,25 @@
-<div class="flex justify-center items-center gap-6 py-4">
+<div class="flex justify-center items-center flex-wrap gap-4 px-4 py-4 border-t border-gray-200 bg-white rounded-b-xl">
+
     <!-- Previous Button -->
     <button
-        class="flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium transition-all 
-       hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="flex items-center gap-1 px-4 py-2 rounded-md border border-gray-300 text-gray-700 text-sm font-medium transition-all
+           hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
         [disabled]="currentPage === 1" (click)="prevPage()">
-        <i class="fas fa-chevron-left text-xs"></i> Previous
+        <i class="fas fa-chevron-left text-xs"></i>
+        Previous
     </button>
 
     <!-- Page Indicator -->
     <div class="text-sm text-gray-600 font-medium select-none">
-        Page <span class="text-blue-600">{{ currentPage }}</span> of {{ totalPages }}
+        Page <span class="text-blue-600 font-semibold">{{ currentPage }}</span> of {{ totalPages }}
     </div>
 
     <!-- Next Button -->
     <button
-        class="flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium transition-all 
-       hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="flex items-center gap-1 px-4 py-2 rounded-md border border-gray-300 text-gray-700 text-sm font-medium transition-all
+           hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
         [disabled]="currentPage === totalPages" (click)="nextPage()">
-        Next <i class="fas fa-chevron-right text-xs"></i>
+        Next
+        <i class="fas fa-chevron-right text-xs"></i>
     </button>
 </div>

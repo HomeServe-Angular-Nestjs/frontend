@@ -1,5 +1,6 @@
 <div class="w-full p-4 bg-white rounded-lg shadow-sm">
     <div class="flex flex-wrap items-center gap-4">
+
         <!-- Search Bar -->
         <div class="relative">
             <label for="searchInput" class="sr-only">Search</label>
@@ -17,28 +18,21 @@
             <i class="fas fa-calendar absolute right-3 top-2.5 text-gray-400" aria-hidden="true"></i>
         </div>
 
-        <!-- Role Toggle -->
+        <!-- Status Toggle -->
         <div class="flex items-center space-x-2">
             <span class="text-sm text-gray-600">Status:</span>
             <div class="flex bg-gray-100 rounded-full p-1">
-                <button (click)="changeStatus('all')" [ngClass]="{
-                    'toggle-active': selectedStatus === 'all',
-                    'toggle-inactive': selectedStatus !== 'all'
-                  }" class="toggle-base">
-                    All
-                </button>
-                <button (click)="changeStatus(true)" [ngClass]="{
-                    'toggle-active': selectedStatus === true,
-                    'toggle-inactive': selectedStatus !== true
-                  }" class="toggle-base">
-                    Active
-                </button>
-                <button (click)="changeStatus(false)" [ngClass]="{
-                    'toggle-active': selectedStatus === false,
-                    'toggle-inactive': selectedStatus !== false
-                  }" class="toggle-base">
-                    Blocked
-                </button>
+                <button (click)="changeStatus('all')"
+                    [ngClass]="selectedStatus === 'all' ? 'toggle-active' : 'toggle-inactive'"
+                    class="toggle-base">All</button>
+
+                <button (click)="changeStatus(true)"
+                    [ngClass]="selectedStatus === true ? 'toggle-active' : 'toggle-inactive'"
+                    class="toggle-base">Active</button>
+
+                <button (click)="changeStatus(false)"
+                    [ngClass]="selectedStatus === false ? 'toggle-active' : 'toggle-inactive'"
+                    class="toggle-base">Blocked</button>
             </div>
         </div>
 
@@ -46,19 +40,13 @@
         <div class="flex items-center space-x-2">
             <span class="text-sm text-gray-600">Role:</span>
             <div class="flex bg-gray-100 rounded-full p-1">
-                <button (click)="setRole('customer')" [ngClass]="{
-                  'toggle-active': selectedRole === 'customer',
-                  'toggle-inactive': selectedRole !== 'customer'
-                }" class="toggle-base">
-                    Customer
-                </button>
+                <button (click)="setRole('customer')"
+                    [ngClass]="selectedRole === 'customer' ? 'toggle-active' : 'toggle-inactive'"
+                    class="toggle-base">Customer</button>
 
-                <button (click)="setRole('provider')" [ngClass]="{
-                  'toggle-active': selectedRole === 'provider',
-                  'toggle-inactive': selectedRole !== 'provider'
-                }" class="toggle-base">
-                    Provider
-                </button>
+                <button (click)="setRole('provider')"
+                    [ngClass]="selectedRole === 'provider' ? 'toggle-active' : 'toggle-inactive'"
+                    class="toggle-base">Provider</button>
             </div>
         </div>
     </div>
