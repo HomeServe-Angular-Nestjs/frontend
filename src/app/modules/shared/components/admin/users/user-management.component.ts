@@ -2,15 +2,15 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { filter, map, Observable, switchMap, tap } from 'rxjs';
 import { IUpdateUserStatus, IUserData, UType } from '../../../../../core/models/user.model';
-import { createAdminTableUI } from '../../../../../core/utils/generate-tables.utils';
-import { TableData } from '../../../../../core/models/table.model';
-import { TableComponent } from '../../../partials/sections/admin/tables/table.component';
-import { FiltersComponent } from '../../../partials/sections/admin/filters/filters.component';
-import { IFilter } from '../../../../../core/models/filter.model';
-import { AdminPaginationComponent } from "../../../partials/sections/admin/pagination/pagination.component";
-import { UserManagementService } from '../../../../../core/services/user.service';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
+import { createAdminTableUI } from '../../../../../core/utils/generate-tables.utils';
+import { AdminService } from '../../../../../core/services/admin.service';
 import { IPagination } from '../../../../../core/models/booking.model';
+import { IFilter } from '../../../../../core/models/filter.model';
+import { TableData } from '../../../../../core/models/table.model';
+import { AdminPaginationComponent } from "../../../partials/sections/admin/pagination/pagination.component";
+import { FiltersComponent } from '../../../partials/sections/admin/filters/filters.component';
+import { TableComponent } from '../../../partials/sections/admin/tables/table.component';
 
 
 @Component({
@@ -19,7 +19,7 @@ import { IPagination } from '../../../../../core/models/booking.model';
   imports: [CommonModule, TableComponent, FiltersComponent, AdminPaginationComponent],
 })
 export class UserManagementComponent implements OnInit {
-  private _userManagementService = inject(UserManagementService);
+  private _userManagementService = inject(AdminService);
   private _toastr = inject(ToastNotificationService);
 
   tableData$!: Observable<TableData>;

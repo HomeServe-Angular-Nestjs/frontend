@@ -1,12 +1,13 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/api.environments";
-import { IRemoveData, IUpdateUserStatus, IUserData, IUserDataWithPagination, UType } from "../models/user.model";
+import { IApprovalOverviewData, IRemoveData, IUpdateUserStatus, IUserData, IUserDataWithPagination, UType } from "../models/user.model";
 import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
+import { IResponse } from "../../modules/shared/models/response.model";
 
 @Injectable({ providedIn: 'root' })
-export class UserManagementService {
+export class AdminService {
     private _http = inject(HttpClient);
 
     private readonly _adminUrl = API_ENV.admin;
@@ -72,6 +73,18 @@ export class UserManagementService {
             )
         );
     }
+
+
+    fetchApprovalOverviewDetails(): Observable<IResponse<IApprovalOverviewData>> {
+        return this._http.get<IResponse<IApprovalOverviewData>>(`${this._adminUrl}/approvals/overview`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+
 
     /**
      * Extracts a readable error message from an HTTP error.

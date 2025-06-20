@@ -63,6 +63,8 @@ export interface ICustomer extends IBaseUser {
     savedProviders?: string[];
 }
 
+export type VerificationStatusType = 'pending' | 'verified' | 'rejected';
+
 export interface IProvider extends IBaseUser {
     bio?: string;
     expertise?: IExpertise[];
@@ -84,6 +86,8 @@ export interface IProvider extends IBaseUser {
     availability: Availability;
     servicesOffered: string[];
     defaultSlots: SlotType[];
+    verificationStatus: VerificationStatusType;
+
 }
 
 export interface IUserState {
@@ -154,4 +158,16 @@ export interface IProviderUpdateBio {
     expertises?: IExpertise[];
     additionalSkills?: string[];
     languages?: ILanguage[];
+}
+
+
+export interface IVerificationStatusMetrics {
+    count: number;
+    percentage: string;
+}
+
+export interface IApprovalOverviewData {
+    pending: IVerificationStatusMetrics;
+    verified: IVerificationStatusMetrics;
+    rejected: IVerificationStatusMetrics;
 }
