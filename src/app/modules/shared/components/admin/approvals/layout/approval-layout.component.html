@@ -10,9 +10,9 @@
         <app-admin-approval-filter></app-admin-approval-filter>
     </section>
 
-    <!-- Results Table / Bookings List Placeholder -->
     <section class="bg-white rounded-xl shadow p-6">
-        <!-- Replace this with your bookings table/list component -->
-        <p class="text-gray-500 text-sm">approval list will be listed here...</p>
+        <ng-container *ngIf="(tableData$ | async) as tableData">
+           
+        </ng-container>
     </section>
 </div>

@@ -1,7 +1,7 @@
-import { TableData } from "../models/table.model";
-import { IUserData } from "../models/user.model";
+import { ApprovalTableRow, TableData, UserTableRow } from "../models/table.model";
+import { IApprovalTableDetails, IUserData } from "../models/user.model";
 
-export const createAdminTableUI = (columns: string[], users: IUserData[]): TableData => {
+export const createAdminTableUI = (columns: string[], users: IUserData[]): TableData<UserTableRow> => {
     const filteredUser = users.filter(user => !user.isDeleted);
     return {
         columns,
@@ -41,6 +41,29 @@ export const createAdminTableUI = (columns: string[], users: IUserData[]): Table
         }))
     };
 };
+
+export const createAdminApprovalsTableUI = (columns: string[], data: IApprovalTableDetails[]): TableData<ApprovalTableRow> => {
+    return {
+        columns,
+        rows: data.map(user => ({
+            id: user.id,
+            profile: {
+                avatar: user.avatar,
+                email: user.email,
+                name: user.name
+            },
+            document: user.documentCount,
+            date: user.date,
+            status: user.verificationStatus,
+            actions: {
+                action: 'approve',
+                id: user.id,
+                value: user.verificationStatus,
+                toolTip: user.verificationStatus === 'verified' ? 'Reject' : 'Approve',
+            }
+        }))
+    }
+}
 
 export const createProviderBookingTables = (columns: string[], data: Record<string, any>[]) => {
     const rows = data.map(item => {

@@ -7,7 +7,7 @@ import { createAdminTableUI } from '../../../../../core/utils/generate-tables.ut
 import { AdminService } from '../../../../../core/services/admin.service';
 import { IPagination } from '../../../../../core/models/booking.model';
 import { IFilter } from '../../../../../core/models/filter.model';
-import { TableData } from '../../../../../core/models/table.model';
+import { TableData, UserTableRow } from '../../../../../core/models/table.model';
 import { AdminPaginationComponent } from "../../../partials/sections/admin/pagination/pagination.component";
 import { FiltersComponent } from '../../../partials/sections/admin/filters/filters.component';
 import { TableComponent } from '../../../partials/sections/admin/tables/table.component';
@@ -22,7 +22,7 @@ export class UserManagementComponent implements OnInit {
   private _userManagementService = inject(AdminService);
   private _toastr = inject(ToastNotificationService);
 
-  tableData$!: Observable<TableData>;
+  tableData$!: Observable<TableData<UserTableRow>>;
   pagination!: IPagination;
   column: string[] = ['id', 'username', 'email', 'contact', 'status', 'joined', 'actions'];
   lastFilterUsed: IFilter = {};
@@ -51,6 +51,8 @@ export class UserManagementComponent implements OnInit {
     const { action, ...rest } = updateData;
     const payload = { ...rest, role };
 
+    console.log(updateData);
+    
     if (action === 'status') {
       this._userManagementService.updateStatus(payload).subscribe({
         next: (success) => {

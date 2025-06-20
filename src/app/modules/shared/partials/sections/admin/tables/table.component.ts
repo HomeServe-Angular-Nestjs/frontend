@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, Output, SimpleChanges, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-import { TableAction, TableData, TableRow } from '../../../../../../core/models/table.model';
+import { TableAction, TableData, UserTableRow } from '../../../../../../core/models/table.model';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog-box/confirm-dialog.component';
 import { FilterDeletedUserPipe } from '../../../../../../core/pipes/filter-blocked-user.pipe';
 
@@ -14,7 +14,7 @@ import { FilterDeletedUserPipe } from '../../../../../../core/pipes/filter-block
 export class TableComponent implements OnChanges {
   private _dialog = inject(MatDialog)
 
-  @Input({ required: true }) tableData!: TableData;
+  @Input({ required: true }) tableData!: TableData<UserTableRow>;
   @Output() actionTriggeredEvent = new EventEmitter()
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -22,7 +22,7 @@ export class TableComponent implements OnChanges {
     }
   }
 
-  emitAction(action: string | boolean, row: TableRow) {
+  emitAction(action: string | boolean, row: UserTableRow) {
     if (action === 'status') {
       this._confirmStatusChange(row)
     } else if (action === 'delete') {
@@ -30,7 +30,7 @@ export class TableComponent implements OnChanges {
     }
   }
 
-  private _confirmStatusChange(row: TableRow) {
+  private _confirmStatusChange(row: UserTableRow) {
     const isActive = row.status === 'Active';
     const nextStatus = isActive ? 'Block' : 'Unblock';
 
@@ -49,12 +49,12 @@ export class TableComponent implements OnChanges {
           icon: !isActive ? 'fa-user-slash' : 'fa-user-check',
           styles: !isActive ? 'text-red-400' : 'text-green-400'
         });
-
+        console.log('from table',row)
         this.actionTriggeredEvent.emit({ action: 'status', status: isActive, userId: row.id });
       });
   }
 
-  private _confirmDeletion(row: TableRow) {
+  private _confirmDeletion(row: UserTableRow) {
     this._openConfirmationDialog(`Are you sure you want to remove ${row.username}?`, 'Confirm Action')
       .afterClosed()
       .subscribe(confirmed => {
@@ -71,7 +71,7 @@ export class TableComponent implements OnChanges {
   }
 
   private _updateActionButton(
-    row: TableRow,
+    row: UserTableRow,
     actionName: string,
     update: Partial<TableAction>) {
     const action = row.actions.find(a => a.action === actionName);

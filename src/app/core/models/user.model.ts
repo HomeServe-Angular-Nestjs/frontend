@@ -111,18 +111,6 @@ export interface ICustomerState {
 
 export type UsersType = ICustomer[] | IProvider[];
 
-export interface UsersViewModel {
-    customerTable: {
-        columns: string[];
-        rows: any[];
-
-    },
-    providerTable: {
-        columns: string[];
-        rows: any[];
-    }
-}
-
 export type UserUpdationType = Partial<ICustomer> | Partial<IProvider>;
 
 export interface IUserData {
@@ -170,4 +158,14 @@ export interface IApprovalOverviewData {
     pending: IVerificationStatusMetrics;
     verified: IVerificationStatusMetrics;
     rejected: IVerificationStatusMetrics;
+}
+
+export interface IApprovalTableDetails {
+    id: string;
+    avatar: string;
+    name: string;
+    email: string;
+    documentCount: number;
+    date: Date;
+    verificationStatus: VerificationStatusType
 }

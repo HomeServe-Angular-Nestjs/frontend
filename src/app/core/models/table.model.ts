@@ -1,3 +1,11 @@
+import { VerificationStatusType } from "./user.model";
+
+export interface TableRowBase {
+    id: string;
+    status: string | VerificationStatusType;
+    actions: TableAction[];
+}
+
 export interface TableAction {
     id: string;
     value: boolean | string;
@@ -7,7 +15,7 @@ export interface TableAction {
     styles?: string;
 }
 
-export interface TableRow {
+export interface UserTableRow {
     id: string;
     username: string;
     email: string;
@@ -18,7 +26,20 @@ export interface TableRow {
     [key: string]: any; //? this allows row column access.
 }
 
-export interface TableData {
+export interface ApprovalTableRow {
+    id: string;
+    profile: {
+        avatar: string;
+        name: string;
+        email: string;
+    },
+    document: number;
+    date: Date;
+    status: VerificationStatusType;
+    actions: TableAction
+}
+
+export interface TableData<T> {
     columns: string[];
-    rows: TableRow[];
+    rows: T[];
 }

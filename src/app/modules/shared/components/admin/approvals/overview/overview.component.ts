@@ -4,6 +4,15 @@ import { AdminService } from '../../../../../../core/services/admin.service';
 import { filter, map } from 'rxjs';
 import { IApprovalOverviewData } from '../../../../../../core/models/user.model';
 
+export interface IVerificationCardData {
+    title: string;
+    icon: string;
+    iconColor: string;
+    count: number;
+    percentage: string;
+    percentageColor: string;
+    borderColor: string;
+}
 
 @Component({
     selector: 'app-admin-approval-overview',
@@ -13,8 +22,8 @@ import { IApprovalOverviewData } from '../../../../../../core/models/user.model'
 export class AdminApprovalOverviewComponent implements OnInit {
     private readonly _adminService = inject(AdminService);
 
-    
-    verificationData: Record<string, string | number>[] = [];
+
+    verificationData: IVerificationCardData[] = [];
 
     ngOnInit(): void {
         this._adminService.fetchApprovalOverviewDetails().pipe(
