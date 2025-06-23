@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-// import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { Store } from '@ngrx/store';
 import { REGEXP_ENV } from '../../../../../environments/regex.environments';
 import { MESSAGES_ENV } from '../../../../../environments/messages.environments';
@@ -29,10 +28,6 @@ export class AdminLoginComponent {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.pattern(this.regexp.password)]],
   });
-
-  // phoneForm: FormGroup = this.fb.group({
-  //   phone: ['', [Validators.required]]
-  // })
 
   formSubmit() {
     const controls = {

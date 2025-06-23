@@ -14,7 +14,7 @@ export interface IDocs {
     isDeleted: boolean;
 };
 
-export type Address = {
+export interface IAddress {
     type: 'point',
     address: string
     coordinates: [number, number];
@@ -50,8 +50,9 @@ export interface IBaseUser {
     username: string;
     password?: string;
     phone?: string;
-    avatar?: string;
+    avatar: string;
     googleId?: string;
+    location?: IAddress;
     isActive: boolean
     isDeleted: boolean;
     createdAt: Date;
@@ -59,7 +60,6 @@ export interface IBaseUser {
 }
 
 export interface ICustomer extends IBaseUser {
-    locations?: Address[];
     savedProviders?: string[];
 }
 
@@ -70,7 +70,6 @@ export interface IProvider extends IBaseUser {
     expertise?: IExpertise[];
     additionalSkills?: string[];
     languages?: ILanguage[];
-    location?: Address;
     workImages?: string[];
     awards?: string[];
     isCertified: boolean;

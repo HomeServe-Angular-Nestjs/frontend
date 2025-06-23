@@ -28,8 +28,6 @@
     "@ngrx/store": "^19.1.0",
     "@ngrx/store-devtools": "^19.1.0",
     "@types/mapbox-gl": "^3.4.1",
-    "intl-tel-input": "^19.5.7",
-    "libphonenumber-js": "^1.12.6",
     "mapbox-gl": "^3.11.1",
     "ngrx-store-localstorage": "^19.0.0",
     "ngx-toastr": "^19.0.0",

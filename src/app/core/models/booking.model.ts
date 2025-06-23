@@ -1,7 +1,7 @@
 import { SelectedServiceIdsType } from "../../modules/pages/customer/booking-1-pick-service/customer-pick-a-service.component";
 import { BookingStatus, PaymentStatus } from "../enums/enums";
 import { ISlotSource } from "./schedules.model";
-import { Address } from "./user.model";
+import { IAddress } from "./user.model";
 
 // --------------------
 // Shared Interfaces
@@ -25,7 +25,7 @@ export interface IPriceBreakupData {
     total: number;
 }
 
-export type CustomerLocationType = Omit<Address, 'type'> & { phone: string };
+export type CustomerLocationType = Omit<IAddress, 'type'> & { phone: string };
 
 export interface IBookingDetailsBase {
     bookingId: string;

@@ -1,0 +1,117 @@
+<main class="p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Profile Overview</h1>
+
+        <!-- Loader -->
+        <div *ngIf="isLoading" class="flex justify-center items-center h-40">
+            <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900"></div>
+        </div>
+
+        <!-- Profile Content -->
+        <ng-container *ngIf="!isLoading">
+            <div class="space-y-6">
+                <!-- Profile Overview -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-lg font-medium text-gray-900">Personal Information</h2>
+                    </div>
+                    <ng-container *ngIf="customer$ | async as customer">
+                        <div class="flex flex-col md:flex-row gap-6">
+
+                            <!-- Profile Picture Card -->
+                            <div class="md:w-1/3">
+                                <div class="bg-gray-50 rounded-lg p-6 text-center">
+                                    <div class="relative inline-block">
+                                        <img [src]="customer.avatar || 'assets/images/profile_placeholder.jpg'"
+                                            (error)="onImageError($event)" alt="Profile"
+                                            class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-sm" />
+                                    </div>
+
+                                    <h3 class="mt-4 text-lg font-medium text-gray-900">{{ customer.username }}</h3>
+                                </div>
+                            </div>
+
+                            <!-- Profile Details Card -->
+                            <div class="md:w-2/3">
+                                <div class="bg-gray-50 rounded-lg p-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="space-y-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-500">Email
+                                                    Address</label>
+                                                <p class="mt-1 text-sm text-gray-900">{{ customer.email }}</p>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-500">Phone
+                                                    Number</label>
+                                                <p class="mt-1 text-sm text-gray-900">{{customer.phone || 'N/A'}}</p>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-500">Location</label>
+                                                <p class="mt-1 text-sm text-gray-900">{{customer.location?.address ||
+                                                    'N/A'}}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-500">Member
+                                                    Since</label>
+                                                <p class="mt-1 text-sm text-gray-900">{{customer.createdAt | date}}</p>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-500">Account
+                                                    Status</label>
+                                                <span
+                                                    class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    {{customer.isActive ? 'Active' : 'Inactive' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Recent Activity</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="p-2 bg-indigo-100 rounded-full">
+                                <i class="fas fa-calendar-alt text-indigo-500"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">New Booking Confirmed</p>
+                                <p class="text-sm text-gray-500">House Cleaning Service - Tomorrow at 2:00 PM</p>
+                            </div>
+                            <span class="text-sm text-gray-500">2 hours ago</span>
+                        </div>
+                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="p-2 bg-green-100 rounded-full">
+                                <i class="fas fa-star text-green-500"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Left a Review</p>
+                                <p class="text-sm text-gray-500">5-star rating for Home Cleaning Services</p>
+                            </div>
+                            <span class="text-sm text-gray-500">1 day ago</span>
+                        </div>
+                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="p-2 bg-blue-100 rounded-full">
+                                <i class="fas fa-heart text-blue-500"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Saved New Provider</p>
+                                <p class="text-sm text-gray-500">Elite Cleaning Services</p>
+                            </div>
+                            <span class="text-sm text-gray-500">2 days ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</main>

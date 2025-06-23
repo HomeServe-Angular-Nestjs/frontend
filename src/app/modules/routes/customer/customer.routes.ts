@@ -3,10 +3,10 @@ import { AuthGuard } from "../../../core/guards/auth.guard";
 import { CustomerLayoutPageComponent } from "../../pages/customer/layout/customer-layout-page.component";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
 import { CustomerProviderProfileLayoutComponent } from "../../pages/customer/provider-details-page/customer-provider-profile-layout.component";
-import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
-import { CustomerProfileLayout } from "../../pages/customer/profile/profile-layout/layout.component";
+import { CustomerProfileLayout } from "../../pages/customer/profile-layout/layout.component";
 
 export const customerRoutes: Routes = [
+
     {
         path: '',
         component: CustomerLayoutPageComponent,
@@ -82,7 +82,17 @@ export const customerRoutes: Routes = [
                     {
                         path: '',
                         pathMatch: "full",
-                        redirectTo: 'bookings'
+                        redirectTo: 'overview'
+                    },
+                    {
+                        path: 'overview',
+                        loadComponent: () => import('../../shared/components/customer/profile/overview/profile-overview.component')
+                            .then(c => c.CustomerProfileOverviewComponent)
+                    },
+                    {
+                        path: 'overview/edit',
+                        loadComponent: () => import('../../shared/components/customer/profile/overview-edit/profile-overview-edit.component')
+                            .then(c => c.CustomerProfileOverviewEditComponent)
                     },
                     {
                         path: 'bookings',
@@ -94,14 +104,8 @@ export const customerRoutes: Routes = [
                         loadComponent: () => import('../../shared/components/customer/bookings/view-details/booking-details.component')
                             .then(c => c.CustomerViewBookingDetailsComponent)
                     },
-                    {
-                        path: 'view',
-                        loadComponent: () => import('../../shared/components/customer/profile/profile.component')
-                            .then(c => c.CustomerProfileViewComponent)
-                    }
                 ],
             }
         ],
     },
-
 ]
