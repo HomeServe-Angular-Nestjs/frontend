@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { API_KEY } from '../../../../../../environments/api.environments';
+import { API_KEY } from '../../../../../../environments/env';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
 import { ISchedules, } from '../../../../../../core/models/schedules.model';
 import { FormsModule } from '@angular/forms';

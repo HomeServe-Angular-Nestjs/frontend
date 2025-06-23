@@ -51,7 +51,7 @@
 
         <!-- Map Container -->
         <div *ngIf="mapVisible" class="mt-4 border rounded-lg overflow-hidden">
-            <app-mapbox-map [center]="center" [zoom]="zoom" [accessToken]="mapboxToken" [search]="true"
+            <app-mapbox-map [center]="center" [zoom]="zoom" [search]="true"
                 (locationChanged)="onMapLocationChanged($event)">
             </app-mapbox-map>
         </div>
@@ -74,9 +74,10 @@
                         <ng-container *ngIf="day.date === selectedDate">
                             <ng-container *ngFor="let slot of day.slots">
                                 <button (click)="afterSlotSelection(slot.id, day.id, schedule.id)" [ngClass]="{
-    'ring-2 ring-blue-500 ring-offset-2 bg-blue-100': selectedSlot === slot.id,
-    'opacity-50 cursor-not-allowed': !slot.isActive || slot.takenBy
-  }" class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100 border border-gray-300 transition-all duration-200"
+                                    'ring-2 ring-blue-500 ring-offset-2 bg-blue-100': selectedSlot === slot.id,
+                                    'opacity-50 cursor-not-allowed': !slot.isActive || slot.takenBy
+                                    }"
+                                    class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100 border border-gray-300 transition-all duration-200"
                                     [disabled]="!slot.isActive || slot.takenBy"
                                     [attr.aria-label]="'Slot from ' + slot.from + ' to ' + slot.to">
                                     {{ slot.from }} - {{ slot.to }}
@@ -88,14 +89,5 @@
                 </ng-container>
             </ng-container>
         </div>
-
-
-
-        <!-- <div class="bg-blue-50 p-4 rounded-md border border-blue-200 shadow-sm">
-            <p class="text-blue-700 text-sm">
-                <i class="fas fa-info-circle mr-2"></i>
-                Next available slot: <strong id="nextSlot">Today, 2:00 PM</strong>
-            </p>
-        </div> -->
     </div>
 </div>

@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { API_ENV } from "../../environments/api.environments";
+import { API_ENV } from "../../environments/env";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
 import { CustomerLocationType, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
 import { ISelectedSlot, ISlotSource } from "../models/schedules.model";

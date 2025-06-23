@@ -2,10 +2,10 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { REGEXP_ENV } from '../../../../../environments/regex.environments';
 import { MESSAGES_ENV } from '../../../../../environments/messages.environments';
 import { IUser } from '../../../models/user.model';
 import { authActions } from '../../../../../store/auth/auth.actions';
+import { REGEXP_ENV } from '../../../../../environments/env';
 
 @Component({
   selector: 'app-admin-login',

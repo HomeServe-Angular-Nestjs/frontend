@@ -69,7 +69,7 @@
             </div>
 
             <!-- Suggestions List -->
-            <ul *ngIf="!isLoadingProviders && fetchedProviders?.length && providerSearch.trim()"
+            <ul *ngIf="!isLoadingProviders && fetchedProviders?.length && providerSearch"
               class="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto text-sm text-gray-800">
               <li *ngFor="let provider of fetchedProviders" (click)="handleProviderClick(provider)"
                 class="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0">

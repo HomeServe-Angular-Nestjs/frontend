@@ -168,3 +168,16 @@ export interface IApprovalTableDetails {
     date: Date;
     verificationStatus: VerificationStatusType
 }
+
+export interface ICustomerProfileData {
+    fullname: string;
+    username: string;
+    email: string;
+    phone: string;
+    location: IAddress;
+}
+
+export interface IChangePassword {
+    newPassword: string;
+    currentPassword: string;
+}

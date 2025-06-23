@@ -27,6 +27,9 @@ export class CustomerHeaderComponent implements OnInit {
 
   private readonly _destroy$ = new Subject<void>();
 
+  consoles(d: any) {
+console.log(d)
+  }
   // User observables
   userStatus$!: Observable<StatusType>;
   email$!: Observable<string>;
@@ -129,7 +132,6 @@ export class CustomerHeaderComponent implements OnInit {
     this.isLoadingServices = false;
     this.serviceSearch = '';
     this.fetchedServices = [];
-    // TODO: Navigate if needed
     this._router.navigate(['service_details', id, 'service']);
   }
 

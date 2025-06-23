@@ -12,7 +12,7 @@ import { CommonModule } from "@angular/common";
 @Component({
     selector: 'app-admin-approval-layout',
     templateUrl: './approval-layout.component.html',
-    imports: [CommonModule, AdminApprovalOverviewComponent, AdminApprovalFilterComponent, TableComponent],
+    imports: [CommonModule, AdminApprovalOverviewComponent, AdminApprovalFilterComponent],
 })
 export class AdminApprovalLayoutComponent implements OnInit {
     private readonly _adminService = inject(AdminService);

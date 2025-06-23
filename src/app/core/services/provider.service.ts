@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
 import { IProvider, IProviderUpdateBio } from "../models/user.model";
-import { API_ENV } from "../../environments/api.environments";
+import { API_ENV } from "../../environments/env";
 import { SlotType } from "../models/schedules.model";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";

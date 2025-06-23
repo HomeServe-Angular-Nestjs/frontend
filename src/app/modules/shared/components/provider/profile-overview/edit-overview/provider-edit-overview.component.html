@@ -58,7 +58,7 @@
         <div class="p-6">
             <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
             <div>
-                <app-mapbox-map [center]="center" [zoom]="zoom" [accessToken]="mapboxToken" [search]="true"
+                <app-mapbox-map [center]="center" [zoom]="zoom" [search]="true"
                     (locationChanged)="onMapLocationChanged($event)">
                 </app-mapbox-map>
             </div>

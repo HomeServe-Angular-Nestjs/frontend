@@ -1,5 +1,5 @@
 import { inject, Injectable } from "@angular/core";
-import { API_ENV } from "../../environments/api.environments";
+import { API_ENV } from "../../environments/env";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { catchError, Observable, throwError } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";

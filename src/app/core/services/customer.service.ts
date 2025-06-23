@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { API_ENV } from "../../environments/api.environments";
-import { ICustomer } from "../models/user.model";
+import { API_ENV } from "../../environments/env";
+import { IChangePassword, ICustomer, ICustomerProfileData } from "../models/user.model";
 import { catchError, Observable, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
@@ -75,6 +75,24 @@ export class CustomerService {
     searchService(search: string): Observable<IResponse> {
         const params = new HttpParams().set('search', search);
         return this._http.get<IResponse>(`${this._apiUrl}/search_services`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    updateProfile(profileData: ICustomerProfileData): Observable<IResponse<ICustomer>> {
+        return this._http.put<IResponse<ICustomer>>(`${this._apiUrl}/profile`, profileData).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    changePassword(passwordData: IChangePassword): Observable<IResponse<ICustomer>> {
+        return this._http.patch<IResponse<ICustomer>>(`${this._apiUrl}/password`, passwordData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

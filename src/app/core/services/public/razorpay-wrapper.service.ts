@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { RazorpayOrder } from "../../models/payment.model";
-import { API_KEY } from "../../../environments/api.environments";
+import { API_KEY } from "../../../environments/env";
 
 @Injectable()
 export class RazorpayWrapperService {

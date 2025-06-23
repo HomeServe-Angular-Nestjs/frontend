@@ -8,7 +8,7 @@ export const authActions = {
     login: createAction('[Auth] Login', props<{ user: IUser }>()),
     loginSuccess: createAction('[Auth] Login Success', props<{ email: string }>()),
     loginFailure: createAction('[Auth] Login Failure', props<{ error: string }>()),
-    logout: createAction('[Auth] Logout', props<{ fromInterceptor?: boolean }>()),
+    logout: createAction('[Auth] Logout', props<{ fromInterceptor?: boolean, message?: string }>()),
     logoutSuccess: createAction('[Auth] Logout success'),
 
     googleLogin: createAction('[Auth] Google Login', props<{ userType: UserType }>()),

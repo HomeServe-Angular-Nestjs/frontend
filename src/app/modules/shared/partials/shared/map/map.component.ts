@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, AfterViewInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import * as mapboxgl from 'mapbox-gl';
+import { API_KEY } from '../../../../../environments/env';
 
 @Component({
     selector: 'app-mapbox-map',
@@ -12,7 +13,6 @@ import * as mapboxgl from 'mapbox-gl';
 export class MapboxMapComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() center: [number, number] = [0, 0];
     @Input() zoom: number = 12;
-    @Input() accessToken!: string;
     @Input() search: boolean = false;
     @Input() disableInteraction: boolean = false;
 
@@ -23,6 +23,7 @@ export class MapboxMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     private map!: mapboxgl.Map;
     private marker!: mapboxgl.Marker;
+    private accessToken = API_KEY.mapbox;
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['center'] && !changes['center'].firstChange) {

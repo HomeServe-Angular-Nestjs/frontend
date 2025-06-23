@@ -3,11 +3,11 @@ import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { LoginAuthService } from "../../../../../core/services/login-auth.service";
-import { REGEXP_ENV } from "../../../../../environments/regex.environments";
 import { MESSAGES_ENV } from "../../../../../environments/messages.environments";
 import { IUser } from "../../../models/user.model";
 import { NotificationService } from "../../../../../core/services/public/notification.service";
 import { ProgressBarComponent } from "../../shared/loading-Animations/progress-bar/progress-bar.component";
+import { REGEXP_ENV } from "../../../../../environments/env";
 
 
 @Component({

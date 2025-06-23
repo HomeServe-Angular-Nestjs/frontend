@@ -7,8 +7,8 @@ import { Router, RouterLink } from "@angular/router";
 import { IUser, UserType } from "../../../models/user.model";
 import { OtpComponent } from "../../../partials/auth/otp/otp.component";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
-import { REGEXP_ENV } from "../../../../../environments/regex.environments";
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
+import { REGEXP_ENV } from "../../../../../environments/env";
 
 @Component({
     selector: 'app-signup-base',

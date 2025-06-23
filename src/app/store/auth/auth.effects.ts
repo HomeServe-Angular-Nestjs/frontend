@@ -62,24 +62,26 @@ export const authEffects = {
         const loginService = inject(LoginAuthService);
         const router = inject(Router);
         const store = inject(Store);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(authActions.logout),
-            switchMap(({ fromInterceptor }) =>
+            switchMap(({ fromInterceptor, message }) =>
                 store.select(selectAuthUserType).pipe(
                     first(),
                     switchMap((userType) => {
                         if (fromInterceptor) {
+                            toastr.error(message || 'Oops, Something happened');
                             router.navigate([loginNavigation(userType as UserType)]);
                             return of(authActions.logoutSuccess());
                         }
 
                         return loginService.logout().pipe(
-                            catchError((error) => of(null)),
-                            map(() => authActions.logoutSuccess()),
+                            catchError(() => of(null)),
                             tap(() => {
                                 router.navigate([loginNavigation(userType as UserType)]);
-                            })
+                            }),
+                            map(() => authActions.logoutSuccess())
                         );
                     })
                 )),

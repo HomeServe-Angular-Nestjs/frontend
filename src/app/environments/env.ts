@@ -19,3 +19,8 @@ export const API_KEY = {
 export const SOCKET_API = {
     chat: 'http://localhost:5000',
 }
+
+export const REGEXP_ENV = {
+    password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    phone: /^[6-9]\d{9}$/
+}
