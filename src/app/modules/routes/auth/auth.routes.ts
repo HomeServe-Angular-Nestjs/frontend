@@ -44,15 +44,4 @@ export const authRoutes: Routes = [
             verifyEmailRoute
         ]
     },
-    {
-        path: 'admin',
-        children: [
-            {
-                path: 'login',
-                loadComponent: () => import('../../pages/admin/login/admin.component')
-                    .then(c => c.AdminLoginPageComponent),
-                canActivate: [GuestGuard]
-            }
-        ]
-    }
 ]

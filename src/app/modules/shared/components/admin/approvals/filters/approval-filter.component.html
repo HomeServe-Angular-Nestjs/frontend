@@ -1,34 +1,31 @@
-<div class="w-full bg-white rounded-xl shadow-sm px-4 py-5">
-    <div class="flex flex-wrap gap-6 items-end">
+<div class="flex flex-wrap gap-6 items-end">
 
-        <!-- Search -->
-        <div class="flex flex-col">
-            <label for="searchInput" class="text-sm font-medium text-gray-600 mb-1">Search</label>
-            <div class="relative">
-                <input id="searchInput" type="text" placeholder="Email or Name" [(ngModel)]="searchTerm"
-                    class="w-64 pl-10 pr-4 py-2 text-sm bg-gray-50 text-gray-700 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition" />
-                <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-            </div>
+    <!-- Search -->
+    <div class="flex items-center gap-3">
+        <label for="searchInput" class="text-sm font-medium text-gray-400 mb-1">Search:</label>
+        <div class="relative">
+            <input id="searchInput" type="text" placeholder="Email or Name" [(ngModel)]="searchTerm"
+                class="w-64 pl-10 pr-4 py-2 text-sm bg-gray-50 text-gray-700 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition" />
+            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
         </div>
+    </div>
 
-        <!-- Verification Status -->
-        <div class="flex flex-col">
-            <label for="verificationStatus" class="text-sm font-medium text-gray-600 mb-1">Status</label>
-            <select id="verificationStatus" [(ngModel)]="verificationStatus"
-                class="w-48 px-4 py-2 text-sm bg-gray-50 text-gray-700 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
-                <option value="">All</option>
-                <option value="pending">Pending</option>
-                <option value="verified">Verified</option>
-                <option value="rejected">Rejected</option>
-            </select>
-        </div>
+    <!-- Verification Status -->
+    <div class="flex items-center gap-3">
+        <label for="verificationStatus" class="text-sm font-medium text-gray-400 mb-1">Status:</label>
+        <select id="verificationStatus" [(ngModel)]="verificationStatus"
+            class="w-48 px-4 py-2 text-sm bg-gray-50 text-gray-700 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="verified">Verified</option>
+            <option value="rejected">Rejected</option>
+        </select>
+    </div>
 
-        <!-- Date Picker -->
-        <div class="flex flex-col">
-            <label for="datePicker" class="text-sm font-medium text-gray-600 mb-1">Date</label>
-            <input id="datePicker" type="date" [(ngModel)]="selectedDate"
-                class="w-48 px-4 py-2 text-sm bg-gray-50 text-gray-700 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition" />
-        </div>
-
+    <!-- Date Picker -->
+    <div class="flex items-center gap-3">
+        <label for="datePicker" class="text-sm font-medium text-gray-400 mb-1">Date:</label>
+        <input id="datePicker" type="date" [(ngModel)]="selectedDate"
+            class="w-48 px-4 py-2 text-sm bg-gray-50 text-gray-700 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition" />
     </div>
 </div>

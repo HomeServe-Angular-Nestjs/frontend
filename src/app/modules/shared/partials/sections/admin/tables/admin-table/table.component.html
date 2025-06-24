@@ -1,0 +1,66 @@
+<table class="min-w-full table-auto border border-gray-300 rounded-md shadow-sm">
+    <thead>
+        <tr class="bg-gray-100 text-left text-sm text-gray-700 uppercase">
+            <th *ngFor="let col of tableData.columns" class="px-4 py-3 font-medium border-b border-gray-200">
+                {{ col }}
+            </th>
+        </tr>
+    </thead>
+
+    <tbody class="text-sm text-gray-800">
+        <tr *ngFor="let row of tableData.rows" class="hover:bg-gray-50 border-b transition-colors">
+
+            <!-- ID -->
+            <td class="px-4 py-3 font-mono text-xs text-gray-600">
+                {{ row.id.toUpperCase() | slice: 0:10 }}
+            </td>
+
+            <!-- Profile -->
+            <td class="px-4 py-3 flex items-center gap-3">
+                <img [src]="row.profile.avatar" alt="Avatar" class="w-8 h-8 rounded-full object-cover border" />
+                <div>
+                    <div class="font-medium">{{ row.profile.name }}</div>
+                    <div class="text-xs text-gray-500">{{ row.profile.email }}</div>
+                </div>
+            </td>
+
+            <!-- Documents -->
+            <td class="px-4 py-3">
+                <button (click)="viewDocuments()"
+                    class="inline-flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-full px-1.5 py-1 font-medium justify-center">
+                    Document <i class="fas fa-eye"></i>
+                    <span>{{ row.document }}</span>
+                </button>
+            </td>
+
+            <!-- Date -->
+            <td class="px-4 py-3 text-gray-700">
+                {{ row.date | date }}
+            </td>
+
+            <!-- Status -->
+            <td class="px-4 py-3 capitalize font-semibold">
+                <span [ngClass]="{
+          'text-yellow-600': row.status === 'pending',
+          'text-green-600': row.status === 'verified',
+          'text-red-600': row.status === 'rejected'
+        }">
+                    {{ row.status }}
+                </span>
+            </td>
+
+            <!-- Actions -->
+            <td class="px-4 py-3">
+                <ng-container *ngFor="let action of tableData.actions">
+                    <ng-container *ngIf="action.id === row.id">
+                        <button type="button" [ngClass]="action.styles"
+                            class="text-sm flex items-center gap-1 px-2 py-1 rounded hover:opacity-90 transition">
+                            <i [class]="action.icon"></i>
+                            <!-- {{ action.value }} -->
+                        </button>
+                    </ng-container>
+                </ng-container>
+            </td>
+        </tr>
+    </tbody>
+</table>

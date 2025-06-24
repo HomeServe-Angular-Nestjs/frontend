@@ -1,4 +1,4 @@
-<div class="px-6 pt-6 pb-10 bg-gray-50 min-h-screen">
+<div class="px-6 pt-6 pb-10 bg-gray-50 min-h-full space-y-5">
 
     <!-- Overview Cards Section -->
     <section class="mb-8">
@@ -6,13 +6,13 @@
     </section>
 
     <!-- Filters Section -->
-    <section class="bg-white rounded-xl p-6 mb-6">
+    <section class="bg-white rounded-lg flex justify-end w-full">
         <app-admin-approval-filter></app-admin-approval-filter>
     </section>
 
-    <section class="bg-white rounded-xl shadow p-6">
+    <section class="bg-white rounded-xl shadow">
         <ng-container *ngIf="(tableData$ | async) as tableData">
-           
+            <app-admin-table-templpate [tableData]="tableData"></app-admin-table-templpate>
         </ng-container>
     </section>
 </div>

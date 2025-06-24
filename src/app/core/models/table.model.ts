@@ -26,6 +26,19 @@ export interface UserTableRow {
     [key: string]: any; //? this allows row column access.
 }
 
+export interface TableData<T> {
+    columns: string[];
+    rows: T[];
+}
+
+//
+
+export interface ITable<R, A> {
+    columns: string[];
+    rows: R[];
+    actions?: A[]
+}
+
 export interface ApprovalTableRow {
     id: string;
     profile: {
@@ -36,10 +49,18 @@ export interface ApprovalTableRow {
     document: number;
     date: Date;
     status: VerificationStatusType;
-    actions: TableAction
 }
 
-export interface TableData<T> {
-    columns: string[];
-    rows: T[];
+export interface ApprovalTableActions {
+    id: string;
+    value: boolean | string;
+    action: boolean;
+    icon?: string;
+    styles?: string;
 }
+
+
+/**
+ * <i class="fa-solid fa-thumbs-up"></i>
+ * <i class="fa-solid fa-thumbs-down"></i>
+ */
