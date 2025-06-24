@@ -53,7 +53,7 @@ export interface IBookingDetailsBase {
 export interface IBookingData {
     providerId: string;
     total: number;
-    location: CustomerLocationType;
+    location: Omit<IAddress, 'type'>;
     slotData: ISlotSource;
     serviceIds: SelectedServiceIdsType[];
     transactionId: string | null;

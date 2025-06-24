@@ -30,39 +30,41 @@
 
         <div class="border-t border-gray-200 my-6"></div>
 
-        <div class="space-y-3">
-            <div class="flex justify-between">
-                <span class="text-gray-600">Subtotal</span>
-                <span>₹{{priceBreakup.subTotal.toFixed()}}</span>
+        <ng-container *ngIf="!isLoading; else loading">
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Subtotal</span>
+                    <span>₹{{priceBreakup.subTotal.toFixed()}}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Tax</span>
+                    <span>₹{{priceBreakup.tax.toFixed()}}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Visiting Fee</span>
+                    <span>₹{{priceBreakup.visitingFee.toFixed()}}</span>
+                </div>
             </div>
-            <div class="flex justify-between">
-                <span class="text-gray-600">Service Fee</span>
-                <span>₹{{priceBreakup.visitingFee.toFixed()}}</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-gray-600">Tax</span>
-                <span>₹{{priceBreakup.tax.toFixed()}}</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-gray-600">Visiting Fee</span>
-                <span>₹{{priceBreakup.total.toFixed()}}</span>
-            </div>
-        </div>
 
-        <div class="border-t border-gray-200 mt-6 pt-4">
-            <div class="flex justify-between items-center">
-                <span class="text-lg font-bold">Total</span>
-                <span class="text-xl font-bold text-blue-600">₹{{priceBreakup.total.toFixed()}}</span>
+            <div class="border-t border-gray-200 mt-6 pt-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-lg font-bold">Total</span>
+                    <span class="text-xl font-bold text-blue-600">₹{{priceBreakup.total.toFixed()}}</span>
+                </div>
             </div>
-        </div>
 
-        <button (click)="InitiatePayment()"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md mt-8 transition duration-200">
-            Confirm Booking
-        </button>
+            <button (click)="InitiatePayment()"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md mt-8 transition duration-200">
+                Confirm Booking
+            </button>
 
-        <div class="mt-6 text-center text-sm text-gray-500">
-            <p><i class="fas fa-shield-alt mr-1"></i> Secure payment</p>
-            <p class="mt-2">Free cancellation until 24 hours before service</p>
-        </div>
+            <div class="mt-6 text-center text-sm text-gray-500">
+                <p><i class="fas fa-shield-alt mr-1"></i> Secure payment</p>
+                <p class="mt-2">Free cancellation until 24 hours before service</p>
+            </div>
+        </ng-container>
+
+        <ng-template #loading>
+            <app-loading-circle-animation></app-loading-circle-animation>
+        </ng-template>
     </div>

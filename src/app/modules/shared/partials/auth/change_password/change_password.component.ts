@@ -6,14 +6,14 @@ import { LoginAuthService } from "../../../../../core/services/login-auth.servic
 import { MESSAGES_ENV } from "../../../../../environments/messages.environments";
 import { IUser } from "../../../models/user.model";
 import { NotificationService } from "../../../../../core/services/public/notification.service";
-import { ProgressBarComponent } from "../../shared/loading-Animations/progress-bar/progress-bar.component";
 import { REGEXP_ENV } from "../../../../../environments/env";
+import { ProgressBarComponent } from "../../shared/loading-Animations/progress-bar/progress-bar.component";
 
 
 @Component({
     selector: 'app-change-password',
     templateUrl: './change_password.component.html',
-    imports: [ReactiveFormsModule, CommonModule, ProgressBarComponent, RouterLink]
+    imports: [ReactiveFormsModule, CommonModule, RouterLink, ProgressBarComponent]
 })
 export class ChangePasswordComponent implements OnInit {
     private route = inject(ActivatedRoute);

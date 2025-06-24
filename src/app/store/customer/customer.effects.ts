@@ -1,5 +1,5 @@
 import { inject } from "@angular/core";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { act, Actions, createEffect, ofType } from "@ngrx/effects";
 import { customerActions } from "./customer.actions";
 import { catchError, map, of, switchMap, throwError } from "rxjs";
 import { CustomerService } from "../../core/services/customer.service";
@@ -79,7 +79,7 @@ export const customerEffects = {
                             toastr.success(response.message);
                             return customerActions.customerSuccessAction({ customer: response.data })
                         }
-                        
+
                         throw new Error(response.message);
                     }),
                     catchError((error: HttpErrorResponse) => {
@@ -89,7 +89,6 @@ export const customerEffects = {
             )
         );
     }, { functional: true }),
-
 
     changePassword$: createEffect(() => {
         const actions$ = inject(Actions);
@@ -101,6 +100,32 @@ export const customerEffects = {
             switchMap(({ passwordData }) =>
                 customerService.changePassword(passwordData).pipe(
                     map(response => {
+                        if (response && response.data) {
+                            toastr.success(response.message);
+                            return customerActions.customerSuccessAction({ customer: response.data })
+                        }
+
+                        throw new Error(response.message);
+                    }),
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, customerActions.customerFailureAction, toastr);
+                    })
+                )
+            )
+        );
+    }, { functional: true }),
+
+    changeAvatar$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const customerService = inject(CustomerService);
+        const toastr = inject(ToastNotificationService);
+
+        return actions$.pipe(
+            ofType(customerActions.changeAvatar),
+            switchMap(({ formData }) =>
+                customerService.changeAvatar(formData).pipe(
+                    map(response => {
+                        console.log(response)
                         if (response && response.data) {
                             toastr.success(response.message);
                             return customerActions.customerSuccessAction({ customer: response.data })

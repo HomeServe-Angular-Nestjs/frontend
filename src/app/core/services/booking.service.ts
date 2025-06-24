@@ -6,6 +6,7 @@ import { CustomerLocationType, IBookingData, IBookingDetailCustomer, IBookingDet
 import { ISelectedSlot, ISlotSource } from "../models/schedules.model";
 import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
+import { IAddress } from "../models/user.model";
 
 
 
@@ -13,7 +14,7 @@ import { IResponse } from "../../modules/shared/models/response.model";
 export class BookingService {
     private _http = inject(HttpClient);
 
-    private _addressSource = new BehaviorSubject<CustomerLocationType | null>(null);
+    private _addressSource = new BehaviorSubject<Omit<IAddress, 'type'> | null>(null);
     address$ = this._addressSource.asObservable();
 
     private _slotSource = new BehaviorSubject<ISelectedSlot | null>(null);
@@ -22,7 +23,7 @@ export class BookingService {
     private _customerApi = API_ENV.customer;
     private _providerApi = API_ENV.provider;
 
-    setSelectedAddress(newAddress: CustomerLocationType | null) {
+    setSelectedAddress(newAddress: Omit<IAddress, 'type'> | null) {
         this._addressSource.next(newAddress);
     }
 

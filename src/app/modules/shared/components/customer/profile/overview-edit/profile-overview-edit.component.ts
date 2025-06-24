@@ -187,4 +187,13 @@ export class CustomerProfileOverviewEditComponent implements OnInit {
             }
         })
     }
+
+    onAvatarChange(event: any) {
+        const file = event.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('customerAvatar', file);
+            this._store.dispatch(customerActions.changeAvatar({ formData }));
+        }
+    }
 }

@@ -11,7 +11,7 @@ import { API_KEY } from '../../../../../environments/env';
     standalone: true
 })
 export class MapboxMapComponent implements AfterViewInit, OnChanges, OnDestroy {
-    @Input() center: [number, number] = [0, 0];
+    @Input() center: [number, number] = [76.9560, 8.5010];
     @Input() zoom: number = 12;
     @Input() search: boolean = false;
     @Input() disableInteraction: boolean = false;

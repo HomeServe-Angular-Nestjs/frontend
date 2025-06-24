@@ -11,12 +11,14 @@ import { PaymentService } from '../../../../../../core/services/payment.service'
 import { RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
 import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
 import { ITransaction } from '../../../../../../core/models/transaction.model';
+import { IAddress } from '../../../../../../core/models/user.model';
+import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
   standalone: true,
   templateUrl: './customer-schedule-order-summary.component.html',
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingCircleAnimationComponent],
   providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy {
@@ -38,8 +40,11 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     visitingFee: 0.00,
     total: 0.00
   };
-  location!: CustomerLocationType;
+  location!: Omit<IAddress, 'type'>;
   selectedSlot: ISelectedSlot | null = null;
+
+  isLoading = true;
+  isProcessing = false;
 
   /**
     * Angular lifecycle hook that initializes component logic,
@@ -74,6 +79,8 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   }
 
   InitiatePayment() {
+    this.isProcessing = true;
+
     if (!this._isAllDataAvailable()) {
       this._toastr.info('Incomplete booking information.');
       return;
@@ -124,9 +131,10 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
         }
       },
       error: (err) => {
-        this._toastr.error(err);
         console.log(err)
-      }
+        this._toastr.error(err);
+      },
+      complete: () => this.isProcessing = false
     });
   }
 
@@ -181,7 +189,8 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
 
     this._bookingService.fetchPriceBreakup(data).subscribe({
       next: (priceBreakup) => this.priceBreakup = priceBreakup,
-      error: (err) => this._toastr.error(err)
+      error: (err) => this._toastr.error(err),
+      complete: () => this.isLoading = false
     });
   }
 
@@ -204,7 +213,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
    * @param location - Location object to validate
    * @returns True if the location has a non-empty address and valid coordinates
    */
-  private _isValidLocation(location: CustomerLocationType | null): boolean {
+  private _isValidLocation(location: Omit<IAddress, "type"> | null): boolean {
     return !!location && location.address !== '' && Array.isArray(location.coordinates);
   }
 }

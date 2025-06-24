@@ -2,24 +2,14 @@
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Booking Details</h1>
     <!-- Mobile Verification -->
     <div class="mb-8">
-        <label class="block text-gray-800 text-sm font-semibold mb-2">Mobile Verification</label>
+        <label class="block text-gray-800 text-sm font-semibold mb-2">Mobile Number</label>
         <div class="flex items-end space-x-4">
             <div class="flex-1">
                 <div class="flex">
-                    <!-- <select
-                        class="border border-gray-300 rounded-l-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option>+1</option>
-                        <option>+91</option>
-                        <option>+44</option>
-                    </select> -->
                     <input type="tel" placeholder="Enter your mobile number" [(ngModel)]="phoneNumber"
                         class="w-full px-4 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
-            <!-- <button 
-                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md whitespace-nowrap">
-                Send Code
-            </button> -->
         </div>
         <div class="mt-4 space-x-4 hidden" id="verificationCodeSection">
             <div class="flex-1">
@@ -51,8 +41,7 @@
 
         <!-- Map Container -->
         <div *ngIf="mapVisible" class="mt-4 border rounded-lg overflow-hidden">
-            <app-mapbox-map [center]="center" [zoom]="zoom" [search]="true"
-                (locationChanged)="onMapLocationChanged($event)">
+            <app-mapbox-map [center]="center" [search]="true" (locationChanged)="onMapLocationChanged($event)">
             </app-mapbox-map>
         </div>
     </div>

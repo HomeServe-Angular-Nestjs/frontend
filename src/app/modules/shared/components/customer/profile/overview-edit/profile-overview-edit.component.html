@@ -4,22 +4,30 @@
     <div class="bg-white rounded-lg shadow-sm py-8">
         <ng-container *ngIf="(customer$ | async) as customer">
             <form [formGroup]="profileForm" class="space-y-6 pb-6" (submit)="saveProfile()">
+
                 <!-- Profile Picture Section -->
                 <div class="flex items-center gap-6 justify-center">
                     <div class="relative">
                         <img [src]="customer.avatar || 'assets/images/profile_placeholder.jpg'" alt="Profile"
                             class="w-24 h-24 rounded-full object-cover" loading="lazy" />
-                        <button type="button"
-                            class="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-md hover:bg-gray-50"
+
+                        <!-- Hidden file input -->
+                        <input type="file" id="avatarUpload" hidden (change)="onAvatarChange($event)"
+                            accept="image/*" />
+
+                        <!-- Label styled as button -->
+                        <label for="avatarUpload"
+                            class="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 cursor-pointer"
                             aria-label="Upload new profile picture">
                             <i class="fas fa-camera text-gray-600"></i>
-                        </button>
+                        </label>
                     </div>
                     <div>
                         <h3 class="text-lg font-medium text-gray-900">Profile Picture</h3>
                         <p class="text-sm text-gray-500">Upload a new profile picture</p>
                     </div>
                 </div>
+
 
                 <!-- Personal Information -->
                 <div class="space-y-4">

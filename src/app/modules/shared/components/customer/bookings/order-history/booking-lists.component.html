@@ -2,7 +2,7 @@
     <div>
         <h1 class="text-2xl font-bold text-gray-900 mb-8">Your Booking History</h1>
 
-        <ng-container *ngIf="bookingsData$ | async as bookingLists; else noBookings">
+        <ng-container *ngIf="bookingsData$ | async as bookingLists; else loading">
 
             <div *ngIf="bookingLists.bookingData && bookingLists.bookingData.length; else noBookings">
                 <div *ngFor="let list of bookingLists.bookingData" class="border rounded-xl shadow-sm bg-white mb-6">
@@ -10,7 +10,8 @@
                     <!-- Booking Header -->
                     <div class="bg-gray-100 px-6 py-4 flex flex-wrap justify-between items-center rounded-t-xl">
                         <div class="text-sm text-gray-700">
-                            <span class="font-semibold">Booking ID:</span>{{ list.bookingId.toUpperCase() | slice:0:10
+                            <span class="font-semibold">Booking ID:</span>{{ list.bookingId.toUpperCase() |
+                            slice:0:10
                             }}
                         </div>
                         <div class="text-sm text-gray-600">
@@ -125,3 +126,7 @@
         </div>
     </ng-container>
 </section>
+
+<ng-template #loading>
+    <app-loading-circle-animation></app-loading-circle-animation>
+</ng-template>
