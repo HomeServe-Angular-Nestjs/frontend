@@ -3,6 +3,7 @@ import { authActions } from "./auth.actions";
 import { AuthState, StatusType } from "../../core/models/auth.model";
 
 export const initialState: AuthState = {
+    id: null,
     email: null,
     status: 'pending',
     error: null,
@@ -22,10 +23,11 @@ export const authFeature = createFeature({
         })),
 
         // When login succeeds
-        on(authActions.loginSuccess, (state, { email }): AuthState => ({
+        on(authActions.loginSuccess, (state, { email, id }): AuthState => ({
             ...state,
             status: 'authenticated',
-            email
+            email,
+            id
         })),
 
         // When login fails
@@ -51,7 +53,7 @@ export const authFeature = createFeature({
         on(authActions.logoutSuccess, (state) => ({
             ...state,
             email: null,
-            status: 'pending' as StatusType, 
+            status: 'pending' as StatusType,
             error: null
         }))
     )

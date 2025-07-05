@@ -8,9 +8,10 @@ export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionRedu
             {
                 auth: {
                     serialize: (state: AuthState) => ({
+                        id: state.id,
                         email: state.email || null,
                         type: state.type,
-                        status: state.status
+                        status: state.status,
                     }),
                     deserialize: (json) => json,
                 }

@@ -23,6 +23,8 @@ import { scheduleEffects } from './store/schedules/schedule.effects';
 import { customerFeature } from './store/customer/customer.feature';
 import { customerEffects } from './store/customer/customer.effects';
 import { ToastrModule } from 'ngx-toastr';
+import { chatFeature } from './store/chat/chat.feature';
+import { chatEffects } from './store/chat/chats.effect';
 
 
 export const appConfig: ApplicationConfig = {
@@ -50,8 +52,9 @@ export const appConfig: ApplicationConfig = {
       [providerFeature.name]: providerFeature.reducer,
       [scheduleFeature.name]: scheduleFeature.reducer,
       [customerFeature.name]: customerFeature.reducer,
+      [chatFeature.name]: chatFeature.reducer,
     }, { metaReducers }),
-    provideEffects(authEffects, userEffects, offeredServiceEffects, providerEffects, scheduleEffects, customerEffects),
+    provideEffects(authEffects, userEffects, offeredServiceEffects, providerEffects, scheduleEffects, customerEffects, chatEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: true, autoPause: true }),
   ]
 };

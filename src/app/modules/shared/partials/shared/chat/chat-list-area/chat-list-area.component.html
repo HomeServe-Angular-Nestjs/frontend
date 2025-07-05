@@ -1,0 +1,52 @@
+<div class="flex flex-col h-full bg-gray-50 border-r">
+    <!-- Search -->
+    <div class="p-4 border-b">
+        <input type="text" placeholder="Search"
+            class="w-full px-4 py-2 text-sm border rounded-full focus:outline-none focus:ring focus:border-blue-400" />
+    </div>
+
+    <!-- Chats -->
+    <ng-container *ngIf="(chats$ | async) as chats; else loadingChats">
+        <div *ngIf="chats.length > 0; else noChats" class="overflow-y-auto flex-1">
+            <ul>
+                <li *ngFor="let chat of chats" (click)="viewMessages(chat.id)"
+                    class="px-4 py-3 hover:bg-blue-100 transition flex items-center gap-4 cursor-pointer border-b">
+
+                    <img [src]="imageHandler(chat.receiver.avatar)" alt="avatar" (error)="onImgError($event)"
+                        class="w-12 h-12 rounded-full object-cover shadow-sm" />
+
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-gray-800 text-base truncate">{{ chat.receiver.name }}</p>
+                        <p class="text-sm text-gray-500 truncate">{{ chat.lastMessage || 'No messages yet.' }}</p>
+                    </div>
+
+                    <span *ngIf="chat.lastSeenAt as date" class="text-gray-500 text-xs whitespace-nowrap">
+                        {{ getLastSeenAt(date) }}
+                    </span>
+
+                </li>
+            </ul>
+        </div>
+    </ng-container>
+    <ng-template #loadingChats>
+        <div class="flex flex-col items-center justify-center h-full bg-white text-gray-400">
+            <svg class="animate-spin h-8 w-8 mb-4 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            <p class="text-lg font-medium">Loading chats...</p>
+            <p class="text-sm text-gray-400 mt-2">Please wait while we load your conversations.</p>
+        </div>
+    </ng-template>
+
+
+    <ng-template #noChats>
+        <div class="flex flex-col items-center justify-center h-full bg-gray-50 text-gray-400">
+            <i class="fas fa-comment-dots text-5xl mb-4"></i>
+            <p class="text-lg font-medium">No chats yet</p>
+            <p class="text-sm text-gray-500 mt-2">Start a new conversation to see it appear here.</p>
+        </div>
+    </ng-template>
+
+</div>

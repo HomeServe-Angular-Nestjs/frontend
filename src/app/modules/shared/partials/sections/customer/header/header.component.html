@@ -1,4 +1,8 @@
-<header class="bg-white shadow-sm fixed w-full top-0 z-50 border-b border-gray-100 backdrop-blur-sm bg-opacity-90">
+<header [ngClass]="{
+  'bg-white shadow-sm w-full top-0 z-50 border-b border-gray-100 backdrop-blur-sm bg-opacity-90': true,
+  'fixed top-0 left-0 w-full z-50': isFixed,
+  'relative': !isFixed
+}">
   <div class="px-6 mx-auto  py-3">
     <div class="flex items-center justify-between">
       <!-- Logo - Enhanced with hover effects -->
@@ -198,7 +202,7 @@
                 <div class="py-1">
                   <a [routerLink]="['/profile']" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Manage
                     Profile</a>
-                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Chat</a>
+                  <a [routerLink]="['chat']" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Chat</a>
                   <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Settings</a>
                 </div>
                 <div class="py-1 border-t border-gray-100">

@@ -6,7 +6,6 @@ import { CustomerProviderProfileLayoutComponent } from "../../pages/customer/pro
 import { CustomerProfileLayout } from "../../pages/customer/profile-layout/layout.component";
 
 export const customerRoutes: Routes = [
-
     {
         path: '',
         component: CustomerLayoutPageComponent,
@@ -105,7 +104,13 @@ export const customerRoutes: Routes = [
                             .then(c => c.CustomerViewBookingDetailsComponent)
                     },
                 ],
-            }
+            },
         ],
     },
+    {
+        path: 'chat',
+        loadComponent: () => import('../../pages/customer/chat/customer-chat.component')
+            .then(c => c.CustomerChatComponent),
+        canActivate: [AuthGuard]
+    }
 ]

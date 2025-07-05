@@ -7,6 +7,10 @@ import { getColorFromChar } from '../../../../../../core/utils/style.utils';
 import { Store } from '@ngrx/store';
 import { customerActions } from '../../../../../../store/customer/customer.actions';
 import { IsSavedPipe } from '../../../../../../core/pipes/is-saved-provider.pipe';
+import { ChatSocketService } from '../../../../../../core/services/socket-service/chat.service';
+import { Router } from '@angular/router';
+import { chatActions } from '../../../../../../store/chat/chat.action';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 @Component({
   selector: 'app-customer-provider-profile-overview',
@@ -15,8 +19,11 @@ import { IsSavedPipe } from '../../../../../../core/pipes/is-saved-provider.pipe
   templateUrl: './customer-provider-profile-overview.component.html',
 })
 export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestroy {
-  private providerService = inject(ProviderService);
-  private _store = inject(Store)
+  private readonly _providerService = inject(ProviderService);
+  private readonly _chatService = inject(ChatSocketService);
+  private readonly _store = inject(Store);
+  private readonly _router = inject(Router);
+  private readonly _toastr = inject(ToastNotificationService);
 
   private providerDataSub!: Subscription;
 
@@ -24,7 +31,7 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
   fallbackChar: string = '';
 
   ngOnInit(): void {
-    this.providerDataSub = this.providerService.providerData$.subscribe(data => {
+    this.providerDataSub = this._providerService.providerData$.subscribe(data => {
       this.providerData = data;
     });
   }
@@ -39,7 +46,27 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
 
   addToSaved(providerId: string | undefined) {
     if (providerId) {
-      this._store.dispatch(customerActions.updateAddToSaved({ providerId }))
+      this._store.dispatch(customerActions.updateAddToSaved({ providerId }));
+    }
+  }
+
+  chat() {
+    if (this.providerData && this.providerData.id) {
+      this._chatService.fetchChat({ id: this.providerData.id, type: 'provider' })
+        .subscribe({
+          next: (response) => {
+            if (response.success && response.data?.id) {
+              this._store.dispatch(chatActions.selectChat({ chatId: response.data.id }));
+              this._router.navigate(['chat']);
+            } else {
+              this._toastr.error('Unable to fetch chat.');
+            }
+          },
+          error: (err) => {
+            this._toastr.error('An error occurred while fetching chat.');
+            console.error('Chat error:', err);
+          }
+        })
     }
   }
 

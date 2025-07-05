@@ -22,3 +22,8 @@ export const selectLocation = createSelector(
     selectCustomerState,
     (state) => state.customer?.location
 );
+
+export const selectCustomerId = createSelector(
+    selectCustomerState,
+    (state) => state.customer?.id
+);

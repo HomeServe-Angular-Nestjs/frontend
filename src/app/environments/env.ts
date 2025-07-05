@@ -8,7 +8,8 @@ export const API_ENV = {
     provider: `${domainName}/provider`,
     payment: `${domainName}/payment`,
     schedule: `${domainName}/schedule`,
-    chat: `${domainName}/chat`
+    chat: `${domainName}/chat`,
+    message: `${domainName}/messages`
 }
 
 export const API_KEY = {
@@ -16,9 +17,7 @@ export const API_KEY = {
     razorpay: 'rzp_test_OZVJGxiPWQgDaM'
 }
 
-export const SOCKET_API = {
-    chat: 'http://localhost:5000',
-}
+export const SOCKET_URL = 'http://localhost:5000';
 
 export const REGEXP_ENV = {
     password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { authActions } from '../../../../../../store/auth/auth.actions';
@@ -27,9 +27,8 @@ export class CustomerHeaderComponent implements OnInit {
 
   private readonly _destroy$ = new Subject<void>();
 
-  consoles(d: any) {
-console.log(d)
-  }
+  @Input() isFixed: boolean = true;
+
   // User observables
   userStatus$!: Observable<StatusType>;
   email$!: Observable<string>;

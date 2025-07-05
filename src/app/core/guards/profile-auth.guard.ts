@@ -26,9 +26,10 @@ export const ProfileAuthGuard: CanActivateFn = (
 
     const isLoggedIn: string = route.queryParams['loggedIn'];
     const email: string = route.queryParams['email'];
+    const id: string = route.queryParams['id'];
 
     if (isLoggedIn === 'true' && email !== '') {
-        store.dispatch(authActions.loginSuccess({ email }));
+        store.dispatch(authActions.loginSuccess({ email, id }));
 
         // wait for the store to be updated.
         return store.select(selectAuthUser).pipe(

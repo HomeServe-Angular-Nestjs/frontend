@@ -9,7 +9,6 @@ import { IBookingFilter, IResponseProviderBookingLists } from "../../../../../..
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { DebounceService } from "../../../../../../core/services/public/debounce.service";
 import { RouterLink } from "@angular/router";
-import { ChatService } from "../../../../../../core/services/chat.service";
 
 @Component({
     selector: 'app-provider-booking-recent',
@@ -21,8 +20,7 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
     private readonly _bookingService = inject(BookingService);
     private readonly _debounceService = inject(DebounceService);
     private readonly _sanitizer = inject(DomSanitizer);
-    private readonly _chatService = inject(ChatService);
-
+    
     @Input() filters: IBookingFilter = {};
 
     private _destroy$ = new Subject<void>();
@@ -89,7 +87,7 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
     }
 
     goToChat(customerId: string) {
-        this._chatService.createChat(customerId).subscribe(data => console.log(data));
+    //     this._chatService.createChat(customerId).subscribe(data => console.log(data));
     }
 
     private _emitFilters(): void {

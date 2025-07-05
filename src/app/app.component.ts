@@ -1,22 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs';
+import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { authActions } from './store/auth/auth.actions';
 import { UserType } from './modules/shared/models/user.model';
+import { ChatSocketService } from './core/services/socket-service/chat.service';
+import { selectCheckStatus } from './store/auth/auth.selector';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnInit {
-  constructor(private router: Router, private store: Store) { }
+export class AppComponent implements OnInit, OnDestroy {
+  private readonly _router = inject(Router);
+  private readonly _store = inject(Store);
+  private readonly _chatSocket = inject(ChatSocketService);
+
+  private readonly _destroy$ = new Subject<void>();
 
   ngOnInit(): void {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+    this._router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this._destroy$),
     ).subscribe((event: NavigationEnd) => {
       const url = event.urlAfterRedirects.split('/');
       let userType: UserType = 'customer';
@@ -27,8 +34,35 @@ export class AppComponent implements OnInit {
         userType = 'admin';
       }
 
-      this.store.dispatch(authActions.setUserType({ userType }));
-
+      this._store.dispatch(authActions.setUserType({ userType }));
     });
+
+    const authStatus$ = this._store.select(selectCheckStatus).pipe(
+      distinctUntilChanged(),
+      takeUntil(this._destroy$)
+    );
+
+    // Connect socket when authenticated
+    authStatus$.pipe(
+      filter(status => status === 'authenticated')
+    ).subscribe(() => {
+      this._chatSocket.connect();
+      this._chatSocket.stopListeningMessages();
+      this._chatSocket.onNewMessage((msg) => {
+        console.log('[Global] New chat message received:', msg);
+      });
+    });
+
+    // Disconnect socket when unauthenticated
+    authStatus$.pipe(
+      filter(status => status !== 'authenticated')
+    ).subscribe(() => {
+      this._chatSocket.disconnect();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 }

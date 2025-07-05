@@ -24,7 +24,10 @@ export const authEffects = {
             ofType(authActions.login),
             switchMap(({ user }) =>
                 loginService.authCredentials(user).pipe(
-                    map(() => authActions.loginSuccess({ email: user.email })),
+                    map((response) => {
+                        console.log(response);
+                        return authActions.loginSuccess({ email: user.email, id: user.id as string })
+                    }),
                     tap(() => {
                         const url = navigationAfterLogin(user.type);
                         router.navigate([url]);

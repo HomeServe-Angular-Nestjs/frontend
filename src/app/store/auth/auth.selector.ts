@@ -1,4 +1,3 @@
-// store/auth/selectors/auth.selectors.ts
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { AuthState } from '../../core/models/auth.model';
 
@@ -23,3 +22,8 @@ export const selectAuthUserType = createSelector(
     selectAuthState,
     (state: AuthState) => state.type
 );
+
+export const selectAuthUserId = createSelector(
+    selectAuthState,
+    (state) => state.id
+)
