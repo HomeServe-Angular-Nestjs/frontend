@@ -3,8 +3,9 @@ import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { selectAllChats } from "../../../../../../store/chat/chat.selector";
 import { chatActions } from "../../../../../../store/chat/chat.action";
-import { filter, Subject, takeUntil } from "rxjs";
+import { filter, Observable, Subject, takeUntil } from "rxjs";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
+import { IChat } from "../../../../../../core/models/chat.model";
 
 @Component({
     selector: 'app-chat-list-area',
@@ -15,19 +16,15 @@ export class ChatListComponent implements OnInit, OnDestroy {
     private readonly _store = inject(Store);
     private readonly _chatService = inject(ChatSocketService);
 
-    chats$ = this._chatService._chats$;
-
     private _destroy$ = new Subject<void>();
+    chats$!: Observable<IChat[]>
 
     ngOnInit(): void {
-        this._store.select(selectAllChats)
+        this.chats$ = this._store.select(selectAllChats)
             .pipe(
                 filter((chat) => !!chat),
                 takeUntil(this._destroy$)
-            ).subscribe(chats => {
-                console.log(chats);
-                this._chatService.setChats(chats)
-            });
+            );
     }
 
     ngOnDestroy(): void {

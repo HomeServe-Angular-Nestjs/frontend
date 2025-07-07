@@ -15,6 +15,6 @@ export const messageAdaptor: EntityAdapter<IMessage> = createEntityAdapter<IMess
     sortComparer: (a, b) => {
         const aTime = new Date(a.createdAt).getTime();
         const bTime = new Date(b.createdAt).getTime();
-        return bTime - aTime;
+        return aTime - bTime;
     }
 });

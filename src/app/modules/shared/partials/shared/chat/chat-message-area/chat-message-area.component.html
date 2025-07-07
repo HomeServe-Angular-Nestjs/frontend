@@ -1,5 +1,6 @@
 <ng-container *ngIf="(chat$ | async) as chat;else noChatSelected">
-    <div class="flex flex-col flex-1 overflow-hidden">
+    <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
+
         <!-- Header -->
         <div class="px-8 py-5 border-b bg-white flex items-center justify-between shrink-0">
             <ng-container *ngIf="chat.receiver as receiver">
@@ -24,7 +25,7 @@
             </ng-container>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
+        <div class="flex-1 min-h-0 overflow-y-auto p-6 space-y-4 bg-white">
             <ng-container *ngIf="(messages$ | async) as messages;else loadingMessages">
                 <ng-container *ngIf="messages.length > 0;else noMessagesContent">
                     <ng-container *ngFor="let message of messages">

@@ -4,7 +4,7 @@ import { ChatSocketService } from "../../../../../../core/services/socket-servic
 import { FormsModule } from "@angular/forms";
 import { filter, map, Observable, Subject, takeUntil } from "rxjs";
 import { Store } from "@ngrx/store";
-import { IChat, IMessage, IParticipant, ISendMessage } from "../../../../../../core/models/chat.model";
+import { IChat, IMessage, ISendMessage } from "../../../../../../core/models/chat.model";
 import { selectSelectedChat, selectSelectedChatsMessage } from "../../../../../../store/chat/chat.selector";
 import { UserType } from "../../../../models/user.model";
 import { selectAuthUserId } from "../../../../../../store/auth/auth.selector";
@@ -20,7 +20,7 @@ export class ChatMessageComponent implements OnInit, OnDestroy {
 
     private readonly _destroy$ = new Subject<void>();
 
-    messages$: Observable<IMessage[]> = this._chatSocketService._messages$;
+    messages$!: Observable<IMessage[]>;
     chat$!: Observable<IChat>;
     currentUserId!: string;
     receiverId!: string;
@@ -28,10 +28,10 @@ export class ChatMessageComponent implements OnInit, OnDestroy {
     textMessage: string = '';
 
     ngOnInit(): void {
-        this._store.select(selectSelectedChatsMessage).pipe(
+        this.messages$ = this._store.select(selectSelectedChatsMessage).pipe(
             map(messages => (messages ?? []).filter(msg => !!msg)),
             takeUntil(this._destroy$),
-        ).subscribe(messages => this._chatSocketService.setMessages(messages));
+        );
 
         this.chat$ = this._store.select(selectSelectedChat).pipe(
             filter(chat => !!chat),

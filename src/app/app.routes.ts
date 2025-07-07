@@ -10,6 +10,11 @@ export const routes: Routes = [
         pathMatch: 'full',
         redirectTo: 'homepage'
     },
+    {
+        path: 'provider',
+        pathMatch: 'full',
+        redirectTo: 'provider/dashboard'
+    },
     ...authRoutes,
     ...customerRoutes,
     ...providerRoutes,
