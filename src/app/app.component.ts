@@ -37,28 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this._store.dispatch(authActions.setUserType({ userType }));
     });
 
-    const authStatus$ = this._store.select(selectCheckStatus).pipe(
-      distinctUntilChanged(),
-      takeUntil(this._destroy$)
-    );
-
-    // Connect socket when authenticated
-    authStatus$.pipe(
-      filter(status => status === 'authenticated')
-    ).subscribe(() => {
-      this._chatSocket.connect();
-      this._chatSocket.stopListeningMessages();
-      this._chatSocket.onNewMessage((msg) => {
-        console.log('[Global] New chat message received:', msg);
-      });
-    });
-
-    // Disconnect socket when unauthenticated
-    authStatus$.pipe(
-      filter(status => status !== 'authenticated')
-    ).subscribe(() => {
-      this._chatSocket.disconnect();
-    });
+   
   }
 
   ngOnDestroy(): void {

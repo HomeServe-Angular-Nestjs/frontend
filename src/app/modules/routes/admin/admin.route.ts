@@ -15,7 +15,7 @@ export const adminRoute: Routes = [
             },
             {
                 path: '',
-                loadComponent: () => import('../../pages/admin/homepage/admin-homepage.component').then(c => c.AdminHomepageComponent),
+                loadComponent: () => import('../../pages/admin/layout/admin-layout.component').then(c => c.AdminHomepageComponent),
                 children: [
                     {
                         path: '',
@@ -36,6 +36,11 @@ export const adminRoute: Routes = [
                         path: 'approvals',
                         loadComponent: () => import('../../shared/components/admin/approvals/layout/approval-layout.component')
                             .then(c => c.AdminApprovalLayoutComponent)
+                    },
+                    {
+                        path: 'subscriptions',
+                        loadComponent: () => import('../../shared/components/admin/subsciptions/admin-subscriptions.component')
+                            .then(c => c.AdminSubscriptionsComponent)
                     }
                 ]
             },

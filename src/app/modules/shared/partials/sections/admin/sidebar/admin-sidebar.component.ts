@@ -36,7 +36,7 @@ export class AdminSidebarComponent {
     {
       name: 'Subscriptions & Plans',
       icon: 'fa-calendar-alt',
-      route: 'admin/subscriptions&plans'
+      route: 'admin/subscriptions'
     },
     {
       name: 'Bookings Management',
