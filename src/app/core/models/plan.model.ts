@@ -1,0 +1,26 @@
+export type PlanDurationType = 'monthly' | 'yearly' | 'lifetime';
+export type PlanRoleType = 'customer' | 'provider';
+
+export interface IPlan {
+    id: string;
+    name: string;
+    price: number;
+    role: PlanRoleType;
+    duration: PlanDurationType;
+    features: string[];
+    isActive: boolean;
+    createdAt: Date;
+}
+
+export interface ICreatePlan {
+    name: string;
+    price: number;
+    role: PlanRoleType;
+    duration: PlanDurationType;
+    features: string[];
+}
+
+export interface IUpdatePlanStatus {
+    id: string;
+    status: boolean;
+}

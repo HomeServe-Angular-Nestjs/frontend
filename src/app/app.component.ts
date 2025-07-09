@@ -36,8 +36,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
       this._store.dispatch(authActions.setUserType({ userType }));
     });
-
-   
   }
 
   ngOnDestroy(): void {

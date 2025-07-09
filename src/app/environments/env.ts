@@ -9,7 +9,8 @@ export const API_ENV = {
     payment: `${domainName}/payment`,
     schedule: `${domainName}/schedule`,
     chat: `${domainName}/chat`,
-    message: `${domainName}/messages`
+    message: `${domainName}/messages`,
+    plans: `${domainName}/plans`,
 }
 
 export const API_KEY = {

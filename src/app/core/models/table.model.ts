@@ -1,11 +1,5 @@
 import { VerificationStatusType } from "./user.model";
 
-export interface TableRowBase {
-    id: string;
-    status: string | VerificationStatusType;
-    actions: TableAction[];
-}
-
 export interface TableAction {
     id: string;
     value: boolean | string;
@@ -31,12 +25,21 @@ export interface TableData<T> {
     rows: T[];
 }
 
-//
+export interface ITableAction {
+    toolTip: string;
+    icon: string;
+    styles?: string;
+    action: string;
+}
 
-export interface ITable<R, A> {
+export interface ITableRow {
+    [key: string]: any;
+    actions?: ITableAction[];
+}
+
+export interface ITable {
     columns: string[];
-    rows: R[];
-    actions?: A[]
+    rows: ITableRow[];
 }
 
 export interface ApprovalTableRow {
@@ -58,9 +61,3 @@ export interface ApprovalTableActions {
     icon?: string;
     styles?: string;
 }
-
-
-/**
- * <i class="fa-solid fa-thumbs-up"></i>
- * <i class="fa-solid fa-thumbs-down"></i>
- */

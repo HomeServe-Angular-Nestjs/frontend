@@ -39,8 +39,8 @@ export const adminRoute: Routes = [
                     },
                     {
                         path: 'subscriptions',
-                        loadComponent: () => import('../../shared/components/admin/subsciptions/admin-subscriptions.component')
-                            .then(c => c.AdminSubscriptionsComponent)
+                        loadComponent: () => import('../../shared/components/admin/subsciptions/layout/admin-subsciption-layout.component')
+                            .then(c => c.AdminSubscriptionLayoutComponent)
                     }
                 ]
             },

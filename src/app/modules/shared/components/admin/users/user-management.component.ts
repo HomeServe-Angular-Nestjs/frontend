@@ -51,8 +51,6 @@ export class UserManagementComponent implements OnInit {
     const { action, ...rest } = updateData;
     const payload = { ...rest, role };
 
-    console.log(updateData);
-    
     if (action === 'status') {
       this._userManagementService.updateStatus(payload).subscribe({
         next: (success) => {

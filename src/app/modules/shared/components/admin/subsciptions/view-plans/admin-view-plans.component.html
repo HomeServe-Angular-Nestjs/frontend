@@ -1,0 +1,42 @@
+<section class="rounded-xl shadow-md bg-white py-6 px-6 space-y-6">
+    <!-- Header Section -->
+    <div class="flex justify-between items-center border-b pb-4">
+        <h1 class="text-2xl font-medium text-gray-800">
+            Manage Subscription Plans
+        </h1>
+        <button (click)="createPlans()"
+            class="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200">
+            <i class="fas fa-plus"></i>
+            <span class="font-medium">Create New Plan</span>
+        </button>
+    </div>
+
+    <!-- Async Data Section -->
+    <ng-container *ngIf="tableData$ | async as planTableData; else noData">
+        <app-admin-table-templpate [table]="planTableData" (adminTableActionEvent)="adminTableActionTriggered($event)"></app-admin-table-templpate>
+
+        <!-- Pagination -->
+        <!-- <div class="pt-4 border-t">
+            <app-admin-pagination [pagination]="pagination" (pageChange)="onPageChange($event)">
+            </app-admin-pagination>
+        </div> -->
+    </ng-container>
+
+    <!-- No Data Template -->
+    <ng-template #noData>
+        <div
+            class="flex flex-col items-center justify-center min-h-[280px] text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300 p-8">
+
+            <svg class="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9.75 9.75h4.5m-4.5 4.5h4.5M4.5 6.75h15M6.75 6.75v10.5A2.25 2.25 0 009 19.5h6a2.25 2.25 0 002.25-2.25V6.75" />
+            </svg>
+
+            <p class="text-xl font-semibold">No subscription plans found</p>
+            <p class="text-sm text-gray-400 mt-1 text-center">
+                Try creating a new plan or check back later.
+            </p>
+        </div>
+    </ng-template>
+</section>

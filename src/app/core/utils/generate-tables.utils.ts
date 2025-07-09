@@ -1,5 +1,6 @@
-import { ApprovalTableActions, ApprovalTableRow, ITable, TableData, UserTableRow } from "../models/table.model";
-import { IApprovalTableDetails, IUserData } from "../models/user.model";
+import { IPlan } from "../models/plan.model";
+import { ITable, TableData, UserTableRow } from "../models/table.model";
+import { IUserData } from "../models/user.model";
 
 export const createAdminTableUI = (columns: string[], users: IUserData[]): TableData<UserTableRow> => {
     const filteredUser = users.filter(user => !user.isDeleted);
@@ -42,34 +43,6 @@ export const createAdminTableUI = (columns: string[], users: IUserData[]): Table
     };
 };
 
-export const createAdminApprovalsTableUI = (columns: string[], data: IApprovalTableDetails[]): ITable<ApprovalTableRow, ApprovalTableActions> => {
-    return {
-        columns,
-        rows: data.map(user => ({
-            id: user.id,
-            profile: {
-                avatar: user.avatar,
-                email: user.email,
-                name: user.name
-            },
-            document: user.documentCount,
-            date: user.date,
-            status: user.verificationStatus,
-        })),
-        actions: data.map(user => ({
-            id: user.id,
-            value: user.verificationStatus,
-            action: user.verificationStatus === 'verified' ? true : false,
-            icon: user.verificationStatus === 'verified'
-                ? 'fa-solid fa-thumbs-up'
-                : 'fa-solid fa-thumbs-down',
-            styles: user.verificationStatus === 'verified'
-                ? 'text-green-600 hover:text-green-800'
-                : 'text-red-600 hover:text-red-800'
-        }))
-    };
-}
-
 export const createProviderBookingTables = (columns: string[], data: Record<string, any>[]) => {
     const rows = data.map(item => {
         const row: Record<string, any> = {};
@@ -80,13 +53,45 @@ export const createProviderBookingTables = (columns: string[], data: Record<stri
         return row;
     });
 
-
-    console.log('columns: ', columns)
-    console.log('rows: ', rows)
-
     return {
         columns,
         rows
+    };
+};
+
+
+export const createPlansTable = (columns: string[], plans: IPlan[]): ITable => {
+    return {
+        columns,
+        rows: plans.map(plan => ({
+            id: plan.id,
+            'plan name': plan.name,
+            pricing: `₹${plan.price}`,
+            role: plan.role,
+            'billing cycle': plan.duration,
+            'created date': plan.createdAt,
+            status: plan.isActive,
+            actions: [
+                {
+                    toolTip: plan.isActive ? 'Deactivate Plan' : 'Activate Plan',
+                    icon: plan.isActive ? 'visibility_off' : 'visibility',
+                    styles: plan.isActive ? 'text-yellow-500' : 'text-green-500',
+                    action: 'toggle',
+                },
+                {
+                    toolTip: 'Edit Plan',
+                    icon: 'edit',
+                    styles: 'text-blue-600',
+                    action: 'edit',
+                },
+                {
+                    toolTip: 'Delete Plan',
+                    icon: 'delete',
+                    styles: 'text-red-600',
+                    action: 'delete',
+                }
+            ]
+        }))
     };
 };
 
