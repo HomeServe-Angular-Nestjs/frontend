@@ -96,7 +96,25 @@ export const providerRoutes: Routes = [
                 canActivate: [AuthGuard],
                 loadComponent: () => import('../../pages/provider/chat/provider-chat.component')
                     .then(c => c.ProviderChatComponent)
-            }
+            },
+            {
+                path: 'performance',
+                canActivate: [AuthGuard],
+                loadComponent: () => import('../../pages/provider/analytics/performance/performance-page.component')
+                    .then(c => c.ProviderPerformanceComponent)
+            },
+            {
+                path: 'area-analytics',
+                canActivate: [AuthGuard],
+                loadComponent: () => import('../../pages/provider/analytics/area/area-page.component')
+                    .then(c => c.ProviderAreaAnalyticsComponent)
+            },
+            {
+                path: 'revenue-analytics',
+                canActivate: [AuthGuard],
+                loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
+                    .then(c => c.ProviderRevenueAnalyticsComponent)
+            },
         ],
     },
 
