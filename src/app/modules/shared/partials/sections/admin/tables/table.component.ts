@@ -12,7 +12,7 @@ import { FilterDeletedUserPipe } from '../../../../../../core/pipes/filter-block
   imports: [CommonModule, FilterDeletedUserPipe],
 })
 export class TableComponent implements OnChanges {
-  private _dialog = inject(MatDialog)
+  private _dialog = inject(MatDialog);
 
   @Input({ required: true }) tableData!: TableData<UserTableRow>;
   @Output() actionTriggeredEvent = new EventEmitter()

@@ -4,7 +4,7 @@ import { ITable, ITableAction, ITableRow } from "../../../../../../../core/model
 import { CapitalizeFirstPipe } from "../../../../../../../core/pipes/capitalize-first.pipe";
 
 @Component({    
-    selector: 'app-admin-table-templpate',
+    selector: 'app-admin-table-template',
     templateUrl: './table.component.html',
     imports: [CommonModule, CapitalizeFirstPipe]
 })

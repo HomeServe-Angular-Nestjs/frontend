@@ -13,13 +13,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return store.select(selectAuthUserType).pipe(
         first(),
         mergeMap(userType => {
-            const withCreds = req.context.get(USE_CREDENTIALS);
+            const withCred = req.context.get(USE_CREDENTIALS);
 
             const modifiedRequest = req.clone({
                 setHeaders: {
                     'x-user-type': userType || ''
                 },
-                withCredentials: withCreds
+                withCredentials: withCred
             });
 
             return next(modifiedRequest).pipe(
@@ -35,8 +35,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     }
 
                     return throwError(() => {
-                        console.error(error)
-                        throw new Error();
+                        const message = error?.error?.error || error?.error?.message || error.message || 'Something went wrong. Please try again!';
+                        throw new Error(message);
                     });
                 })
             );

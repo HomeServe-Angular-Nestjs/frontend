@@ -13,13 +13,14 @@
 
     <!-- Async Data Section -->
     <ng-container *ngIf="tableData$ | async as planTableData; else noData">
-        <app-admin-table-templpate [table]="planTableData" (adminTableActionEvent)="adminTableActionTriggered($event)"></app-admin-table-templpate>
+        <app-admin-table-template [table]="planTableData"
+            (adminTableActionEvent)="adminTableActionTriggered($event)"></app-admin-table-template>
 
         <!-- Pagination -->
         <!-- <div class="pt-4 border-t">
-            <app-admin-pagination [pagination]="pagination" (pageChange)="onPageChange($event)">
-            </app-admin-pagination>
-        </div> -->
+                <app-admin-pagination [pagination]="pagination" (pageChange)="onPageChange($event)">
+                </app-admin-pagination>
+            </div> -->
     </ng-container>
 
     <!-- No Data Template -->
