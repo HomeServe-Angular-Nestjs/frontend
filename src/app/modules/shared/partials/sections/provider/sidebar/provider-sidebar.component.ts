@@ -11,7 +11,6 @@ import { authActions } from '../../../../../../store/auth/auth.actions';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './provider-sidebar.component.html',
-  // styleUrl: './provider-sidebar.component.scss',
 })
 export class ProviderSidebarComponent {
   constructor(private store: Store) { }

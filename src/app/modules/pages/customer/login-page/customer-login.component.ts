@@ -13,8 +13,4 @@ import { LoginBaseComponent } from "../../../shared/components/auth/login-base/l
 })
 export class CustomerLoginComponent {
     config = LOGIN_CONFIGS.customer;
-
-    constructor(private store: Store) {
-        this.store.dispatch(authActions.setUserType({ userType: 'customer' }));
-    }
 }

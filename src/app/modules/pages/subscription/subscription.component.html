@@ -1,0 +1,60 @@
+<section class="bg-gray-50 py-16 px-4">
+    <div class="max-w-6xl mx-auto text-center">
+        <h2 class="text-4xl font-extrabold text-gray-800">Simple, Transparent Pricing</h2>
+        <p class="text-gray-500 mt-3 text-lg">Choose the plan that aligns with your needs</p>
+
+        <div class="mt-12 flex flex-col lg:flex-row gap-10 items-stretch justify-center">
+            <ng-container *ngIf="plans$ | async as plans">
+                <ng-container *ngFor="let plan of plans">
+                    <!-- Plan Card -->
+                    <div class="flex-1 p-8 rounded-3xl shadow-md border border-gray-200 flex flex-col justify-between transition"
+                        [ngClass]="{
+              'bg-white text-gray-800': plan.name.toLowerCase() === 'basic',
+              'bg-green-50 text-green-900': userType === 'provider' && plan.name.toLowerCase() !== 'basic',
+              'bg-blue-50 text-blue-900': userType === 'customer' && plan.name.toLowerCase() !== 'basic'
+            }">
+                        <div>
+                            <span class="inline-block px-3 py-1 text-xs font-medium rounded-full mb-3" [ngClass]="{
+                  'bg-gray-100 text-gray-600': plan.name.toLowerCase() === 'basic',
+                  'bg-white border border-current text-green-700': userType === 'provider' && plan.name.toLowerCase() !== 'basic',
+                  'bg-white border border-current text-blue-700': userType === 'customer' && plan.name.toLowerCase() !== 'basic'
+                }">
+                                {{ plan.name.toLowerCase() === 'free' ? 'Starter' : 'Most Popular' }}
+                            </span>
+
+                            <h3 class="text-2xl font-semibold">{{ plan.name | capitalizeFirst }}</h3>
+                            <p class="text-5xl font-extrabold mt-4 mb-6">
+                                {{ plan.price === 0 ? 'Free' : '$' + plan.price }}
+                                <span *ngIf="plan.duration" class="text-lg font-light">/ {{ plan.duration }}</span>
+                            </p>
+
+                            <ul class="text-sm space-y-3 mb-6 text-left">
+                                <li *ngFor="let feature of plan.features" class="list-disc">{{ feature }}</li>
+                            </ul>
+                        </div>
+
+                        <button (click)="proceedSub(plan)"
+                            class="mt-auto w-full py-3 rounded-xl font-semibold transition border" [ngClass]="{
+                'bg-gray-100 text-gray-800 hover:bg-gray-200 border-transparent': plan.name.toLowerCase() === 'basic',
+                'bg-green-100 text-green-800 hover:bg-green-200 border-green-200': userType === 'provider' && plan.name.toLowerCase() !== 'basic',
+                'bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200': userType === 'customer' && plan.name.toLowerCase() !== 'basic'
+              }">
+                            {{ plan.name.toLowerCase() === 'free' ? 'Get Started' : 'Get Premium' }}
+                        </button>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+
+        <p class="text-sm text-gray-500 mt-10">
+            All plans include booking management and {{ userType }} support.
+        </p>
+
+        <a href="#" class="font-medium mt-1 inline-block text-sm transition" [ngClass]="{
+        'text-green-600 hover:text-green-700': userType === 'provider',
+        'text-blue-600 hover:text-blue-700': userType === 'customer'
+      }">
+            Compare all features →
+        </a>
+    </div>
+</section>

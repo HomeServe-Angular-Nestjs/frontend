@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
-import { CustomerLocationType, IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
+import { IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { ISelectedSlot } from '../../../../../../core/models/schedules.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
@@ -13,6 +13,7 @@ import { RazorpayWrapperService } from '../../../../../../core/services/public/r
 import { ITransaction } from '../../../../../../core/models/transaction.model';
 import { IAddress } from '../../../../../../core/models/user.model';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
+import { TransactionType } from '../../../../../../core/enums/enums';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
@@ -141,7 +142,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private _verifyPaymentAndConfirmBooking(response: RazorpayPaymentResponse, order: RazorpayOrder) {
     const orderData: RazorpayOrder = {
       id: order.id,
-      entity: order.entity,
+      transactionType: TransactionType.BOOKING,
       amount: order.amount,
       currency: order.currency,
       status: order.status,

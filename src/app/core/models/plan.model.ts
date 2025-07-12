@@ -1,9 +1,10 @@
 export type PlanDurationType = 'monthly' | 'yearly' | 'lifetime';
 export type PlanRoleType = 'customer' | 'provider';
+export type PlanName = 'free' | 'premium';
 
 export interface IPlan {
     id: string;
-    name: string;
+    name: string | PlanName;
     price: number;
     role: PlanRoleType;
     duration: PlanDurationType;

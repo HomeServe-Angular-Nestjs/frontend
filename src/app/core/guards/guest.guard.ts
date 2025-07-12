@@ -27,7 +27,6 @@ export const GuestGuard: CanActivateFn = (): Observable<boolean | UrlTree> => {
     ]).pipe(
         take(1),
         map(([status, type]) => {
-            // console.log('GuestGuard check:', { status, type });
             if (status === 'authenticated' && type) {
                 const url = navigationAfterLogin(type)
                 return router.createUrlTree([url]);
@@ -35,4 +34,4 @@ export const GuestGuard: CanActivateFn = (): Observable<boolean | UrlTree> => {
             return true;
         })
     );
-};
+}; 

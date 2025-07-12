@@ -8,9 +8,8 @@ export const authActions = {
     logout: createAction('[Auth] Logout', props<{ fromInterceptor?: boolean, message?: string }>()),
     logoutSuccess: createAction('[Auth] Logout success'),
 
+    updateShowSubscriptionPageValue: createAction('[Auth] Update show subscription page value', props<{ value: boolean }>()),
     googleLogin: createAction('[Auth] Google Login', props<{ userType: UserType }>()),
-
     setUserType: createAction('[Auth] Set User Type', props<{ userType: UserType }>()),
-
     checkAuth: createAction('[Auth] Check Auth'),
 };

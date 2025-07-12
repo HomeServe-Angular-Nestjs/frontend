@@ -12,6 +12,7 @@ export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionRedu
                         email: state.email || null,
                         type: state.type,
                         status: state.status,
+                        showSubscriptionPage: state.showSubscriptionPage,
                     }),
                     deserialize: (json) => json,
                 }

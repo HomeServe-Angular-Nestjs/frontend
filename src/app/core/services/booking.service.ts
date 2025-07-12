@@ -2,8 +2,8 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/env";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
-import { CustomerLocationType, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
-import { ISelectedSlot, ISlotSource } from "../models/schedules.model";
+import { IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
+import { ISelectedSlot } from "../models/schedules.model";
 import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { IAddress } from "../models/user.model";
@@ -34,6 +34,7 @@ export class BookingService {
     // ------------------------------------------------------------------------------------------------------------------------------
     // **************************************************[Customer Related APIs]*******************************************************
     // ------------------------------------------------------------------------------------------------------------------------------
+
 
     fetchPriceBreakup(data: IPriceBreakup[]): Observable<IPriceBreakupData> {
         return this._http.post<IPriceBreakupData>(`${this._customerApi}/booking/price_breakup`, data).pipe(

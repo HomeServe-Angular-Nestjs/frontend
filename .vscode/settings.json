@@ -3,6 +3,7 @@
         "mapbox",
         "mapboxgl",
         "maxlength",
+        "ondismiss",
         "toastr",
         "Updation"
     ]

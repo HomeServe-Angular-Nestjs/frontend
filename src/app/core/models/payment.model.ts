@@ -1,8 +1,9 @@
+import { TransactionType } from "../enums/enums";
 import { ITransaction } from "./transaction.model";
 
 export interface RazorpayOrder {
     id: string;
-    entity: string;
+    transactionType: TransactionType;
     amount: number;
     currency: string;
     receipt: string;

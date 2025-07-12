@@ -11,6 +11,7 @@ export const API_ENV = {
     chat: `${domainName}/chat`,
     message: `${domainName}/messages`,
     plans: `${domainName}/plans`,
+    subscription: `${domainName}/subscription`
 }
 
 export const API_KEY = {
