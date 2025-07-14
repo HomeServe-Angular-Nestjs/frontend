@@ -13,7 +13,7 @@ import { RazorpayWrapperService } from '../../../../../../core/services/public/r
 import { ITransaction } from '../../../../../../core/models/transaction.model';
 import { IAddress } from '../../../../../../core/models/user.model';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
-import { TransactionType } from '../../../../../../core/enums/enums';
+import { TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
@@ -47,10 +47,15 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   isLoading = true;
   isProcessing = false;
 
-  /**
-    * Angular lifecycle hook that initializes component logic,
-    * sets subscriptions to services and route, and fetches price breakdown.
-    */
+  get getServiceIds(): SelectedServiceIdsType[] {
+    return this.selectedServiceData.map(item => {
+      return {
+        id: item.id,
+        selectedIds: item.subService.map(sub => sub.id)
+      }
+    });
+  }
+
   ngOnInit() {
     const routeSub = this._route.paramMap.subscribe(params => {
       this.providerId = params.get('id');
@@ -72,71 +77,44 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     this._fetchPriceBreakup(priceData);
   }
 
-  /**
-   * Angular lifecycle hook to clean up subscriptions to prevent memory leaks.
-   */
   ngOnDestroy(): void {
     this._subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  InitiatePayment() {
-    this.isProcessing = true;
+  private _prepareDataForPriceBreakup(data: SelectedServiceType[]): IPriceBreakup[] {
+    return data
+      .filter(item => item.subService?.length)
+      .map(item => ({
+        serviceId: item.id,
+        subServiceIds: item.subService.map(sub => sub.id)
+      }));
+  }
 
-    if (!this._isAllDataAvailable()) {
-      this._toastr.info('Incomplete booking information.');
+  private _fetchPriceBreakup(data: IPriceBreakup[]): void {
+    if (!data.length || !this.providerId) {
+      this._toastr.error('Cannot fetch price without services or provider.');
       return;
     }
 
-    const totalAmount = this.priceBreakup.total;
-    this._paymentService.createRazorpayOrder(totalAmount).subscribe(({
-      next: (order) => {
-        this._razorpayWrapper.openCheckout(order,
-          (paymentResponse: RazorpayPaymentResponse) => this._verifyPaymentAndConfirmBooking(paymentResponse, order),
-          () => this._toastr.warning('payment dismissed')
-        );
-      },
-      error: (err) => this._toastr.error('payment failed')
-    }));
+    this._bookingService.fetchPriceBreakup(data).subscribe({
+      next: (priceBreakup) => this.priceBreakup = priceBreakup,
+      error: (err) => this._toastr.error(err),
+      complete: () => this.isLoading = false
+    });
   }
 
+  private _isAllDataAvailable(): boolean {
+    return (
+      !!this.priceBreakup.total &&
+      this.selectedServiceData.length > 0 &&
+      !!this.providerId &&
+      !!this.selectedSlot &&
+      !!this._isValidLocation(this.location)
+    );
+  }
 
-  /**
-   * Confirms booking if all required data is valid.
-   * Otherwise, displays an error notification.
-   */
-  saveBooking(transactionData: ITransaction) {
-    const serviceIds: SelectedServiceIdsType[] = this.selectedServiceData.map(item => {
-      return {
-        id: item.id,
-        selectedIds: item.subService.map(sub => sub.id)
-      }
-    });
-
-    const bookingData: IBookingData = {
-      providerId: this.providerId!,
-      total: Number(this.priceBreakup.total.toFixed()),
-      location: this.location,
-      slotData: this.selectedSlot!,
-      serviceIds,
-      transactionId: transactionData.id ? transactionData.id : null
-    };
-
-    this._bookingService.postBookingData(bookingData).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this._toastr.success('Service booked successfully!');
-          localStorage.removeItem('selectedServiceData');
-          this._router.navigate(['profile', 'bookings'])
-        } else {
-          this._toastr.success('Sorry, booking failed due to some technical issues. Contact the admin for further steps.');
-        }
-      },
-      error: (err) => {
-        console.log(err)
-        this._toastr.error(err);
-      },
-      complete: () => this.isProcessing = false
-    });
+  private _isValidLocation(location: Omit<IAddress, "type"> | null): boolean {
+    return !!location && location.address !== '' && Array.isArray(location.coordinates);
   }
 
   private _verifyPaymentAndConfirmBooking(response: RazorpayPaymentResponse, order: RazorpayOrder) {
@@ -154,67 +132,68 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
 
     this._paymentService.verifyPaymentSignature(response, orderData, 'customer').subscribe({
       next: (response) => {
-        if (response.verified) {
-          this.saveBooking(response.transaction);
-        } else {
-          this._toastr.error('Payment verification failed');
-        }
+        this._saveBooking(response.transaction);
       },
-      error: (err) => this._toastr.error('Server verification failed.')
-    })
-  }
-
-  /**
-   * Prepares the selected service and sub-service data for price calculation.
-   * @param data - List of selected services and their sub-services
-   * @returns Array formatted for backend pricing request
-   */
-  private _prepareDataForPriceBreakup(data: SelectedServiceType[]): IPriceBreakup[] {
-    return data
-      .filter(item => item.subService?.length)
-      .map(item => ({
-        serviceId: item.id,
-        subServiceIds: item.subService.map(sub => sub.id)
-      }));
-  }
-
-  /**
-   * Calls the service to fetch the price breakdown for selected services.
-   * @param data - The service and sub-service ID list for pricing
-   */
-  private _fetchPriceBreakup(data: IPriceBreakup[]): void {
-    if (!data.length || !this.providerId) {
-      this._toastr.error('Cannot fetch price without services or provider.');
-      return;
-    }
-
-    this._bookingService.fetchPriceBreakup(data).subscribe({
-      next: (priceBreakup) => this.priceBreakup = priceBreakup,
-      error: (err) => this._toastr.error(err),
-      complete: () => this.isLoading = false
+      error: (err) => {
+        console.error(err);
+        this._toastr.error('Server verification failed.')
+      }
     });
   }
 
-  /**
-   * Verifies that all essential data is available to proceed with booking.
-   * @returns True if all required fields are properly set
-   */
-  private _isAllDataAvailable(): boolean {
-    return (
-      !!this.priceBreakup.total &&
-      this.selectedServiceData.length > 0 &&
-      !!this.providerId &&
-      !!this.selectedSlot &&
-      !!this._isValidLocation(this.location)
-    );
+  private _saveBooking(transactionData?: ITransaction) {
+    const serviceIds: SelectedServiceIdsType[] = this.getServiceIds;
+
+    const bookingData: IBookingData = {
+      providerId: this.providerId!,
+      total: Number(this.priceBreakup.total.toFixed()),
+      location: this.location,
+      slotData: this.selectedSlot!,
+      serviceIds,
+      transactionId: transactionData?.id ?? null
+    };
+
+    this._bookingService.postBookingData(bookingData).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this._toastr.success(transactionData?.id
+            ? 'Service booked successfully!'
+            : 'Booking saved as pending payment. Please complete the payment from your profile.');
+          localStorage.removeItem('selectedServiceData');
+          this._router.navigate(['profile', 'bookings'])
+        } else {
+          this._toastr.success('Sorry, booking failed due to some technical issues. Contact the admin for further steps.');
+        }
+      },
+      error: (err) => {
+        console.log(err);
+        this._toastr.error(err);
+      },
+      complete: () => this.isProcessing = false
+    });
   }
 
-  /**
-   * Validates the user's selected location.
-   * @param location - Location object to validate
-   * @returns True if the location has a non-empty address and valid coordinates
-   */
-  private _isValidLocation(location: Omit<IAddress, "type"> | null): boolean {
-    return !!location && location.address !== '' && Array.isArray(location.coordinates);
+  InitiatePayment() {
+    this.isProcessing = true;
+
+    if (!this._isAllDataAvailable()) {
+      this._toastr.info('Incomplete booking information.');
+      return;
+    }
+
+    const totalAmount = this.priceBreakup.total;
+    this._paymentService.createRazorpayOrder(totalAmount).subscribe(({
+      next: (order) => {
+        this._razorpayWrapper.openCheckout(order,
+          (paymentResponse: RazorpayPaymentResponse) =>
+            this._verifyPaymentAndConfirmBooking(paymentResponse, order),
+          () => this._saveBooking()
+        );
+      },
+      error: (err) => {
+        console.error(err);
+        this._toastr.error('payment failed');
+      }
+    }));
   }
 }

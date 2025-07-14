@@ -6,6 +6,11 @@ export enum BookingStatus {
     CANCELLED = 'cancelled',
 }
 
+export enum CancelStatus {
+    IN_PROGRESS = 'in_progress',
+    CANCELLED = 'cancelled',
+}
+
 export enum PaymentStatus {
     UNPAID = 'unpaid',
     PAID = 'paid',

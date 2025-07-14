@@ -8,8 +8,6 @@ import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { IAddress } from "../models/user.model";
 
-
-
 @Injectable({ providedIn: 'root' })
 export class BookingService {
     private _http = inject(HttpClient);
@@ -47,6 +45,15 @@ export class BookingService {
 
     postBookingData(data: IBookingData): Observable<IResponse> {
         return this._http.post<IResponse>(`${this._customerApi}/booking/confirm`, data).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    updateBooking(data: { transactionId: string | null, bookingId: string }): Observable<IResponse> {
+        return this._http.patch<IResponse>(`${this._customerApi}/booking/update`, data).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

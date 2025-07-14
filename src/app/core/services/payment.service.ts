@@ -11,6 +11,10 @@ export class PaymentService {
 
     private _apiUrl = API_ENV.payment;
 
+    private getErrorMessage(error: HttpErrorResponse): string {
+        return error?.error?.message || 'something went wrong';
+    }
+
     createRazorpayOrder(amount: number): Observable<RazorpayOrder> {
         return this._http.post<RazorpayOrder>(`${this._apiUrl}/create_order`, { amount }).pipe(
             catchError((error: HttpErrorResponse) =>
@@ -29,12 +33,5 @@ export class PaymentService {
         );
     }
 
-    /**
-     * Extracts a readable error message from an HTTP error.
-     * @param error - The HTTP error response.
-     * @returns A user-friendly error message.
-     */
-    private getErrorMessage(error: HttpErrorResponse): string {
-        return error?.error?.message || 'something went wrong';
-    }
+
 }

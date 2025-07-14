@@ -1,24 +1,31 @@
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { CommonModule } from "@angular/common";
 import { FullDateWithTimePipe } from "../../../../../../core/pipes/to-full-date-with-time.pipe";
-import { IBookingWithPagination } from "../../../../../../core/models/booking.model";
+import { IBookingResponse, IBookingWithPagination } from "../../../../../../core/models/booking.model";
 import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
 import { map, Observable } from "rxjs";
 import { RouterLink } from "@angular/router";
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { FormsModule } from "@angular/forms";
-import { BookingStatus } from "../../../../../../core/enums/enums";
+import { BookingStatus, TransactionType } from "../../../../../../core/enums/enums";
+import { PaymentService } from "../../../../../../core/services/payment.service";
+import { RazorpayWrapperService } from "../../../../../../core/services/public/razorpay-wrapper.service";
+import { RazorpayOrder, RazorpayPaymentResponse } from "../../../../../../core/models/payment.model";
+import { ITransaction } from "../../../../../../core/models/transaction.model";
 
 @Component({
     selector: 'app-customer-booking-lists',
     templateUrl: './booking-lists.component.html',
-    imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent]
+    imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent],
+    providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerBookingListsComponent implements OnInit {
     private readonly _bookingService = inject(BookingService);
     private readonly _toastr = inject(ToastNotificationService);
+    private readonly _paymentService = inject(PaymentService);
+    private readonly _razorpayWrapperService = inject(RazorpayWrapperService);
 
     bookingsData$!: Observable<IBookingWithPagination>;
     cancellationReasonModal = false;
@@ -52,31 +59,81 @@ export class CustomerBookingListsComponent implements OnInit {
         );
     }
 
-    canBeCancelled(date: any): boolean {
-        const bookingDate = new Date(date);
+    private _updateBooking(bookingId: string, transactionData?: ITransaction) {
+        const bookingData = {
+            bookingId,
+            transactionId: transactionData?.id ?? null,
+        };
+
+        this._bookingService.updateBooking(bookingData).subscribe({
+            next: (res) => {
+                console.log(res);
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        })
+    }
+
+    private _verifyPaymentAndUpdateBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {
+        const orderData = {
+            id: order.id,
+            transactionType: TransactionType.BOOKING,
+            amount: order.amount,
+            currency: order.currency,
+            status: order.status,
+            method: 'debit',
+            receipt: order.receipt,
+            offer_id: order.offer_id,
+            created_at: order.created_at,
+        };
+
+        this._paymentService.verifyPaymentSignature(response, orderData, 'customer').subscribe({
+            next: (response) => {
+                console.log(response)
+                this._updateBooking(bookingId, response.transaction);
+            },
+            error: (err) => {
+                console.error(err);
+                this._toastr.error('Server verification failed.')
+            }
+        });
+    }
+
+    private _initiatePayment(totalAmount: number, bookingId: string) {
+        this._paymentService.createRazorpayOrder(totalAmount).subscribe({
+            next: (order) => {
+                console.log(order);
+                this._razorpayWrapperService.openCheckout(
+                    order,
+                    (paymentResponse: RazorpayPaymentResponse) =>
+                        this._verifyPaymentAndUpdateBooking(paymentResponse, order, bookingId),
+                );
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        });
+    }
+
+    canBeCancelled(booking: IBookingResponse): boolean {
+        const bookingDate = new Date(booking.createdAt);
         if (isNaN(bookingDate.getTime())) {
-            this._toastr.warning('Invalid date input:', date);
+            this._toastr.warning(`Invalid scheduled date: , ${booking.createdAt}`);
             return false;
         }
 
         const now = new Date();
+        const timeDiff = now.getTime() - bookingDate.getTime()
         const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
 
-        return (now.getTime() - bookingDate.getTime()) <= twentyFourHoursInMs;
-    }
+        const isWithinCancellableWindow = timeDiff < twentyFourHoursInMs;
+        const isAlreadyCancelled =
+            booking.bookingStatus === 'cancelled' ||
+            booking.paymentStatus === 'refunded' ||
+            booking.cancelStatus;
 
-    onPageChange(newPage: number) {
-        this._fetchBookings(newPage);
-    }
-
-    openModal(bookingId: string) {
-        this.bookingSelectedForCancellation = bookingId;
-        this.cancellationReasonModal = true;
-    }
-
-    closeModal() {
-        this.bookingSelectedForCancellation = '';
-        this.cancellationReasonModal = false;
+        return isWithinCancellableWindow && !isAlreadyCancelled;
     }
 
     submitCancellation() {
@@ -99,4 +156,31 @@ export class CustomerBookingListsComponent implements OnInit {
             }
         })
     }
+
+    completePayment(booking: IBookingResponse) {
+        const totalAmount = booking.totalAmount;
+
+        if (!totalAmount || !booking.bookingId) {
+            this._toastr.warning('Invalid booking data. Cannot proceed with payment.');
+            return;
+        }
+
+        this._initiatePayment(totalAmount, booking.bookingId);
+    }
+
+    onPageChange(newPage: number) {
+        this._fetchBookings(newPage);
+    }
+
+    openModal(bookingId: string) {
+        this.bookingSelectedForCancellation = bookingId;
+        this.cancellationReasonModal = true;
+    }
+
+    closeModal() {
+        this.bookingSelectedForCancellation = '';
+        this.cancellationReasonModal = false;
+    }
+
+
 }
