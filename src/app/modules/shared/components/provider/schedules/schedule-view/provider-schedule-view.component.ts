@@ -10,7 +10,7 @@ import { ToastNotificationService } from '../../../../../../core/services/public
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../../partials/shared/confirm-dialog-box/confirm-dialog.component';
 import { IPagination } from '../../../../../../core/models/booking.model';
-import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagenation/provider-pagination.component";
+import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagination/provider-pagination.component";
 
 @Component({
   selector: 'app-provider-schedule-view',

@@ -9,7 +9,7 @@ import { OfferedServicesService } from '../../../../../../core/services/service-
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { ProviderServiceFilterComponent } from "../service-filter/service-filter.component";
 import { IFilter } from '../../../../../../core/models/filter.model';
-import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagenation/provider-pagination.component";
+import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagination/provider-pagination.component";
 import { IPagination } from '../../../../../../core/models/booking.model';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 

@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { BehaviorSubject, Observable, Subject, takeUntil } from "rxjs";
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
-import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagenation/provider-pagination.component";
+import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagination/provider-pagination.component";
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { IBookingFilter, IResponseProviderBookingLists } from "../../../../../../core/models/booking.model";
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
