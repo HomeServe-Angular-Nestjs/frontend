@@ -18,10 +18,10 @@
                         <tr>
                             <th class="px-4 py-3">Booking ID</th>
                             <th class="px-4 py-3">Customer</th>
-                            <th class="px-4 py-3">Service</th>
                             <th class="px-4 py-3">Date & Time</th>
                             <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3">Payment</th>
+                            <th class="px-4 py-3">Request cancel</th>
                             <th class="px-4 py-3">Actions</th>
                         </tr>
                     </thead>
@@ -46,11 +46,6 @@
                                     </div>
                                 </td>
 
-                                <!-- Service -->
-                                <td class="px-4 py-3 max-w-[160px] truncate">
-                                    {{ booking.services[0].title }}
-                                </td>
-
                                 <!-- Date & Time -->
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <div>{{ getDate(booking.expectedArrivalTime) }}</div>
@@ -71,6 +66,22 @@
                                         class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
                                         {{ booking.paymentStatus }}
                                     </span>
+                                </td>
+
+                                <td class="px-4 py-3">
+                                    <ng-container [ngSwitch]="booking.cancelStatus">
+                                        <div *ngSwitchCase="'in_progress'"
+                                            class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
+                                            Requested
+                                        </div>
+                                        <div *ngSwitchCase="'cancelled'"
+                                            class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
+                                            Cancelled
+                                        </div>
+                                        <div *ngSwitchCase="null" class="px-2 py-1 text-xs font-semibold">
+                                            ---
+                                        </div>
+                                    </ng-container>
                                 </td>
 
                                 <!-- Actions -->

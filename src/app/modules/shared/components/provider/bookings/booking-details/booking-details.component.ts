@@ -2,13 +2,13 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { Observable, filter, map, switchMap } from "rxjs";
+import { Observable, filter, map, of, switchMap } from "rxjs";
 
 import { IBookingDetailProvider } from "../../../../../../core/models/booking.model";
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { BookingStatus, PaymentStatus } from "../../../../../../core/enums/enums";
-import { AlertService } from "../../../../../../core/services/public/alert.service";
+import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 
 @Component({
     selector: 'app-provider-view-booking-details',
@@ -18,7 +18,7 @@ import { AlertService } from "../../../../../../core/services/public/alert.servi
 })
 export class ProviderViewBookingDetailsComponents implements OnInit {
     private readonly _bookingService = inject(BookingService);
-    private readonly _alertService = inject(AlertService);
+    private readonly _toastr = inject(ToastNotificationService);
     private _route = inject(ActivatedRoute);
 
     bookingData$!: Observable<IBookingDetailProvider>;
@@ -49,13 +49,15 @@ export class ProviderViewBookingDetailsComponents implements OnInit {
 
     changeBookingStatus(bookingId: string, newStatus: BookingStatus): void {
         this._bookingService.changeBookingStatus(bookingId, newStatus).subscribe({
-            next: (success) => {
-                if (success) {
-                    this._alertService.showToast('Status updated', 'success');
+            next: (response) => {
+                if (response.success && response.data) {
+                    this.bookingData$ = of(response.data);
+                    this._toastr.success(response.message);
                 }
             },
             error: (err) => {
-                this._alertService.showToast(err, 'error');
+                console.error(err);
+                this._toastr.error(err);
             }
         });
     }
@@ -99,26 +101,20 @@ export class ProviderViewBookingDetailsComponents implements OnInit {
     }
 
     isStatusDisabled(optionStatus: BookingStatus, currentStatus: BookingStatus): boolean {
-        if (currentStatus === BookingStatus.COMPLETED) {
-            // When completed, no other status is allowed
-            return optionStatus !== 'completed';
+        if (currentStatus === BookingStatus.COMPLETED || currentStatus === BookingStatus.CANCELLED) {
+            return optionStatus !== currentStatus;
         }
 
-        if (currentStatus === BookingStatus.IN_PROGRESS) {
-            // Can't go back to pending
-            return optionStatus === 'pending';
-        }
+        const allowedTransitions: Record<BookingStatus, BookingStatus[]> = {
+            [BookingStatus.PENDING]: [BookingStatus.CONFIRMED, BookingStatus.CANCELLED],
+            [BookingStatus.CONFIRMED]: [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
+            [BookingStatus.IN_PROGRESS]: [BookingStatus.COMPLETED, BookingStatus.CANCELLED],
+            [BookingStatus.COMPLETED]: [],
+            [BookingStatus.CANCELLED]: []
+        };
 
-        if (currentStatus === BookingStatus.CONFIRMED) {
-            // Can't go back to pending or in_progress
-            return optionStatus === BookingStatus.PENDING || optionStatus === BookingStatus.IN_PROGRESS;
-        }
+        const allowed = allowedTransitions[currentStatus];
 
-        if (currentStatus === BookingStatus.CANCELLED) {
-            // Can't go back to pending
-            return optionStatus === BookingStatus.PENDING;
-        }
-
-        return false; // All other transitions allowed
+        return !allowed.includes(optionStatus) && optionStatus !== currentStatus;
     }
 }

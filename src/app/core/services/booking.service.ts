@@ -134,8 +134,8 @@ export class BookingService {
         )
     }
 
-    changeBookingStatus(bookingId: string, newStatus: BookingStatus): Observable<boolean> {
-        return this._http.patch<boolean>(`${this._providerApi}/bookings/b_status`, { bookingId, newStatus }).pipe(
+    changeBookingStatus(bookingId: string, newStatus: BookingStatus): Observable<IResponse<IBookingDetailProvider>> {
+        return this._http.patch<IResponse<IBookingDetailProvider>>(`${this._providerApi}/bookings/b_status`, { bookingId, newStatus }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

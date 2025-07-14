@@ -34,6 +34,9 @@ export interface IBookingDetailsBase {
     paymentStatus: PaymentStatus;
     createdAt: string;
     expectedArrivalTime: string;
+    cancelStatus: CancelStatus | null;
+    cancelReason: string | null;
+    cancelledAt: Date | null;
     totalAmount: number;
     orderedServices: {
         title: string;
@@ -160,6 +163,7 @@ export interface IProviderBookingLists {
     };
     bookingId: string;
     expectedArrivalTime: string;
+    cancelStatus: CancelStatus;
     totalAmount: number;
     createdAt: Date;
     paymentStatus: PaymentStatus;

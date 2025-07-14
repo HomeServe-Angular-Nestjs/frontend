@@ -64,6 +64,24 @@
         </div>
     </div>
 
+    <div *ngIf="bookingDetails.cancelStatus" class=" bg-red-50 p-4 rounded-md border border-red-200">
+        <h4 class="text-sm font-semibold text-red-700 mb-1">
+            {{bookingDetails.cancelStatus === 'in_progress' ? 'Cancel Requested' : 'Cancelled Booking' }}
+        </h4>
+
+        <p class="text-sm text-gray-800">
+            Reason: <span class="font-medium">{{ bookingDetails.cancelReason || 'No reason provided.' }}</span>
+        </p>
+
+        <p class="text-sm text-gray-600 mt-1">
+            Cancelled At:
+            <span class="font-medium">
+                {{ bookingDetails.cancelledAt | date: 'medium' }}
+            </span>
+        </p>
+    </div>
+
+
     <!-- Action Controls -->
     <div class="flex flex-wrap justify-between items-center mt-6">
         <div class="flex items-center gap-2">
