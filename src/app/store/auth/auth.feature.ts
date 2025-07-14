@@ -8,7 +8,7 @@ export const initialState: AuthState = {
     status: 'pending',
     error: null,
     type: null,
-    showSubscriptionPage: true
+    showSubscriptionPage: true,
 };
 
 export const authFeature = createFeature({
@@ -39,11 +39,6 @@ export const authFeature = createFeature({
             email: null,
         })),
 
-        on(authActions.updateShowSubscriptionPageValue, (state, { value }) => ({
-            ...state,
-            showSubscriptionPage: value
-        })),
-
         // When Initiating Google Login
         on(authActions.googleLogin, (state, { userType }): AuthState => ({
             ...state,
@@ -55,6 +50,11 @@ export const authFeature = createFeature({
             type: userType
         })),
 
+        on(authActions.updateShowSubscriptionPageValue, (state, { value }) => ({
+            ...state,
+            showSubscriptionPage: value
+        })),
+
         //When logs out
         on(authActions.logoutSuccess, (state) => ({
             ...state,
@@ -62,7 +62,7 @@ export const authFeature = createFeature({
             status: 'pending' as StatusType,
             error: null,
             id: null,
-            showSubscriptionPage: true
+            showSubscriptionPage: true,
         }))
     )
 });

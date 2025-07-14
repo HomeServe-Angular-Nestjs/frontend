@@ -1,15 +1,15 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { ProviderSidebarComponent } from '../../../shared/partials/sections/provider/sidebar/provider-sidebar.component';
 import { ProviderHeaderComponent } from "../../../shared/partials/sections/provider/header/provider-header.component";
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
 import { selectCheckStatus, selectShowSubscriptionPage } from '../../../../store/auth/auth.selector';
 import { ProviderSubscriptionPage } from "../../subscription/subscription.component";
 import { authActions } from '../../../../store/auth/auth.actions';
-import { IPlan, PlanDurationType } from '../../../../core/models/plan.model';
+import { IPlan } from '../../../../core/models/plan.model';
 import { PaymentService } from '../../../../core/services/payment.service';
 import { RazorpayWrapperService } from '../../../../core/services/public/razorpay-wrapper.service';
 import { RazorpayOrder, RazorpayPaymentResponse } from '../../../../core/models/payment.model';
@@ -17,8 +17,9 @@ import { ToastNotificationService } from '../../../../core/services/public/toast
 import { ITransaction } from '../../../../core/models/transaction.model';
 import { SubscriptionService } from '../../../../core/services/subscription.service';
 import { ICreateSubscription } from '../../../../core/models/subscription.model';
-import { PaymentStatus, TransactionStatus, TransactionType } from '../../../../core/enums/enums';
+import { TransactionStatus, TransactionType } from '../../../../core/enums/enums';
 import { getStartTimeAndEndTime } from '../../../../core/utils/date.util';
+import { subscriptionAction } from '../../../../store/subscriptions/subscription.action';
 
 @Component({
   selector: 'app-provider-layout',
@@ -40,25 +41,19 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
   showSubscriptionPage$ = this._store.select(selectShowSubscriptionPage);
 
   ngOnInit(): void {
-    const authStatus$ = this._store.select(selectCheckStatus).pipe(
+    this._store.select(selectCheckStatus).pipe(
       distinctUntilChanged(),
       takeUntil(this._destroy$)
-    );
-
-    // Connect socket when authenticated
-    authStatus$.pipe(
-      filter(status => status === 'authenticated')
-    ).subscribe(() => {
-      this._chatSocket.connect();
-      this._chatSocket.stopListeningMessages();
+    ).subscribe(status => {
+      if (status === 'authenticated') {
+        this._chatSocket.stopListeningMessages();
+        this._chatSocket.connect();
+      } else {
+        this._chatSocket.disconnect();
+      }
     });
 
-    // Disconnect socket when unauthenticated
-    authStatus$.pipe(
-      filter(status => status !== 'authenticated')
-    ).subscribe(() => {
-      this._chatSocket.disconnect();
-    });
+
   }
 
   ngOnDestroy(): void {
@@ -69,7 +64,6 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
   private _initializePayment(plan: IPlan) {
     this._paymentService.createRazorpayOrder(Number(plan.price)).subscribe({
       next: (order: RazorpayOrder) => {
-        console.log(order);
         this._razorpayWrapper.openCheckout(order,
           (paymentResponse: RazorpayPaymentResponse) => this._verifyPaymentAndConfirmSubscription(paymentResponse, order, plan),
           () => this._toastr.warning('payment dismissed')
@@ -96,7 +90,6 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
 
     this._paymentService.verifyPaymentSignature(response, orderData, 'provider').subscribe({
       next: (response) => {
-        console.log(response)
         if (response.verified && response.transaction.id) {
           this._saveSubscription(response.transaction, plan);
         } else {
@@ -124,7 +117,11 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
 
     this._subscriptionService.createSubscription(subscriptionData).subscribe({
       next: (response) => {
-        console.log(response)
+        if (response.success && response.data) {
+          this._store.dispatch(subscriptionAction.subscriptionSuccessAction({ selectedSubscription: response.data }));
+        } else {
+          this._store.dispatch(subscriptionAction.subscriptionFailedAction({ error: response.message }));
+        }
       },
       error: (err) => {
         console.error(err);
@@ -133,7 +130,6 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
   }
 
   proceedWithSub(selectedPlan: IPlan) {
-    console.log(selectedPlan);
     if (selectedPlan.name === 'free') {
       this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value: false }));
       return;

@@ -13,18 +13,20 @@ import { userFeature } from './store/users/user.feature';
 import { offeredServiceFeature } from './store/offered-services/offeredServices.feature';
 import { providerFeature } from './store/provider/provider.feature';
 import { scheduleFeature } from './store/schedules/schedule.feature';
+import { customerFeature } from './store/customer/customer.feature';
+import { subscriptionFeature } from './store/subscriptions/subscription.features';
+import { chatFeature } from './store/chat/chat.feature';
 
 import { authEffects } from './store/auth/auth.effects';
 import { userEffects } from './store/users/user.effect';
 import { providerEffects } from './store/provider/provider.effects';
 import { offeredServiceEffects } from './store/offered-services/offeredServices.effects';
-import { metaReducers } from './store/auth/meta.reducer';
 import { scheduleEffects } from './store/schedules/schedule.effects';
-import { customerFeature } from './store/customer/customer.feature';
 import { customerEffects } from './store/customer/customer.effects';
 import { ToastrModule } from 'ngx-toastr';
-import { chatFeature } from './store/chat/chat.feature';
 import { chatEffects } from './store/chat/chats.effect';
+import { metaReducers } from './store/auth/meta.reducer';
+import { subscriptionEffects } from './store/subscriptions/subscription.effects';
 
 
 export const appConfig: ApplicationConfig = {
@@ -53,8 +55,19 @@ export const appConfig: ApplicationConfig = {
       [scheduleFeature.name]: scheduleFeature.reducer,
       [customerFeature.name]: customerFeature.reducer,
       [chatFeature.name]: chatFeature.reducer,
+      [subscriptionFeature.name]: subscriptionFeature.reducer,
+
     }, { metaReducers }),
-    provideEffects(authEffects, userEffects, offeredServiceEffects, providerEffects, scheduleEffects, customerEffects, chatEffects),
+    provideEffects(
+      offeredServiceEffects,
+      subscriptionEffects,
+      scheduleEffects,
+      customerEffects,
+      providerEffects,
+      authEffects,
+      userEffects,
+      chatEffects,
+    ),
     provideStoreDevtools({ maxAge: 25, logOnly: true, autoPause: true }),
   ]
 };

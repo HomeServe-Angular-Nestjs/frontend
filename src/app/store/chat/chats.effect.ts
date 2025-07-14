@@ -19,7 +19,7 @@ export const chatEffects = {
                 chatService.fetchAllChats().pipe(
                     map((response) => {
                         if (response.data) {
-                            return chatActions.fetchAllChatSsuccess({ chats: response.data })
+                            return chatActions.fetchAllChatSuccess({ chats: response.data })
                         } else {
                             throw new Error('failed to fetch chats');
                         }

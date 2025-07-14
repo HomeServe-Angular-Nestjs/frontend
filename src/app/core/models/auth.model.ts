@@ -9,4 +9,5 @@ export interface AuthState {
     error: string | null;
     type: UserType | null;
     showSubscriptionPage: boolean;
+
 }

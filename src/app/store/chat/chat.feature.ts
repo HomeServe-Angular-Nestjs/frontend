@@ -3,7 +3,7 @@ import { IChatState } from "../../core/models/chat.model";
 import { chatAdaptor, messageAdaptor } from "./chat.entities";
 import { chatActions } from "./chat.action";
 
-export const inititalChatState: IChatState = {
+export const initialChatState: IChatState = {
     chats: chatAdaptor.getInitialState(),
     messages: messageAdaptor.getInitialState(),
     isLoadingMessages: false,
@@ -16,7 +16,7 @@ export const inititalChatState: IChatState = {
 export const chatFeature = createFeature({
     name: 'chat',
     reducer: createReducer(
-        inititalChatState,
+        initialChatState,
 
         on(chatActions.fetchAllChat, (state) => ({
             ...state,
@@ -24,7 +24,7 @@ export const chatFeature = createFeature({
             error: null
         })),
 
-        on(chatActions.fetchAllChatSsuccess, (state, { chats }) => ({
+        on(chatActions.fetchAllChatSuccess, (state, { chats }) => ({
             ...state,
             chats: chatAdaptor.setAll(chats, state.chats),
             isFetchingAllChats: false,

@@ -1,3 +1,4 @@
+import { EntityState } from "@ngrx/entity";
 import { PlanRoleType } from "./plan.model";
 
 export type RenewalType = 'auto' | 'manual';
@@ -5,6 +6,7 @@ export type SubsDurationType = 'monthly' | 'yearly';
 export type SubsPaymentStatus = 'pending' | 'paid' | 'failed';
 
 export interface ISubscription {
+    id: string;
     userId: string;
     transactionId: string;
     planId: string;
@@ -35,4 +37,10 @@ export interface ICreateSubscription {
     paymentStatus?: SubsPaymentStatus;
     startTime: string;
     endDate: string | null;
+}
+
+export interface ISubscriptionState {
+    selectedSubscription: ISubscription | null;
+    error: string | null;
+    showSubscriptionPage: boolean;
 }

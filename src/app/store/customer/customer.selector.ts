@@ -1,6 +1,5 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { ICustomerState } from "../../core/models/user.model";
-import { state } from "@angular/animations";
 
 export const selectCustomerState = createFeatureSelector<ICustomerState>('customer');
 

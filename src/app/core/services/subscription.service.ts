@@ -26,4 +26,13 @@ export class SubscriptionService {
         );
     }
 
+    fetchSubscription(): Observable<IResponse<ISubscription>> {
+        return this._http.get<IResponse<ISubscription>>(`${this._apiUrl}`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this._getErrorMessage(error)))
+            )
+        );
+    }
+
 }

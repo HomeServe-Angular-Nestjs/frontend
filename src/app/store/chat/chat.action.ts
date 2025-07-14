@@ -3,7 +3,7 @@ import { IChat, IMessage } from "../../core/models/chat.model";
 
 export const chatActions = {
     fetchAllChat: createAction('[Chat] Fetch all chat'),
-    fetchAllChatSsuccess: createAction('[Chat] Fetch all chat success', props<{ chats: IChat[] }>()),
+    fetchAllChatSuccess: createAction('[Chat] Fetch all chat success', props<{ chats: IChat[] }>()),
     fetchAllChatFailure: createAction('[Chat] Fetch all chat failure', props<{ error: string }>()),
 
     selectChat: createAction('[Chat] Update selected chat', props<{ chatId: string }>()),

@@ -1,11 +1,11 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
+import { filter, map, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { authActions } from './store/auth/auth.actions';
 import { UserType } from './modules/shared/models/user.model';
-import { ChatSocketService } from './core/services/socket-service/chat.service';
-import { selectCheckStatus } from './store/auth/auth.selector';
+import { subscriptionAction } from './store/subscriptions/subscription.action';
+import { selectSelectedSubscription } from './store/subscriptions/subscription.selector';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,6 @@ import { selectCheckStatus } from './store/auth/auth.selector';
 export class AppComponent implements OnInit, OnDestroy {
   private readonly _router = inject(Router);
   private readonly _store = inject(Store);
-  private readonly _chatSocket = inject(ChatSocketService);
 
   private readonly _destroy$ = new Subject<void>();
 
@@ -35,6 +34,17 @@ export class AppComponent implements OnInit, OnDestroy {
       }
 
       this._store.dispatch(authActions.setUserType({ userType }));
+
+      // Check if the user is already subscribed.
+      this._store.dispatch(subscriptionAction.fetchSubscriptions());
+      this._store.select(selectSelectedSubscription).pipe(
+        map(Boolean),
+        takeUntil(this._destroy$)
+      ).subscribe(isSubscribed => {
+        let value = false;
+        if (!isSubscribed) value = true
+        this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value }));
+      });
     });
   }
 
