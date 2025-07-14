@@ -7,7 +7,7 @@ import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
 import { selectCheckStatus, selectShowSubscriptionPage } from '../../../../store/auth/auth.selector';
 import { Store } from '@ngrx/store';
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
-import { ProviderSubscriptionPage } from "../../subscription/subscription.component";
+import { ProviderSubscriptionPage } from "../../subscription/plans/subscription-plan.component";
 import { authActions } from '../../../../store/auth/auth.actions';
 
 @Component({

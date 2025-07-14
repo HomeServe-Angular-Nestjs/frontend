@@ -1,5 +1,5 @@
 <ng-container *ngIf="showSubscriptionPage$ | async; else showHomepage">
-    <app-subscription-page (proceedSubEvent)="proceedWithSub($event)"></app-subscription-page>
+    <app-subscription-plan-page (proceedSubEvent)="proceedWithSub($event)"></app-subscription-plan-page>
 </ng-container>
 
 <ng-template #showHomepage>
@@ -17,6 +17,7 @@
             <div class="flex flex-col flex-1 w-full">
                 <div class="h-full w-full">
                     <router-outlet></router-outlet>
+
                 </div>
             </div>
         </section>

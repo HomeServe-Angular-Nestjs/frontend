@@ -5,6 +5,7 @@ import { ProfilesLayoutComponent } from "../../pages/provider/profiles/profiles-
 import { ProviderProfileOverviewLayoutComponent } from "../../shared/components/provider/profile-overview/layout/provider-profile-overview-layout.component";
 import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
+import { SubscriptionGuard } from "../../../core/guards/subscription.guard";
 
 export const providerRoutes: Routes = [
     {
@@ -17,6 +18,11 @@ export const providerRoutes: Routes = [
                 loadComponent: () => import('../../pages/provider/provider-homepage/provider-homepage.component')
                     .then(c => c.ProviderHomepageComponent),
                 canActivate: [ProfileAuthGuard, AuthGuard],
+            },
+            {
+                path: 'subscriptions',
+                loadComponent: () => import('../../pages/subscription/view-subscription/subscription-view.component')
+                    .then(c => c.ProviderViewSubscriptionPage)
             },
             {
                 path: 'profiles',
@@ -99,19 +105,19 @@ export const providerRoutes: Routes = [
             },
             {
                 path: 'performance',
-                canActivate: [AuthGuard],
+                canActivate: [AuthGuard, SubscriptionGuard],
                 loadComponent: () => import('../../pages/provider/analytics/performance/performance-page.component')
                     .then(c => c.ProviderPerformanceComponent)
             },
             {
                 path: 'area-analytics',
-                canActivate: [AuthGuard],
+                canActivate: [AuthGuard, SubscriptionGuard],
                 loadComponent: () => import('../../pages/provider/analytics/area/area-page.component')
                     .then(c => c.ProviderAreaAnalyticsComponent)
             },
             {
                 path: 'revenue-analytics',
-                canActivate: [AuthGuard],
+                canActivate: [AuthGuard, SubscriptionGuard],
                 loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
                     .then(c => c.ProviderRevenueAnalyticsComponent)
             },

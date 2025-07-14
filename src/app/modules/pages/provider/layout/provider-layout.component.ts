@@ -1,13 +1,13 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { ProviderSidebarComponent } from '../../../shared/partials/sections/provider/sidebar/provider-sidebar.component';
 import { ProviderHeaderComponent } from "../../../shared/partials/sections/provider/header/provider-header.component";
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
 import { selectCheckStatus, selectShowSubscriptionPage } from '../../../../store/auth/auth.selector';
-import { ProviderSubscriptionPage } from "../../subscription/subscription.component";
+import { ProviderSubscriptionPage } from "../../subscription/plans/subscription-plan.component";
 import { authActions } from '../../../../store/auth/auth.actions';
 import { IPlan } from '../../../../core/models/plan.model';
 import { PaymentService } from '../../../../core/services/payment.service';
@@ -34,7 +34,8 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
   private readonly _paymentService = inject(PaymentService);
   private readonly _razorpayWrapper = inject(RazorpayWrapperService);
   private readonly _toastr = inject(ToastNotificationService);
-  private readonly _subscriptionService = inject(SubscriptionService)
+  private readonly _subscriptionService = inject(SubscriptionService);
+  private readonly _router = inject(Router);
 
   private _destroy$ = new Subject<void>();
 
@@ -119,6 +120,8 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.success && response.data) {
           this._store.dispatch(subscriptionAction.subscriptionSuccessAction({ selectedSubscription: response.data }));
+          this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value: false }));
+          this._router.navigate(['provider', 'dashboard']);
         } else {
           this._store.dispatch(subscriptionAction.subscriptionFailedAction({ error: response.message }));
         }
@@ -132,6 +135,7 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
   proceedWithSub(selectedPlan: IPlan) {
     if (selectedPlan.name === 'free') {
       this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value: false }));
+      this._router.navigate(['provider', 'dashboard']);
       return;
     }
 

@@ -39,19 +39,19 @@ export class ProviderSidebarComponent {
         {
           name: 'Performance',
           icon: 'fas fa-chart-line',
-          route: '',
+          route: 'performance',
           active: false
         },
         {
           name: 'Revenue',
           icon: 'fas fa-dollar-sign',
-          route: '',
+          route: 'revenue-analytics',
           active: false
         },
         {
           name: 'Area Analytics',
           icon: 'fas fa-map-marked-alt',
-          route: '',
+          route: 'area-analytics',
           active: false
         }
       ]

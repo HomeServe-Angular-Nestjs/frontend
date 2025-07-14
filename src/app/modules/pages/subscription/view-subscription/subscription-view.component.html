@@ -1,0 +1,88 @@
+<section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-[80vh]">
+    <div class="max-w-4xl mx-auto">
+        <!-- Left-Aligned Page Heading -->
+        <div class="mb-8">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800">Your Subscription</h1>
+            <p class="mt-2 text-gray-600 text-base sm:text-lg">
+                Stay informed about your current plan and manage your subscription efficiently.
+            </p>
+        </div>
+
+        <!-- Subscription Card -->
+        <section *ngIf="subscription$ | async as subscription" class="bg-white rounded-xl shadow-md p-6 sm:p-8">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <!-- Plan Info (spans 2 columns) -->
+                <div class="sm:col-span-2">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-2">Current Plan</h2>
+
+                    <p class="text-2xl font-bold mb-1" [ngClass]="{
+              'text-green-700': userType === 'provider',
+              'text-blue-700': userType === 'customer'
+            }">
+                        {{ subscription.name | capitalizeFirst}}
+                        <span class="ml-2 text-sm font-medium text-gray-500 capitalize">
+                            ({{ subscription.duration }})
+                        </span>
+                    </p>
+
+                    <p class="text-sm text-gray-600">
+                        Expiring on:
+                        <span class="font-medium text-gray-800">
+                            {{ subscription.endDate | date: 'mediumDate' }}
+                        </span>
+                    </p>
+
+                    <!-- Features -->
+                    <div class="mt-4">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-1">
+                            Included Features
+                        </h3>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-1"
+                            *ngIf="subscription.features?.length">
+                            <li *ngFor="let feature of subscription.features">{{ feature }}</li>
+                        </ul>
+                    </div>
+
+                    <!-- Renewal Type -->
+                    <div class="flex items-center text-xs text-gray-500 mt-4 gap-2">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only" [checked]="subscription.renewalType === 'auto'"
+                                (change)="toggleRenewalType($event)" />
+                            <i class="fas text-base transition-all duration-200" [ngClass]="{
+                                'fa-toggle-on text-green-600': subscription.renewalType === 'auto',
+                                'fa-toggle-off text-gray-400': subscription.renewalType === 'manual'
+                                }"></i>
+                        </label>
+
+                        <span class="font-medium capitalize text-gray-700">
+                            {{ subscription.renewalType }}
+                        </span>
+                    </div>
+
+
+
+                    <!-- Inactive Status -->
+                    <p class="text-xs text-red-600 mt-1" *ngIf="!subscription.isActive">
+                        This plan is currently inactive.
+                    </p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-col justify-start gap-3 sm:items-end">
+                    <button class=" text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition" [ngClass]="{
+                            'bg-blue-600 hover:bg-blue-700': userType === 'customer',
+                            'bg-green-600 hover:bg-green-700': userType === 'provider'
+                        }" (click)="onUpgrade()">
+                        Upgrade Plan
+                    </button>
+                    <button
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg shadow-sm transition"
+                        (click)="onShowPlans()">
+                        View All Plans
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</section>

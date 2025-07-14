@@ -35,16 +35,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
       this._store.dispatch(authActions.setUserType({ userType }));
 
-      // Check if the user is already subscribed.
-      this._store.dispatch(subscriptionAction.fetchSubscriptions());
-      this._store.select(selectSelectedSubscription).pipe(
-        map(Boolean),
-        takeUntil(this._destroy$)
-      ).subscribe(isSubscribed => {
-        let value = false;
-        if (!isSubscribed) value = true
-        this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value }));
-      });
+      // // Check if the user is already subscribed.
+      // this._store.dispatch(subscriptionAction.fetchSubscriptions());
+      // this._store.select(selectSelectedSubscription).pipe(
+      //   map(Boolean),
+      //   takeUntil(this._destroy$)
+      // ).subscribe(isSubscribed => {
+      //   let value = false;
+      //   if (!isSubscribed) value = true
+      //   this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value }));
+      // });
     });
   }
 

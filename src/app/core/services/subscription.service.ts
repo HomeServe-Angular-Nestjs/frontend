@@ -1,15 +1,24 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/env";
-import { catchError, Observable, throwError } from "rxjs";
+import { catchError, map, Observable, throwError } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { ICreateSubscription, ISubscription } from "../models/subscription.model";
+import { Store } from "@ngrx/store";
+import { selectSelectedSubscription } from "../../store/subscriptions/subscription.selector";
 
 @Injectable({ providedIn: 'root' })
 export class SubscriptionService {
     private readonly _http = inject(HttpClient);
+    private readonly _store = inject(Store);
 
     private readonly _apiUrl = API_ENV.subscription;
+
+    // get hasActiveSubscription$(): Observable<boolean> {
+    //     return this._store.select(selectSelectedSubscription).pipe(
+    //         map(Boolean)
+    //     );
+    // }
 
     private _getErrorMessage(error: HttpErrorResponse): string {
         if (error.error?.message) return error.error.message;
@@ -26,7 +35,7 @@ export class SubscriptionService {
         );
     }
 
-    fetchSubscription(): Observable<IResponse<ISubscription>> {
+    fetchSubscription(): Observable<IResponse<ISubscription | null>> {
         return this._http.get<IResponse<ISubscription>>(`${this._apiUrl}`).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>

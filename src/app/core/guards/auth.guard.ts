@@ -7,11 +7,6 @@ import { ToastNotificationService } from '../services/public/toastr.service';
 
 /**
  * Guard that controls access to routes based on authentication status and user role.
- *
- * @param {ActivatedRouteSnapshot} route - Snapshot of the current route that is being activated.
- * @returns {Observable<boolean | UrlTree>} - Returns `true` if the user is authenticated and has the required role;
- * otherwise redirects to the login page or a specific login page based on user type.
- *
  * This guard checks the user's authentication status and role from the store:
  * - If the user is authenticated and has the correct role (or no role is required), the route is activated.
  * - If the user is not authenticated or does not have the correct role, they are redirected to the appropriate login page
@@ -32,37 +27,35 @@ export const getLoginRedirectPath = (url: string): string => {
   return 'login';
 }
 
-export const AuthGuard: CanActivateFn =
-  (route: ActivatedRouteSnapshot, state: RouterStateSnapshot)
-    : Observable<boolean | UrlTree> => {
-    const store = inject(Store);
-    const router = inject(Router);
-    const toastr = inject(ToastNotificationService);
+export const AuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> => {
+  const store = inject(Store);
+  const router = inject(Router);
+  const toastr = inject(ToastNotificationService);
 
-    return combineLatest([
-      store.select(authSelector.selectCheckStatus),
-      store.select(authSelector.selectAuthUserType)
-    ]).pipe(
-      take(1),
-      map(([status, type]) => {
-        const requiredRole = getRoleFromRoute(route);
-        let redirectPath = getLoginRedirectPath(state.url);
+  const userStatus$ = store.select(authSelector.selectCheckStatus);
+  const userType$ = store.select(authSelector.selectAuthUserType)
 
-        if (status === 'authenticated') {
-          if (!requiredRole || type === requiredRole) {
-            return true;
-          }
+  return combineLatest([userStatus$, userType$]).pipe(
+    take(1),
+    map(([status, type]) => {
+      const requiredRole = getRoleFromRoute(route);
+      let redirectPath = getLoginRedirectPath(state.url);
 
-          toastr.error('Access denied: Unauthorized');
-          return router.createUrlTree([redirectPath], {
-            queryParams: { return: state.url }
-          });
+      if (status === 'authenticated') {
+        if (!requiredRole || type === requiredRole) {
+          return true;
         }
 
-        toastr.info('Please login first.', 'Info', { positionClass: "top-10px" });
+        toastr.error('Access denied: Unauthorized');
         return router.createUrlTree([redirectPath], {
           queryParams: { return: state.url }
         });
-      })
-    );
-  };
+      }
+
+      toastr.info('Please login first.', 'Info', { positionClass: "top-10px" });
+      return router.createUrlTree([redirectPath], {
+        queryParams: { return: state.url }
+      });
+    })
+  );
+};

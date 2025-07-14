@@ -1,16 +1,15 @@
 import { CommonModule } from "@angular/common";
 import { Component, EventEmitter, inject, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { selectAuthUserType } from "../../../store/auth/auth.selector";
+import { selectAuthUserType } from "../../../../store/auth/auth.selector";
 import { combineLatest, map, Observable, shareReplay } from "rxjs";
-import { IPlan } from "../../../core/models/plan.model";
-import { PlanService } from "../../../core/services/plans.service";
-import { CapitalizeFirstPipe } from "../../../core/pipes/capitalize-first.pipe";
-import { Router } from "@angular/router";
+import { IPlan } from "../../../../core/models/plan.model";
+import { PlanService } from "../../../../core/services/plans.service";
+import { CapitalizeFirstPipe } from "../../../../core/pipes/capitalize-first.pipe";
 
 @Component({
-    selector: 'app-subscription-page',
-    templateUrl: './subscription.component.html',
+    selector: 'app-subscription-plan-page',
+    templateUrl: './subscription-plan.component.html',
     imports: [CommonModule, CapitalizeFirstPipe]
 })
 export class ProviderSubscriptionPage implements OnInit {
