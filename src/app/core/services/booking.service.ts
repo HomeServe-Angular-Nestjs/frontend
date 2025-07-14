@@ -73,7 +73,16 @@ export class BookingService {
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
             )
-        )
+        );
+    }
+
+    cancelBooking(bookingId: string, reason: string): Observable<IResponse> {
+        return this._http.patch<IResponse>(`${this._customerApi}/booking/cancel`, { bookingId, reason }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
     }
 
 
