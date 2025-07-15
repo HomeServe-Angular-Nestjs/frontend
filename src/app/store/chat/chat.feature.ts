@@ -9,9 +9,9 @@ export const initialChatState: IChatState = {
     isLoadingMessages: false,
     isFetchingAllChats: false,
     selectedChatId: null,
+    isAllMessagesFetched: false,
     error: null
 }
-
 
 export const chatFeature = createFeature({
     name: 'chat',
@@ -48,15 +48,41 @@ export const chatFeature = createFeature({
             error: null
         })),
 
-        on(chatActions.fetchMessagesSuccess, (state, { messages }) => ({
-            ...state,
-            messages: messageAdaptor.setAll(messages, state.messages),
-            isLoadingMessages: false
-        })),
+        on(chatActions.fetchMessagesSuccess, (state, { messages, beforeMessageId }) => {
+
+            // If this is a "load more" call and no messages returned, stop further fetching
+            if (beforeMessageId && messages.length === 0) {
+                return {
+                    ...state,
+                    isLoadingMessages: false,
+                    isAllMessagesFetched: true
+                };
+            }
+
+            // If all messages already fetched, avoid updating again
+            if (state.isAllMessagesFetched && beforeMessageId) {
+                return {
+                    ...state,
+                    isLoadingMessages: false
+                };
+            }
+
+            // Apply new messages
+            const updatedMessages = beforeMessageId
+                ? messageAdaptor.addMany(messages, state.messages)
+                : messageAdaptor.setAll(messages, state.messages);
+
+            return {
+                ...state,
+                messages: updatedMessages,
+                isLoadingMessages: false,
+            }
+        }),
 
         on(chatActions.fetchMessagesFailure, (state, { error }) => ({
             ...state,
             isLoadingMessages: false,
+            isAllMessagesFetched: false,
             error,
         })),
 
@@ -68,6 +94,7 @@ export const chatFeature = createFeature({
         on(chatActions.clearMessages, (state) => ({
             ...state,
             messages: messageAdaptor.removeAll(state.messages),
+            isAllMessagesFetched: false
         })),
     )
 });

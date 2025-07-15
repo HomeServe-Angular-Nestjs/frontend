@@ -25,18 +25,19 @@
             </ng-container>
         </div>
 
-        <div class="flex-1 min-h-0 overflow-y-auto p-6 space-y-4 bg-white">
-            <ng-container *ngIf="(messages$ | async) as messages;else loadingMessages">
-                <ng-container *ngIf="messages.length > 0;else noMessagesContent">
+        <div #messageScrollBox class="flex-1 overflow-y-scroll px-6 py-4 space-y-4 bg-white min-h-0"
+            (scroll)="onScroll()">
+            <ng-container *ngIf="(messages$ | async) as messages; else loadingMessages">
+                <ng-container *ngIf="messages.length > 0; else noMessagesContent">
                     <ng-container *ngFor="let message of messages">
-                        <div class="flex" [ngClass]="{ 
-                                'justify-end': message.senderId === currentUserId,
-                                 'justify-start': message.receiverId === currentUserId 
-                                  }">
+                        <div class="flex" [ngClass]="{
+                'justify-end': message.senderId === currentUserId,
+                'justify-start': message.receiverId === currentUserId
+              }">
                             <div class="rounded-lg p-3 text-sm max-w-xs" [ngClass]="{
-                                'bg-blue-600 text-white': message.senderId === currentUserId,
-                                'bg-gray-100 text-gray-900':message.receiverId === currentUserId 
-                                }">
+                  'bg-blue-600 text-white': message.senderId === currentUserId,
+                  'bg-gray-100 text-gray-900': message.receiverId === currentUserId
+                }">
                                 {{ message.content }}
                                 <div class="text-xs text-gray-400 mt-1 text-right">
                                     {{ message.createdAt | date: 'shortTime' }}
@@ -47,6 +48,7 @@
                 </ng-container>
             </ng-container>
         </div>
+
 
         <!-- Input Bar -->
         <div class="px-4 py-3 border-t bg-white flex items-center gap-3 shrink-0">

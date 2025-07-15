@@ -33,14 +33,18 @@ export const selectSelectedChat = createSelector(
 );
 
 export const selectSelectedChatsMessage = createSelector(
-    chatFeature.selectMessages,
+    selectAllMessages,
     selectSelectedChatId,
-    (state, selectedChatId) => {
-        if (!selectedChatId) return [];
-        return Object.values(state.entities).filter(
-            (msg) => msg && msg.chatId === selectedChatId
-        );
-    }
+    (messages, selectedChatId) =>
+        selectedChatId
+            ? messages.filter(msg => msg.chatId === selectedChatId)
+            : []
 );
+
+export const selectIsAllMessagesFetched = createSelector(
+    chatFeature.selectChatState,
+    (state) => state.isAllMessagesFetched
+);
+
 
 

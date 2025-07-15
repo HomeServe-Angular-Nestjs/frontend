@@ -35,7 +35,6 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
       filter(status => status === 'authenticated')
     ).subscribe(() => {
       this._chatSocket.connect();
-      this._chatSocket.stopListeningMessages();
     });
 
     // Disconnect socket when unauthenticated
@@ -49,6 +48,7 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
+    this._chatSocket.stopListeningMessages();
   }
 
   proceedWithSub() {

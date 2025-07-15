@@ -26,7 +26,6 @@ export class ChatSocketService extends BaseSocketService {
         console.log('[ChatSocket] Connected');
         this._retryCount = 0;
         this.onNewMessage((message: IMessage) => {
-            console.log(message);
             this._store.dispatch(chatActions.addMessage({ message }));
         })
     }
@@ -100,8 +99,13 @@ export class ChatSocketService extends BaseSocketService {
     // **************************************************[API For Messages]*******************************************************
     // ------------------------------------------------------------------------------------------------------------------------------
 
-    fetchAllMessages(chatId: string): Observable<IResponse<IMessage[]>> {
-        const params = new HttpParams().set('chatId', chatId);
+    fetchAllMessages(chatId: string, beforeMessageId?: string): Observable<IResponse<IMessage[]>> {
+        let params = new HttpParams().set('chatId', chatId);
+
+        if (beforeMessageId) {
+            params = params.set('beforeMessageId', beforeMessageId);
+        }
+
         return this._http.get<IResponse<IMessage[]>>(`${this._messageApi}`, { params }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>

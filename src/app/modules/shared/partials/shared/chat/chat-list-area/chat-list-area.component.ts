@@ -14,7 +14,6 @@ import { IChat } from "../../../../../../core/models/chat.model";
 })
 export class ChatListComponent implements OnInit, OnDestroy {
     private readonly _store = inject(Store);
-    private readonly _chatService = inject(ChatSocketService);
 
     private _destroy$ = new Subject<void>();
     chats$!: Observable<IChat[]>

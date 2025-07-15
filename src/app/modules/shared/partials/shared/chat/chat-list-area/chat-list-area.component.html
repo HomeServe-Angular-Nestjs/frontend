@@ -20,9 +20,16 @@
                         <p class="text-sm text-gray-500 truncate">{{ chat.lastMessage || 'No messages yet.' }}</p>
                     </div>
 
-                    <span *ngIf="chat.lastSeenAt as date" class="text-gray-500 text-xs whitespace-nowrap">
-                        {{ getLastSeenAt(date) }}
-                    </span>
+                    <div class="flex flex-col items-center space-y-1">
+                        <p *ngIf="chat.lastSeenAt as date" class="text-gray-500 text-xs whitespace-nowrap">
+                            {{ date | date:'d/M/yyyy'}}
+                        </p>
+                        <p *ngIf="chat.totalMessages > 0">
+                            <span class="p-1 text-xs text-white bg-blue-600 rounded-full">
+                                {{ chat.totalMessages }}
+                            </span>
+                        </p>
+                    </div>
 
                 </li>
             </ul>
