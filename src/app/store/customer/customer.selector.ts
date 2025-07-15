@@ -1,5 +1,6 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { ICustomerState } from "../../core/models/user.model";
+import { state } from "@angular/animations";
 
 export const selectCustomerState = createFeatureSelector<ICustomerState>('customer');
 
@@ -25,4 +26,9 @@ export const selectLocation = createSelector(
 export const selectCustomerId = createSelector(
     selectCustomerState,
     (state) => state.customer?.id
+);
+
+export const selectCustomerReviewStatus = createSelector(
+    selectCustomerState,
+    (state) => state.customer?.isReviewed
 );

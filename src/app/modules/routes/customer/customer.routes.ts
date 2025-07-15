@@ -56,8 +56,8 @@ export const customerRoutes: Routes = [
                     },
                     {
                         path: 'reviews',
-                        loadComponent: () => import('../../shared/components/customer/provider-details/profile-reviews/customer-provider-profile-review.component')
-                            .then(c => c.CustomerProviderProfileReviewComponent)
+                        loadComponent: () => import('../../shared/components/customer/provider-details/profile-reviews/layout/customer-review-layout.component')
+                            .then(c => c.CustomerReviewLayoutComponent)
                     }
                 ]
             },

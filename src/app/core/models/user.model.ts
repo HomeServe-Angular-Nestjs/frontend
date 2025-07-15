@@ -61,6 +61,7 @@ export interface IBaseUser {
 
 export interface ICustomer extends IBaseUser {
     savedProviders?: string[];
+    isReviewed: boolean;
 }
 
 export type VerificationStatusType = 'pending' | 'verified' | 'rejected';
@@ -86,7 +87,6 @@ export interface IProvider extends IBaseUser {
     servicesOffered: string[];
     defaultSlots: SlotType[];
     verificationStatus: VerificationStatusType;
-
 }
 
 export interface IUserState {

@@ -1,0 +1,29 @@
+<div class=" p-6 bg-white rounded-2xl shadow-md space-y-4">
+    <h2 class="text-xl font-semibold text-gray-800">Leave a Review</h2>
+
+    <!-- Star Rating -->
+    <div class="flex items-center space-x-1">
+        <ng-container *ngFor="let star of stars; let i = index">
+            <button type="button" class="text-2xl" [ngClass]="{
+                'text-yellow-400': i < selectedRating,
+                'text-gray-400': i >= selectedRating
+              }" (click)="setRating(i + 1)">
+                ★
+            </button>
+        </ng-container>
+    </div>
+
+    <!-- Review Form -->
+    <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Your Review</label>
+            <textarea rows="4" formControlName="desc" class="w-full border rounded-lg p-2 mt-1 outline-none"
+                placeholder="Write your review..."></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 transition">
+            Submit Review
+        </button>
+
+    </form>
+</div>
