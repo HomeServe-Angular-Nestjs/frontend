@@ -57,3 +57,11 @@ export interface IServiceFilter {
     sort?: ServiceSort;
     search?: string;
 }
+
+export interface ICustomerSearchServices {
+    id: string;
+    title: string;
+    image: string;
+    provider: string;
+    offeredServiceIds: string[];
+}

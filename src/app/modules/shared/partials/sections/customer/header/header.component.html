@@ -29,7 +29,7 @@
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <i class="fas fa-search text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
             </div>
-            <input type="text" id="service-search"
+            <input type="text" id="service-search" [(ngModel)]="serviceSearch" (ngModelChange)="searchServices()"
               class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition-all outline-none peer"
               placeholder=" " />
             <ul *ngIf="!isLoadingServices && fetchedServices?.length && serviceSearch.trim()"
@@ -39,16 +39,14 @@
 
                 <!-- Avatar -->
                 <div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
-                  <img [src]="service.avatar || 'https://via.placeholder.com/48'" alt="Avatar"
+                  <img [src]="service.image || 'https://via.placeholder.com/48'" alt="image"
                     class="w-full h-full object-cover" />
                 </div>
 
                 <!-- Info -->
                 <div class="flex-1 min-w-0">
-                  <p class="font-medium truncate">{{ service.name }}</p>
-                  <p class="text-xs text-gray-500 leading-tight line-clamp-2">{{ service.address }}</p>
+                  <p class="font-medium truncate">{{ service.title }}</p>
                 </div>
-
               </li>
             </ul>
             <label for="service-search"

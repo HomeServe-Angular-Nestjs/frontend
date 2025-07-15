@@ -92,7 +92,6 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
       },
       error: (err) => this._toastr.error(err)
     });
-
   }
 
   bookService(ids: string[]) {

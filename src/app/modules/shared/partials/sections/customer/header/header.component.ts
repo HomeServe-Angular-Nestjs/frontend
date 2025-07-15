@@ -12,6 +12,7 @@ import { customerActions } from '../../../../../../store/customer/customer.actio
 import { FormsModule } from '@angular/forms';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { CustomerService } from '../../../../../../core/services/customer.service';
+import { ICustomerSearchServices } from '../../../../../../core/models/offeredService.model';
 
 @Component({
   selector: 'app-customer-header',
@@ -76,7 +77,7 @@ export class CustomerHeaderComponent implements OnInit {
     this.isLoadingProviders = true;
     this._customerService.searchProviders(search).subscribe({
       next: (res) => {
-        if (res.success) this.fetchedProviders = res.data;
+        if (res.success && res.data) this.fetchedProviders = res.data;
         this.isLoadingProviders = false;
       },
       error: (err) => {
@@ -87,11 +88,14 @@ export class CustomerHeaderComponent implements OnInit {
   }
 
   private fetchServices(search: string): void {
+    if (!search.trim()) return;
     this.isLoadingServices = true;
     this._customerService.searchService(search).subscribe({
       next: (res) => {
+        console.log(res)
         if (res.success) this.fetchedServices = res.data;
         this.isLoadingServices = false;
+
       },
       error: (err) => {
         console.error(err);
@@ -111,27 +115,17 @@ export class CustomerHeaderComponent implements OnInit {
   handleProviderClick(provider: any): void {
     this.providerSearch = provider.address || '';
     this.fetchedProviders = [];
-    this.onProviderSelected(provider.id);
-  }
-
-  onProviderSelected(id: string): void {
     this.isLoadingProviders = false;
-    this.providerSearch = '';
-    this.fetchedProviders = [];
-    this._router.navigate(['provider_details', id, 'about']);
+    this._router.navigate(['provider_details', provider.id, 'about']);
   }
 
-  handleServiceClick(service: any): void {
+  handleServiceClick(data: ICustomerSearchServices): void {
     this.serviceSearch = '';
     this.fetchedServices = [];
-    this.onServiceSelected(service.id);
-  }
-
-  onServiceSelected(id: string): void {
     this.isLoadingServices = false;
-    this.serviceSearch = '';
-    this.fetchedServices = [];
-    this._router.navigate(['service_details', id, 'service']);
+    this._router.navigate(['pick_a_service', data.provider], {
+      queryParams: { ids: data.offeredServiceIds.join(',') }
+    });
   }
 
   logout(): void {
