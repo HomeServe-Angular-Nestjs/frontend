@@ -27,7 +27,7 @@ export class ChatSocketService extends BaseSocketService {
         this._retryCount = 0;
         this.onNewMessage((message: IMessage) => {
             this._store.dispatch(chatActions.addMessage({ message }));
-        })
+        });
     }
 
     protected override onDisconnect(reason: string): void {
@@ -63,6 +63,8 @@ export class ChatSocketService extends BaseSocketService {
             callback(msg);
         });
     }
+
+
 
     stopListeningMessages(): void {
         this.removeListener('newMessage');

@@ -24,9 +24,9 @@
                         <p *ngIf="chat.lastSeenAt as date" class="text-gray-500 text-xs whitespace-nowrap">
                             {{ date | date:'d/M/yyyy'}}
                         </p>
-                        <p *ngIf="chat.totalMessages > 0">
+                        <p *ngIf="chat.unreadMessages > 0">
                             <span class="p-1 text-xs text-white bg-blue-600 rounded-full">
-                                {{ chat.totalMessages }}
+                                {{ chat.unreadMessages }}
                             </span>
                         </p>
                     </div>

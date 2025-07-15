@@ -8,9 +8,9 @@ export const initialChatState: IChatState = {
     messages: messageAdaptor.getInitialState(),
     isLoadingMessages: false,
     isFetchingAllChats: false,
-    selectedChatId: null,
     isAllMessagesFetched: false,
-    error: null
+    selectedChatId: null,
+    error: null,
 }
 
 export const chatFeature = createFeature({

@@ -1,9 +1,9 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { selectAllChats } from "../../../../../../store/chat/chat.selector";
+import { selectAllChats, selectSelectedChatId } from "../../../../../../store/chat/chat.selector";
 import { chatActions } from "../../../../../../store/chat/chat.action";
-import { filter, Observable, Subject, takeUntil } from "rxjs";
+import { filter, map, Observable, Subject, takeUntil } from "rxjs";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { IChat } from "../../../../../../core/models/chat.model";
 
@@ -53,6 +53,12 @@ export class ChatListComponent implements OnInit, OnDestroy {
     }
 
     viewMessages(chatId: string) {
+        this.chats$ = this.chats$.pipe(
+            map(chats => chats.map(chat => ({
+                ...chat,
+                totalMessages: chat.id === chatId ? 0 : chat.unreadMessages
+            })))
+        );
         this._store.dispatch(chatActions.selectChat({ chatId }));
         this._store.dispatch(chatActions.fetchMessages({ chatId }));
     }
@@ -64,5 +70,8 @@ export class ChatListComponent implements OnInit, OnDestroy {
     onImgError(event: Event) {
         const target = event.target as HTMLImageElement;
         target.src = 'assets/images/profile_placeholder.jpg';
+    }
+
+    hasUnReadMessages() {
     }
 }

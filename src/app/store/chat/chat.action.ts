@@ -8,7 +8,6 @@ export const chatActions = {
 
     selectChat: createAction('[Chat] Update selected chat', props<{ chatId: string }>()),
 
-
     fetchMessages: createAction('[Chat] Fetch messages', props<{ chatId: string, beforeMessageId?: string }>()),
     fetchMessagesSuccess: createAction('[Chat] Fetch messages success', props<{ messages: IMessage[], beforeMessageId?: string }>()),
     fetchMessagesFailure: createAction('[Chat] Fetch messages failure', props<{ error: string }>()),

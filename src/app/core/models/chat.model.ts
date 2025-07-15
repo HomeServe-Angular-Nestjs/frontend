@@ -40,7 +40,7 @@ export interface IChat extends IBase {
     lastMessage?: string;
     lastSeenAt?: Date;
     blockedInfo?: IBlockedInfo | null;
-    totalMessages: number;
+    unreadMessages: number;
 }
 
 export interface IMessage extends IBase {
@@ -57,8 +57,8 @@ export interface IChatState {
     chats: EntityState<IChat>;
     messages: EntityState<IMessage>;
     selectedChatId: string | null;
-    isLoadingMessages: boolean;
-    isFetchingAllChats: boolean,
     isAllMessagesFetched: boolean,
+    isFetchingAllChats: boolean,
+    isLoadingMessages: boolean;
     error: string | null;
 }
