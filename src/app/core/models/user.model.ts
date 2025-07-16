@@ -1,6 +1,7 @@
 import { EntityState } from '@ngrx/entity';
 import { ISlot, SlotType } from './schedules.model';
 import { IPagination } from './booking.model';
+import { IReview } from './reviews.model';
 
 export type UType = 'customer' | 'provider';
 
@@ -87,6 +88,8 @@ export interface IProvider extends IBaseUser {
     servicesOffered: string[];
     defaultSlots: SlotType[];
     verificationStatus: VerificationStatusType;
+    avgRating: number;
+    reviews: IReview[];
 }
 
 export interface IUserState {
@@ -183,9 +186,9 @@ export interface IChangePassword {
 }
 
 export interface IDisplayReviews {
-  avatar: string;
-  name: string;
-  avgRating: number;
-  writtenAt: string;
-  desc: string;
+    avatar: string;
+    name: string;
+    avgRating: number;
+    writtenAt: string;
+    desc: string;
 }

@@ -25,8 +25,8 @@
             </div>
             <div class="flex items-center gap-2 mb-2">
                 <span class="text-yellow-400">⭐</span>
-                <span class="font-semibold">4.8</span>
-                <span class="text-gray-500">(128 reviews)</span>
+                <span class="font-semibold">{{providerData?.avgRating?.toFixed()}}</span>
+                <span class="text-gray-500">({{providerData?.reviews?.length}} reviews)</span>
             </div>
             <div class="flex flex-wrap gap-2 mb-4">
                 <ng-container *ngIf="providerData?.profession">
@@ -73,11 +73,12 @@
                 <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     Book Now
                 </button>
-                <button (click)="chat()" class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <button (click)="chat()"
+                    class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                     Message
                 </button>
                 <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-                     (click)="addToSaved(providerData?.id)">
+                    (click)="addToSaved(providerData?.id)">
                     <span [class.text-red-500]="(providerData?.id | isSaved | async)">❤</span> Favorite
                 </button>
             </div>

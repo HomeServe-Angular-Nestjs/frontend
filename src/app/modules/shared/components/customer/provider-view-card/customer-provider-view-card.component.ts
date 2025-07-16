@@ -41,6 +41,12 @@ export class CustomerProviderViewCardComponent implements OnDestroy {
     this._router.navigate(['provider_details', providerId, 'about']);
   }
 
+  getStarType(index: number, rating: number = 0): 'full' | 'half' | 'empty' {
+    if (index < Math.floor(rating)) return 'full';
+    if (index < rating) return 'half';
+    return 'empty';
+  }
+
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete()

@@ -70,6 +70,13 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
     }
   }
 
+  getStarType(index: number, rating: number | undefined): 'full' | 'half' | 'empty' {
+    if (!rating) return 'empty';
+    if (index < Math.floor(rating)) return 'full';
+    if (index < rating) return 'half';
+    return 'empty';
+  }
+
   ngOnDestroy(): void {
     if (this.providerDataSub) {
       this.providerDataSub.unsubscribe();
