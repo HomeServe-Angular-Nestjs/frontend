@@ -12,15 +12,15 @@ import { ProviderService } from '../../../../../../core/services/provider.servic
   templateUrl: './customer-provider-profile-about.component.html',
 })
 export class CustomerProviderProfileAboutComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly providerService = inject(ProviderService);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _providerService = inject(ProviderService);
 
   provider$!: Observable<IProvider | null>;
 
   ngOnInit(): void {
-    this.provider$ = this.route.parent!.paramMap.pipe(
+    this.provider$ = this._route.parent!.paramMap.pipe(
       map(param => param.get('id')),
-      switchMap(providerId => this.providerService.getOneProvider(providerId))
+      switchMap(providerId => this._providerService.getOneProvider(providerId))
     );
   }
 }

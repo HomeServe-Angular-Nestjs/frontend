@@ -181,3 +181,11 @@ export interface IChangePassword {
     newPassword: string;
     currentPassword: string;
 }
+
+export interface IDisplayReviews {
+  avatar: string;
+  name: string;
+  avgRating: number;
+  writtenAt: string;
+  desc: string;
+}

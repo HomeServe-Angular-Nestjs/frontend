@@ -16,8 +16,4 @@ export class CustomerReviewLayoutComponent {
 
     canSubmitReview$: Observable<boolean> = this._store.select(selectCustomerReviewStatus)
         .pipe(map(value => value ? !value : false));
-
-    ngOnInit() {
-        this.canSubmitReview$.subscribe(d => console.log(d));
-    }
 }

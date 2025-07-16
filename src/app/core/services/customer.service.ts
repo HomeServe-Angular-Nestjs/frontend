@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/env";
-import { IChangePassword, ICustomer, ICustomerProfileData } from "../models/user.model";
+import { IChangePassword, ICustomer, ICustomerProfileData, IDisplayReviews } from "../models/user.model";
 import { catchError, Observable, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
@@ -113,8 +113,8 @@ export class CustomerService {
         );
     }
 
-    submitReview(reviewData: ISubmitReview): Observable<IResponse<IReview>> {
-        return this._http.post<IResponse<IReview>>(`${this._apiUrl}/reviews`, reviewData).pipe(
+    submitReview(reviewData: ISubmitReview): Observable<IResponse<IDisplayReviews>> {
+        return this._http.post<IResponse<IDisplayReviews>>(`${this._apiUrl}/reviews`, reviewData).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

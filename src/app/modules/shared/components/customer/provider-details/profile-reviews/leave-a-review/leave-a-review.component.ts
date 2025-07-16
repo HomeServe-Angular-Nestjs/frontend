@@ -1,28 +1,33 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { AfterViewInit, Component, inject, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import { Store } from "@ngrx/store";
-import { selectAuthUserId } from "../../../../../../../store/auth/auth.selector";
 import { getValidationMessage } from "../../../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../../../core/services/public/toastr.service";
 import { ISubmitReview } from "../../../../../../../core/models/reviews.model";
 import { CustomerService } from "../../../../../../../core/services/customer.service";
 import { customerActions } from "../../../../../../../store/customer/customer.actions";
-import { selectCustomerReviewStatus } from "../../../../../../../store/customer/customer.selector";
-import { map, Observable } from "rxjs";
+import { CustomerReviewListComponent } from "../customer-reviews/customer-provider-profile-review.component";
+import { map, zip } from "rxjs";
+import { IDisplayReviews } from "../../../../../../../core/models/user.model";
 
 @Component({
     selector: 'app-customer-leave-a-review',
     templateUrl: './leave-a-review.component.html',
     imports: [CommonModule, ReactiveFormsModule]
 })
-export class CustomerLeaveAReviewComponent implements OnInit {
+export class CustomerLeaveAReviewComponent implements OnInit, AfterViewInit {
     private readonly _fb = inject(FormBuilder);
     private readonly _route = inject(ActivatedRoute);
     private readonly _store = inject(Store);
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _customerService = inject(CustomerService);
+
+    private isReviewListReady = false;
+
+    @ViewChild(CustomerReviewListComponent)
+    customerReviewListComponent!: CustomerReviewListComponent;
 
     selectedRating = 0;
     stars = Array(5).fill(0);
@@ -40,6 +45,10 @@ export class CustomerLeaveAReviewComponent implements OnInit {
                 this.reviewForm.patchValue({ providerId })
             }
         });
+    }
+
+    ngAfterViewInit(): void {
+        this.isReviewListReady = true;
     }
 
     setRating(rating: number): void {
@@ -65,7 +74,13 @@ export class CustomerLeaveAReviewComponent implements OnInit {
 
             this._customerService.submitReview(reviewData).subscribe({
                 next: (res) => {
-                    this._store.dispatch(customerActions.changeReviewedStatus({ status: true }))
+                    if (res.success && res.data) {
+                        const newReview: IDisplayReviews = res.data;
+                        if (this.isReviewListReady && this.customerReviewListComponent) {
+                            this.customerReviewListComponent.addReview(newReview);
+                        }
+                        this._store.dispatch(customerActions.changeReviewedStatus({ status: true }));
+                    }
                     this.reviewForm.reset({ isReported: false });
                     this.selectedRating = 0;
                 },
