@@ -12,20 +12,20 @@ import { CustomerService } from "../../../../../../core/services/customer.servic
 import { customerActions } from "../../../../../../store/customer/customer.actions";
 import { API_KEY, REGEXP_ENV } from "../../../../../../environments/env";
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { MapboxLocationService } from "../../../../../../core/services/public/location.service";
+import { LocationService } from "../../../../../../core/services/public/location.service";
 
 @Component({
     selector: 'app-customer-profile-overview',
     templateUrl: './profile-overview-edit.component.html',
     imports: [CommonModule, ReactiveFormsModule, MapboxMapComponent],
-    providers: [MapboxLocationService]
+    providers: [LocationService]
 })
 export class CustomerProfileOverviewEditComponent implements OnInit {
     private readonly _store = inject(Store);
     private readonly _fb = inject(FormBuilder);
     private readonly _router = inject(Router);
     private readonly _toastr = inject(ToastNotificationService);
-    private readonly _locationService = inject(MapboxLocationService);
+    private readonly _locationService = inject(LocationService);
 
     customer$: Observable<ICustomer | null> = this._store.select(selectCustomer);
     googleLogin$: Observable<boolean> = of(false);

@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/env";
 import { BehaviorSubject, catchError, Observable, pipe, throwError } from "rxjs";
-import { IOfferedService, IServiceFilter, IServicesWithPagination, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
+import { IGetServiceTitle, IOfferedService, IServiceFilter, IServicesWithPagination, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 
@@ -31,16 +31,6 @@ export class OfferedServicesService {
         )
     }
 
-    // ToDo - remove
-    // updateSubService(updateData: Partial<ISubService>): Observable<{ id: string, subService: ISubService }> {
-    //     return this._http.patch<{ id: string, subService: ISubService }>(`${this._apiUrl}/subservice`, updateData).pipe(
-    //         catchError((error: HttpErrorResponse) =>
-    //             throwError(() =>
-    //                 new Error(this.getErrorMessage(error)))
-    //         )
-    //     );
-    // }
-
     // ------------------------------------------------------------------------------------------------------------------------------
     // **************************************************[Customer Related APIs]*******************************************************
     // ------------------------------------------------------------------------------------------------------------------------------
@@ -55,6 +45,14 @@ export class OfferedServicesService {
         );
     }
 
+    getHomepageServiceTitles(): Observable<IResponse<IGetServiceTitle[]>> {
+        return this._http.get<IResponse<IGetServiceTitle[]>>(`${this._apiUrl}/service/titles`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
 
     // ------------------------------------------------------------------------------------------------------------------------------
     // **************************************************[Provider Related APIs]*******************************************************

@@ -11,7 +11,7 @@ import { ScheduleService } from '../../../../../../core/services/schedule.servic
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectLocation, selectPhoneNumber } from '../../../../../../store/customer/customer.selector';
-import { MapboxLocationService } from '../../../../../../core/services/public/location.service';
+import { LocationService } from '../../../../../../core/services/public/location.service';
 import { IAddress } from '../../../../../../core/models/user.model';
 
 @Component({
@@ -19,7 +19,7 @@ import { IAddress } from '../../../../../../core/models/user.model';
   standalone: true,
   imports: [CommonModule, MapboxMapComponent, FormsModule],
   templateUrl: './customer-schedule-booking-details.component.html',
-  providers: [MapboxLocationService]
+  providers: [LocationService]
 })
 export class CustomerScheduleBookingDetailsComponent implements OnInit {
   private readonly _route = inject(ActivatedRoute);
@@ -27,7 +27,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   private readonly _scheduleService = inject(ScheduleService);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _store = inject(Store);
-  private readonly _locationService = inject(MapboxLocationService);
+  private readonly _locationService = inject(LocationService);
 
   schedules$!: Observable<ISchedules[]>;
 
