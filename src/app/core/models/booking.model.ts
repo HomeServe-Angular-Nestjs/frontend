@@ -183,3 +183,24 @@ export interface IBookingDetailProvider extends IBookingDetailsBase {
         location: string;
     };
 }
+
+
+//  Admin Related Interfaces
+export interface IAdminBookingForTable {
+    bookingId: string;
+    customer: {
+        avatar: string;
+        id: string;
+        username: string;
+        email: string;
+    };
+    provider: {
+        avatar: string;
+        id: string;
+        username: string;
+        email: string;
+    };
+    date: Date;
+    status: BookingStatus;
+    paymentStatus: PaymentStatus;
+}

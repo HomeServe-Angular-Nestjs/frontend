@@ -53,8 +53,6 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
         this._chatSocket.disconnect();
       }
     });
-
-
   }
 
   ngOnDestroy(): void {

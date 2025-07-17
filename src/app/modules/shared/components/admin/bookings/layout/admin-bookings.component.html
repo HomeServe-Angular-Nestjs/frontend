@@ -1,0 +1,3 @@
+<ng-container *ngIf="bookings$ | async as bookings">
+    <app-admin-booking-table [bookings]="bookings"></app-admin-booking-table>
+</ng-container>

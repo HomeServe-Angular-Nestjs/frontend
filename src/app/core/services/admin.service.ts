@@ -5,6 +5,7 @@ import { IApprovalOverviewData, IApprovalTableDetails, IRemoveData, IUpdateUserS
 import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
+import { IAdminBookingForTable } from "../models/booking.model";
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -24,6 +25,10 @@ export class AdminService {
 
     get users(): IUserData[] | null {
         return this._userDataSource.getValue();
+    }
+
+    private getErrorMessage(error: HttpErrorResponse): string {
+        return error?.error?.message || 'something went wrong';
     }
 
     setRole(role: UType) {
@@ -93,12 +98,13 @@ export class AdminService {
         );
     }
 
-    /**
-     * Extracts a readable error message from an HTTP error.
-     * @param error - The HTTP error response.
-     * @returns A user-friendly error message.
-     */
-    private getErrorMessage(error: HttpErrorResponse): string {
-        return error?.error?.message || 'something went wrong';
+    getBookings(): Observable<IResponse<IAdminBookingForTable[]>> {
+        return this._http.get<IResponse<IAdminBookingForTable[]>>(`${this._adminUrl}/bookings`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
     }
+
 }

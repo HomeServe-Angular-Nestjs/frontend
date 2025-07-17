@@ -2,6 +2,7 @@ import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
 import { IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
@@ -13,7 +14,8 @@ import { RazorpayWrapperService } from '../../../../../../core/services/public/r
 import { ITransaction } from '../../../../../../core/models/transaction.model';
 import { IAddress } from '../../../../../../core/models/user.model';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
-import { TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
+import { TransactionType } from '../../../../../../core/enums/enums';
+import { customerActions } from '../../../../../../store/customer/customer.actions';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
@@ -29,6 +31,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private readonly _razorpayWrapper = inject(RazorpayWrapperService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _store = inject(Store);
 
   private _subscriptions: Subscription[] = [];
 
@@ -156,9 +159,12 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     this._bookingService.postBookingData(bookingData).subscribe({
       next: (response) => {
         if (response.success) {
+          this._store.dispatch(customerActions.changeReviewedStatus({ status: false }));
+
           this._toastr.success(transactionData?.id
             ? 'Service booked successfully!'
             : 'Booking saved as pending payment. Please complete the payment from your profile.');
+
           localStorage.removeItem('selectedServiceData');
           this._router.navigate(['profile', 'bookings'])
         } else {

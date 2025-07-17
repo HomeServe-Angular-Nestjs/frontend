@@ -41,7 +41,7 @@ export class AdminSidebarComponent {
     {
       name: 'Bookings Management',
       icon: 'fa-book',
-      route: 'bookings'
+      route: 'admin/bookings'
     },
     {
       name: 'Revenue & Transactions',

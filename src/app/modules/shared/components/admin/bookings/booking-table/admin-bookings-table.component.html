@@ -1,0 +1,95 @@
+<!-- Heading Section -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-7">
+    <!-- Title & Description -->
+    <div class="mb-2 sm:mb-0">
+        <h2 class="text-xl font-semibold text-gray-800">Booking History</h2>
+        <p class="text-sm text-gray-500">Overview of all completed, cancelled, and refunded bookings.</p>
+    </div>
+
+    <!-- Optional Filter/Search Controls -->
+    <div class="flex flex-col sm:flex-row gap-2">
+        <!-- Search -->
+        <input type="text" placeholder="Search by customer or ID"
+            class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 text-sm" />
+
+        <!-- Filter (example) -->
+        <select
+            class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 text-sm">
+            <option value="">All Statuses</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="pending">Pending</option>
+        </select>
+    </div>
+</div>
+
+
+<div class="overflow-x-auto rounded-lg shadow border border-gray-200">
+    <table class="min-w-full text-sm text-left text-gray-600">
+        <thead class="bg-gray-100 text-xs font-semibold uppercase text-gray-700">
+            <tr>
+                <th class="px-4 py-3">Booking Id</th>
+                <th class="px-4 py-3">Customer</th>
+                <th class="px-4 py-3">Provider</th>
+                <th class="px-4 py-3">Date</th>
+                <th class="px-4 py-3">Status</th>
+                <th class="px-4 py-3">Payment</th>
+                <th class="px-4 py-3">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let booking of bookings; let i = index" class="border-b">
+                <td class="px-4 py-2">{{booking.bookingId | slice:0:10}}</td>
+
+                <!-- Customer -->
+                <td class="px-4 py-2 flex items-center gap-2">
+                    <img [src]="booking.customer.avatar" alt="Customer Avatar" class="w-8 h-8 rounded-full" />
+                    <div>
+                        <div class="font-medium">{{ booking.customer.username }}</div>
+                        <div class="text-xs text-gray-500">{{ booking.customer.email }}</div>
+                    </div>
+                </td>
+
+                <td class="">
+                    <div class="px-4 py-2 flex items-center gap-2">
+                        <img [src]="booking.provider.avatar" alt="Provider Avatar" class="w-8 h-8 rounded-full" />
+                        <div>
+                            <div class="font-medium">{{ booking.provider.username }}</div>
+                            <div class="text-xs text-gray-500">{{ booking.provider.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <!-- Date -->
+                <td class="px-4 py-2">
+                    {{ booking.date | date: 'short' }}
+                </td>
+
+                <!-- Status -->
+                <td class="px-4 py-2">
+                    <span [ngClass]="{
+              'text-red-600 font-semibold': booking.status === 'cancelled',
+              'text-green-600 font-semibold': booking.status === 'completed',
+              'text-yellow-600 font-semibold': booking.status === 'pending'
+            }">
+                        {{ booking.status | titlecase }}
+                    </span>
+                </td>
+
+                <!-- Payment -->
+                <td class="px-4 py-2 capitalize text-gray-700">
+                    {{ booking.paymentStatus }}
+                </td>
+
+                <td class="text-center px-4">
+                    <i class="fas fa-eye text-blue-700"></i>
+                </td>
+            </tr>
+        </tbody>
+
+        <tfoot class="*">
+            <app-admin-pagination [pagination]="pagination"></app-admin-pagination>
+        </tfoot>
+    </table>
+
+
+</div>

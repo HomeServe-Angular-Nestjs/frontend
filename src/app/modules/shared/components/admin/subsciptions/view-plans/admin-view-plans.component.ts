@@ -27,7 +27,6 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
     private _destroy$ = new Subject<void>();
 
     tableData$ = this._planService.tableData$;
-    pagination!: IPagination;
     columns: string[] = ['id', 'plan name', 'pricing', 'role', 'billing cycle', 'created date', 'status'];
 
     ngOnInit(): void {
