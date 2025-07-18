@@ -20,7 +20,7 @@ export class ChangePasswordComponent implements OnInit {
     private loginService = inject(LoginAuthService);
     private fb = inject(FormBuilder);
     private toastr
- = inject(NotificationService);
+        = inject(NotificationService);
 
     regexp = REGEXP_ENV;
     messages = MESSAGES_ENV;
@@ -56,9 +56,9 @@ export class ChangePasswordComponent implements OnInit {
                 this.verificationState = "verified";
             },
             error: (err) => {
-                console.log(err)
                 this.verificationState = 'error';
                 this.errorMessage = err.error.message;
+                console.error(err)
             }
         });
     }
@@ -102,7 +102,7 @@ export class ChangePasswordComponent implements OnInit {
             Object.keys(control.errors).forEach((key) => {
                 if (this.messages['errorMessages'][fieldName]?.[key]) {
                     this.toastr
-.error(this.messages['errorMessages'][fieldName][key]);
+                        .error(this.messages['errorMessages'][fieldName][key]);
                 }
             });
             return true;

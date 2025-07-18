@@ -79,7 +79,6 @@ export class ProviderSlotCreationComponent {
                 const slotsToSave = this._generateSlotsForMonthMode();
 
                 if (slotsToSave && slotsToSave.month && slotsToSave.days?.length > 0) {
-                    console.log(slotsToSave)
                     this._scheduleService.createSchedules(slotsToSave).subscribe({
                         next: (response) => {
                             if (response.success) {

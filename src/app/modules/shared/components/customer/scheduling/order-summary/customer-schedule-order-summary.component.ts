@@ -172,8 +172,8 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
         }
       },
       error: (err) => {
-        console.log(err);
         this._toastr.error(err);
+        console.error(err);
       },
       complete: () => this.isProcessing = false
     });

@@ -87,7 +87,6 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
     }
 
     goToChat(customerId: string) {
-    //     this._chatService.createChat(customerId).subscribe(data => console.log(data));
     }
 
     private _emitFilters(): void {

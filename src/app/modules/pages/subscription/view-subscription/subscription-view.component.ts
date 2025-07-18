@@ -32,8 +32,6 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
                 this.userType = type;
             }
         });
-
-        this.subscription$.subscribe(data => console.log(data));
     }
 
     ngOnDestroy(): void {

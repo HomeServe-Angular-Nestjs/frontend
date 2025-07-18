@@ -92,7 +92,6 @@ export class ProviderKycComponent {
 
   submitKYC() {
     // In a real app, you would send this data to your backend
-    console.log('Submitting KYC data:', this.kycData);
     this.formSubmitted = true;
 
     // Mark all steps as completed
@@ -101,6 +100,5 @@ export class ProviderKycComponent {
 
   closeForm() {
     // In a real app, you might navigate to another page
-    console.log('Closing KYC form');
   }
 }

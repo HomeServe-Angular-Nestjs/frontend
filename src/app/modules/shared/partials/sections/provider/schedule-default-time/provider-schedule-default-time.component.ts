@@ -52,7 +52,6 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
   ngOnInit(): void {
     this._store.select(selectDefaultSlots).subscribe(data => {
       if (data) {
-        console.log(data)
         this.defaultSlots = [...data];
       }
     });
@@ -106,10 +105,7 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
       return;
     }
 
-    console.log(from12, to12)
-
     if (this.addNewSlots) {
-      console.log('if');
 
       // this.defaultSlotAddEvent.emit({ from: from12, to: to12 });
     } else {
@@ -117,7 +113,6 @@ export class ProviderScheduleDefaultTimeComponent implements OnInit {
       this._providerService.updateDefaultSlot(slot).subscribe({
         next: (defaultSlots) => {
           this._store.dispatch(providerActions.updateDefaultSlot({ defaultSlots }));
-          console.log(defaultSlots);
         },
         error: (err) => console.error(err)
       });

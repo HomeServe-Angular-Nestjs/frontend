@@ -15,6 +15,5 @@ export class AdminBookingTableComponent implements OnInit {
     pagination: any
 
     ngOnInit(): void {
-        console.log(this.bookings);
     }
 }

@@ -77,27 +77,4 @@ export const userEffects = {
             )
         );
     }, { functional: true }),
-
-    /**
-     * fetches filtered providers when 'filterProvider' is dispatched.
-     * On success, dispatches 'filterProviderSuccess'. On error, shows a notification and dispatches 'filterProviderFailure'.
-     */
-    filterProviders$: createEffect(() => {
-        const actions$ = inject(Actions);
-        const providerService = inject(ProviderService);
-        const toastr = inject(ToastNotificationService);
-
-        return actions$.pipe(
-            ofType(userActions.filterProvider),
-            switchMap(({ filter }) =>
-                providerService.getProviders(filter).pipe(
-                    map((providers) => userActions.filterProviderSuccess({ providers })),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, userActions.filterProviderFailure, toastr
-                        );
-                    })
-                )
-            )
-        );
-    }, { functional: true }),
 }

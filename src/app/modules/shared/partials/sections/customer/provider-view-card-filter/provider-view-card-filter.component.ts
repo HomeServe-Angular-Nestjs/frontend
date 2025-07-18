@@ -33,7 +33,7 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
         this._filters$
             .pipe(takeUntil(this._destroy$))
             .subscribe((filter) => {
-                this.filterEvents.emit(filter);
+                this.filterEvents.emit(filter); 
             });
 
         this._debounceService.onSearch(700)

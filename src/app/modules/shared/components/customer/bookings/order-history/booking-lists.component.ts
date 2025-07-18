@@ -90,7 +90,6 @@ export class CustomerBookingListsComponent implements OnInit {
 
         this._paymentService.verifyPaymentSignature(response, orderData, 'customer').subscribe({
             next: (response) => {
-                console.log(response)
                 this._updateBooking(bookingId, response.transaction);
             },
             error: (err) => {
@@ -103,7 +102,6 @@ export class CustomerBookingListsComponent implements OnInit {
     private _initiatePayment(totalAmount: number, bookingId: string) {
         this._paymentService.createRazorpayOrder(totalAmount).subscribe({
             next: (order) => {
-                console.log(order);
                 this._razorpayWrapperService.openCheckout(
                     order,
                     (paymentResponse: RazorpayPaymentResponse) =>

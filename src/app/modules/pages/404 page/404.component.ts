@@ -7,7 +7,6 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
     standalone: true,
     imports: [CommonModule, RouterModule,],
     templateUrl: './404.component.html',
-    styleUrls: ['./404.component.scss']
 })
 export class NotFoundComponent implements OnInit {
     type: 'route' | 'data' = 'route';

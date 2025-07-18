@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
-import { IDisplayReviews, IProvider, IProviderUpdateBio } from "../models/user.model";
+import { IDisplayReviews, IHomeSearch, IProvider, IProviderUpdateBio } from "../models/user.model";
 import { API_ENV } from "../../environments/env";
 import { SlotType } from "../models/schedules.model";
 import { IFilter } from "../models/filter.model";
@@ -37,10 +37,36 @@ export class ProviderService {
         this.providerDataSource.next(data);
     }
 
-    getProviders(filter: IFilter = {}): Observable<IProvider[]> {
-        const params = this._buildFilterParams(filter);
-        return this._http.get<IProvider[]>(`${this._apiUrl}/fetch_providers`, { params });
+    getProviders(filter: IFilter = {}, locationSearch?: IHomeSearch): Observable<IResponse<IProvider[]>> {
+        let params = this._buildFilterParams(filter);
+
+        if (locationSearch) {
+            params = params.set('lat', locationSearch.lat.toString())
+                .set('lng', locationSearch.lng.toString())
+                .set('title', locationSearch.title);
+        }
+
+        return this._http.get<IResponse<IProvider[]>>(`${this._apiUrl}/fetch_providers`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
     }
+
+    // getProvidersForHomeSearch(homeSearch: IHomeSearch): Observable<IResponse<IProvider[]>> {
+    //     const params = new HttpParams()
+    //         .set('lat', homeSearch.lat.toString())
+    //         .set('lng', homeSearch.lng.toString())
+    //         .set('title', homeSearch.title);
+
+    //     return this._http.get<IResponse<IProvider[]>>(`${this._apiUrl}/location_search`, { params }).pipe(
+    //         catchError((error: HttpErrorResponse) =>
+    //             throwError(() =>
+    //                 new Error(this.getErrorMessage(error)))
+    //         )
+    //     );
+    // }
 
     getOneProvider(id: string | null = null): Observable<IProvider> {
         return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?id=${id}`);

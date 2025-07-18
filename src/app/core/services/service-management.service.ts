@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http"
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/env";
 import { BehaviorSubject, catchError, Observable, pipe, throwError } from "rxjs";
-import { IGetServiceTitle, IOfferedService, IServiceFilter, IServicesWithPagination, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
+import { IOfferedService, IServiceFilter, IServicesWithPagination, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 
@@ -45,8 +45,8 @@ export class OfferedServicesService {
         );
     }
 
-    getHomepageServiceTitles(): Observable<IResponse<IGetServiceTitle[]>> {
-        return this._http.get<IResponse<IGetServiceTitle[]>>(`${this._apiUrl}/service/titles`).pipe(
+    getHomepageServiceTitles(): Observable<IResponse<string[]>> {
+        return this._http.get<IResponse<string[]>>(`${this._apiUrl}/service/titles`).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

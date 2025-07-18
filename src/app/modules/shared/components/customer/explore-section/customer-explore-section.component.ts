@@ -1,18 +1,14 @@
 import { Component, inject, } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OfferedServicesService } from '../../../../../core/services/service-management.service';
-import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
-import { IGetServiceTitle } from '../../../../../core/models/offeredService.model';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { encode as base64Encode } from 'js-base64';
+import { OfferedServicesService } from '../../../../../core/services/service-management.service';
 import { LocationService } from '../../../../../core/services/public/location.service';
 import { DebounceService } from '../../../../../core/services/public/debounce.service';
-import { Router } from '@angular/router';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
-
-interface ISearchedLocation {
-  address: string;
-  coordinates: [number, number];
-}
+import { ISearchedLocation } from '../../../../../core/models/user.model';
 
 @Component({
   selector: 'app-customer-explore-section',
@@ -27,14 +23,14 @@ export class CustomerExploreSectionComponent {
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _router = inject(Router);
 
-  private _allServiceTitles$ = new BehaviorSubject<IGetServiceTitle[]>([]);
+  private _allServiceTitles$ = new BehaviorSubject<string[]>([]);
   private _search$ = new BehaviorSubject<string>('');
   private _interval: any;
 
-  serviceTitles$!: Observable<IGetServiceTitle[]>;
+  serviceTitles$!: Observable<string[]>;
   serviceSearch: string = '';
   isServiceSearchDropdownOpen = false;
-  selectedService!: IGetServiceTitle;
+  selectedService!: string;
 
   locationData$ = new BehaviorSubject<ISearchedLocation[]>([]);
   locationSearch: string = '';
@@ -97,7 +93,7 @@ export class CustomerExploreSectionComponent {
     this.serviceTitles$ = combineLatest([this._allServiceTitles$, this._search$]).pipe(
       map(([services, search]) =>
         search !== 'all' ? services.filter(service =>
-          service.title.toLowerCase().includes(search.toLowerCase())
+          service.toLowerCase().includes(search.toLowerCase())
         ) : services)
     );
   }
@@ -122,8 +118,7 @@ export class CustomerExploreSectionComponent {
         this.locationData$.next(result);
         this.isLocationSearchLoading = false;
       },
-      error: (err) => {
-        console.error(err);
+      error: () => {
         this.locationData$.next([]);
         this.isLocationSearchLoading = false;
       }
@@ -165,19 +160,24 @@ export class CustomerExploreSectionComponent {
 
   findProviders() {
     const hasLocation = this.selectedLocation?.address && this.selectedLocation?.coordinates;
-    const hasService = this.selectedService?.id && this.selectedService?.title;
 
-    if (!hasLocation || !hasService) {
+    if (!hasLocation || !this.selectedService) {
       this._toastr.error('Please select a valid location and service.');
       return;
     }
 
+    const { coordinates } = this.selectedLocation;
+
+    const data = {
+      title: this.selectedService,
+      ...coordinates
+    };
+
+    const encodedData = base64Encode(JSON.stringify(data));
+
     this._router.navigate(['view_providers'], {
       queryParams: {
-        hs: {
-          ...this.selectedService,
-          ...this.selectedLocation
-        }
+        ls: encodedData
       }
     });
   }

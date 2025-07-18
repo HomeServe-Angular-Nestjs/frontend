@@ -43,9 +43,9 @@
                                             *ngIf="(serviceTitles$ | async) as serviceTitles; else noTitlesFound">
                                             <ng-container *ngIf="serviceTitles.length; else noTitlesFound">
                                                 <button *ngFor="let service of serviceTitles"
-                                                    (click)="serviceSearch = service.title; isServiceSearchDropdownOpen = false; selectedService = service"
+                                                    (click)="serviceSearch = service; isServiceSearchDropdownOpen = false; selectedService = service"
                                                     class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors border-b last:border-b-0">
-                                                    {{ service.title }}
+                                                    {{ service }}
                                                 </button>
                                             </ng-container>
                                         </ng-container>

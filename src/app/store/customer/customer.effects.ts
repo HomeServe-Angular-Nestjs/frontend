@@ -125,7 +125,6 @@ export const customerEffects = {
             switchMap(({ formData }) =>
                 customerService.changeAvatar(formData).pipe(
                     map(response => {
-                        console.log(response)
                         if (response && response.data) {
                             toastr.success(response.message);
                             return customerActions.customerSuccessAction({ customer: response.data })

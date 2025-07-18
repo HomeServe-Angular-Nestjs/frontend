@@ -92,7 +92,6 @@ export class CustomerHeaderComponent implements OnInit {
     this.isLoadingServices = true;
     this._customerService.searchService(search).subscribe({
       next: (res) => {
-        console.log(res)
         if (res.success) this.fetchedServices = res.data;
         this.isLoadingServices = false;
 

@@ -17,16 +17,12 @@ export class AdminBookingLayoutComponent implements OnInit {
 
 
     ngOnInit(): void {
-        console.log('ng')
         this._loadTable();
     }
 
     private _loadTable() {
         this.bookings$ = this._adminService.getBookings().pipe(
-            map(res => {
-                console.log(res.data)
-                return res.data ?? [];
-            })
+            map(res => res.data ?? [])
         );
     }
 }

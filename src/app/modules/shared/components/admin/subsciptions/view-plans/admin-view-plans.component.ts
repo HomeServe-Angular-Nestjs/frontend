@@ -155,7 +155,6 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
     }
 
     adminTableActionTriggered(event: { action: string; row: any }) {
-        console.log(event);
         let action = event.action;
         if (action === 'toggle') {
             action = event.row.status ? 'inactivate' : 'activate';

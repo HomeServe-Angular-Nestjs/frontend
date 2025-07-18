@@ -2,7 +2,6 @@ import { EntityState } from '@ngrx/entity';
 import { ISlot, SlotType } from './schedules.model';
 import { IPagination } from './booking.model';
 import { IReview } from './reviews.model';
-
 export type UType = 'customer' | 'provider';
 
 export interface IDocs {
@@ -191,4 +190,15 @@ export interface IDisplayReviews {
     avgRating: number;
     writtenAt: string;
     desc: string;
+}
+
+export interface ISearchedLocation {
+    address: string;
+    coordinates: { lat: number, lng: number };
+}
+
+export interface IHomeSearch {
+    title: string;
+    lat: number,
+    lng: number;
 }

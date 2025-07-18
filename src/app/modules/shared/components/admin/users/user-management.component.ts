@@ -80,7 +80,6 @@ export class UserManagementComponent implements OnInit {
   }
 
   onPageChange(newPage: number) {
-    console.log(newPage)
     this._loadTableData(this.lastFilterUsed, newPage);
   }
 

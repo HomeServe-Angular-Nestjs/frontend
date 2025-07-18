@@ -100,7 +100,7 @@ export class CustomerProfileOverviewEditComponent implements OnInit {
             location: this.profileForm.get('location')
         };
 
-        const profileDatastr = this.profileForm.getRawValue();
+        const profileDataStr = this.profileForm.getRawValue();
         const original = this.originalCustomerData;
 
         if (this.profileForm.valid) {
@@ -112,7 +112,7 @@ export class CustomerProfileOverviewEditComponent implements OnInit {
                 location: controls.location?.value,
             }
 
-            const hasChanged = JSON.stringify(profileDatastr) !== JSON.stringify(original);
+            const hasChanged = JSON.stringify(profileDataStr) !== JSON.stringify(original);
 
             if (!hasChanged) {
                 return;
@@ -183,7 +183,7 @@ export class CustomerProfileOverviewEditComponent implements OnInit {
             },
             error: (err) => {
                 this._toastr.error('Failed to get address.');
-                console.log(err);
+                console.error(err);
             }
         })
     }

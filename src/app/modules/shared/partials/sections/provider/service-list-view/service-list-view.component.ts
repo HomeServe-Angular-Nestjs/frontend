@@ -55,7 +55,6 @@ export class ServiceListViewComponent {
         ).afterClosed()
             .subscribe(confirm => {
                 if (!confirm) return;
-                console.log(serviceId, subId)
 
                 this._serviceService.removeSubService(serviceId, subId).subscribe({
                     next: (response) => {

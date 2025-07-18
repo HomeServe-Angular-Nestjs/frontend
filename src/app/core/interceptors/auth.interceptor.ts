@@ -35,6 +35,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     }
 
                     return throwError(() => {
+                        console.error(error);
                         const message = error?.error?.error || error?.error?.message || error.message || 'Something went wrong. Please try again!';
                         throw new Error(message);
                     });

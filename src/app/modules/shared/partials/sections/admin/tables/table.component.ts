@@ -49,7 +49,7 @@ export class TableComponent implements OnChanges {
           icon: !isActive ? 'fa-user-slash' : 'fa-user-check',
           styles: !isActive ? 'text-red-400' : 'text-green-400'
         });
-        console.log('from table',row)
+        
         this.actionTriggeredEvent.emit({ action: 'status', status: isActive, userId: row.id });
       });
   }
