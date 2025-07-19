@@ -29,7 +29,7 @@ export class CustomerProviderProfileAvailabilityAndMatrixComponent {
       if (data) {
         this.providerData = data;
         this.center = data?.location?.coordinates;
-        this.address = data?.location?.address;
+        this.address = data?.address;
       }
     });
   }

@@ -2,7 +2,7 @@ import { SelectedServiceIdsType } from "../../modules/pages/customer/booking-1-p
 import { BookingStatus, CancelStatus, PaymentStatus } from "../enums/enums";
 import { RazorpayOrder, RazorpayPaymentResponse } from "./payment.model";
 import { ISlotSource } from "./schedules.model";
-import { IAddress } from "./user.model";
+import { ILocation } from "./user.model";
 
 // --------------------
 // Shared Interfaces
@@ -26,7 +26,7 @@ export interface IPriceBreakupData {
     total: number;
 }
 
-export type CustomerLocationType = Omit<IAddress, 'type'> & { phone: string };
+export type CustomerLocationType = Omit<ILocation, 'type'> & { phone: string };
 
 export interface IBookingDetailsBase {
     bookingId: string;
@@ -57,7 +57,7 @@ export interface IBookingDetailsBase {
 export interface IBookingData {
     providerId: string;
     total: number;
-    location: Omit<IAddress, 'type'>;
+    location: Omit<ILocation, 'type'>;
     slotData: ISlotSource;
     serviceIds: SelectedServiceIdsType[];
     transactionId: string | null;

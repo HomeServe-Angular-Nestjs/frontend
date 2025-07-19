@@ -1,10 +1,9 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from "@angular/core";
-import { filter, Observable } from "rxjs";
+import { Observable } from "rxjs";
 import { ICustomer } from "../../../../../../core/models/user.model";
 import { Store } from "@ngrx/store";
 import { selectCustomer } from "../../../../../../store/customer/customer.selector";
-import { DomSanitizer } from "@angular/platform-browser";
 
 @Component({
     selector: 'app-customer-profile-overview',
@@ -13,7 +12,6 @@ import { DomSanitizer } from "@angular/platform-browser";
 })
 export class CustomerProfileOverviewComponent implements OnInit {
     private readonly _store = inject(Store);
-    private readonly _sanitizer = inject(DomSanitizer);
 
     customer$: Observable<ICustomer | null> = this._store.select(selectCustomer);
     isLoading = true;
@@ -24,6 +22,8 @@ export class CustomerProfileOverviewComponent implements OnInit {
                 this.isLoading = false;
             }
         });
+
+        this.customer$.subscribe(d => console.log(d));
     }
 
     onImageError(event: Event) {

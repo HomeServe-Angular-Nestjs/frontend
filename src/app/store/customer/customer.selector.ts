@@ -20,7 +20,12 @@ export const selectPhoneNumber = createSelector(
 
 export const selectLocation = createSelector(
     selectCustomerState,
-    (state) => state.customer?.location
+    (state) => {
+        return {
+            coordinates: state.customer?.location?.coordinates,
+            address: state.customer?.address
+        }
+    }
 );
 
 export const selectCustomerId = createSelector(

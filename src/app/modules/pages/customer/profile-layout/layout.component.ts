@@ -1,18 +1,21 @@
-import { Component, inject, OnInit } from "@angular/core";
-import { RouterLink, RouterOutlet } from "@angular/router";
+import { Component, inject } from "@angular/core";
+import { RouterLink, RouterModule, RouterOutlet } from "@angular/router";
 import { CommonModule } from "@angular/common";
-import { map, Observable } from "rxjs";
+import { Observable } from "rxjs";
 import { ICustomer } from "../../../../core/models/user.model";
 import { Store } from "@ngrx/store";
 import { selectCustomer } from "../../../../store/customer/customer.selector";
 
 @Component({
     selector: 'app-customer-profile-layout',
+    standalone: true,
     templateUrl: './layout.component.html',
-    imports: [RouterOutlet, CommonModule, RouterLink]
+    imports: [RouterOutlet, CommonModule, RouterLink, RouterModule]
 })
 export class CustomerProfileLayout {
     private readonly _store = inject(Store);
+
+    customer$: Observable<ICustomer | null> = this._store.select(selectCustomer);
 
     menuSections = [
         {
@@ -35,10 +38,7 @@ export class CustomerProfileLayout {
             items: [
                 { label: 'Wallet & Payments', icon: 'fas fa-wallet', route: '/wallet' },
                 { label: 'Settings', icon: 'fas fa-cog', route: '/settings' },
-                { label: 'Logout', icon: 'fas fa-sign-out-alt', route: '/logout', logout: true },
             ],
         },
     ];
-
-    customer$: Observable<ICustomer | null> = this._store.select(selectCustomer);
 }

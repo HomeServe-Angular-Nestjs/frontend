@@ -1,8 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { API_KEY } from '../../../../../../environments/env';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { ISchedules, } from '../../../../../../core/models/schedules.model';
+import { IAddress, ISchedules, } from '../../../../../../core/models/schedules.model';
 import { FormsModule } from '@angular/forms';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
@@ -12,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectLocation, selectPhoneNumber } from '../../../../../../store/customer/customer.selector';
 import { LocationService } from '../../../../../../core/services/public/location.service';
-import { IAddress } from '../../../../../../core/models/user.model';
+import { ILocation } from '../../../../../../core/models/user.model';
 
 @Component({
   selector: 'app-customer-schedule-booking-details',
@@ -54,11 +53,17 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
       }
     });
 
-    this._store.select(selectLocation).subscribe(location => {
-      if (location) {
-        this.selectedAddress = location.address;
-        this.center = location.coordinates;
-        this._bookingService.setSelectedAddress(location);
+    this._store.select(selectLocation).subscribe(data => {
+      if (data && data.coordinates && data.address) {
+        this.selectedAddress = data.address;
+        this.center = data.coordinates;
+
+        const locationData: IAddress & Omit<ILocation, 'type'> = {
+          address: data.address,
+          coordinates: data.coordinates
+        }
+
+        this._bookingService.setSelectedAddress(locationData);
       }
     });
   }

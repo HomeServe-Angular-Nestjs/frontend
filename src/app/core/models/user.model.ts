@@ -14,9 +14,8 @@ export interface IDocs {
     isDeleted: boolean;
 };
 
-export interface IAddress {
+export interface ILocation {
     type: 'point',
-    address: string
     coordinates: [number, number];
 };
 
@@ -52,7 +51,8 @@ export interface IBaseUser {
     phone?: string;
     avatar: string;
     googleId?: string;
-    location?: IAddress;
+    location?: ILocation;
+    address: string;
     isActive: boolean
     isDeleted: boolean;
     createdAt: Date;
@@ -176,7 +176,7 @@ export interface ICustomerProfileData {
     username: string;
     email: string;
     phone: string;
-    location: IAddress;
+    location: ILocation;
 }
 
 export interface IChangePassword {

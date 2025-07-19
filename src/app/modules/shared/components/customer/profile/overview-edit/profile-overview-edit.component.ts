@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from "@angular/core";
 import { combineLatest, map, Observable, of, startWith } from "rxjs";
-import { IAddress, ICustomer } from "../../../../../../core/models/user.model";
+import { ILocation, ICustomer } from "../../../../../../core/models/user.model";
 import { Store } from "@ngrx/store";
 import { selectCustomer } from "../../../../../../store/customer/customer.selector";
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from "@angular/forms";

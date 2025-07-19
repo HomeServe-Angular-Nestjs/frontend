@@ -3,16 +3,16 @@ import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/env";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
 import { IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
-import { ISelectedSlot } from "../models/schedules.model";
+import { IAddress, ISelectedSlot } from "../models/schedules.model";
 import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { IAddress } from "../models/user.model";
+import { ILocation } from "../models/user.model";
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
     private _http = inject(HttpClient);
 
-    private _addressSource = new BehaviorSubject<Omit<IAddress, 'type'> | null>(null);
+    private _addressSource = new BehaviorSubject<IAddress & Omit<ILocation, 'type'> | null>(null);
     address$ = this._addressSource.asObservable();
 
     private _slotSource = new BehaviorSubject<ISelectedSlot | null>(null);
@@ -21,7 +21,7 @@ export class BookingService {
     private _customerApi = API_ENV.customer;
     private _providerApi = API_ENV.provider;
 
-    setSelectedAddress(newAddress: Omit<IAddress, 'type'> | null) {
+    setSelectedAddress(newAddress: IAddress & Omit<ILocation, 'type'>) {
         this._addressSource.next(newAddress);
     }
 

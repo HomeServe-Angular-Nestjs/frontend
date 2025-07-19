@@ -58,11 +58,6 @@ export interface IMonthSchedule {
     month: string; // "2025-06"
     days: IDaySlot[];
 }
-// export interface IResponse<T = any> {
-//     success: boolean,
-//     message: string,
-//     data?: T
-// }
 
 export interface ISchedules {
     id: string;
@@ -150,4 +145,9 @@ export interface ISelectedSlot {
     month: string;
     dayId: string;
     slotId: string;
+}
+
+export interface IAddress {
+    coordinates: [number, number];
+    address: string;
 }

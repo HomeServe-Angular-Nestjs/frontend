@@ -6,13 +6,13 @@ import { Store } from '@ngrx/store';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
 import { IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
-import { ISelectedSlot } from '../../../../../../core/models/schedules.model';
+import { IAddress, ISelectedSlot } from '../../../../../../core/models/schedules.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { PaymentService } from '../../../../../../core/services/payment.service';
 import { RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
 import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
 import { ITransaction } from '../../../../../../core/models/transaction.model';
-import { IAddress } from '../../../../../../core/models/user.model';
+import { ILocation } from '../../../../../../core/models/user.model';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { TransactionType } from '../../../../../../core/enums/enums';
 import { customerActions } from '../../../../../../store/customer/customer.actions';
@@ -44,7 +44,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     visitingFee: 0.00,
     total: 0.00
   };
-  location!: Omit<IAddress, 'type'>;
+  location!: IAddress
   selectedSlot: ISelectedSlot | null = null;
 
   isLoading = true;
@@ -116,7 +116,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     );
   }
 
-  private _isValidLocation(location: Omit<IAddress, "type"> | null): boolean {
+  private _isValidLocation(location: IAddress | null): boolean {
     return !!location && location.address !== '' && Array.isArray(location.coordinates);
   }
 

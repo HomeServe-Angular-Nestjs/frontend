@@ -24,8 +24,8 @@
                 <ng-container *ngIf="center; else noCenter">
                     <!-- Map Component -->
                     <div class="w-full rounded-lg">
-                        <app-mapbox-map [center]="center" [zoom]="zoom"
-                            [disableInteraction]="true" class="w-full h-full">
+                        <app-mapbox-map [center]="center" [zoom]="zoom" [disableInteraction]="true"
+                            class="w-full h-full">
                         </app-mapbox-map>
                     </div>
                 </ng-container>
@@ -65,8 +65,8 @@
                     <path fill-rule="evenodd"
                         d="M5.05 2.05a7 7 0 119.9 9.9L10 17.9l-4.95-5.95a7 7 0 010-9.9zM10 11a3 3 0 100-6 3 3 0 000 6z"
                         clip-rule="evenodd" />
-                </svg> <ng-container *ngIf="providerData && providerData?.location?.address; else unavailableLocation">
-                    <span class="font-medium">{{ providerData.location?.address }}</span>
+                </svg> <ng-container *ngIf="providerData && providerData?.address; else unavailableLocation">
+                    <span class="font-medium">{{ providerData.address }}</span>
                 </ng-container>
                 <ng-template #unavailableLocation>
                     <span class="text-gray-400 italic">Unavailable</span>
