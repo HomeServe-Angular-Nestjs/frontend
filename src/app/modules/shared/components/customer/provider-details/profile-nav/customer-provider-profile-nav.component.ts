@@ -28,7 +28,12 @@ export class CustomerProviderProfileNavigationComponent implements OnInit {
             name: 'Reviews',
             route: 'reviews',
             active: false
-        }
+        },
+        {
+            name: 'Gallery',
+            route: 'gallery',
+            active: false
+        },
     ];
 
     ngOnInit(): void {

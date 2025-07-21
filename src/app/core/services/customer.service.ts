@@ -121,5 +121,14 @@ export class CustomerService {
             )
         );
     }
+
+    getProviderGalleryImages(providerId: string): Observable<IResponse<string[]>> {
+        return this._http.get<IResponse<string[]>>(`${this._apiUrl}/gallery_images/${providerId}`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
 }
 
