@@ -1,0 +1,67 @@
+<div class="relative">
+    <div class="p-8 max-w-7xl space-y-6">
+        <!-- Work Photos Section -->
+        <div class="bg-white rounded-xl shadow-sm">
+            <div class="p-6 border-b">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Work Photos</h3>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Showcase your previous work and projects
+                        </p>
+                    </div>
+                    <button
+                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#16A34A] rounded-lg hover:bg-green-600">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        <span>Add Photos</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Photo Grid -->
+            <div class="p-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <!-- Add Photo Placeholder -->
+                    <label
+                        class="w-40 h-40 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-[#16A34A] hover:bg-green-50 transition-colors text-center">
+                        <input type="file" class="hidden" (change)="uploadImage($event)" />
+
+                        <i class="fas fa-plus text-gray-400 text-xl mb-2" aria-hidden="true"></i>
+                        <span class="text-sm text-gray-500">Add Photo</span>
+                    </label>
+
+                    <!-- Photo Item -->
+                    <ng-container *ngIf="workImages.length > 0">
+                        <ng-container *ngFor="let imageUrl of workImages">
+                            <div class="group relative w-40 h-40 rounded-lg overflow-hidden bg-gray-100">
+                                <img [src]="imageUrl" alt="Work sample" class="w-full h-full object-cover" />
+                                <div
+                                    class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <button class="p-2 text-white hover:text-[#16A34A]" title="View">
+                                        <i class="fas fa-eye" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="p-2 text-white hover:text-[#16A34A]" title="Edit">
+                                        <i class="fas fa-edit" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="p-2 text-white hover:text-red-500" title="Delete">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <ng-container *ngIf="isUploading">
+        <div class="inset-0 bg-gray-50 bg-opacity-50 flex items-center justify-center fixed">
+            <div class="flex flex-col items-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-green-700 mb-4"></div>
+                <div class="text-green-700 text-lg font-semibold">Uploading...</div>
+            </div>
+        </div>
+    </ng-container>
+</div>

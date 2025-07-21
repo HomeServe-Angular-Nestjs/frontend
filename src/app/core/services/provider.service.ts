@@ -6,6 +6,7 @@ import { API_ENV } from "../../environments/env";
 import { SlotType } from "../models/schedules.model";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
+import { UploadType } from "../enums/enums";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
@@ -53,20 +54,6 @@ export class ProviderService {
             )
         );
     }
-
-    // getProvidersForHomeSearch(homeSearch: IHomeSearch): Observable<IResponse<IProvider[]>> {
-    //     const params = new HttpParams()
-    //         .set('lat', homeSearch.lat.toString())
-    //         .set('lng', homeSearch.lng.toString())
-    //         .set('title', homeSearch.title);
-
-    //     return this._http.get<IResponse<IProvider[]>>(`${this._apiUrl}/location_search`, { params }).pipe(
-    //         catchError((error: HttpErrorResponse) =>
-    //             throwError(() =>
-    //                 new Error(this.getErrorMessage(error)))
-    //         )
-    //     );
-    // }
 
     getOneProvider(id: string | null = null): Observable<IProvider> {
         return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?id=${id}`);
@@ -138,4 +125,21 @@ export class ProviderService {
         );
     }
 
+    uploadImage(imageData: FormData): Observable<IResponse> {
+        return this._http.patch<IResponse>(`${this._apiUrl}/gallery_upload`, imageData).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    getWorkImages(): Observable<IResponse<string[]>> {
+        return this._http.get<IResponse<string[]>>(`${this._apiUrl}/work_images`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
 }

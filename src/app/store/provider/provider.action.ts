@@ -13,4 +13,6 @@ export const providerActions = {
     updateProviderOfferedServices: createAction('[Provider] Update provider offered service', props<{ offeredServices: string[] }>()),
     updateDefaultSlot: createAction('[Provider] Update default slot', props<{ defaultSlots: SlotType[] }>()),
     clearDefaultSlot: createAction('[Provider] Clear Default Slot'),
+
+    addWorkImage: createAction('[Provider] Add work images', props<{ workImage: string }>()),
 }

@@ -57,3 +57,8 @@ export enum Language {
     CONVERSATIONAL = 'conversational',
     BASIC = 'basic'
 }
+
+export enum UploadType {
+    GALLERY = 'gallery',
+
+}

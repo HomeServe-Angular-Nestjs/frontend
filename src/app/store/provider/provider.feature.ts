@@ -66,5 +66,18 @@ export const providerFeature = createFeature({
             loading: false,
             error: null
         })),
+
+        on(providerActions.addWorkImage, (state, { workImage }) => {
+            const workImages = state.provider?.workImages ?? [];
+            return {
+                ...state,
+                provider: state.provider
+                    ? {
+                        ...state.provider,
+                        workImages: [...workImages, workImage]
+                    }
+                    : null
+            }
+        }),
     )
 })

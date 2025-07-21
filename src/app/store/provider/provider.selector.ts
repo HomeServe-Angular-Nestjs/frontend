@@ -18,3 +18,8 @@ export const selectBufferTime = createSelector(
     selectProviderState,
     (state) => state.provider?.bufferTime
 );
+
+export const selectWorkImages = createSelector(
+    selectProviderState,
+    (state) => state.provider?.workImages
+)

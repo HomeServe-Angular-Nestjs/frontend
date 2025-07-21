@@ -81,6 +81,11 @@ export const providerRoutes: Routes = [
                         path: 'schedule_create',
                         loadComponent: () => import('../../shared/components/provider/schedules/schedule-create/provider-schedule-create.component')
                             .then(c => c.ProviderScheduleCreateComponent)
+                    },
+                    {
+                        path: 'gallery',
+                        loadComponent: () => import('../../shared/components/provider/gallery/provider-gallery.component')
+                            .then(c => c.ProviderGalleryComponent)
                     }
                 ],
                 canActivate: [AuthGuard],

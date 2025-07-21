@@ -5,7 +5,7 @@
 <ng-template #showHomepage>
     <div class="flex h-screen font-sans">
         <!-- Sidebar -->
-        <app-provider-sidebar class="w-64 border-r bg-white shadow-md shrink-0"></app-provider-sidebar>
+        <app-provider-sidebar class="w-64 border-r bg-white shrink-0"></app-provider-sidebar>
 
         <!-- Main Content -->
         <section class="flex flex-col flex-1 bg-gray-50">
@@ -14,7 +14,7 @@
                 <app-provider-header></app-provider-header>
             </div>
 
-            <div class="overflow-hidden min-h-0">
+            <div class="min-h-0">
                 <router-outlet></router-outlet>
             </div>
         </section>
