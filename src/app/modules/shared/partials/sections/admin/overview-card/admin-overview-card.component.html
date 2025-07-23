@@ -1,0 +1,10 @@
+<div class="flex items-center gap-4 bg-white rounded-lg shadow p-4 border border-gray-100 w-full">
+    <span *ngIf="icon" class="p-3 rounded-full flex items-center justify-center text-xl" [ngClass]="iconBg">
+        <i [class]="icon"></i>
+    </span>
+    <div>
+        <div class="text-2xl font-bold">{{ value }}</div>
+        <div class="text-sm text-gray-600">{{ title }}</div>
+        <div *ngIf="subtext" class="text-xs text-gray-400 mt-1">{{ subtext }}</div>
+    </div>
+</div>

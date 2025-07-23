@@ -1,0 +1,34 @@
+<div class="flex flex-wrap items-center gap-4 justify-end">
+    <select [(ngModel)]="reviewFilter.searchBy" (change)="onFilterChange()"
+        class="px-3 py-2 border rounded-md text-sm bg-white focus:ring focus:ring-blue-100 focus:outline-none">
+        <option value="review id">Review Id</option>
+        <option value="customer">Customer</option>
+        <option value="provider">Provider</option>
+        <option value="content">Content</option>
+    </select>
+
+    <input [(ngModel)]="reviewFilter.search" [placeholder]="'Search by ' + reviewFilter.searchBy"
+        (ngModelChange)="onFilterChange()" class="border px-3 py-1 rounded w-64" />
+
+    <label>
+        Min Rating:
+        <select [(ngModel)]="reviewFilter.minRating" class="border px-2 py-1 rounded" (change)="onFilterChange()">
+            <option value="">All</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+            <option value="5">5</option>
+        </select>
+    </label>
+
+    <label>
+        Sort:
+        <select [(ngModel)]="reviewFilter.sortBy" class="border px-2 py-1 rounded" (change)="onFilterChange()">
+            <option value="latest">Latest</option>
+            <option value="oldest">Oldest</option>
+            <option value="highest">Highest Rating</option>
+            <option value="lowest">Lowest Rating</option>
+        </select>
+    </label>
+</div>

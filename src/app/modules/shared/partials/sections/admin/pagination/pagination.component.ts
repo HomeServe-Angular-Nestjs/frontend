@@ -12,11 +12,11 @@ export class AdminPaginationComponent {
     @Output() pageChange = new EventEmitter<number>();
 
     get currentPage() {
-        return this.pagination.page;
+        return this.pagination?.page;
     }
 
     get totalPages(): number {
-        return Math.ceil(this.pagination.total / this.pagination.limit);
+        return Math.ceil(this.pagination?.total / this.pagination?.limit);
     }
 
     nextPage() {

@@ -1,14 +1,21 @@
-<div class="min-w-screen min-h-screen flex bg-[#F9FAFB]">
-    <div class="fixed h-full z-50">
+<div class="min-h-screen flex bg-[#F9FAFB]">
+    <!-- Sidebar (Fixed) -->
+    <div class="fixed h-full w-72 z-50">
         <app-admin-sidebar></app-admin-sidebar>
     </div>
-    <div class="ml-72 w-full flex flex-col px-6" >
-        <div class="sticky top-10 z-10">
+
+    <!-- Main Content Area -->
+    <div class="ml-72 flex flex-col w-[calc(100vw-18rem)] pt-4">
+
+        <!-- Sticky Header -->
+        <div class="sticky top-0 z-40 bg-[#F9FAFB] px-6 py-4  bordr-gray-200">
             <app-admin-header></app-admin-header>
         </div>
 
-        <div class="mt-20">
+        <!-- Scrollable Content -->
+        <div class="flex-1 px-6 pt-6 overflow-y-auto">
             <router-outlet></router-outlet>
         </div>
+
     </div>
 </div>

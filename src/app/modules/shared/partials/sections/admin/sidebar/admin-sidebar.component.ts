@@ -22,7 +22,7 @@ export class AdminSidebarComponent {
     {
       name: 'Dashboard',
       icon: 'fa-tachometer-alt',
-      route: 'admin/homepage'
+      route: 'admin/dashboard'
     },
     {
       name: 'User Management',

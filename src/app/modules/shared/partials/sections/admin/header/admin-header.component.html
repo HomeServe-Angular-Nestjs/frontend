@@ -1,7 +1,7 @@
-<header class="flex justify-between h-14 shadow-md rounded-sm py-3 px-5 items-center">
+<header class="sticky flex justify-between h-14 shadow-md rounded-sm py-3 px-5 items-center bg-white">
   <!-- Breadcrumbs -->
   <div class="">
-    <h1>Dashboard</h1>
+    <h1 class="font-medium text-xl text-gray-800">{{header$ | async }}</h1>
   </div>
 
   <div class="flex space-x-6">

@@ -18,7 +18,7 @@
             <div (click)="item.subItems ? toggleMenu(item.name) : (item.route ? navigateTo(item.route) : null)"
                 class="flex items-center justify-between px-3 py-2 text-sm rounded-md cursor-pointer transition-all duration-200 group"
                 [ngClass]="{
-                    'bg-blue-100 text-blue-800 font-semibold border-l-4 border-blue-600': item.route && isActive(item.route),
+                    'bg-blue-100 text-blue-600 font-medium border-l-4 border-blue-600': item.route && isActive(item.route),
                     'text-gray-700 hover:bg-blue-50': !item.route || !isActive(item.route)
                 }">
 

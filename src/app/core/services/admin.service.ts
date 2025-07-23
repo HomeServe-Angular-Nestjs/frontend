@@ -5,7 +5,8 @@ import { IApprovalOverviewData, IApprovalTableDetails, IRemoveData, IUpdateUserS
 import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { IAdminBookingForTable } from "../models/booking.model";
+import { IAdminBookingForTable, IBookingStats } from "../models/booking.model";
+import { IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -100,6 +101,41 @@ export class AdminService {
 
     getBookings(): Observable<IResponse<IAdminBookingForTable[]>> {
         return this._http.get<IResponse<IAdminBookingForTable[]>>(`${this._adminUrl}/bookings`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    getBookingStats(): Observable<IResponse<IBookingStats>> {
+        return this._http.get<IResponse<IBookingStats>>(`${this._adminUrl}/bookings/stats`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    getReviewData(filter: IReviewFilters): Observable<IResponse<PaginatedReviewResponse>> {
+        let params = new HttpParams();
+
+        for (let [key, value] of Object.entries(filter)) {
+            if (value !== undefined && value !== null) {
+                params = params.set(key, value);
+            }
+        }
+
+        return this._http.get<IResponse<PaginatedReviewResponse>>(`${this._adminUrl}/reviews`, { params }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    updateReviewStatus(data: { reviewId: string, providerId: string, status: boolean }): Observable<IResponse> {
+        return this._http.patch<IResponse>(`${this._adminUrl}/reviews/status`, data).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

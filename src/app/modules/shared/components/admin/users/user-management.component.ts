@@ -11,6 +11,7 @@ import { TableData, UserTableRow } from '../../../../../core/models/table.model'
 import { AdminPaginationComponent } from "../../../partials/sections/admin/pagination/pagination.component";
 import { FiltersComponent } from '../../../partials/sections/admin/filters/filters.component';
 import { TableComponent } from '../../../partials/sections/admin/tables/table.component';
+import { SharedDataService } from '../../../../../core/services/public/shared-data.service';
 
 
 @Component({
@@ -21,6 +22,7 @@ import { TableComponent } from '../../../partials/sections/admin/tables/table.co
 export class UserManagementComponent implements OnInit {
   private _userManagementService = inject(AdminService);
   private _toastr = inject(ToastNotificationService);
+  private readonly _sharedData = inject(SharedDataService);
 
   tableData$!: Observable<TableData<UserTableRow>>;
   pagination!: IPagination;
@@ -28,6 +30,8 @@ export class UserManagementComponent implements OnInit {
   lastFilterUsed: IFilter = {};
 
   ngOnInit(): void {
+    this._sharedData.setTitle('User Management');
+
     this._loadTableData({});
     this.tableData$ = this._userManagementService.userData$.pipe(
       filter((users): users is IUserData[] => users !== null),

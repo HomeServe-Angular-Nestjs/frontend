@@ -5,6 +5,7 @@ import { CommonModule } from "@angular/common";
 import { IPlan } from "../../../../../../core/models/plan.model";
 import { PlanService } from "../../../../../../core/services/plans.service";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
+import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 
 @Component({
     selector: 'app-admin-sub-layout',
@@ -14,6 +15,8 @@ import { ToastNotificationService } from "../../../../../../core/services/public
 export class AdminSubscriptionLayoutComponent implements OnInit, OnDestroy {
     private readonly _planService = inject(PlanService);
     private readonly _toastr = inject(ToastNotificationService);
+      private readonly _sharedData = inject(SharedDataService);
+    
 
     @ViewChild(AdminViewPlansComponent) viewPlansComponent!: AdminViewPlansComponent;
 
@@ -21,7 +24,7 @@ export class AdminSubscriptionLayoutComponent implements OnInit, OnDestroy {
     planToEdit: IPlan | null = null;
 
     ngOnInit(): void {
-
+    this._sharedData.setTitle('Subscription & Plans');
     }
 
     ngOnDestroy(): void {

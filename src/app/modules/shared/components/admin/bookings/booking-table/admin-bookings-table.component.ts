@@ -1,6 +1,5 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, Input, OnInit } from "@angular/core";
-import { AdminService } from "../../../../../../core/services/admin.service";
 import { IAdminBookingForTable } from "../../../../../../core/models/booking.model";
 import { AdminPaginationComponent } from "../../../../partials/sections/admin/pagination/pagination.component";
 
@@ -15,5 +14,6 @@ export class AdminBookingTableComponent implements OnInit {
     pagination: any
 
     ngOnInit(): void {
+
     }
 }

@@ -1,0 +1,23 @@
+<app-admin-reviews-filter (filtersChanged)="onFilterChange($event)"></app-admin-reviews-filter>
+
+<div class="p-6">
+    <h1 class="text-2xl font-semibold mb-6">Reviews & Ratings</h1>
+    <ng-container *ngIf="reviews$ | async as reviews; else loading">
+        <app-admin-reviews-list [reviews]="reviews"
+            (toggleStatusEvent)="onToggleStatus($event)"></app-admin-reviews-list>
+    </ng-container>
+
+    <ng-template #loading>
+        <div class="flex flex-col items-center justify-center gap-3 py-16">
+            <span class="relative flex h-12 w-12">
+                <span
+                    class="animate-spin inline-block w-full h-full rounded-full border-4 border-blue-400 border-t-transparent"></span>
+            </span>
+            <span class="text-gray-500 text-base font-medium">Loading reviews...</span>
+        </div>
+    </ng-template>
+
+    <div class="flex justify-end items-center">
+        <app-admin-pagination [pagination]="pagination" (pageChange)="changePage($event)"></app-admin-pagination>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+<ng-container *ngIf="reviews.length > 0; else noReviews">
+    <div class="overflow-x-auto rounded-xl shadow">
+        <table class="min-w-full text-sm text-left text-gray-700 bg-white">
+            <thead class="bg-gray-100 text-xs uppercase text-gray-600">
+                <tr>
+                    <th class="px-4 py-3">Review Id</th>
+                    <th class="px-4 py-3">Provider</th>
+                    <th class="px-4 py-3">Customer</th>
+                    <th class="px-4 py-3">Review</th>
+                    <th class="px-4 py-3">Rating</th>
+                    <th class="px-4 py-3">Date</th>
+                    <th class="px-4 py-3">Reported</th>
+                    <th class="px-4 py-3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let review of reviews">
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3 font-mono text-xs text-gray-500 tracking-wid">
+                            {{review.reviewId | uppercase | slice:0:10}}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-3">
+                                <img [src]="review.providerAvatar" referrerPolicy="no-referrer"
+                                    class="w-8 h-8 rounded-full border object-cover" alt="Avatar" />
+                                <div>
+                                    <div class="font-semibold">{{ review.providerName }}</div>
+                                    <div class="text-xs text-gray-500">{{ review.providerEmail }}</div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Customer Info -->
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-3">
+                                <img [src]="review.reviewedBy.customerAvatar" referrerPolicy="no-referrer"
+                                    class="w-8 h-8 rounded-full border object-cover" alt="Avatar" />
+                                <div>
+                                    <div class="font-medium">{{ review.reviewedBy.customerName }}</div>
+                                    <div class="text-xs text-gray-500">{{ review.reviewedBy.customerEmail }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Review Description -->
+                        <td class="px-4 py-3 italic max-w-[300px] truncate" [title]="review.desc">
+                            “{{ review.desc }}”
+                        </td>
+
+                        <!-- Rating -->
+                        <td class="px-4 py-3 text-yellow-500">
+                            <ng-container *ngFor="let star of [].constructor(5); let i = index">
+                                <i class="{{ i < review.rating ? 'fas fa-star' : 'far fa-star' }}"></i>
+                            </ng-container>
+                        </td>
+
+                        <!-- Date -->
+                        <td class="px-4 py-3 text-gray-500">{{ review.writtenAt | date: 'mediumDate' }}</td>
+
+                        <!-- Toggle Reported -->
+                        <td class="px-4 py-3">
+                            {{review.isReported ? 'Yes' : 'No'}}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            <button (click)="onToggleStatus(review.reviewId,review.providerId, review.isActive)">
+                                <i class="fas"
+                                    [ngClass]="review.isActive ? 'fa-toggle-on text-green-600' : 'fa-toggle-off text-gray-400'"
+                                    style="font-size: 1.25rem; cursor: pointer;" title="Toggle report status"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</ng-container>
+
+<!-- No Reviews Template -->
+<ng-template #noReviews>
+    <p class="text-center text-gray-500">No reviews found.</p>
+</ng-template>

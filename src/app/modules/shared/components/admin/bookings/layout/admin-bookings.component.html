@@ -1,3 +1,28 @@
+<section class="mb-9">
+    <h2 class="text-2xl font-bold text-gray-900 leading-tight mb-4 tracking-tight">
+        Booking Summary Overview
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <app-admin-overview-card *ngFor="let stat of stats" [icon]="stat.icon" [iconBg]="stat.iconBg"
+            [title]="stat.title" [value]="stat.value" [subtext]="stat.subtext">
+        </app-admin-overview-card>
+    </div>
+</section>
+
 <ng-container *ngIf="bookings$ | async as bookings">
-    <app-admin-booking-table [bookings]="bookings"></app-admin-booking-table>
+    <section class="mb-5 flex justify-between">
+        <section class="mb-6">
+            <h3 class="text-lg md:text-xl font-semibold text-gray-800">
+                Booking History
+            </h3>
+            <p class="text-sm text-gray-500 mt-1">
+                Overview of all completed, cancelled, and refunded bookings.
+            </p>
+        </section>
+        <app-admin-booking-filters></app-admin-booking-filters>
+    </section>
+
+    <section>
+        <app-admin-booking-table [bookings]="bookings"></app-admin-booking-table>
+    </section>
 </ng-container>

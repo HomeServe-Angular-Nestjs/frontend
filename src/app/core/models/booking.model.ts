@@ -204,3 +204,12 @@ export interface IAdminBookingForTable {
     status: BookingStatus;
     paymentStatus: PaymentStatus;
 }
+
+export interface IBookingStats {
+    total: number;
+    pending: number;
+    cancelled: number;
+    unpaid: number;
+    refunded: number;
+    completed: number;
+}
