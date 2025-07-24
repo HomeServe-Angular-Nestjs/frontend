@@ -2,105 +2,118 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { AdminService } from '../../../../../../core/services/admin.service';
+import { EChartsOption } from 'echarts';
 
 
 @Component({
     selector: 'app-admin-dashboard-revenue-chart',
-    imports: [CommonModule, NgxEchartsModule],
-    template: `
-    <div echarts 
-         [options]="chartOptions" 
-         class="w-full h-96 border rounded-xl shadow-sm bg-white p-4">
-    </div>
-  `,
+    templateUrl: './revenue-chart.component.html',
     styles: [`
     :host {
-      display: block;
+        display: block;
     }
-  `]
+    `],
+    imports: [CommonModule, NgxEchartsModule],
 })
 export class AdminRevenueChartComponent implements OnInit {
-    private readonly _adminService = inject(AdminService);
+    options: EChartsOption = {};
+    updateOptions: EChartsOption = {};
 
-    chartOptions: any;
+    private oneDay = 24 * 3600 * 1000;
+    private now!: Date;
+    private value!: number;
+    private data!: [string, number][];
+    private timer: any;
 
-    // Simulated data array from your DB
-    transactionData = [
-        {
-            amount: 71906,
-            createdAt: '2025-07-14T14:59:39.169Z'
-        },
-        {
-            amount: 50230,
-            createdAt: '2025-07-15T10:22:11.000Z'
-        },
-        {
-            amount: 81200,
-            createdAt: '2025-07-16T17:45:00.000Z'
+    ngOnInit(): void {
+        this.data = [];
+        this.now = new Date(2024, 0, 1); // Starting date
+        this.value = Math.random() * 10000;
+
+        for (let i = 0; i < 100; i++) {
+            this.data.push(this.randomData());
         }
-    ];
 
-    ngOnInit() {
-        let formattedData = [];
-        this._adminService.getDashboardRevenueData().subscribe(res => {
-            if (res.data) {
-                formattedData = res.data
-            }
-        });
-
-        formattedData = this.transactionData.map(tx => {
-            return [new Date(tx.createdAt).getTime(), tx.amount];
-        });
-
-        this.chartOptions = {
+        this.options = {
             title: {
                 text: 'Revenue Analysis',
                 left: 'left',
                 textStyle: {
                     fontSize: 16,
-                    fontWeight: '600',
+                    fontWeight: 600,
                     color: '#333',
-                    marginBottom: '10px'
-                }
+                },
             },
             tooltip: {
                 trigger: 'axis',
                 formatter: (params: any) => {
-                    const date = new Date(params[0].value[0]).toLocaleString();
-                    const amount = params[0].value[1];
-                    return `Date: ${date}<br/>Amount: ₹${amount}`;
-                }
+                    const p = params[0];
+                    const date = new Date(p.value[0]).toLocaleString();
+                    const amount = p.value[1];
+                    return `📅 Date: ${date}<br/>💰 Amount: ₹${amount.toLocaleString()}`;
+                },
+                axisPointer: {
+                    animation: false,
+                },
             },
             xAxis: {
                 type: 'time',
                 name: 'Date & Time',
                 axisLabel: {
-                    formatter: (value: any) => new Date(value).toLocaleDateString()
-                }
+                    formatter: (value: any) => new Date(value).toLocaleDateString(),
+                },
+                splitLine: { show: false },
             },
             yAxis: {
                 type: 'value',
-                name: 'Amount (₹)'
+                name: 'Amount (₹)',
+                boundaryGap: [0, '10%'],
+                splitLine: { show: true },
             },
             series: [
                 {
-                    data: formattedData,
+                    name: 'Revenue',
                     type: 'line',
+                    showSymbol: false,
                     smooth: true,
-                    symbol: 'circle',
-                    symbolSize: 8,
+                    symbolSize: 6,
+                    data: this.data,
                     lineStyle: {
                         color: '#556B2F',
-                        width: 2
+                        width: 2,
                     },
                     itemStyle: {
-                        color: '#8FBC8F'
+                        color: '#8FBC8F',
                     },
                     areaStyle: {
-                        color: 'rgba(143, 188, 143, 0.2)'
-                    }
-                }
-            ]
+                        color: 'rgba(143, 188, 143, 0.2)',
+                    },
+                },
+            ],
         };
+
+        this.timer = setInterval(() => {
+            for (let i = 0; i < 2; i++) {
+                this.data.shift();
+                this.data.push(this.randomData());
+            }
+
+            this.updateOptions = {
+                series: [{ data: this.data }],
+            };
+        }, 1000);
+    }
+
+    ngOnDestroy(): void {
+        clearInterval(this.timer);
+    }
+
+    randomData(): [string, number] {
+        this.now = new Date(this.now.getTime() + this.oneDay);
+        this.value = this.value + Math.random() * 1000 - 500;
+        return [
+            this.now.toISOString(),
+            Math.max(0, Math.round(this.value)),
+        ];
     }
 }

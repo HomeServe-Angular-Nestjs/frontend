@@ -15,7 +15,7 @@ export class UserTrackingBarChartComponent implements OnInit {
         this.chartOptions = {
             title: {
                 text: 'User Stats',
-                left: 'center'
+                left: 'left'
             },
             tooltip: {
                 trigger: 'axis',
@@ -31,7 +31,7 @@ export class UserTrackingBarChartComponent implements OnInit {
             },
             legend: {
                 data: ['Providers', 'Customers'],
-                top: 30
+                bottom: 0
             },
             xAxis: {
                 type: 'category',

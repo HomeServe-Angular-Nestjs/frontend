@@ -11,6 +11,7 @@ import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 import { provideEchartsCore } from 'ngx-echarts';
 import { UserTrackingBarChartComponent } from "../user-tracking-bar-chart/user-tracking-bar-chart.component";
+import { AdminTopProvidersBarChartComponent } from "../top-earning-providers-bar-chart/top-earning-providers-bar-chart.component";
 
 echarts.use([
   TitleComponent,
@@ -26,7 +27,7 @@ echarts.use([
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
-  imports: [CommonModule, AdminDashboardOverviewComponent, AdminRevenueChartComponent, SubscriptionPieChartComponent, UserTrackingBarChartComponent],
+  imports: [CommonModule, AdminDashboardOverviewComponent, AdminRevenueChartComponent, SubscriptionPieChartComponent, UserTrackingBarChartComponent, AdminTopProvidersBarChartComponent],
   providers: [provideEchartsCore({ echarts })],
 })
 export class AdminDashboardComponent implements OnInit {
