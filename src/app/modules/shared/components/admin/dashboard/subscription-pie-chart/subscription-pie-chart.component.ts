@@ -1,35 +1,45 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { EChartsOption } from 'echarts';
+import { AdminService } from '../../../../../../core/services/admin.service';
+import { filter, map } from 'rxjs';
+import { IAdminDashboardSubscription } from '../../../../../../core/models/subscription.model';
 
 @Component({
     selector: 'app-admin-subscription-pie-chart',
     imports: [CommonModule, NgxEchartsModule],
     templateUrl: './subscription-pie-chart.component.html',
 })
-export class SubscriptionPieChartComponent {
-    subscriberData = {
-        free: 1200,
-        premium: {
-            monthly: 600,
-            yearly: 200,
-        }
-    };
+export class SubscriptionPieChartComponent implements OnInit {
+    private readonly _adminService = inject(AdminService);
 
-    chartOptions: any;
+    chartOptions: EChartsOption = {};
 
-    constructor() {
-        const { free, premium } = this.subscriberData;
-        const totalPremium = premium.monthly + premium.yearly;
+    ngOnInit() {
+        this._adminService.getSubscriptionData().pipe(
+            map(res => res.data),
+            filter(Boolean)
+        ).subscribe({
+            next: (data) => {
+                this._setChart(data);
+            },
+            error: (err) => {
+                console.error('Error fetching subscription data:', err);
+            }
+        });
+    }
+
+    private _setChart(subscriptionData: IAdminDashboardSubscription) {
+        const { free, totalPremium, monthlyPremium, yearlyPremium } = subscriptionData;
 
         this.chartOptions = {
             title: {
                 text: 'Subscription Plan Distribution',
                 left: 'left',
                 textStyle: {
-                    paddingLeft: '20px',
                     fontSize: 16,
-                    fontWeight: '600'
+                    fontWeight: 600
                 }
             },
             tooltip: {
@@ -68,8 +78,8 @@ export class SubscriptionPieChartComponent {
                         }
                     },
                     data: [
-                        { value: premium.monthly, name: 'Monthly' },
-                        { value: premium.yearly, name: 'Yearly' }
+                        { value: monthlyPremium, name: 'Monthly' },
+                        { value: yearlyPremium, name: 'Yearly' }
                     ]
                 }
             ]

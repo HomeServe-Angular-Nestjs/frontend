@@ -7,6 +7,7 @@ import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { IAdminBookingFilter, IAdminBookingForTable, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
 import { IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
+import { IAdminDashboardSubscription } from "../models/subscription.model";
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -161,6 +162,15 @@ export class AdminService {
 
     getDashboardRevenueData(): Observable<IResponse> {
         return this._http.get<IResponse>(`${this._adminUrl}/dashboard/revenue`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    getSubscriptionData(): Observable<IResponse<IAdminDashboardSubscription>> {
+        return this._http.get<IResponse<IAdminDashboardSubscription>>(`${this._adminUrl}/dashboard/subscription`).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

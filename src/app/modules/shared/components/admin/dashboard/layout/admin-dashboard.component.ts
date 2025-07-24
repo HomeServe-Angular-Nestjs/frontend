@@ -32,7 +32,6 @@ echarts.use([
 })
 export class AdminDashboardComponent implements OnInit {
   private readonly _sharedData = inject(SharedDataService);
-  private readonly _adminService = inject(AdminService);
 
   ngOnInit(): void {
     this._sharedData.setTitle('Admin Dashboard');

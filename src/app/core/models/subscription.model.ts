@@ -44,3 +44,10 @@ export interface ISubscriptionState {
     error: string | null;
     showSubscriptionPage: boolean;
 }
+
+export interface IAdminDashboardSubscription {
+    free: number;
+    totalPremium: number;
+    monthlyPremium: number;
+    yearlyPremium: number;
+}
