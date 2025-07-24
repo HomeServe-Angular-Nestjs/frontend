@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../environments/env";
-import { IAdminDashboardUserStats, IApprovalOverviewData, IApprovalTableDetails, IRemoveData, IUpdateUserStatus, IUserData, IUserDataWithPagination, UType } from "../models/user.model";
+import { IAdminDashboardUserStats, IApprovalOverviewData, IApprovalTableDetails, IRemoveData, ITopProviders, IUpdateUserStatus, IUserData, IUserDataWithPagination, UType } from "../models/user.model";
 import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
@@ -180,6 +180,15 @@ export class AdminService {
 
     getUserStats(): Observable<IResponse<IAdminDashboardUserStats>> {
         return this._http.get<IResponse<IAdminDashboardUserStats>>(`${this._adminUrl}/dashboard/user_stats`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    getTopEarningProviders(): Observable<IResponse<ITopProviders[]>> {
+        return this._http.get<IResponse<ITopProviders[]>>(`${this._adminUrl}/dashboard/top_providers`).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))

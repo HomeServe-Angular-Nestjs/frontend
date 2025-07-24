@@ -213,3 +213,11 @@ export interface IAdminDashboardUserStats {
     customer: IStats;
     provider: IStats;
 }
+
+
+export interface ITopProviders {
+    totalEarnings: number;
+    providerId: string;
+    username: string;
+    email: string;
+}

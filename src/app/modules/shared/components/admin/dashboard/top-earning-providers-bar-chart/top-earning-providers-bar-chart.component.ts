@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { AdminService } from '../../../../../../core/services/admin.service';
+import { filter, map } from 'rxjs';
+import { ITopProviders } from '../../../../../../core/models/user.model';
 
 
 @Component({
@@ -9,9 +12,26 @@ import { NgxEchartsModule } from 'ngx-echarts';
     imports: [NgxEchartsModule]
 })
 export class AdminTopProvidersBarChartComponent implements OnInit {
+    private readonly _adminService = inject(AdminService);
+
     chartOptions: EChartsOption = {};
 
     ngOnInit(): void {
+        this._adminService.getTopEarningProviders().pipe(
+            map(res => res.data),
+            filter(Boolean)
+        ).subscribe({
+            next: (data) => {
+                this._setupChart(data);
+            },
+            error: (err) => {
+                console.error('Error fetching top earning providers:', err);
+            }
+        })
+    }
+
+    private _setupChart(data: ITopProviders[]): void {
+
         this.chartOptions = {
             title: {
                 text: 'Top 10 Earning Providers',
@@ -47,11 +67,7 @@ export class AdminTopProvidersBarChartComponent implements OnInit {
             },
             yAxis: {
                 type: 'category',
-                data: [
-                    'Provider A', 'Provider B', 'Provider C', 'Provider D', 'Provider E',
-                    'Provider F', 'Provider G', 'Provider H', 'Provider I', 'Provider J'
-                ],
-                
+                data: [...data.map((d: ITopProviders) => d.username)],
                 inverse: true,
                 axisLabel: {
                     fontSize: 10,
@@ -74,10 +90,9 @@ export class AdminTopProvidersBarChartComponent implements OnInit {
                         color: '#34d399', // emerald green
                         borderRadius: [0, 6, 6, 0]
                     },
-                    data: [92000, 87000, 83000, 79000, 76000, 74000, 72000, 69000, 67000, 65000]
+                    data: [...data.map((d: ITopProviders) => d.totalEarnings)]
                 }
             ]
         };
-
     }
 }
