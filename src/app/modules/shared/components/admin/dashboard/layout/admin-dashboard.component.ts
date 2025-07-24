@@ -7,9 +7,10 @@ import { AdminRevenueChartComponent } from "../revenue-chart/revenue-chart.compo
 import { SubscriptionPieChartComponent } from "../subscription-pie-chart/subscription-pie-chart.component";
 import * as echarts from 'echarts/core';
 import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components';
-import { LineChart, PieChart } from 'echarts/charts';
+import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 import { provideEchartsCore } from 'ngx-echarts';
+import { UserTrackingBarChartComponent } from "../user-tracking-bar-chart/user-tracking-bar-chart.component";
 
 echarts.use([
   TitleComponent,
@@ -18,13 +19,14 @@ echarts.use([
   LegendComponent,
   LineChart,
   PieChart,
-  CanvasRenderer
+  CanvasRenderer,
+  BarChart
 ]);
 
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
-  imports: [CommonModule, AdminDashboardOverviewComponent, AdminRevenueChartComponent, SubscriptionPieChartComponent],
+  imports: [CommonModule, AdminDashboardOverviewComponent, AdminRevenueChartComponent, SubscriptionPieChartComponent, UserTrackingBarChartComponent],
   providers: [provideEchartsCore({ echarts })],
 })
 export class AdminDashboardComponent implements OnInit {
