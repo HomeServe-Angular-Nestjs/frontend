@@ -1,25 +1,12 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgxEchartsModule, provideEchartsCore } from 'ngx-echarts';
-import * as echarts from 'echarts/core';
-import { LineChart } from 'echarts/charts';
-import { TitleComponent, TooltipComponent, GridComponent, LegendComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
+import { NgxEchartsModule } from 'ngx-echarts';
 import { AdminService } from '../../../../../../core/services/admin.service';
 
-echarts.use([
-    TitleComponent,
-    TooltipComponent,
-    GridComponent,
-    LegendComponent,
-    LineChart,
-    CanvasRenderer
-]);
 
 @Component({
     selector: 'app-admin-dashboard-revenue-chart',
     imports: [CommonModule, NgxEchartsModule],
-    providers: [provideEchartsCore({ echarts })],
     template: `
     <div echarts 
          [options]="chartOptions" 
@@ -60,7 +47,7 @@ export class AdminRevenueChartComponent implements OnInit {
                 formattedData = res.data
             }
         });
-        
+
         formattedData = this.transactionData.map(tx => {
             return [new Date(tx.createdAt).getTime(), tx.amount];
         });
