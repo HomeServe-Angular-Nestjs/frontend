@@ -1,0 +1,4 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 p-6">
+    <app-admin-overview-card *ngFor="let stat of overviewStats" [title]="stat.title" [value]="stat.value"
+        [icon]="stat.icon" [iconBg]="stat.iconBg" [subtext]="stat.subtext"></app-admin-overview-card>
+</div>

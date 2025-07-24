@@ -1,36 +1,51 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, ViewChild } from "@angular/core";
 import { AdminService } from "../../../../../../core/services/admin.service";
 import { AdminBookingTableComponent } from "../booking-table/admin-bookings-table.component";
-import { IAdminBookingForTable, IBookingStats } from "../../../../../../core/models/booking.model";
-import { map, Observable } from "rxjs";
+import { IAdminBookingFilter, IAdminBookingForTable, IBookingStats, IPagination } from "../../../../../../core/models/booking.model";
+import { map, Observable, of, shareReplay } from "rxjs";
 import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 import { AdminBookingFilterComponent } from "../booking-filter/booking-filter.component";
-import { _VisuallyHiddenLoader } from "@angular/cdk/private";
 import { IAdminOverViewCard, OverviewCardComponent } from "../../../../partials/sections/admin/overview-card/admin-overview-card.component";
+import { AdminPaginationComponent } from "../../../../partials/sections/admin/pagination/pagination.component";
+import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 
 @Component({
     selector: 'app-admin-bookings',
     templateUrl: './admin-bookings.component.html',
-    imports: [CommonModule, AdminBookingTableComponent, AdminBookingFilterComponent, OverviewCardComponent]
+    imports: [CommonModule, AdminBookingTableComponent, AdminBookingFilterComponent, OverviewCardComponent, AdminPaginationComponent, LoadingCircleAnimationComponent]
 })
 export class AdminBookingLayoutComponent implements OnInit {
     private readonly _adminService = inject(AdminService);
     private readonly _sharedData = inject(SharedDataService);
 
-    bookings$!: Observable<IAdminBookingForTable[]>;
+    @ViewChild(AdminBookingFilterComponent)
+    private _filterComponent!: AdminBookingFilterComponent
+
+    bookings$: Observable<IAdminBookingForTable[]> = of([]);
     stats!: IAdminOverViewCard[];
+    pagination!: IPagination;
 
     ngOnInit(): void {
         this._sharedData.setTitle('Booking Management');
-        this._loadTable();
+        this._loadTable({});
         this._loadOverviewData();
     }
 
-    private _loadTable() {
-        this.bookings$ = this._adminService.getBookings().pipe(
-            map(res => res.data ?? [])
+    private _loadTable(filter: IAdminBookingFilter) {
+        const response$ = this._adminService.getBookings(filter).pipe(
+            map(res => res.data),
+            shareReplay(1)
         );
+
+        this.bookings$ = response$.pipe(
+            map(data => data?.bookingData ?? [])
+        );
+
+        response$.subscribe(data => {
+            if (data?.pagination)
+                this.pagination = data?.pagination;
+        });
     }
 
     private _buildOverviewCards(data?: IBookingStats): IAdminOverViewCard[] {
@@ -85,7 +100,6 @@ export class AdminBookingLayoutComponent implements OnInit {
         ];
     }
 
-
     private _loadOverviewData() {
         this._adminService.getBookingStats().subscribe({
             next: (res) => {
@@ -97,6 +111,18 @@ export class AdminBookingLayoutComponent implements OnInit {
             error: (err) => {
                 console.error(err);
             }
-        })
+        });
+    }
+
+    applyFilters(filters: IAdminBookingFilter) {
+        this._loadTable(filters);
+    }
+
+    changePage(page: number) {
+        const filter: IAdminBookingFilter = {
+            ...this._filterComponent.filter,
+            page
+        };
+        this._loadTable(filter);
     }
 }

@@ -28,7 +28,6 @@ import { chatEffects } from './store/chat/chats.effect';
 import { metaReducers } from './store/auth/meta.reducer';
 import { subscriptionEffects } from './store/subscriptions/subscription.effects';
 
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),

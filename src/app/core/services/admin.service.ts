@@ -5,7 +5,7 @@ import { IApprovalOverviewData, IApprovalTableDetails, IRemoveData, IUpdateUserS
 import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { IAdminBookingForTable, IBookingStats } from "../models/booking.model";
+import { IAdminBookingFilter, IAdminBookingForTable, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
 import { IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
 
 @Injectable({ providedIn: 'root' })
@@ -99,8 +99,15 @@ export class AdminService {
         );
     }
 
-    getBookings(): Observable<IResponse<IAdminBookingForTable[]>> {
-        return this._http.get<IResponse<IAdminBookingForTable[]>>(`${this._adminUrl}/bookings`).pipe(
+    getBookings(filter: IAdminBookingFilter = {}): Observable<IResponse<IPaginatedBookingsResponse>> {
+        let params = new HttpParams();
+        for (const [key, value] of Object.entries(filter)) {
+            if (value != null && value != undefined) {
+                params = params.set(key, value);
+            }
+        }
+
+        return this._http.get<IResponse<IPaginatedBookingsResponse>>(`${this._adminUrl}/bookings`, { params }).pipe(
             catchError((error: HttpErrorResponse) =>
                 throwError(() =>
                     new Error(this.getErrorMessage(error)))
@@ -143,4 +150,21 @@ export class AdminService {
         );
     }
 
+    getDashboardOverviewData(): Observable<IResponse> {
+        return this._http.get<IResponse>(`${this._adminUrl}/dashboard/overview`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
+
+    getDashboardRevenueData(): Observable<IResponse> {
+        return this._http.get<IResponse>(`${this._adminUrl}/dashboard/revenue`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this.getErrorMessage(error)))
+            )
+        );
+    }
 }

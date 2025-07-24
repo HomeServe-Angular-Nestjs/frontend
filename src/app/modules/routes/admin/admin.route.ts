@@ -24,7 +24,7 @@ export const adminRoute: Routes = [
                     },
                     {
                         path: 'dashboard',
-                        loadComponent: () => import('../../shared/components/admin/dashboard/admin-dashboard.component').then(c => c.AdminDashboardComponent),
+                        loadComponent: () => import('../../shared/components/admin/dashboard/layout/admin-dashboard.component').then(c => c.AdminDashboardComponent),
                         canActivate: [AuthGuard]
                     },
                     {

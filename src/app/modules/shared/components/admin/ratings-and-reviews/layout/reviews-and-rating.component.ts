@@ -9,11 +9,12 @@ import { SharedDataService } from "../../../../../../core/services/public/shared
 import { IAdminReviewData, IReviewFilters, PaginatedReviewResponse } from "../../../../../../core/models/reviews.model";
 import { IPagination } from "../../../../../../core/models/booking.model";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
+import { AdminReviewOverviewComponent } from "../overviews/reviews-overviews.component";
 
 @Component({
     selector: 'app-admin-reviews-and-ratings-layout',
     templateUrl: './reviews-and-rating.component.html',
-    imports: [CommonModule, AdminReviewsFilterComponent, AdminReviewsListComponent, AdminPaginationComponent]
+    imports: [CommonModule, AdminReviewsFilterComponent, AdminReviewsListComponent, AdminPaginationComponent, AdminReviewOverviewComponent]
 })
 export class AdminReviewsAndRatingsLayout {
     private readonly _adminService = inject(AdminService);
@@ -35,7 +36,7 @@ export class AdminReviewsAndRatingsLayout {
 
     private _loadTableData(filter: IReviewFilters = {}) {
         const response$ = this._adminService.getReviewData(filter).pipe(
-            delay(600),
+            // delay(600),
             map(res => res.data ?? { reviews: [], pagination: {} })
         );
 

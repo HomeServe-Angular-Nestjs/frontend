@@ -1,6 +1,5 @@
 <div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200 bg-white">
     <table class="min-w-full text-sm text-left text-gray-800">
-
         <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-600">
             <tr>
                 <th class="px-5 py-3">Booking ID</th>
@@ -13,63 +12,53 @@
             </tr>
         </thead>
 
-        <tbody>
+        <!-- ✅ Table body when bookings exist -->
+        <tbody *ngIf="bookings && bookings.length > 0; else noBookings">
             <tr *ngFor="let booking of bookings; let i = index" class="border-b hover:bg-blue-50/30 transition-shadow">
-
                 <td class="px-5 py-3 font-mono text-xs text-gray-500 tracking-wide">
-                    {{ booking.bookingId | uppercase | slice:0:10 }}
+                    {{ booking.bookingId | uppercase | slice: 0:10 }}
                 </td>
-
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">
                         <img [src]="booking.customer.avatar" class="w-9 h-9 rounded-full border object-cover shadow-sm"
                             alt="Customer avatar" />
                         <div>
                             <div class="font-semibold">{{ booking.customer.username }}</div>
-                            <div class="text-xs text-gray-400 truncate">
-                                {{ booking.customer.email }}
-                            </div>
+                            <div class="text-xs text-gray-400 truncate">{{ booking.customer.email }}</div>
                         </div>
                     </div>
                 </td>
-
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">
                         <img [src]="booking.provider.avatar" class="w-9 h-9 rounded-full border object-cover shadow-sm"
                             alt="Provider avatar" />
                         <div>
                             <div class="font-semibold">{{ booking.provider.username }}</div>
-                            <div class="text-xs text-gray-400 truncate">
-                                {{ booking.provider.email }}
-                            </div>
+                            <div class="text-xs text-gray-400 truncate">{{ booking.provider.email }}</div>
                         </div>
                     </div>
                 </td>
-
                 <td class="px-5 py-3">
                     {{ booking.date | date: 'short' }}
                 </td>
-
                 <td class="px-5 py-3">
                     <span [ngClass]="{
-              'text-green-600': booking.status === 'completed',
-              'text-red-600': booking.status === 'cancelled',
-              'text-yellow-600': booking.status === 'pending',
-            }" class="capitalize">
+            'text-green-600': booking.status === 'completed',
+            'text-red-600': booking.status === 'cancelled',
+            'text-yellow-600': booking.status === 'pending'
+          }" class="capitalize">
                         {{ booking.status | titlecase }}
                     </span>
                 </td>
-
                 <td class="px-5 py-3">
                     <span [ngClass]="{
-              'text-green-600': booking.paymentStatus === 'paid',
-              'text-red-600': booking.paymentStatus === 'failed',
-              'text-blue-600': booking.paymentStatus === 'refunded',
-            }" class="capitalize">
+            'text-green-600': booking.paymentStatus === 'paid',
+            'text-red-600': booking.paymentStatus === 'failed',
+            'text-blue-600': booking.paymentStatus === 'refunded'
+          }" class="capitalize">
                         {{ booking.paymentStatus | titlecase }}
                     </span>
                 </td>
-
                 <td class="px-5 py-3 text-center">
                     <button
                         class="inline-flex items-center justify-center p-2 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
@@ -79,10 +68,18 @@
                 </td>
             </tr>
         </tbody>
+
+        <ng-template #noBookings>
+            <tbody>
+                <tr>
+                    <td colspan="7" class="text-center py-12 text-gray-400">
+                        <div class="flex flex-col items-center justify-center">
+                            <i class="fas fa-calendar-times text-3xl mb-3"></i>
+                            <p class="text-sm">No bookings found</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </ng-template>
     </table>
-</div>
-<div class="px-5 py-3 bg-gray-50">
-    <div>
-        <app-admin-pagination [pagination]="pagination"></app-admin-pagination>
-    </div>
 </div>

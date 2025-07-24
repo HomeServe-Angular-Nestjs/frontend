@@ -205,6 +205,11 @@ export interface IAdminBookingForTable {
     paymentStatus: PaymentStatus;
 }
 
+export interface IPaginatedBookingsResponse {
+    bookingData: IAdminBookingForTable[];
+    pagination: IPagination;
+}
+
 export interface IBookingStats {
     total: number;
     pending: number;
@@ -212,4 +217,12 @@ export interface IBookingStats {
     unpaid: number;
     refunded: number;
     completed: number;
+}
+
+export interface IAdminBookingFilter {
+    page?: number;
+    searchBy?: string;
+    search?: string;
+    bookingStatus?: BookingStatus | '';
+    paymentStatus?: PaymentStatus | '';
 }

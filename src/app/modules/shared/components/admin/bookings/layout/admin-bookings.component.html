@@ -1,7 +1,8 @@
-<section class="mb-9">
-    <h2 class="text-2xl font-bold text-gray-900 leading-tight mb-4 tracking-tight">
+<section class="mb-10">
+    <h2 class="text-2xl font-bold text-gray-900 leading-tight tracking-tight mb-6">
         Booking Summary Overview
     </h2>
+
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         <app-admin-overview-card *ngFor="let stat of stats" [icon]="stat.icon" [iconBg]="stat.iconBg"
             [title]="stat.title" [value]="stat.value" [subtext]="stat.subtext">
@@ -9,20 +10,29 @@
     </div>
 </section>
 
-<ng-container *ngIf="bookings$ | async as bookings">
-    <section class="mb-5 flex justify-between">
-        <section class="mb-6">
-            <h3 class="text-lg md:text-xl font-semibold text-gray-800">
-                Booking History
-            </h3>
-            <p class="text-sm text-gray-500 mt-1">
-                Overview of all completed, cancelled, and refunded bookings.
-            </p>
-        </section>
-        <app-admin-booking-filters></app-admin-booking-filters>
-    </section>
+<section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div>
+        <h3 class="text-lg md:text-xl font-semibold text-gray-800">
+            Booking History
+        </h3>
+        <p class="text-sm text-gray-500 mt-1">
+            View all completed, cancelled, and refunded bookings.
+        </p>
+    </div>
+    <app-admin-booking-filters (filterEvent)="applyFilters($event)"></app-admin-booking-filters>
+</section>
 
-    <section>
-        <app-admin-booking-table [bookings]="bookings"></app-admin-booking-table>
-    </section>
+<!-- Bookings Table -->
+<ng-container *ngIf="bookings$ | async as bookings;">
+    <app-admin-booking-table [bookings]="bookings"></app-admin-booking-table>
+</ng-container>
+<ng-template #loading>
+    <app-loading-circle-animation></app-loading-circle-animation>
+</ng-template>
+
+<!-- Pagination Controls -->
+<ng-container *ngIf="pagination?.page">
+    <div class="px-5 py-4 bg-gray-50 border-t border-gray-200 mt-6 rounded-b-lg">
+        <app-admin-pagination [pagination]="pagination" (pageChange)="changePage($event)"></app-admin-pagination>
+    </div>
 </ng-container>
