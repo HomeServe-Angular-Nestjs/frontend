@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { AdminService } from '../../../../../../core/services/admin.service';
+import { filter, map } from 'rxjs';
+import { IAdminDashboardUserStats } from '../../../../../../core/models/user.model';
 
 
 @Component({
@@ -9,9 +12,28 @@ import { NgxEchartsModule } from 'ngx-echarts';
     imports: [NgxEchartsModule]
 })
 export class UserTrackingBarChartComponent implements OnInit {
+    private readonly _adminService = inject(AdminService);
+
     chartOptions: EChartsOption = {};
 
     ngOnInit(): void {
+        this._adminService.getUserStats().pipe(
+            map(res => res.data),
+            filter(Boolean)
+        ).subscribe({
+            next: (data) => {
+                this._setChartData(data);
+            },
+            error: (err) => {
+                console.error('Error fetching user stats:', err);
+            }
+        })
+
+    }
+
+    private _setChartData(data: IAdminDashboardUserStats) {
+        const { customer, provider } = data;
+
         this.chartOptions = {
             title: {
                 text: 'User Stats',
@@ -52,7 +74,7 @@ export class UserTrackingBarChartComponent implements OnInit {
                         borderRadius: [0, 0, 10, 10]
                     },
                     barWidth: 50,
-                    data: [30, 100, 80] // example data for providers
+                    data: [provider.new, provider.total, provider.active]
                 },
                 {
                     name: 'Customers',
@@ -64,10 +86,9 @@ export class UserTrackingBarChartComponent implements OnInit {
                         borderRadius: [10, 10, 0, 0]
                     },
                     barWidth: 50,
-                    data: [50, 200, 150] // example data for customers
+                    data: [customer.new, customer.total, customer.active]
                 }
             ]
         };
-
     }
 }

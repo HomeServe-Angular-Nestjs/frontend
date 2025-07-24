@@ -202,3 +202,14 @@ export interface IHomeSearch {
     lat: number,
     lng: number;
 }
+
+export interface IStats {
+    new: number;
+    total: number;
+    active: number;
+}
+
+export interface IAdminDashboardUserStats {
+    customer: IStats;
+    provider: IStats;
+}
