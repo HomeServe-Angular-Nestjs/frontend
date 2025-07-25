@@ -3,11 +3,11 @@ import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { LoginAuthService } from "../../../../../core/services/login-auth.service";
-import { MESSAGES_ENV } from "../../../../../environments/messages.environments";
 import { IUser } from "../../../models/user.model";
 import { NotificationService } from "../../../../../core/services/public/notification.service";
 import { REGEXP_ENV } from "../../../../../environments/env";
 import { ProgressBarComponent } from "../../shared/loading-Animations/progress-bar/progress-bar.component";
+import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
 
 
 @Component({
@@ -16,20 +16,18 @@ import { ProgressBarComponent } from "../../shared/loading-Animations/progress-b
     imports: [ReactiveFormsModule, CommonModule, RouterLink, ProgressBarComponent]
 })
 export class ChangePasswordComponent implements OnInit {
-    private route = inject(ActivatedRoute);
-    private loginService = inject(LoginAuthService);
-    private fb = inject(FormBuilder);
-    private toastr
-        = inject(NotificationService);
+    private readonly _route = inject(ActivatedRoute);
+    private readonly _loginService = inject(LoginAuthService);
+    private readonly _fb = inject(FormBuilder);
+    private readonly _toastr = inject(NotificationService);
 
     regexp = REGEXP_ENV;
-    messages = MESSAGES_ENV;
     verificationState: 'verified' | 'loading' | 'error' | 'done' = 'loading';
     errorMessage = '';
     user!: IUser;
     hidePassword = true;
 
-    form: FormGroup = this.fb.group({
+    form: FormGroup = this._fb.group({
         password: ['', [Validators.required, Validators.pattern(REGEXP_ENV.password)]],
         confirmPassword: ['', [Validators.required]]
     }, { validator: this.passwordMatchValidator });
@@ -39,7 +37,7 @@ export class ChangePasswordComponent implements OnInit {
     }
 
     verifyToken() {
-        const token = this.route.snapshot.queryParamMap.get('verification_token');
+        const token = this._route.snapshot.queryParamMap.get('verification_token');
 
         if (!token) {
             this.verificationState = "verified";
@@ -47,7 +45,7 @@ export class ChangePasswordComponent implements OnInit {
             return;
         }
 
-        this.loginService.verifyToken(token).subscribe({
+        this._loginService.verifyToken(token).subscribe({
             next: (data) => {
                 this.user = {
                     email: data.email,
@@ -69,22 +67,28 @@ export class ChangePasswordComponent implements OnInit {
             confirmPassword: this.form.get('confirmPassword'),
         }
 
-        const hasErrors = this.hasValidationErrors(controls.password, 'password') ||
-            this.hasValidationErrors(controls.confirmPassword, 'confirmPassword');
-        if (hasErrors) return;
+        if (this.form.valid) {
+            this.user['password'] = controls.password?.value;
 
-        this.user['password'] = controls.password?.value;
-
-        this.loginService.changePassword(this.user).subscribe({
-            next: () => {
-                this.verificationState = 'done';
-            },
-            error: (err) => {
-                console.error(err);
-                this.verificationState = 'error';
-                this.errorMessage = err.error.message;
+            this._loginService.changePassword(this.user).subscribe({
+                next: () => {
+                    this.verificationState = 'done';
+                },
+                error: (err) => {
+                    console.error(err);
+                    this.verificationState = 'error';
+                    this.errorMessage = err.error.message;
+                }
+            });
+        } else {
+            for (const [key, control] of Object.entries(controls)) {
+                const message = getValidationMessage(control, key);
+                if (message) {
+                    this._toastr.error(message);
+                    return;
+                }
             }
-        });
+        }
     }
 
     togglePasswordVisibility() {
@@ -95,18 +99,5 @@ export class ChangePasswordComponent implements OnInit {
         const password = formGroup.get('password')?.value;
         const confirmPassword = formGroup.get('confirmPassword')?.value;
         return password === confirmPassword ? null : { mismatch: true };
-    }
-
-    private hasValidationErrors(control: AbstractControl | null, fieldName: string): boolean {
-        if (control?.errors) {
-            Object.keys(control.errors).forEach((key) => {
-                if (this.messages['errorMessages'][fieldName]?.[key]) {
-                    this.toastr
-                        .error(this.messages['errorMessages'][fieldName][key]);
-                }
-            });
-            return true;
-        }
-        return false;
     }
 }

@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { MESSAGES_ENV } from '../../../../../environments/messages.environments';
 import { IUser } from '../../../models/user.model';
 import { authActions } from '../../../../../store/auth/auth.actions';
 import { REGEXP_ENV } from '../../../../../environments/env';
+import { getValidationMessage } from '../../../../../core/utils/form-validation.utils';
+import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
 
 @Component({
   selector: 'app-admin-login',
@@ -15,18 +16,18 @@ import { REGEXP_ENV } from '../../../../../environments/env';
 
 })
 export class AdminLoginComponent {
+  private readonly _fb = inject(FormBuilder);
+  private readonly _store = inject(Store);
+  private readonly _toastr = inject(ToastNotificationService);
 
-  private fb = inject(FormBuilder);
-  private store = inject(Store);
+  private readonly _regexp = REGEXP_ENV;
 
-  private regexp = REGEXP_ENV;
-  private messages = MESSAGES_ENV;
   errorMessage: string = '';
   fPassword = false;
 
-  form: FormGroup = this.fb.group({
+  form: FormGroup = this._fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.pattern(this.regexp.password)]],
+    password: ['', [Validators.required, Validators.pattern(this._regexp.password)]],
   });
 
   formSubmit() {
@@ -35,37 +36,28 @@ export class AdminLoginComponent {
       password: this.form.get('password')
     };
 
-    const hasError = this.hasValidationErrors(controls.email, 'email') ||
-      this.hasValidationErrors(controls.password, 'password');
-
-    if (hasError) return;
-
-    const user: IUser = {
-      email: controls.email?.value,
-      password: controls.password?.value,
-      type: 'admin'
-    }
-
     if (this.form.valid) {
-      this.store.dispatch(authActions.login({ user }));
-    }
+      const user: IUser = {
+        email: controls.email?.value,
+        password: controls.password?.value,
+        type: 'admin'
+      }
 
+      if (this.form.valid) {
+        this._store.dispatch(authActions.login({ user }));
+      }
+    } else {
+      for (const [key, control] of Object.entries(controls)) {
+        const message = getValidationMessage(control, key);
+        if (message) {
+          this._toastr.error(message);
+          return;
+        }
+      }
+    }
   }
 
   forgotPassword() {
     this.fPassword = !this.fPassword;
-  }
-
-  private hasValidationErrors(control: AbstractControl | null, fieldName: string): boolean {
-    if (!control) return false;
-
-    if (control.invalid && control.errors) {
-      const errorKey = Object.keys(control.errors)[0];
-      if (this.messages['errorMessages']?.[fieldName]?.[errorKey]) {
-        this.errorMessage = this.messages['errorMessages'][fieldName][errorKey];
-      }
-      return true;
-    }
-    return false;
   }
 }
