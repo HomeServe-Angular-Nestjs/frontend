@@ -5,7 +5,7 @@ import { RouterLink } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { ILoginConfig } from "../../../../config/login.config";
 import { IUser, UserType } from "../../../models/user.model";
-import { API_ENV, REGEXP_ENV } from "../../../../../environments/env";
+import { API_ENV, REGEXP_ENV } from "../../../../../../environments/env";
 import { authActions } from "../../../../../store/auth/auth.actions";
 import { EmailInputComponent } from "../../../partials/auth/email-input/email-input.component";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";

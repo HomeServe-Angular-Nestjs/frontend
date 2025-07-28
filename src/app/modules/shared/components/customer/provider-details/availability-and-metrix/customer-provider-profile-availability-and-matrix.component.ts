@@ -4,7 +4,7 @@ import { ProviderService } from '../../../../../../core/services/provider.servic
 import { Subscription } from 'rxjs';
 import { IProvider } from '../../../../../../core/models/user.model';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { API_KEY } from '../../../../../../environments/env';
+import { API_KEY } from '../../../../../../../environments/env';
 
 @Component({
   selector: 'app-customer-provider-profile-availability-and-matrix',

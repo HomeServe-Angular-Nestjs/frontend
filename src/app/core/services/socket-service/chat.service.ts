@@ -4,7 +4,7 @@ import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
 import { IChat, IMessage, IParticipant, ISendMessage } from "../../models/chat.model";
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { IResponse } from "../../../modules/shared/models/response.model";
-import { API_ENV } from "../../../environments/env";
+import { API_ENV } from "../../../../environments/env";
 import { Store } from "@ngrx/store";
 import { chatActions } from "../../../store/chat/chat.action";
 

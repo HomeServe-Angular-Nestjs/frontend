@@ -10,7 +10,7 @@ import { getValidationMessage } from "../../../../../../core/utils/form-validati
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { CustomerService } from "../../../../../../core/services/customer.service";
 import { customerActions } from "../../../../../../store/customer/customer.actions";
-import { API_KEY, REGEXP_ENV } from "../../../../../../environments/env";
+import { API_KEY, REGEXP_ENV } from "../../../../../../../environments/env";
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
 import { LocationService } from "../../../../../../core/services/public/location.service";
 

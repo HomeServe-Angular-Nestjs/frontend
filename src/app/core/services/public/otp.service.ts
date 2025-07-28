@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { catchError, Observable, throwError } from "rxjs";
-import { API_ENV } from "../../../environments/env";
+import { API_ENV } from "../../../../environments/env";
 
 @Injectable()
 export class OtpService {

@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { API_ENV } from "../../environments/env";
+import { API_ENV } from "../../../environments/env";
 import { catchError, map, Observable, throwError } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { ICreateSubscription, ISubscription } from "../models/subscription.model";

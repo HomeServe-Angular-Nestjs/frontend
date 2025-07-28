@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { API_ENV } from '../../environments/env';
+import { API_ENV } from '../../../environments/env';
 import { catchError, Observable, throwError } from 'rxjs';
 import { IDaysDetails, IMonthSchedule, ISchedule, IScheduleDetailFilters, IScheduleList, IScheduleListWithPagination, ISchedules, IUpdateScheduleDateSlotStatus, IUpdateScheduleDateStatus, IUpdateScheduleStatus, } from '../models/schedules.model';
 import { IProvider } from '../models/user.model';

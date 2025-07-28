@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { IUser, UserType } from "../../modules/shared/models/user.model";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { API_ENV } from "../../environments/env";
+import { API_ENV } from "../../../environments/env";
 import { catchError, map, Observable, tap, throwError } from "rxjs";
 import { IResponse, IVerifyTokenResponse } from "../../modules/shared/models/response.model";
 import { Store } from "@ngrx/store";

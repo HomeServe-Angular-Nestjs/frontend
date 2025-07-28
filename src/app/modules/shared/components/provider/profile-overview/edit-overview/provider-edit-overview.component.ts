@@ -9,7 +9,7 @@ import { Store } from '@ngrx/store';
 import { selectProvider } from '../../../../../../store/provider/provider.selector';
 import { providerActions } from '../../../../../../store/provider/provider.action';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { API_KEY } from '../../../../../../environments/env';
+import { API_KEY } from '../../../../../../../environments/env';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 export interface profile {

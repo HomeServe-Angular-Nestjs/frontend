@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { API_ENV } from "../../environments/env";
+import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, catchError, throwError } from "rxjs";
 import { IUser } from "../../modules/shared/models/user.model";
 

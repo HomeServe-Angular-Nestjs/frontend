@@ -5,7 +5,7 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validator
 import { LoginAuthService } from "../../../../../core/services/login-auth.service";
 import { IUser } from "../../../models/user.model";
 import { NotificationService } from "../../../../../core/services/public/notification.service";
-import { REGEXP_ENV } from "../../../../../environments/env";
+import { REGEXP_ENV } from "../../../../../../environments/env";
 import { ProgressBarComponent } from "../../shared/loading-Animations/progress-bar/progress-bar.component";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
 

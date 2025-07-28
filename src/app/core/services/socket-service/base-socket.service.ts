@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-import { SOCKET_URL } from '../../../environments/env';
+import { SOCKET_URL } from '../../../../environments/env';
 
 export abstract class BaseSocketService {
     protected socket: Socket | null = null;

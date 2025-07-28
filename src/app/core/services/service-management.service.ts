@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { API_ENV } from "../../environments/env";
+import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, catchError, Observable, pipe, throwError } from "rxjs";
 import { IOfferedService, IServiceFilter, IServicesWithPagination, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../models/offeredService.model";
 import { IFilter } from "../models/filter.model";

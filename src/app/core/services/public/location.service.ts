@@ -1,6 +1,6 @@
 import { HttpClient, HttpContext, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { API_KEY, OPEN_CAGE_URL } from "../../../environments/env";
+import { API_KEY, OPEN_CAGE_URL } from "../../../../environments/env";
 import { map, Observable, switchMap } from "rxjs";
 import { USE_CREDENTIALS } from "../../interceptors/auth.interceptor";
 

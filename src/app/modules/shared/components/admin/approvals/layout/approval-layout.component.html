@@ -11,8 +11,35 @@
     </section>
 
     <section class="bg-white rounded-xl shadow">
-        <ng-container *ngIf="(tableData$ | async) as tableData">
-            <!-- <app-admin-table-templpate [tableData]="tableData"></app-admin-table-templpate> -->
-        </ng-container>
+        <ng-template #textCell let-cell="cell">
+            <app-table-cell-text [text]="cell.value"></app-table-cell-text>
+        </ng-template>
+
+        <ng-template #imageTwoTextCell let-cell="cell">
+            <app-table-cell-image-two-text [image]="cell.value.image" [title]="cell.value.title"
+                [subtitle]="cell.value.subtitle"></app-table-cell-image-two-text>
+        </ng-template>
+
+        <ng-template #dateCell let-cell="cell">
+            <app-table-cell-text [text]="cell.value"></app-table-cell-text>
+        </ng-template>
+
+        <ng-template #badgeCell let-cell="cell">
+            <span class="badge">{{ cell.value }}</span>
+        </ng-template>
+
+        <ng-template #actionsCell let-cell="cell">
+            <button>Edit</button> | <button>Delete</button>
+        </ng-template>
+
+        <app-table-wrapper [row]="rows">
+            <!-- Headers slot -->
+            <tr table-header>
+                <th class="px-5 py-3" *ngFor="let col of columns">{{ col }}</th>
+            </tr>
+
+            <!-- Rows slot -->
+        </app-table-wrapper>
+
     </section>
 </div>

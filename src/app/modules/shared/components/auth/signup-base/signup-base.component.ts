@@ -8,7 +8,7 @@ import { IUser, UserType } from "../../../models/user.model";
 import { OtpComponent } from "../../../partials/auth/otp/otp.component";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
-import { REGEXP_ENV } from "../../../../../environments/env";
+import { REGEXP_ENV } from "../../../../../../environments/env";
 
 @Component({
     selector: 'app-signup-base',

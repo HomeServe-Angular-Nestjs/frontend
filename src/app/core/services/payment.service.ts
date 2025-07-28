@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { API_ENV } from "../../environments/env";
+import { API_ENV } from "../../../environments/env";
 import { catchError, Observable, throwError } from "rxjs";
 import { IVerifiedPayment, RazorpayOrder, RazorpayPaymentResponse } from "../models/payment.model";
 import { UType } from "../models/user.model";

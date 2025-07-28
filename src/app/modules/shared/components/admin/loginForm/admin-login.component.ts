@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Store } from '@ngrx/store';
 import { IUser } from '../../../models/user.model';
 import { authActions } from '../../../../../store/auth/auth.actions';
-import { REGEXP_ENV } from '../../../../../environments/env';
+import { REGEXP_ENV } from '../../../../../../environments/env';
 import { getValidationMessage } from '../../../../../core/utils/form-validation.utils';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
 

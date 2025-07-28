@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { API_ENV } from "../../environments/env";
+import { API_ENV } from "../../../environments/env";
 import { IChangePassword, ICustomer, ICustomerProfileData, IDisplayReviews } from "../models/user.model";
 import { catchError, Observable, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
