@@ -1,15 +1,25 @@
-<!-- service-form.component.html -->
-<div class="min-h-screen p-6 bg-gray-50">
-    <div class="max-w-4xl mx-auto space-y-8">
+<div class="min-h-screen p-6 bg-gray-50 relative">
+    <!-- Overlay Loading Spinner -->
+    <div *ngIf="isLoading" class="fixed inset-0 z-50 bg-white/50 flex items-center justify-center">
+        <div class="w-36 h-36 rounded-lg bg-white shadow-lg border border-gray-200 flex items-center justify-center">
+            <app-loading-circle-animation [color]="loadingColor" [text]="loadingText">
+            </app-loading-circle-animation>
+        </div>
+    </div>
+
+
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <!-- Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Create New Service</h1>
-                <p class="text-gray-500 mt-1">Design your service offerings with clear pricing and options</p>
+                <h1 class="text-3xl font-semibold text-gray-900">Create New Service</h1>
+                <p class="text-gray-500 mt-2 text-sm sm:text-base">
+                    Design your service offerings with clear pricing and options.
+                </p>
             </div>
             <button (click)="onSubmit()"
-                class="flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all shadow-sm hover:shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                class="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                         clip-rule="evenodd" />
@@ -18,18 +28,18 @@
             </button>
         </div>
 
-        <!-- Main card -->
-        <form [formGroup]="serviceForm" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-
-            <!-- Service Details Section with Image Upload -->
-            <div class="p-6 border-b border-gray-100">
+        <!-- Form Card -->
+        <form [formGroup]="serviceForm" (submit)="onSubmit()"
+            class=" bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-100">
+            <!-- Service Information -->
+            <div class="p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
                     Service Information
                 </h2>
 
                 <div class="space-y-5">
-                    <!-- Service Image Upload -->
+                    <!-- Image Upload -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Service Image</label>
                         <div class="flex items-center gap-4">
@@ -46,15 +56,15 @@
                                     </svg>
                                 </div>
                                 <input #serviceImageInput type="file" accept="image/*" class="hidden"
-                                    (change)="onServiceImageUpload($event)">
-                                <button (click)="serviceImageInput.click()"
+                                    (change)="onServiceImageUpload($event)" />
+                                <button type="button" (click)="serviceImageInput.click()"
                                     class="absolute inset-0 w-full h-full opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 flex items-center justify-center transition-opacity">
                                     <span class="text-white text-xs font-medium">Change</span>
                                 </button>
                             </div>
                             <div class="flex-1">
-                                <button (click)="serviceImageInput.click()"
-                                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium cursor-pointer">
+                                <button type="button" (click)="serviceImageInput.click()"
+                                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
                                     Upload Image
                                 </button>
                                 <p class="mt-2 text-xs text-gray-500">JPG, PNG or GIF (Max 2MB)</p>
@@ -62,6 +72,7 @@
                         </div>
                     </div>
 
+                    <!-- Title Input -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Service Title</label>
                         <input type="text" formControlName="serviceTitle" placeholder="e.g. Air Conditioning Repair"
@@ -69,6 +80,7 @@
                         <p class="mt-1 text-xs text-gray-500">Give your service a clear, descriptive name</p>
                     </div>
 
+                    <!-- Description -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <textarea rows="3" formControlName="serviceDesc"
@@ -78,14 +90,14 @@
                 </div>
             </div>
 
-            <!-- Sub services Section -->
+            <!-- Sub-Services Section -->
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
                         <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
                         Service Options
                     </h2>
-                    <button (click)="addSubService()" #addSubServiceBtn
+                    <button type="button" (click)="addSubService()"
                         class="flex items-center gap-2 px-3.5 py-1.5 bg-white border border-emerald-600 text-emerald-600 hover:bg-emerald-50 rounded-lg text-sm font-medium transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
@@ -96,13 +108,12 @@
                     </button>
                 </div>
 
-                <div formArrayName="subServices" class=" space-y-4">
-                    <!-- Subservice Card Example with Image Upload -->
+                <!-- Sub-Services List -->
+                <div formArrayName="subServices" class="space-y-4">
                     <div *ngFor="let subService of subServices.controls; let i = index" [formGroupName]="i"
-                        [attr.id]="'sub-service-' + i"
-                        class=" border border-gray-100 rounded-xl bg-gray-50 p-5 shadow-xs">
-                        <div class="flex justify-between items-start">
-                            <div class="w-full space-y-4">
+                        class="border border-gray-100 rounded-xl bg-gray-50 p-5 shadow-sm">
+                        <div class="flex justify-between items-start gap-4">
+                            <div class="space-y-4 w-full">
                                 <!-- Option Image Upload -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Option Image</label>
@@ -110,29 +121,20 @@
                                         <div class="relative group">
                                             <div
                                                 class="w-20 h-20 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-
-                                                <!-- Show the image if uploaded -->
                                                 <img *ngIf="subService.get('image')?.value"
                                                     [src]="subService.get('image')?.value" alt="Option image"
                                                     class="w-full h-full object-cover">
-
-                                                <!-- Show placeholder icon if no image -->
-                                                <svg *ngIf="" xmlns="http://www.w3.org/2000/svg"
-                                                    class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                                    stroke="currentColor">
+                                                <svg *ngIf="!subService.get('image')?.value"
+                                                    xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="1.5"
                                                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
-
                                             </div>
-
-                                            <!-- Hidden input for upload service -->
                                             <input #subServiceImageInput type="file" accept="image/*" class="hidden"
                                                 (change)="onSubServiceImageUpload($event, i)">
-
-                                            <!-- Overlay button to trigger file input -->
-                                            <button (click)="subServiceImageInput.click()"
+                                            <button type="button" (click)="subServiceImageInput.click()"
                                                 class="absolute inset-0 w-full h-full opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 flex items-center justify-center transition-opacity">
                                                 <span class="text-white text-xs font-medium">Change</span>
                                             </button>
@@ -142,48 +144,55 @@
                                                 class="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-xs font-medium">
                                                 Upload Image
                                             </button>
-                                            <p class="mt-1 text-xs text-gray-500">JPG, PNG or GIF (Max 2MB)
-                                            </p>
+                                            <p class="mt-1 text-xs text-gray-500">JPG, PNG or GIF (Max 2MB)</p>
                                         </div>
                                     </div>
                                 </div>
-
+                                <!-- Grid Inputs -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Option Name -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Option
-                                            Name</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Option Name</label>
                                         <input formControlName="title" type="text" placeholder="e.g. Basic AC Repair"
                                             class="w-full px-3.5 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none">
                                     </div>
+                                    <!-- Price -->
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
                                         <div class="relative">
                                             <span
-                                                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                                            <input formControlName="price" type="text" placeholder="0.00"
+                                                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
+                                            <input formControlName="price" type="number" placeholder="0.00"
                                                 class="w-full pl-8 pr-3.5 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none">
                                         </div>
                                     </div>
                                 </div>
-
+                                <!-- Short Description -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                                     <input formControlName="desc" type="text"
                                         placeholder="Short description of this option"
                                         class="w-full px-3.5 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none">
                                 </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Duration</label>
-                                        <input formControlName="estimatedTime" type="text" placeholder="e.g. 1-2 hours"
-                                            class="w-full px-3.5 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none">
+                                <!-- Duration -->
+                                <div class="w-full sm:w-1/4">
+                                    <label class="block text-sm font-medium text-gray-800 mb-2">Duration</label>
+                                    <div
+                                        class="flex justify-start rounded-lg overflow-hidden shadow-sm ring-1 ring-gray-300 focus-within:ring-2 focus-within:ring-emerald-500">
+                                        <input formControlName="estimatedTime" type="number" placeholder="In number"
+                                            class="w-full px-4 py-2 text-sm text-gray-900 placeholder-gray-400 border-0 focus:outline-none focus:ring-0" />
+                                        <select formControlName="durationOptions"
+                                            class="px-4 py-2 text-sm text-gray-900 bg-white border-l border-gray-300 focus:outline-none focus:ring-0">
+                                            <option value="">Select</option>
+                                            <option value="minutes">Minutes</option>
+                                            <option value="hours">Hours</option>
+                                            <option value="days">Days</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
-
-                            <button (click)="removeSubService(i)"
-                                class="ml-4 text-gray-400 hover:text-red-500 transition-colors p-1">
+                            <button type="button" (click)="removeSubService(i)"
+                                class="ml-4 text-gray-400 hover:text-red-500 transition-colors p-1 self-start">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                     fill="currentColor">
                                     <path fill-rule="evenodd"
@@ -196,13 +205,13 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+            <!-- Form Footer -->
+            <div class="p-6 bg-gray-50 flex justify-end gap-3">
                 <a routerLink="/provider/profiles/service_offered"
                     class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
                     Cancel
                 </a>
-                <button (click)="onSubmit()"
+                <button type="submit"
                     class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-sm hover:shadow-md">
                     Save Service
                 </button>

@@ -30,5 +30,8 @@ export const SOCKET_URL = 'http://localhost:5000';
 
 export const REGEXP_ENV = {
     password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-    phone: /^[6-9]\d{9}$/
+    phone: /^[6-9]\d{9}$/,
+    decimals: /^\d+(\.\d{1,2})?$/,
+    integers: /^\d+$/,
+
 }
