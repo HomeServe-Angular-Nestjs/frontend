@@ -5,7 +5,6 @@ import { catchError, map, Observable, throwError } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { ICreateSubscription, ISubscription } from "../models/subscription.model";
 import { Store } from "@ngrx/store";
-import { selectSelectedSubscription } from "../../store/subscriptions/subscription.selector";
 
 @Injectable({ providedIn: 'root' })
 export class SubscriptionService {

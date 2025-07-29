@@ -1,23 +1,37 @@
 import { inject } from "@angular/core";
 import { CanActivateFn, Router } from "@angular/router";
 import { Store } from "@ngrx/store";
-import { map, Observable, of, switchMap, take } from "rxjs";
+import { combineLatest, map, Observable, of, switchMap, take } from "rxjs";
 import { selectSelectedSubscription } from "../../store/subscriptions/subscription.selector";
 import { ToastNotificationService } from "../services/public/toastr.service";
 import { SubscriptionService } from "../services/subscription.service";
 import { subscriptionAction } from "../../store/subscriptions/subscription.action";
 import { ISubscription } from "../models/subscription.model";
-import { authActions } from "../../store/auth/auth.actions";
+import { selectAuthUserType } from "../../store/auth/auth.selector";
 
 export const SubscriptionGuard: CanActivateFn = (): Observable<boolean> => {
     const store = inject(Store);
     const subscriptionService = inject(SubscriptionService);
     const toastr = inject(ToastNotificationService);
+    const router = inject(Router);
 
-    return store.select(selectSelectedSubscription).pipe(
+    const selectedSubscription$ = store.select(selectSelectedSubscription);
+    const userType$ = store.select(selectAuthUserType);
+
+    return combineLatest([selectedSubscription$, userType$]).pipe(
         take(1),
-        switchMap((subscription) => {
-            if (subscription) return of(validate(subscription));
+        switchMap(([subscription, userType]) => {
+            const url = userType === 'provider' ? '/provider/plans' : '/plans';
+
+            if (subscription) {
+                const isValid = validate(subscription);
+                if (!isValid) {
+                    toastr.error('Your subscription is not active. Please renew to continue.');
+                    router.navigate([url]);
+                    return of(false);
+                }
+                return of(true);
+            }
 
             return subscriptionService.fetchSubscription().pipe(
                 map((res) => {
@@ -26,7 +40,9 @@ export const SubscriptionGuard: CanActivateFn = (): Observable<boolean> => {
                         store.dispatch(subscriptionAction.subscriptionSuccessAction({ selectedSubscription: data }));
                         return validate(data);
                     }
-                    store.dispatch(authActions.updateShowSubscriptionPageValue({ value: true }));
+
+                    toastr.error('You don’t have an active subscription. Please choose a plan to get started.');
+                    router.navigate([url]);
                     return false;
                 })
             );
@@ -34,28 +50,13 @@ export const SubscriptionGuard: CanActivateFn = (): Observable<boolean> => {
     );
 
     function validate(sub: ISubscription): boolean {
-        if (!sub.isActive) {
-            toastr.error('Your subscription is inactive');
-            return false;
-        }
+        const now = new Date();
 
-        if (!sub.endDate) {
-            toastr.error('Subscription end date is missing');
-            return false;
-        }
-
-        const endDate = new Date(sub.endDate);
-        if (isNaN(endDate.getTime())) {
-            toastr.error('Invalid subscription end date');
-            return false;
-        }
-
-        if (new Date() > endDate) {
-            toastr.error('Your subscription has expired');
-            return false;
-        }
-
-        return true;
+        return (!sub.isActive
+            || !sub.endDate
+            || isNaN(new Date(sub.endDate).getTime())
+            || now > new Date(sub.endDate)
+        );
     }
 };
 
