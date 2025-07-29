@@ -90,7 +90,7 @@ export const providerRoutes: Routes = [
                     {
                         path: 'gallery',
                         loadComponent: () => import('../../shared/components/provider/gallery/provider-gallery.component')
-                            .then(c => c.ProviderGalleryComponent)
+                            .then(c => c.ProviderGalleryComponent),
                     }
                 ],
                 canActivate: [AuthGuard],

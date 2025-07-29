@@ -1,25 +1,23 @@
 <div class="bg-gray-50 mt-2">
     <div class="px-8 py-3">
-        <!-- Breadcrumb
-        <div class="flex items-center text-sm mb-4">
-            <a href="#" class="text-gray-500 hover:text-gray-700">Account</a>
-            <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
-            <span class="text-gray-900 font-medium">Profile</span>
-        </div> -->
 
         <!-- Profile Section Navigation -->
         <div class="flex items-center space-x-6">
             <ng-container *ngFor="let item of crumbs">
-                <a [routerLink]="item.route" (click)="changeStatus(item.name)"
-                    class="px-3 py-2 text-sm font-medium " [ngClass]="{
-                        'text-[#16A34A] border-b-2 border-[#16A34A] ': item.active,
-                        'text-gray-500 hover:text-gray-700 border-transparent hover:border-gray-300':!item.active
-                    }">
-                    <i [class]="'fas' + item.icon +'mr-2'"></i>
-                    <p>{{item.name}}</p>
-                </a>
-            </ng-container>
+                <div class="relative px-3 py-2 text-sm font-medium">
+                    <a [routerLink]="item.route" (click)="changeStatus(item.name)" [ngClass]="{
+        'text-[#16A34A] border-b-2 border-[#16A34A]': item.active,
+        'text-gray-500 hover:text-gray-700 border-transparent hover:border-gray-300': !item.active
+      }" class="inline-flex items-center gap-1 border-b transition-colors duration-200">
+                        <i [class]="'fas ' + item.icon + ' mr-1'"></i>
+                        <p>{{ item.name }}</p>
+                    </a>
 
+                    <!-- Crown icon for 'Gallery' item
+                    <i *ngIf="item.name === 'Gallery'"
+                        class="fas fa-crown absolute -top-2 -right-2 text-yellow-500 rotate-[15deg]"></i> -->
+                </div>
+            </ng-container>
 
         </div>
     </div>
