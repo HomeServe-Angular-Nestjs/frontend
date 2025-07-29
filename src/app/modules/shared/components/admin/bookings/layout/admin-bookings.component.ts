@@ -27,7 +27,7 @@ export class AdminBookingLayoutComponent implements OnInit {
     pagination!: IPagination;
 
     ngOnInit(): void {
-        this._sharedData.setTitle('Booking Management');
+        this._sharedData.setAdminHeader('Booking Management');
         this._loadTable({});
         this._loadOverviewData();
     }

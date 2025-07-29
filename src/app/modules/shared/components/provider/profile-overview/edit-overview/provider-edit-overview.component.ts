@@ -12,25 +12,6 @@ import { MapboxMapComponent } from "../../../../partials/shared/map/map.componen
 import { API_KEY } from '../../../../../../../environments/env';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
-export interface profile {
-  fullName: string,
-  profession: string,
-  avatar: string | File
-  location: string,
-  serviceRadius: number,
-  experience: number,
-  licensed: true,
-  workingDays: {
-    start: string,
-    end: string
-  },
-  workingHours: {
-    start: string,
-    end: string
-  },
-  emergencyAvailable: boolean,
-};
-
 @Component({
   selector: 'app-provider-edit-overview',
   standalone: true,
@@ -60,6 +41,7 @@ export class ProviderEditOverviewComponent implements OnInit {
     profession: ['', Validators.required],
     experience: ['', [Validators.required, Validators.min(0), Validators.max(50)]],
     location: [null, Validators.required],
+    address: ['', Validators.required],
     serviceRadius: ['', [Validators.min(1), Validators.max(100)]],
     workingDaysStart: ['', Validators.required],
     workingDaysEnd: ['', Validators.required],
@@ -81,6 +63,7 @@ export class ProviderEditOverviewComponent implements OnInit {
         profession: this.provider.profession,
         experience: this.provider.experience,
         location: this.provider.location,
+        address: this.provider.address,
         serviceRadius: this.provider.serviceRadius,
         workingDaysStart: this.provider.availability?.day?.from,
         workingDaysEnd: this.provider.availability?.day?.to,
@@ -113,6 +96,7 @@ export class ProviderEditOverviewComponent implements OnInit {
       profession: this.profileForm.get('profession'),
       experience: this.profileForm.get('experience'),
       location: this.profileForm.get('location'),
+      address: this.profileForm.get('address'),
       serviceRadius: this.profileForm.get('serviceRadius'),
       workingDaysStart: this.profileForm.get('workingDaysStart'),
       workingDaysEnd: this.profileForm.get('workingDaysEnd'),
@@ -138,6 +122,7 @@ export class ProviderEditOverviewComponent implements OnInit {
           }
         },
         location: controls.location?.value,
+        address: controls.address?.value,
         avatar: this.provider?.avatar,
       }
 
@@ -169,12 +154,12 @@ export class ProviderEditOverviewComponent implements OnInit {
     this.selectedAddress = data.features[0]?.place_name || 'No address found';
 
     const location = {
-      type: 'point',
+      type: 'Point',
       coordinates: [lng, lat],
-      address: this.selectedAddress,
     }
 
     this.profileForm.get('location')?.setValue(location);
+    this.profileForm.get('address')?.setValue(this.selectedAddress);
   }
 
   cancelEdit() {

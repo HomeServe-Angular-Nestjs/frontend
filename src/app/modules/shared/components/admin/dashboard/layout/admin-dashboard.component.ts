@@ -34,6 +34,6 @@ export class AdminDashboardComponent implements OnInit {
   private readonly _sharedData = inject(SharedDataService);
 
   ngOnInit(): void {
-    this._sharedData.setTitle('Admin Dashboard');
+    this._sharedData.setAdminHeader('Admin Dashboard');
   }
 }

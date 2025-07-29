@@ -24,7 +24,7 @@ export class AdminSubscriptionLayoutComponent implements OnInit, OnDestroy {
     planToEdit: IPlan | null = null;
 
     ngOnInit(): void {
-    this._sharedData.setTitle('Subscription & Plans');
+    this._sharedData.setAdminHeader('Subscription & Plans');
     }
 
     ngOnDestroy(): void {

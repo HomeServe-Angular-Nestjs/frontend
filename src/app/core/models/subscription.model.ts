@@ -37,6 +37,7 @@ export interface ICreateSubscription {
     paymentStatus?: SubsPaymentStatus;
     startTime: string;
     endDate: string | null;
+    price: number;
 }
 
 export interface ISubscriptionState {

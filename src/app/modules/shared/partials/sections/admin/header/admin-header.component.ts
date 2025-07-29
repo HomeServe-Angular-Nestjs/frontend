@@ -12,7 +12,7 @@ export class AdminHeaderComponent implements OnInit {
   private readonly _sharedData = inject(SharedDataService);
 
 
-  header$ = this._sharedData.title$;
+  header$ = this._sharedData.adminHeader$;
 
   ngOnInit(): void {
 

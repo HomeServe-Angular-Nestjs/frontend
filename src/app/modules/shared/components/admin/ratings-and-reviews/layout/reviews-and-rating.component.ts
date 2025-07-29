@@ -30,7 +30,7 @@ export class AdminReviewsAndRatingsLayout {
     reviews$!: Observable<IAdminReviewData[]>;
 
     ngOnInit(): void {
-        this._sharedData.setTitle('Ratings & Reviews');
+        this._sharedData.setAdminHeader('Ratings & Reviews');
         this._loadTableData();
     }
 

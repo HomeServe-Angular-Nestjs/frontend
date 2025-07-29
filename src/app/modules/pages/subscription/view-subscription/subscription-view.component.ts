@@ -2,19 +2,23 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { ISubscription } from "../../../../core/models/subscription.model";
 import { Store } from "@ngrx/store";
-import { Observable, Subject, takeUntil } from "rxjs";
-import { selectAuthUserType } from "../../../../store/auth/auth.selector";
+import { combineLatest, Observable, Subject, takeUntil } from "rxjs";
+import { selectAuthUserType, selectShowSubscriptionPage } from "../../../../store/auth/auth.selector";
 import { selectSelectedSubscription } from "../../../../store/subscriptions/subscription.selector";
-import { subscriptionAction } from "../../../../store/subscriptions/subscription.action";
 import { CapitalizeFirstPipe } from "../../../../core/pipes/capitalize-first.pipe";
+import { subscriptionAction } from "../../../../store/subscriptions/subscription.action";
+import { Router, RouterLink } from "@angular/router";
+import { SharedDataService } from "../../../../core/services/public/shared-data.service";
 
 @Component({
     selector: 'app-subscription-view-page',
     templateUrl: './subscription-view.component.html',
-    imports: [CommonModule, CapitalizeFirstPipe]
+    imports: [CommonModule, CapitalizeFirstPipe, RouterLink]
 })
 export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
     private readonly _store = inject(Store);
+    private readonly _sharedService = inject(SharedDataService);
+    private readonly _router = inject(Router);
 
     private _destroy$ = new Subject<void>();
 
@@ -22,15 +26,20 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
     userType = 'customer';
 
     ngOnInit(): void {
+        this._sharedService.setProviderHeader('Subscription');
+
         this._store.dispatch(subscriptionAction.fetchSubscriptions());
-        this.subscription$ = this._store.select(selectSelectedSubscription);
+        this.subscription$ = this._store.select(selectSelectedSubscription).pipe(takeUntil(this._destroy$));
+        const isSubscriptionPageRendered$ = this._store.select(selectShowSubscriptionPage).pipe(takeUntil(this._destroy$));
 
         this._store.select(selectAuthUserType).pipe(
             takeUntil(this._destroy$)
         ).subscribe(type => {
-            if (type) {
-                this.userType = type;
-            }
+            if (type) this.userType = type;
+        });
+
+        combineLatest([this.subscription$, isSubscriptionPageRendered$]).subscribe(([subscription]) => {
+            if (!subscription) this._router.navigate(['/provider/plans']);
         });
     }
 
@@ -39,15 +48,9 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
         this._destroy$.complete();
     }
 
-    onUpgrade(): void {
-        // Logic to navigate to upgrade
-    }
-
-    onShowPlans(): void {
+    cancelPlan(): void {
         // Logic to navigate to plan comparison or selection
     }
 
     toggleRenewalType(event: Event) { }
-
-
 }

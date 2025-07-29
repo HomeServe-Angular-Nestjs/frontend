@@ -33,5 +33,4 @@ export const REGEXP_ENV = {
     phone: /^[6-9]\d{9}$/,
     decimals: /^\d+(\.\d{1,2})?$/,
     integers: /^\d+$/,
-
 }

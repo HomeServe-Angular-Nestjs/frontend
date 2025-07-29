@@ -1,22 +1,16 @@
-<ng-container *ngIf="showSubscriptionPage$ | async; else showHomepage">
-    <app-subscription-plan-page (proceedSubEvent)="proceedWithSub($event)"></app-subscription-plan-page>
-</ng-container>
+<div class="flex h-screen font-sans">
+    <!-- Sidebar -->
+    <app-provider-sidebar class="w-64 border-r bg-white shrink-0"></app-provider-sidebar>
 
-<ng-template #showHomepage>
-    <div class="flex h-screen font-sans">
-        <!-- Sidebar -->
-        <app-provider-sidebar class="w-64 border-r bg-white shrink-0"></app-provider-sidebar>
+    <!-- Main Content -->
+    <section class="flex flex-col flex-1 bg-gray-50">
+        <!-- Header -->
+        <div class="p-4 bg-white z-10 shrink-0">
+            <app-provider-header></app-provider-header>
+        </div>
 
-        <!-- Main Content -->
-        <section class="flex flex-col flex-1 bg-gray-50">
-            <!-- Header -->
-            <div class="p-4 bg-white z-10 shrink-0">
-                <app-provider-header></app-provider-header>
-            </div>
-
-            <div class="min-h-0">
-                <router-outlet></router-outlet>
-            </div>
-        </section>
-    </div>
-</ng-template>
+        <div class="min-h-0">
+            <router-outlet></router-outlet>
+        </div>
+    </section>
+</div>

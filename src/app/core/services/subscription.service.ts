@@ -14,12 +14,6 @@ export class SubscriptionService {
 
     private readonly _apiUrl = API_ENV.subscription;
 
-    // get hasActiveSubscription$(): Observable<boolean> {
-    //     return this._store.select(selectSelectedSubscription).pipe(
-    //         map(Boolean)
-    //     );
-    // }
-
     private _getErrorMessage(error: HttpErrorResponse): string {
         if (error.error?.message) return error.error.message;
         if (typeof error.error === 'string') return error.error;
@@ -35,6 +29,24 @@ export class SubscriptionService {
         );
     }
 
+    getUpgradeAmount(subscriptionId: string): Observable<IResponse<number>> {
+        return this._http.get<IResponse<number>>(`${this._apiUrl}/upgrade_amount/${subscriptionId}`).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this._getErrorMessage(error)))
+            )
+        );
+    }
+
+    upgradeSubscription(data: ICreateSubscription): Observable<IResponse<ISubscription>> {
+        return this._http.post<IResponse<ISubscription>>(`${this._apiUrl}/upgrade`, { data }).pipe(
+            catchError((error: HttpErrorResponse) =>
+                throwError(() =>
+                    new Error(this._getErrorMessage(error)))
+            )
+        );
+    }
+
     fetchSubscription(): Observable<IResponse<ISubscription | null>> {
         return this._http.get<IResponse<ISubscription>>(`${this._apiUrl}`).pipe(
             catchError((error: HttpErrorResponse) =>
@@ -43,5 +55,7 @@ export class SubscriptionService {
             )
         );
     }
+
+
 
 }

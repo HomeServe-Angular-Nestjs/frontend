@@ -30,7 +30,7 @@ export class UserManagementComponent implements OnInit {
   lastFilterUsed: IFilter = {};
 
   ngOnInit(): void {
-    this._sharedData.setTitle('User Management');
+    this._sharedData.setAdminHeader('User Management');
 
     this._loadTableData({});
     this.tableData$ = this._userManagementService.userData$.pipe(

@@ -62,3 +62,9 @@ export enum UploadType {
     GALLERY = 'gallery',
 
 }
+
+export enum PlanDuration {
+    MONTHLY = 'monthly',
+    YEARLY = 'yearly',
+    LIFETIME = 'lifetime'
+}

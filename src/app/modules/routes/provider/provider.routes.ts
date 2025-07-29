@@ -25,6 +25,11 @@ export const providerRoutes: Routes = [
                     .then(c => c.ProviderViewSubscriptionPage)
             },
             {
+                path: 'plans',
+                loadComponent: () => import('../../pages/subscription/plans/subscription-plan.component')
+                    .then(c => c.ProviderSubscriptionPlansPage)
+            },
+            {
                 path: 'profiles',
                 component: ProfilesLayoutComponent,
                 resolve: {
