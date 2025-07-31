@@ -1,11 +1,9 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter, map, mergeMap, Subject, takeUntil } from 'rxjs';
+import { filter, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { authActions } from './store/auth/auth.actions';
 import { UserType } from './modules/shared/models/user.model';
-import { subscriptionAction } from './store/subscriptions/subscription.action';
-import { selectSelectedSubscription } from './store/subscriptions/subscription.selector';
 
 @Component({
   selector: 'app-root',

@@ -8,6 +8,7 @@ import { IResponse } from "../../modules/shared/models/response.model";
 import { IAdminBookingFilter, IAdminBookingForTable, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
 import { IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
 import { IAdminDashboardSubscription } from "../models/subscription.model";
+import { IReportDownloadBookingData, IReportDownloadTransactionData, IReportDownloadUserData } from "../models/admin-report.model";
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -130,7 +131,7 @@ export class AdminService {
 
         for (let [key, value] of Object.entries(filter)) {
             if (value !== undefined && value !== null) {
-                params = params.set(key, value);
+                params = params.set(key, value ?? 1);
             }
         }
 
@@ -194,5 +195,23 @@ export class AdminService {
                     new Error(this.getErrorMessage(error)))
             )
         );
+    }
+
+    downloadBookingReport(data: Partial<IReportDownloadBookingData>): Observable<Blob> {
+        return this._http.post<Blob>(`${this._adminUrl}/bookings/download_report`, data, {
+            responseType: 'blob' as 'json'
+        });
+    }
+
+    downloadUserReport(data: IReportDownloadUserData): Observable<Blob> {
+        return this._http.post<Blob>(`${this._adminUrl}/users/download_report`, data, {
+            responseType: 'blob' as 'json'
+        });
+    }
+
+    downloadTransactionReport(data: IReportDownloadTransactionData): Observable<Blob> {
+        return this._http.post<Blob>(`${this._adminUrl}/transactions/download_report`, data, {
+            responseType: 'blob' as 'json'
+        });
     }
 }

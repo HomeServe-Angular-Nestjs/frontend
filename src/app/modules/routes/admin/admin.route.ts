@@ -51,6 +51,11 @@ export const adminRoute: Routes = [
                         path: 'ratings&reviews',
                         loadComponent: () => import('../../shared/components/admin/ratings-and-reviews/layout/reviews-and-rating.component')
                             .then(c => c.AdminReviewsAndRatingsLayout)
+                    },
+                    {
+                        path: 'reports',
+                        loadComponent: () => import('../../shared/components/admin/reports/layout/report-layout.component')
+                            .then(c => c.AdminReportsComponent)
                     }
                 ]
             },

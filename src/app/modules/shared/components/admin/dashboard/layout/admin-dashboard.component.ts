@@ -27,13 +27,20 @@ echarts.use([
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
-  imports: [CommonModule, AdminDashboardOverviewComponent, AdminRevenueChartComponent, SubscriptionPieChartComponent, UserTrackingBarChartComponent, AdminTopProvidersBarChartComponent],
+  imports: [
+    CommonModule,
+    AdminDashboardOverviewComponent,
+    AdminRevenueChartComponent,
+    SubscriptionPieChartComponent,
+    UserTrackingBarChartComponent,
+    AdminTopProvidersBarChartComponent
+  ],
   providers: [provideEchartsCore({ echarts })],
 })
 export class AdminDashboardComponent implements OnInit {
   private readonly _sharedData = inject(SharedDataService);
 
   ngOnInit(): void {
-    this._sharedData.setAdminHeader('Admin Dashboard');
+    this._sharedData.setAdminHeader('Dashboard');
   }
 }

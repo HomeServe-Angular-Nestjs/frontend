@@ -1,0 +1,31 @@
+<form [formGroup]="filterForm" class="space-y-4">
+    <ng-container *ngFor="let filter of filters">
+        <ng-container *ngIf="shouldShowField(filter)">
+            <div>
+                <label class="block text-sm font-semibold text-gray-800 mb-2 tracking-wide">
+                    {{ filter.label }} <span class="text-gray-500 font-normal">{{filter.desc}}</span>
+                </label>
+
+                <ng-container [ngSwitch]="filter.type">
+                    <select *ngSwitchCase="'select'"
+                        class="w-full rounded-lg border border-gray-300 bg-white focus:ring-2
+                             focus:ring-blue-500 focus:border-blue-500 transition py-2 px-4 text-sm shadow-sm outline-none"
+                        [formControlName]="filter.name">
+                        <option value="">All</option>
+                        <option *ngFor="let opt of filter.options" [value]="opt">{{ opt }}</option>
+                    </select>
+
+                    <input *ngSwitchCase="'date'" type="date"
+                        class="w-full rounded-lg border border-gray-300 bg-white focus:ring-2 
+                            focus:ring-blue-500 focus:border-blue-400 transition py-2 px-4 text-sm shadow-sm outline-none"
+                        [formControlName]="filter.name" />
+
+                    <input *ngSwitchCase="'text'" type="text"
+                        class="w-full rounded-lg border border-gray-300 bg-white focus:ring-2 
+                            focus:ring-blue-400 focus:border-blue-400 transition py-2 px-4 text-sm shadow-sm outline-none" [placeholder]="filter.placeholder"
+                        [formControlName]="filter.name" />
+                </ng-container>
+            </div>
+        </ng-container>
+    </ng-container>
+</form>
