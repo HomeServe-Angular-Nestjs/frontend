@@ -7,13 +7,11 @@ import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
 import { selectCheckStatus, selectShowSubscriptionPage } from '../../../../store/auth/auth.selector';
 import { Store } from '@ngrx/store';
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
-import { ProviderSubscriptionPlansPage } from "../../subscription/plans/subscription-plan.component";
 import { authActions } from '../../../../store/auth/auth.actions';
 
 @Component({
   selector: 'app-customer-landing-page',
-  standalone: true,
-  imports: [CommonModule, CustomerHeaderComponent, RouterOutlet, CustomerFooterComponent, ProviderSubscriptionPlansPage],
+  imports: [CommonModule, CustomerHeaderComponent, RouterOutlet, CustomerFooterComponent],
   templateUrl: './customer-layout-page.component.html',
 })
 export class CustomerLayoutPageComponent implements OnInit, OnDestroy {

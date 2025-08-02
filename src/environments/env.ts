@@ -33,4 +33,6 @@ export const REGEXP_ENV = {
     phone: /^[6-9]\d{9}$/,
     decimals: /^\d+(\.\d{1,2})?$/,
     integers: /^\d+$/,
+    time24Hour: /^([01]\d|2[0-3]):([0-5]\d)$/, // format HH:mm
+    dateYYYYMMDD: /^\d{4}-\d{2}-\d{2}$/, // Matches YYYY-MM-DD strictly
 }

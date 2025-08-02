@@ -1,11 +1,5 @@
-<ng-container *ngIf=" showSubscriptionPage$ | async; else closedPage">
-    <app-subscription-plan-page (proceedSubEvent)="proceedWithSub()"></app-subscription-plan-page>
-</ng-container>
-
-<ng-template #closedPage>
-    <app-customer-header></app-customer-header>
-    <main class="mt-[4.2rem]">
-        <router-outlet></router-outlet>
-    </main>
-    <app-customer-footer></app-customer-footer>
-</ng-template>
+<app-customer-header></app-customer-header>
+<main class="mt-[4.2rem]">
+    <router-outlet></router-outlet>
+</main>
+<app-customer-footer></app-customer-footer>

@@ -84,8 +84,8 @@ export const providerRoutes: Routes = [
                     },
                     {
                         path: 'schedule_create',
-                        loadComponent: () => import('../../shared/components/provider/schedules/schedule-create/provider-schedule-create.component')
-                            .then(c => c.ProviderScheduleCreateComponent)
+                        loadComponent: () => import('../../shared/components/provider/slot-management/layout/slot-management-layout.component')
+                            .then(c => c.ProviderSlotCreationComponent)
                     },
                     {
                         path: 'gallery',
