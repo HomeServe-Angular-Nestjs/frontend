@@ -1,9 +1,14 @@
 <form [formGroup]="slotRuleForm" (ngSubmit)="onSubmit()"
     class="space-y-6 p-6 bg-white rounded-2xl max-w-xl mx-auto border border-gray-100">
 
-    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">
-        Slot Rule Configuration
-    </h2>
+    <div class="flex items-center justify-between mb-4 border-b border-gray-200 pb-2">
+        <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
+            Slot Rule Configuration
+        </h2>
+        <button (click)="closeModal()" type="button" class="text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times text-lg"></i>
+        </button>
+    </div>
 
     <!-- Name -->
     <div class="relative">
@@ -154,8 +159,7 @@
         <label for="isActive" class="text-sm font-semibold text-gray-700">Activate Rule</label>
     </div>
 
-    <button type="submit"
-        class="w-full bg-green-600 text-white text-sm font-semibold py-2.5 px-4 rounded-xl shadow-sm hover:bg-green-700 transition-colors duration-200">
-        Save Slot Rule
-    </button>
+    <app-button
+        [buttonClass]="'w-full bg-green-600 text-white text-sm font-semibold py-2.5 px-4 rounded-xl shadow-sm hover:bg-green-700 transition-colors duration-200 mt-3'"
+        [text]="'Save Slot Rule'" [type]="'submit'"></app-button>
 </form>

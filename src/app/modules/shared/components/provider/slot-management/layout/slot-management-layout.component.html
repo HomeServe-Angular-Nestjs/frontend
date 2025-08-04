@@ -2,11 +2,14 @@
     <app-button [text]="'Add Rule'" (clicked)="isOpenAddRuleModal = true" [icon]="'fa-plus'"></app-button>
 </div>
 
+<section class="p-6">
+    <app-provider-rule-list></app-provider-rule-list>
+</section>
+
 <!-- Only render modal when flag is true -->
 <section *ngIf="isOpenAddRuleModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-
     <div class="bg-white w-full max-w-2xl max-h-[95vh] overflow-y-auto relative p-4">
         <!-- Slot rule modal inside scrollable container -->
-        <app-provider-slot-rule-modal></app-provider-slot-rule-modal>
+        <app-provider-slot-rule-modal (closeModalEvent)="isOpenAddRuleModal = false"></app-provider-slot-rule-modal>
     </div>
 </section>

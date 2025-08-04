@@ -1,17 +1,23 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, EventEmitter, inject, OnInit, Output } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { arrayNotEmptyValidator, checkNegativeValidator, commaSeparatedDateValidator, dateRangeValidator, getValidationMessage, pastDateValidator, timeRangeValidator, timeValidator } from "../../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
+import { ISlotRule } from "../../../../../../core/models/slot-rule.model";
+import { SlotRuleService } from "../../../../../../core/services/slot-rule.service";
+import { ButtonComponent } from "../../../../../../UI/button/button.component";
 
 @Component({
     selector: 'app-provider-slot-rule-modal',
     templateUrl: './slot-rule-modal.component.html',
-    imports: [CommonModule, ReactiveFormsModule]
+    imports: [CommonModule, ReactiveFormsModule, ButtonComponent]
 })
 export class ProviderSlotRuleModalComponent implements OnInit {
     private readonly _fb = inject(FormBuilder);
+    private readonly _slotRuleService = inject(SlotRuleService);
     private readonly _toastr = inject(ToastNotificationService);
+
+    @Output() closeModalEvent = new EventEmitter<void>();
 
     weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -66,19 +72,19 @@ export class ProviderSlotRuleModalComponent implements OnInit {
         this.slotRuleForm.updateValueAndValidity();
 
         const controls = {
-            // name: this.slotRuleForm.get('name'),
-            // description: this.slotRuleForm.get('description'),
+            name: this.slotRuleForm.get('name'),
+            description: this.slotRuleForm.get('description'),
             startDate: this.slotRuleForm.get('startDate'),
             endDate: this.slotRuleForm.get('endDate'),
-            // daysOfWeek: this.slotRuleForm.get('daysOfWeek'), 
-            // startTime: this.slotRuleForm.get('startTime'),
-            // endTime: this.slotRuleForm.get('endTime'),
-            // slotDuration: this.slotRuleForm.get('slotDuration'),
-            // breakDuration: this.slotRuleForm.get('breakDuration'),
-            // capacity: this.slotRuleForm.get('capacity'),
-            // isActive: this.slotRuleForm.get('isActive'),
-            // priority: this.slotRuleForm.get('priority'),
-            // excludeDates: this.slotRuleForm.get('excludeDates'),
+            daysOfWeek: this.slotRuleForm.get('daysOfWeek'),
+            startTime: this.slotRuleForm.get('startTime'),
+            endTime: this.slotRuleForm.get('endTime'),
+            slotDuration: this.slotRuleForm.get('slotDuration'),
+            breakDuration: this.slotRuleForm.get('breakDuration'),
+            capacity: this.slotRuleForm.get('capacity'),
+            isActive: this.slotRuleForm.get('isActive'),
+            priority: this.slotRuleForm.get('priority'),
+            excludeDates: this.slotRuleForm.get('excludeDates'),
         };
 
         if (!this.slotRuleForm.valid) {
@@ -91,19 +97,28 @@ export class ProviderSlotRuleModalComponent implements OnInit {
             }
         }
 
-        // if (controls.startTime?.hasError('invalidTimeRange')) {
-        //     this._toastr.error('Start time must be before end time.');
-        // }
-
-        const formData = {
+        const slotRuleData: ISlotRule = {
             ...this.slotRuleForm.value,
             excludeDates: this.slotRuleForm.value.excludeDates
                 .split(',')
                 .map((d: string) => d.trim())
                 .filter(Boolean),
+            priority: Number(this.slotRuleForm.value.priority)
         };
 
-        console.log('Final Slot Rule:', formData);
-        // API call here
+        this._slotRuleService.createRule(slotRuleData).subscribe({
+            next: (res) => {
+                if (res && res.success) {
+                    this._toastr.success(res.message);
+
+                } else {
+                    this._toastr.error('Failed to create slot rule.');
+                }
+            }
+        });
+    }
+
+    closeModal() {
+        this.closeModalEvent.emit();
     }
 }

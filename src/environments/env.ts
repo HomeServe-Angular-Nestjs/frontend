@@ -16,7 +16,8 @@ export const API_ENV = {
     plans: `${domainName}/plans`,
     subscription: `${domainName}/subscription`,
     uploads: `${domainName}/uploads`,
-}
+    rule: `${domainName}/rule`
+};
 
 export const API_KEY = {
     mapbox: 'pk.eyJ1Ijoic2FqaWRtdWhhbW1lZCIsImEiOiJjbTl3b25hZDMxMHB0Mmlwc3ZlcnV3MmMwIn0.zMhfdAfDTgodZvIu0tbglw',

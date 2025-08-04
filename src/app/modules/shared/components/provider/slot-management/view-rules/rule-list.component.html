@@ -1,0 +1,118 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
+    <div *ngFor="let slot of slotRules">
+        <div class="bg-white shadow-lg rounded-2xl border border-gray-100 flex flex-col h-full">
+
+            <div
+                class="flex items-center justify-between p-5 pb-3 rounded-t-2xl bg-gradient-to-r from-green-100 to-green-300 border-b border-gray-200">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-lg font-bold text-gray-900 truncate" title="{{ slot.ruleName }}">
+                            {{ slot.ruleName }}
+                        </h2>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-600 truncate">{{ slot.description }}</p>
+                </div>
+                <div class="flex flex-col items-end ml-3 shrink-0">
+                    <app-toggle-button [trackWidth]="'w-10'" [labelClass]="'px-2'" [trackHeight]="'h-5'"
+                        [knobWidth]="'w-4'" [knobHeight]="'h-4'" [knobTranslateX]="'translate-x-5'"
+                        [(checkedValue)]="slot.isActive">
+                    </app-toggle-button>
+                    <span class="mt-2 text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm transition"
+                        [ngClass]="slot.isActive ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'">
+                        {{ slot.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- BODY DETAILS -->
+            <div class="flex-1 px-5 py-4">
+                <dl class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+
+                    <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                        <i class="fa fa-calendar-alt text-blue-400 w-4 h-4"></i>
+                        <div>
+                            <dt class="font-semibold text-gray-700">Dates</dt>
+                            <dd class="text-gray-800">{{ slot.startDate }} → {{ slot.endDate }}</dd>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                        <i class="fa fa-clock text-purple-400 w-4 h-4"></i>
+                        <div>
+                            <dt class="font-semibold text-gray-700">Time</dt>
+                            <dd class="text-gray-800">{{ slot.startTime }} - {{ slot.endTime }}</dd>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                        <i class="fa fa-hourglass-half text-teal-400 w-4 h-4"></i>
+                        <div>
+                            <dt class="font-semibold text-gray-700">Duration</dt>
+                            <dd class="text-gray-800">{{ slot.slotDuration }} mins</dd>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                        <i class="fa fa-coffee text-amber-400 w-4 h-4"></i>
+                        <div>
+                            <dt class="font-semibold text-gray-700">Break</dt>
+                            <dd class="text-gray-800">{{ slot.breakDuration }} mins</dd>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                        <i class="fa fa-users text-green-400 w-4 h-4"></i>
+                        <div>
+                            <dt class="font-semibold text-gray-700">Capacity</dt>
+                            <dd class="text-gray-800">{{ slot.capacity }}</dd>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                        <i class="fa fa-sort-amount-up text-pink-400 w-4 h-4"></i>
+                        <div>
+                            <dt class="font-semibold text-gray-700">Priority</dt>
+                            <dd class="text-gray-800">{{ slot.priority }}</dd>
+                        </div>
+                    </div>
+                </dl>
+
+                <!-- DAYS OF WEEK -->
+                <div class="mt-5">
+                    <div class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Days</div>
+                    <div class="flex flex-wrap gap-2">
+                        <span *ngFor="let day of slot.daysOfWeek"
+                            class="bg-blue-100 text-blue-800 font-semibold px-2 py-1 rounded-full shadow-sm border border-blue-200">
+                            {{ day }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- EXCLUDED DATES -->
+                <div *ngIf="slot.excludeDates?.length" class="mt-4">
+                    <div class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Excluded Dates</div>
+                    <div class="flex flex-wrap gap-2">
+                        <span *ngFor="let date of slot.excludeDates"
+                            class="bg-red-100 text-red-700 font-semibold px-2 py-1 rounded-full shadow-sm border border-red-200">
+                            {{ date }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="flex justify-end gap-2 bg-gray-50 rounded-b-2xl px-5 py-3 border-t border-gray-200">
+                <app-button
+                    [buttonClass]="'text-white bg-green-500 hover:bg-green-600 px-3 py-1.5 rounded shadow-sm transition flex items-center gap-2'"
+                    [ariaLabel]="'Edit Slot Rule'" [icon]="'edit'" (clicked)="onEdit(slot)">
+                </app-button>
+                <app-button
+                    [buttonClass]="'text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded shadow-sm transition flex items-center gap-2'"
+                    [ariaLabel]="'Delete Slot Rule'" [icon]="'trash'" (clicked)="onDelete(slot)">
+                    <i class="fa fa-trash"></i>
+                </app-button>
+            </div>
+
+        </div>
+    </div>
+</div>
