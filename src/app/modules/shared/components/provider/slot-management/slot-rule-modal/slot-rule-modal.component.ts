@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, inject, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, inject, OnInit, Output, } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { arrayNotEmptyValidator, checkNegativeValidator, commaSeparatedDateValidator, dateRangeValidator, getValidationMessage, pastDateValidator, timeRangeValidator, timeValidator } from "../../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
@@ -108,9 +108,10 @@ export class ProviderSlotRuleModalComponent implements OnInit {
 
         this._slotRuleService.createRule(slotRuleData).subscribe({
             next: (res) => {
-                if (res && res.success) {
+                if (res && res.success && res.data) {
+                    this._slotRuleService.addSloRule(res.data);
                     this._toastr.success(res.message);
-
+                    this.closeModal();
                 } else {
                     this._toastr.error('Failed to create slot rule.');
                 }

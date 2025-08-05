@@ -7,7 +7,7 @@ export interface ISlotRule {
     description: string;
     startDate: string;
     endDate: string;
-    daysOFWeek: WeekType[];
+    daysOfWeek: WeekType[];
     startTime: string;
     endTime: string;
     breakDuration: string;

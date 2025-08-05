@@ -1,8 +1,8 @@
 <div class="flex justify-end pr-12">
-    <app-button [text]="'Add Rule'" (clicked)="isOpenAddRuleModal = true" [icon]="'fa-plus'"></app-button>
+    <app-button [buttonClass]="'px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg'" [text]="'Add Rule'" (clicked)="isOpenAddRuleModal = true" [icon]="'plus'"></app-button>
 </div>
 
-<section class="p-6">
+<section class="p-6 overflow-hidden">
     <app-provider-rule-list></app-provider-rule-list>
 </section>
 

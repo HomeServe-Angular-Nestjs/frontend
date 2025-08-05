@@ -1,30 +1,27 @@
 import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { ToggleButtonComponent } from "../../../../../../UI/button/toggle-button.component";
+import { SlotRuleService } from "../../../../../../core/services/slot-rule.service";
+import { BehaviorSubject, map, Observable, of } from "rxjs";
+import { ISlotRule } from "../../../../../../core/models/slot-rule.model";
 
 @Component({
     selector: 'app-provider-rule-list',
     templateUrl: './rule-list.component.html',
     imports: [CommonModule, ButtonComponent, ToggleButtonComponent, FormsModule]
 })
-export class ProviderSlotRuleListComponent{
-    slotRules = [{
-        ruleName: "Weekend",
-        description: "this is the description",
-        startDate: "2025-08-01",
-        endDate: "2025-09-01",
-        daysOfWeek: ["Mon", "Tue", "Fri"],
-        startTime: "14:17",
-        endTime: "19:17",
-        slotDuration: 30,
-        breakDuration: 10,
-        capacity: 5,
-        isActive: true,
-        priority: 1,
-        excludeDates: ["2025-08-15", "2025-08-15"]
-    }];
+export class ProviderSlotRuleListComponent implements OnInit {
+    private readonly _slotRuleService = inject(SlotRuleService);
+
+    slotRules$ = this._slotRuleService._slotRule$;
+
+    ngOnInit(): void {
+        this._slotRuleService.fetchRules().subscribe(response => {
+            this._slotRuleService.setSlotRules(response.data ?? []);
+        });
+    }
 
     onEdit(slot: any) {
         // Trigger edit logic or open modal
