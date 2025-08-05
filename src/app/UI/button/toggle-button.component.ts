@@ -14,7 +14,7 @@ import { FormsModule } from "@angular/forms";
         type="checkbox"
         class="sr-only"
         [checked]="checkedValue"
-        (change)="onToggle($event)"
+        (change)="onToggle()"
         >
 
         <div
@@ -34,7 +34,7 @@ export class ToggleButtonComponent {
     @Input() labelTextClass = '';
 
     @Input() checkedValue: boolean = false;
-    @Output() checkedValueChange = new EventEmitter<boolean>();
+    @Output() checkedValueChange = new EventEmitter<void>();
 
     @Input() toggleClass = 'relative inline-block w-11 h-6 transition duration-200 ease-in-out rounded-full';
     @Input() activeColor = 'bg-green-500';
@@ -46,9 +46,7 @@ export class ToggleButtonComponent {
     @Input() knobHeight = 'h-5';
     @Input() knobTranslateX = 'translate-x-5';
 
-    onToggle(event: Event) {
-        const isChecked = (event.target as HTMLInputElement).checked;
-        this.checkedValue = isChecked;
-        this.checkedValueChange.emit(isChecked);
+    onToggle() {
+        this.checkedValueChange.emit();
     }
 }

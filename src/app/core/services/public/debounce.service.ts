@@ -3,7 +3,7 @@ import { debounceTime, distinctUntilChanged, Observable, Subject, switchMap } fr
 
 @Injectable()
 export class DebounceService {
-    private _searchSubject = new Subject<string>();
+    private _searchSubject = new Subject<any>();
 
     /**
      * Push a new delay value into the stream.
@@ -18,7 +18,7 @@ export class DebounceService {
     * @param delay - The debounce time in milliseconds
     * @returns Observable emitting the debounced value
     */
-    onSearch(delay: number = 300): Observable<string> {
+    onSearch(delay: number = 300): Observable<any> {
         return this._searchSubject.asObservable().pipe(
             debounceTime(delay),
             distinctUntilChanged(),

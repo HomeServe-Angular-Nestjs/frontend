@@ -4,22 +4,45 @@ import { FormsModule } from "@angular/forms";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { ToggleButtonComponent } from "../../../../../../UI/button/toggle-button.component";
 import { SlotRuleService } from "../../../../../../core/services/slot-rule.service";
-import { BehaviorSubject, map, Observable, of } from "rxjs";
 import { ISlotRule } from "../../../../../../core/models/slot-rule.model";
+import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
+import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
+import { MatDialog } from "@angular/material/dialog";
+import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagination/provider-pagination.component";
+import { IPagination } from "../../../../../../core/models/booking.model";
 
 @Component({
     selector: 'app-provider-rule-list',
     templateUrl: './rule-list.component.html',
-    imports: [CommonModule, ButtonComponent, ToggleButtonComponent, FormsModule]
+    imports: [CommonModule, ButtonComponent, ToggleButtonComponent, FormsModule, ProviderPaginationComponent],
 })
 export class ProviderSlotRuleListComponent implements OnInit {
     private readonly _slotRuleService = inject(SlotRuleService);
+    private readonly _toastr = inject(ToastNotificationService);
+    private readonly _dialog = inject(MatDialog);
 
     slotRules$ = this._slotRuleService._slotRule$;
+    pagination: IPagination = {
+        limit: 1,
+        page: 1,
+        total: 1,
+    };
 
     ngOnInit(): void {
-        this._slotRuleService.fetchRules().subscribe(response => {
-            this._slotRuleService.setSlotRules(response.data ?? []);
+        this._loadRuleList();
+    }
+
+    private _loadRuleList(page: number = 1) {
+        this._slotRuleService.fetchRules(page).subscribe(response => {
+            const data = response.data;
+            this._slotRuleService.setSlotRules(data?.rules ?? []);
+            if (data) this.pagination = data.pagination;
+        });
+    }
+
+    private _openConfirmationDialog(message: string, title: string) {
+        return this._dialog.open(ConfirmDialogComponent, {
+            data: { title, message },
         });
     }
 
@@ -28,12 +51,33 @@ export class ProviderSlotRuleListComponent implements OnInit {
         console.log('Edit clicked:', slot);
     }
 
-    onDelete(slot: any) {
-        // Trigger delete confirmation
-        console.log('Delete clicked:', slot);
+    onDelete(rule: ISlotRule) {
+        this._openConfirmationDialog(
+            'Are you sure you want to delete this rule? This action is permanent and cannot be undone.',
+            'Confirm Deletion'
+        ).afterClosed()
+            .subscribe(confirmed => {
+                if (!confirmed) return;
+
+                this._slotRuleService.removeRule(rule.id).subscribe(response => {
+                    if (response && response.success) {
+                        this._slotRuleService.removeOneRule(rule.id);
+                        this._toastr.success(`Slot "${rule.name}" ${response.message}`);
+                    }
+                });
+            })
     }
 
-    handleToggle(event: any) {
-        console.log(event);
+    handleToggle(rule: ISlotRule) {
+        this._slotRuleService.toggleStatus(rule.id, rule.isActive).subscribe(response => {
+            if (response && response.data) {
+                this._slotRuleService.updateRule(response.data);
+                this._toastr.success(response.message);
+            }
+        });
+    }
+
+    changePage(page: number) {
+        this._loadRuleList(page);
     }
 }

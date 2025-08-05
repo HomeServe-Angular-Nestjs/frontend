@@ -8,12 +8,10 @@ import { IPagination } from "../../../../../../core/models/booking.model";
     imports: [CommonModule]
 })
 export class ProviderPaginationComponent implements OnChanges {
-    @Input({ required: true }) pagination: IPagination = {
-        limit: 1,
-        page: 1,
-        total: 1,
-    };
-    
+    @Input({ required: true }) pagination!: IPagination;
+
+    @Input() title = '';
+
     @Output() pageChange = new EventEmitter<number>();
 
     currentPage: number = 1;
