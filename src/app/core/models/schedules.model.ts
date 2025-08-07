@@ -1,5 +1,5 @@
 import { EntityState } from "@ngrx/entity";
-import { ServiceToggleType } from "./offeredService.model";
+import { StatusToggleType } from "./offeredService.model";
 import { IPagination } from "./booking.model";
 
 export interface ISchedule {
@@ -135,7 +135,7 @@ export interface IUpdateScheduleDateSlotStatus {
 export type AvailabilityType = 'all' | 'booked' | 'available';
 
 export interface IScheduleDetailFilters {
-    status?: ServiceToggleType;
+    status?: StatusToggleType;
     date?: string;
     availableType?: AvailabilityType;
 }

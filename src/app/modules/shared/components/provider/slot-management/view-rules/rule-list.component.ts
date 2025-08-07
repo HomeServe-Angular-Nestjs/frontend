@@ -1,25 +1,29 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { ToggleButtonComponent } from "../../../../../../UI/button/toggle-button.component";
 import { SlotRuleService } from "../../../../../../core/services/slot-rule.service";
-import { ISlotRule } from "../../../../../../core/models/slot-rule.model";
+import { IRuleFilter, ISlotRule } from "../../../../../../core/models/slot-rule.model";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
 import { MatDialog } from "@angular/material/dialog";
 import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagination/provider-pagination.component";
 import { IPagination } from "../../../../../../core/models/booking.model";
+import { Subject, takeUntil } from "rxjs";
 
 @Component({
     selector: 'app-provider-rule-list',
     templateUrl: './rule-list.component.html',
     imports: [CommonModule, ButtonComponent, ToggleButtonComponent, FormsModule, ProviderPaginationComponent],
 })
-export class ProviderSlotRuleListComponent implements OnInit {
+export class ProviderSlotRuleListComponent implements OnInit, OnDestroy {
     private readonly _slotRuleService = inject(SlotRuleService);
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _dialog = inject(MatDialog);
+    private readonly _destroy$ = new Subject<void>();
+
+    @Output() editEvent = new EventEmitter<ISlotRule>();
 
     slotRules$ = this._slotRuleService._slotRule$;
     pagination: IPagination = {
@@ -27,13 +31,24 @@ export class ProviderSlotRuleListComponent implements OnInit {
         page: 1,
         total: 1,
     };
+    filter: IRuleFilter = {};
 
     ngOnInit(): void {
-        this._loadRuleList();
+        this._slotRuleService._ruleFilter$
+            .pipe(takeUntil(this._destroy$))
+            .subscribe((filter) => {
+                this.filter = filter;
+                this._loadRuleList(filter)
+            });
     }
 
-    private _loadRuleList(page: number = 1) {
-        this._slotRuleService.fetchRules(page).subscribe(response => {
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
+    }
+
+    private _loadRuleList(filters: IRuleFilter, page: number = 1) {
+        this._slotRuleService.fetchRules(filters, page).subscribe(response => {
             const data = response.data;
             this._slotRuleService.setSlotRules(data?.rules ?? []);
             if (data) this.pagination = data.pagination;
@@ -46,9 +61,8 @@ export class ProviderSlotRuleListComponent implements OnInit {
         });
     }
 
-    onEdit(slot: any) {
-        // Trigger edit logic or open modal
-        console.log('Edit clicked:', slot);
+    onEdit(rule: ISlotRule) {
+        this.editEvent.emit(rule);
     }
 
     onDelete(rule: ISlotRule) {
@@ -78,6 +92,6 @@ export class ProviderSlotRuleListComponent implements OnInit {
     }
 
     changePage(page: number) {
-        this._loadRuleList(page);
+        this._loadRuleList(this.filter, page);
     }
 }

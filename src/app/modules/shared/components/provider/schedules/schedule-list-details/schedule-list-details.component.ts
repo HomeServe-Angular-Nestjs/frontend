@@ -5,7 +5,7 @@ import { AvailabilityType, IDaysDetails, IScheduleDetailFilters } from '../../..
 import { BehaviorSubject, map, Observable, shareReplay, Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
-import { ServiceToggleType } from '../../../../../../core/models/offeredService.model';
+import { StatusToggleType } from '../../../../../../core/models/offeredService.model';
 
 @Component({
     selector: 'app-provider-schedule-list-details',
@@ -23,7 +23,7 @@ export class ProviderScheduleListDetailsComponent implements OnInit, OnDestroy {
 
     scheduleDates$!: Observable<(IDaysDetails & { expanded: boolean })[]>;
 
-    statusOptions: { value: ServiceToggleType, label: string }[] = [
+    statusOptions: { value: StatusToggleType, label: string }[] = [
         { value: 'all', label: 'All' },
         { value: 'true', label: 'Active' },
         { value: 'false', label: 'Inactive' }
@@ -35,7 +35,7 @@ export class ProviderScheduleListDetailsComponent implements OnInit, OnDestroy {
         { value: 'available', label: "Available" }
     ];
 
-    selectedStatus: ServiceToggleType = 'all';
+    selectedStatus: StatusToggleType = 'all';
     selectedAvailability: AvailabilityType = 'all';
     selectedDate: string = '';
 

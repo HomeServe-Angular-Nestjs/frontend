@@ -6,12 +6,12 @@ import { IProvider } from '../../../../../../core/models/user.model';
 import { Store } from '@ngrx/store';
 import { providerActions } from '../../../../../../store/provider/provider.action';
 import { selectProvider } from '../../../../../../store/provider/provider.selector';
-import { ProviderSlotCreationComponent } from "../slot-creation/provider-slot-creation.component";
+import { ProviderSlotManagementComponent } from "../slot-creation/provider-slot-creation.component";
 
 @Component({
   selector: 'app-provider-schedule-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule, ProviderSlotCreationComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule, ProviderSlotManagementComponent],
   templateUrl: './provider-schedule-create.component.html',
 })
 export class ProviderScheduleCreateComponent implements OnInit {

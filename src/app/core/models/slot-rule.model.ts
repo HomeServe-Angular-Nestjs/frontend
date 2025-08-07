@@ -1,5 +1,7 @@
-import { WeekEnum } from "../enums/enums";
+import { RuleSortEnum, WeekEnum } from "../enums/enums";
+import { StatusType } from "./auth.model";
 import { IPagination } from "./booking.model";
+import { StatusToggleType } from "./offeredService.model";
 
 export type WeekType = `${WeekEnum}`
 
@@ -23,4 +25,12 @@ export interface ISlotRule {
 export interface ISlotRulePaginatedResponse {
     rules: ISlotRule[]
     pagination: IPagination;
+}
+
+export interface IRuleFilter {
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    ruleStatus?: StatusToggleType;
+    sort?: RuleSortEnum;
 }

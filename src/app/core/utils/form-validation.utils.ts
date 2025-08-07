@@ -91,7 +91,7 @@ export function checkNegativeValidator(): ValidatorFn {
         if (raw === null || raw === undefined || raw === '') return null;
 
         const value = Number(raw);
-        return isNaN(value) || value <= 0 ? { negativeNumber: true } : null;
+        return isNaN(value) || value < 0 ? { negativeNumber: true } : null;
     };
 }
 

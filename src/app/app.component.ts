@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { authActions } from './store/auth/auth.actions';
@@ -14,7 +14,6 @@ import { UserType } from './modules/shared/models/user.model';
 export class AppComponent implements OnInit, OnDestroy {
   private readonly _router = inject(Router);
   private readonly _store = inject(Store);
-  private readonly _route = inject(ActivatedRoute);
 
   private readonly _destroy$ = new Subject<void>();
 

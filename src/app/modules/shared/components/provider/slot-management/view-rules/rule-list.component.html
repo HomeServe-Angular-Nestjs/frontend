@@ -1,10 +1,10 @@
 <ng-container *ngIf="(slotRules$ | async) as slotRules">
-    <div class=" grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 ">
+    <div class=" grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
         <div *ngFor=" let rule of slotRules">
             <div class="bg-white shadow-lg rounded-2xl border border-gray-100 flex flex-col h-full">
 
                 <div
-                    class="flex items-center justify-between p-5 pb-3 rounded-t-2xl bg-gradient-to-r from-green-100 to-green-300 border-b border-gray-200">
+                    class="flex items-center justify-between p-5 pb-3 rounded-t-2xl bg-gradient-to-r from-green-50 to-green-100 border-b border-gray-200">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                             <h2 class="text-lg font-bold text-gray-900 truncate" title="{{ rule.name }}">
@@ -19,7 +19,7 @@
                             [knobTranslateX]="'translate-x-5'" (checkedValueChange)="handleToggle(rule)">
                         </app-toggle-button>
                         <span class="mt-2 text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm transition"
-                            [ngClass]="rule.isActive ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'">
+                            [ngClass]="rule.isActive ? 'bg-green-300 text-green-800' : 'bg-red-300 text-red-800'">
                             {{ rule.isActive ? 'Active' : 'Inactive' }}
                         </span>
                     </div>

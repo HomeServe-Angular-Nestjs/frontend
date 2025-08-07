@@ -44,7 +44,7 @@ export enum TransactionType {
     SUBSCRIPTION = 'Subscription',
 }
 
-export enum ServiceSort {
+export enum SortEnum {
     LATEST = 'latest',
     OLDEST = 'oldest',
     A_Z = 'a-z',
@@ -77,4 +77,11 @@ export enum WeekEnum {
     FRI = 'Fri',
     SAT = 'Sat',
     SUN = 'Sun',
+}
+
+export enum RuleSortEnum {
+    LATEST = 'latest',
+    OLDEST = 'oldest',
+    HIGH_PRIORITY = 'high_priority',
+    LOW_PRIORITY = 'low_priority',
 }

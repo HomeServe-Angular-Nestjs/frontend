@@ -30,10 +30,10 @@ export class ProfileBreadcrumbsComponent implements OnInit {
             route: 'service_offered'
         },
         {
-            name: 'Work Scheduled',
+            name: 'Slot Rules',
             icon: 'fa-clock',
             active: false,
-            route: 'schedule'
+            route: 'rules'
         },
         {
             name: 'Gallery',
