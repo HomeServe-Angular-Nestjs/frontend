@@ -1,9 +1,7 @@
 import { Component, EventEmitter, inject, Input, Output } from "@angular/core";
-import { IOfferedService, ISubService, IToggleServiceStatus, IUpdateSubservice } from "../../../../../../core/models/offeredService.model";
+import { IOfferedService,  IToggleServiceStatus, IUpdateSubservice } from "../../../../../../core/models/offeredService.model";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
-import { Store } from "@ngrx/store";
-import { offeredServiceActions } from "../../../../../../store/offered-services/offeredService.action";
 import { OfferedServicesService } from "../../../../../../core/services/service-management.service";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { MatDialog } from "@angular/material/dialog";
@@ -20,7 +18,6 @@ export class ServiceListViewComponent {
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _dialog = inject(MatDialog);
     private readonly _router = inject(Router);
-    private readonly _store = inject(Store);
 
     @Input({ required: true }) offeredServices!: IOfferedService[];
     @Output() updateEvent = new EventEmitter<IToggleServiceStatus>();
