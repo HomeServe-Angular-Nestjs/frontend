@@ -107,9 +107,6 @@ export class CustomerBookingListsComponent implements OnInit {
                     (paymentResponse: RazorpayPaymentResponse) =>
                         this._verifyPaymentAndUpdateBooking(paymentResponse, order, bookingId),
                 );
-            },
-            error: (err) => {
-                console.error(err);
             }
         });
     }

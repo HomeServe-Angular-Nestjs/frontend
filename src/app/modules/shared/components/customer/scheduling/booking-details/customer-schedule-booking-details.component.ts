@@ -1,17 +1,18 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { IAddress, ISchedules, } from '../../../../../../core/models/schedules.model';
 import { FormsModule } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { map, Observable, of } from 'rxjs';
+import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
+import { IAddress, } from '../../../../../../core/models/schedules.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
-import { map, Observable, switchMap } from 'rxjs';
-import { ScheduleService } from '../../../../../../core/services/schedule.service';
-import { ActivatedRoute } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { selectLocation, selectPhoneNumber } from '../../../../../../store/customer/customer.selector';
 import { LocationService } from '../../../../../../core/services/public/location.service';
 import { ILocation } from '../../../../../../core/models/user.model';
+import { SlotRuleService } from '../../../../../../core/services/slot-rule.service';
+import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
 
 @Component({
   selector: 'app-customer-schedule-booking-details',
@@ -21,31 +22,28 @@ import { ILocation } from '../../../../../../core/models/user.model';
   providers: [LocationService]
 })
 export class CustomerScheduleBookingDetailsComponent implements OnInit {
-  private readonly _route = inject(ActivatedRoute);
-  private readonly _bookingService = inject(BookingService);
-  private readonly _scheduleService = inject(ScheduleService);
-  private readonly _toastr = inject(ToastNotificationService);
   private readonly _store = inject(Store);
+  private readonly _slotRuleService = inject(SlotRuleService);
+  private readonly _bookingService = inject(BookingService);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _toastr = inject(ToastNotificationService);
   private readonly _locationService = inject(LocationService);
-
-  schedules$!: Observable<ISchedules[]>;
 
   mapVisible = false;
   center!: [number, number];
   selectedAddress: string | null = null;
   selectedDate: string = '';
   phoneNumber: string | null = null;
-  selectedSlot: string = '';
+  selectedSlot: IAvailableSlot | null = null;
+  providerId: string = '';
+  availableSlots$: Observable<IAvailableSlot[]> = of([]);
+
+  readonly minDate = new Date().toISOString().split('T')[0];
 
   ngOnInit(): void {
-    this.schedules$ = this._route.paramMap.pipe(
-      map(params => params.get('id') ?? ''),
-      switchMap(providerId =>
-        this._scheduleService.fetchSchedules(providerId).pipe(
-          map(response => response.data ?? [])
-        )
-      )
-    );
+    this._route.paramMap.pipe(
+      map(params => params.get('id') ?? '')
+    ).subscribe(id => this.providerId = id);
 
     this._store.select(selectPhoneNumber).subscribe(phoneNumber => {
       if (phoneNumber) {
@@ -68,27 +66,44 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
     });
   }
 
-  getMonth(dateStr: string): string {
-    return dateStr?.slice(0, 7);
-  }
-
   toggleMap() {
     this.mapVisible = !this.mapVisible;
   }
 
-  afterSlotSelection(slotId: string, dayId: string, scheduleId: string) {
-    this.selectedSlot = slotId;
+  getAvailableSlots() {
+    if (!this.providerId.trim()) {
+      this._toastr.error('Provider Id is missing.');
+      return;
+    }
+
+    if (!this.selectedDate.trim()) {
+      this._toastr.error('Please select a valid date.');
+      return;
+    }
+
+    this.availableSlots$ = this._slotRuleService.fetchAvailableSlots(this.providerId, this.selectedDate).pipe(
+      map(res => {
+        console.log(res)
+        if (res.success && res.data) return res.data;
+        else return [];
+      }));
+  }
+
+  selectSlot(slot: IAvailableSlot) {
+    if (!this.selectedDate) {
+      this._toastr.error('Date is missing.');
+      return;
+    }
+
     this._bookingService.setSelectedSlot({
-      slotId,
-      dayId,
-      month: this.getMonth(this.selectedDate),
-      scheduleId
+      ...slot,
+      date: this.selectedDate
     });
   }
 
   async onMapLocationChanged(newCenter: [number, number]) {
     this.center = newCenter;
-    const [lng, lat] = newCenter;
+    const [lng, lat] = newCenter; 
 
     this._locationService.getAddressFromCoordinates(lng, lat).subscribe({
       next: (response) => {

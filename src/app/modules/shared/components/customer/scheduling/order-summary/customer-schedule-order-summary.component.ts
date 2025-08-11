@@ -1,25 +1,24 @@
 import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
 import { IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
-import { IAddress, ISelectedSlot } from '../../../../../../core/models/schedules.model';
+import { IAddress } from '../../../../../../core/models/schedules.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { PaymentService } from '../../../../../../core/services/payment.service';
 import { RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
 import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
 import { ITransaction } from '../../../../../../core/models/transaction.model';
-import { ILocation } from '../../../../../../core/models/user.model';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { TransactionType } from '../../../../../../core/enums/enums';
 import { customerActions } from '../../../../../../store/customer/customer.actions';
+import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
-  standalone: true,
   templateUrl: './customer-schedule-order-summary.component.html',
   imports: [CommonModule, LoadingCircleAnimationComponent],
   providers: [PaymentService, RazorpayWrapperService]
@@ -45,7 +44,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     total: 0.00
   };
   location!: IAddress
-  selectedSlot: ISelectedSlot | null = null;
+  selectedSlot: IAvailableSlot | null = null;
 
   isLoading = true;
   isProcessing = false;
@@ -147,11 +146,16 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private _saveBooking(transactionData?: ITransaction) {
     const serviceIds: SelectedServiceIdsType[] = this.getServiceIds;
 
+    if (!this.selectedSlot) {
+      this._toastr.error('Please select a slot.');
+      return;
+    }
+
     const bookingData: IBookingData = {
       providerId: this.providerId!,
       total: Number(this.priceBreakup.total.toFixed()),
       location: this.location,
-      slotData: this.selectedSlot!,
+      slotData: this.selectedSlot,
       serviceIds,
       transactionId: transactionData?.id ?? null
     };

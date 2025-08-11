@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
-import { IRuleFilter, ISlotRule, ISlotRulePaginatedResponse } from "../models/slot-rule.model";
+import { IAvailableSlot, IRuleFilter, ISlotRule, ISlotRulePaginatedResponse } from "../models/slot-rule.model";
 import { BehaviorSubject, Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 
@@ -72,5 +72,10 @@ export class SlotRuleService {
 
     removeRule(ruleId: string): Observable<IResponse> {
         return this._http.delete<IResponse>(`${this._slotApi}/${ruleId}`);
+    }
+
+    fetchAvailableSlots(providerId: string, date: string): Observable<IResponse<IAvailableSlot[]>> {
+        const params = new HttpParams().set('date', date);
+        return this._http.get<IResponse<IAvailableSlot[]>>(`${this._slotApi}/available_slots/${providerId}`, { params })
     }
 }

@@ -1,5 +1,6 @@
 <div class=" rounded-lg shadow-md p-6 bg-white ">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Booking Details</h1>
+
     <!-- Mobile Verification -->
     <div class="mb-8">
         <label class="block text-gray-800 text-sm font-semibold mb-2">Mobile Number</label>
@@ -7,7 +8,7 @@
             <div class="flex-1">
                 <div class="flex">
                     <input type="tel" placeholder="Enter your mobile number" [(ngModel)]="phoneNumber"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
         </div>
@@ -26,18 +27,21 @@
 
     <!-- Service Location with Map -->
     <div class="mb-8">
-        <label class="block text-gray-800 text-sm font-semibold mb-2">Your Location</label>
+        <div class="relative">
+            <label class="block text-gray-800 text-sm font-semibold mb-2">Your Location</label>
 
-        <div class="bg-white mt-4 p-4 rounded-lg border border-gray-200 shadow-sm flex items-start">
+            <button
+                class="absolute bottom-0 right-4 text-xs font-medium text-blue-600 hover:text-blue-700 transition w-fit"
+                (click)="toggleMap()">
+                <i class="fas fa-map-marker-alt text-xs"></i>
+                <span> {{ mapVisible ? 'Hide Map' : 'Change Location' }}</span>
+            </button>
+        </div>
+
+        <div class="bg-white mt-4 p-4 rounded-lg border border-gray-200 shadow-sm flex items-start relative">
             <i class="fas fa-map-pin text-blue-500 mr-3 mt-1"></i>
             <p class="text-gray-800 text-sm">{{ selectedAddress || 'No location selected' }}</p>
         </div>
-
-        <button class="mt-4 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition"
-            (click)="toggleMap()">
-            <i class="fas fa-map-marker-alt mr-2 text-base"></i>
-            {{ mapVisible ? 'Hide Map' : 'Change Location' }}
-        </button>
 
         <!-- Map Container -->
         <div *ngIf="mapVisible" class="mt-4 border rounded-lg overflow-hidden">
@@ -45,37 +49,27 @@
             </app-mapbox-map>
         </div>
     </div>
+
     <!-- Date and Time Picker -->
-    <div class="mb-8">
-        <label class="block text-gray-800 text-sm font-semibold mb-3">Select Date & Time</label>
+    <div class="mb-2">
+        <label for="date" class="block text-gray-800 text-sm font-semibold mb-3">
+            Select Date & Time
+        </label>
+        <input type="date" id="date" [(ngModel)]="selectedDate" [min]="minDate" (ngModelChange)="getAvailableSlots()"
+            class="w-full px-4 py-2 rounded-md border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
 
-        <!-- Date Picker -->
-        <div class="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
-            <input type="date" id="date" [(ngModel)]="selectedDate"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        </div>
+        <div class="mt-4">
+            <ng-container *ngIf="availableSlots$ | async as availableSlots">
+                <div *ngIf="availableSlots?.length; else noSlots" class="grid grid-cols-2 gap-2">
+                    <button *ngFor="let slot of availableSlots" (click)="selectSlot(slot)"
+                        class="w-full px-3 py-2 rounded-lg transition bg-blue-50 text-blue-900 font-medium shadow hover:bg-blue-100 focus:ring-2 focus:ring-blue-500">
+                        {{ slot.from }} &#45; {{ slot.to }}
+                    </button>
+                </div>
 
-        <!-- Slot Display -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4" *ngIf="schedules$ | async as schedules">
-            <ng-container *ngFor="let schedule of schedules">
-                <ng-container *ngIf="schedule.month === getMonth(selectedDate)">
-                    <ng-container *ngFor="let day of schedule.days">
-                        <ng-container *ngIf="day.date === selectedDate">
-                            <ng-container *ngFor="let slot of day.slots">
-                                <button (click)="afterSlotSelection(slot.id, day.id, schedule.id)" [ngClass]="{
-                                    'ring-2 ring-blue-500 ring-offset-2 bg-blue-100': selectedSlot === slot.id,
-                                    'opacity-50 cursor-not-allowed': !slot.isActive || slot.takenBy
-                                    }"
-                                    class="w-full py-2 px-3 bg-white rounded-lg text-gray-700 hover:bg-blue-100 border border-gray-300 transition-all duration-200"
-                                    [disabled]="!slot.isActive || slot.takenBy"
-                                    [attr.aria-label]="'Slot from ' + slot.from + ' to ' + slot.to">
-                                    {{ slot.from }} - {{ slot.to }}
-                                    <span *ngIf="!slot.isActive" class="text-red-500 text-xs ml-2">(Inactive)</span>
-                                </button>
-                            </ng-container>
-                        </ng-container>
-                    </ng-container>
-                </ng-container>
+                <ng-template #noSlots>
+                    <div class="text-gray-500 mt-4 text-center">No slots available for this date. Please try another.</div>
+                </ng-template>
             </ng-container>
         </div>
     </div>

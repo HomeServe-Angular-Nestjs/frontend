@@ -3,10 +3,11 @@ import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
 import { IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
-import { IAddress, ISelectedSlot } from "../models/schedules.model";
+import { IAddress } from "../models/schedules.model";
 import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { ILocation } from "../models/user.model";
+import { ISelectedSlot } from "../models/slot-rule.model";
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
@@ -25,8 +26,8 @@ export class BookingService {
         this._addressSource.next(newAddress);
     }
 
-    setSelectedSlot(data: ISelectedSlot) {
-        this._slotSource.next(data);
+    setSelectedSlot(slot: ISelectedSlot | null) {
+        this._slotSource.next(slot);
     }
 
     // ------------------------------------------------------------------------------------------------------------------------------
