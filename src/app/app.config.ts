@@ -27,9 +27,11 @@ import { ToastrModule } from 'ngx-toastr';
 import { chatEffects } from './store/chat/chats.effect';
 import { metaReducers } from './store/auth/meta.reducer';
 import { subscriptionEffects } from './store/subscriptions/subscription.effects';
+import { ErrorHandlerService } from './core/services/public/error-handler.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    ErrorHandlerService,
     provideAnimations(),
     importProvidersFrom(ToastrModule.forRoot({
       positionClass: 'toast-top-center',
