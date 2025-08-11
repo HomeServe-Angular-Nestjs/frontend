@@ -28,6 +28,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
             return next(modifiedRequest).pipe(
                 catchError((error: HttpErrorResponse) => {
+                    console.error(error)
                     const errorCode = error?.error?.code;
                     const backendMessage = error?.error?.message;
 

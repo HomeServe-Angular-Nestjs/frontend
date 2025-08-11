@@ -12,7 +12,6 @@ export const providerRoutes: Routes = [
         path: 'provider',
         component: ProviderLayoutComponent,
         data: { role: 'provider' },
-        canActivate: [AuthGuard],
         children: [
             {
                 path: 'dashboard',
@@ -23,15 +22,20 @@ export const providerRoutes: Routes = [
             {
                 path: 'subscriptions',
                 loadComponent: () => import('../../pages/subscription/view-subscription/subscription-view.component')
-                    .then(c => c.ProviderViewSubscriptionPage)
+                    .then(c => c.ProviderViewSubscriptionPage),
+                canActivate: [AuthGuard],
+
             },
             {
                 path: 'plans',
                 loadComponent: () => import('../../pages/subscription/plans/subscription-plan.component')
-                    .then(c => c.ProviderSubscriptionPlansPage)
+                    .then(c => c.ProviderSubscriptionPlansPage),
+                canActivate: [AuthGuard],
+
             },
             {
                 path: 'manage_services',
+                canActivate: [AuthGuard],
                 children: [
                     {
                         path: '',
@@ -50,12 +54,16 @@ export const providerRoutes: Routes = [
                     },
                 ]
             },
-            // {
-            //     path: 'schedules',
-            //     // loadComponent:
-            // },
+            {
+                path: 'schedules',
+                loadComponent: () => import('../../shared/components/provider/schedules/view-schedules.component')
+                    .then(c => c.ProviderScheduleView),
+                canActivate: [AuthGuard],
+
+            },
             {
                 path: 'profiles',
+                canActivate: [AuthGuard],
                 component: ProfilesLayoutComponent,
                 resolve: {
                     provider: ProviderResolver
@@ -107,33 +115,38 @@ export const providerRoutes: Routes = [
             {
                 path: 'bookings',
                 loadComponent: () => import('../../pages/provider/bookings/bookings.component')
-                    .then(c => c.ProviderBookingsComponent)
+                    .then(c => c.ProviderBookingsComponent),
+                canActivate: [AuthGuard],
+
             },
             {
                 path: 'bookings/:id',
+                canActivate: [AuthGuard],
                 loadComponent: () => import('../../shared/components/provider/bookings/booking-details/booking-details.component')
                     .then(c => c.ProviderViewBookingDetailsComponents)
             },
             {
                 path: 'chat',
-                loadComponent: () => import('../../pages/provider/chat/provider-chat.component')
-                    .then(c => c.ProviderChatComponent)
+                canActivate: [AuthGuard],
+                loadComponent:
+                    () => import('../../pages/provider/chat/provider-chat.component')
+                        .then(c => c.ProviderChatComponent)
             },
             {
                 path: 'performance',
-                canActivate: [SubscriptionGuard],
+                canActivate: [SubscriptionGuard, AuthGuard],
                 loadComponent: () => import('../../pages/provider/analytics/performance/performance-page.component')
                     .then(c => c.ProviderPerformanceComponent)
             },
             {
                 path: 'area-analytics',
-                canActivate: [SubscriptionGuard],
+                canActivate: [SubscriptionGuard, AuthGuard],
                 loadComponent: () => import('../../pages/provider/analytics/area/area-page.component')
                     .then(c => c.ProviderAreaAnalyticsComponent)
             },
             {
                 path: 'revenue-analytics',
-                canActivate: [SubscriptionGuard],
+                canActivate: [SubscriptionGuard, AuthGuard],
                 loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
                     .then(c => c.ProviderRevenueAnalyticsComponent)
             },

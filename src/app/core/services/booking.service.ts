@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
-import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
+import { BehaviorSubject, catchError, Observable, shareReplay, throwError } from "rxjs";
 import { IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists } from "../models/booking.model";
 import { IAddress } from "../models/schedules.model";
 import { BookingStatus } from "../enums/enums";
@@ -64,24 +64,14 @@ export class BookingService {
 
     fetchBookings(page: number = 1): Observable<IBookingWithPagination> {
         const params = new HttpParams().set('page', page);
-
         return this._http.get<IBookingWithPagination>(`${this._customerApi}/booking/fetch`, { params }).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
+            shareReplay(1)
         );
     }
 
     fetchBookingDetails(bookingId: string): Observable<IBookingDetailCustomer> {
         const params = new HttpParams().set('bookingId', bookingId);
-
-        return this._http.get<IBookingDetailCustomer>(`${this._customerApi}/booking/view_details`, { params }).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        );
+        return this._http.get<IBookingDetailCustomer>(`${this._customerApi}/booking/view_details`, { params })
     }
 
     cancelBooking(bookingId: string, reason: string): Observable<IResponse> {

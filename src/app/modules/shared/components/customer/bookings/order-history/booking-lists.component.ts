@@ -4,7 +4,7 @@ import { CommonModule } from "@angular/common";
 import { FullDateWithTimePipe } from "../../../../../../core/pipes/to-full-date-with-time.pipe";
 import { IBookingResponse, IBookingWithPagination } from "../../../../../../core/models/booking.model";
 import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
-import { map, Observable } from "rxjs";
+import { map, Observable, shareReplay } from "rxjs";
 import { RouterLink } from "@angular/router";
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
@@ -33,7 +33,7 @@ export class CustomerBookingListsComponent implements OnInit {
     bookingSelectedForCancellation = '';
 
     private _fetchBookings(page: number) {
-        this.bookingsData$ = this._bookingService.fetchBookings(page)
+        this.bookingsData$ = this._bookingService.fetchBookings(page);
     }
 
     ngOnInit(): void {
