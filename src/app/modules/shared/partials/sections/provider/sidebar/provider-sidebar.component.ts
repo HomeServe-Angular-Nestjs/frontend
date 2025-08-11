@@ -26,11 +26,23 @@ export class ProviderSidebarComponent {
           active: true
         },
         {
+          name: 'Manage Services',
+          icon: 'fas fa-calendar-check',
+          route: 'manage_services',
+          active: false
+        },
+        {
           name: 'Bookings',
           icon: 'fas fa-calendar-check',
           route: 'bookings',
           active: false
-        }
+        },
+        {
+          name: 'Schedules',
+          icon: 'fas fa-calendar-check',
+          route: 'schedules',
+          active: false
+        },
       ]
     },
     {

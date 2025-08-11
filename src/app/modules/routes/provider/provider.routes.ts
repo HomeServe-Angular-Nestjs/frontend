@@ -30,6 +30,30 @@ export const providerRoutes: Routes = [
                     .then(c => c.ProviderSubscriptionPlansPage)
             },
             {
+                path: 'manage_services',
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('../../shared/components/provider/service-section/service-view/service-view.component')
+                            .then(c => c.ServiceViewComponent),
+                    },
+                    {
+                        path: 'create',
+                        loadComponent: () => import('../../shared/components/provider/service-section/service-edit/service-create.component')
+                            .then(c => c.ServiceCreateComponent)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('../../shared/components/provider/service-section/service-edit/service-create.component')
+                            .then(c => c.ServiceCreateComponent)
+                    },
+                ]
+            },
+            // {
+            //     path: 'schedules',
+            //     // loadComponent:
+            // },
+            {
                 path: 'profiles',
                 component: ProfilesLayoutComponent,
                 resolve: {
@@ -61,21 +85,6 @@ export const providerRoutes: Routes = [
                         path: 'about',
                         loadComponent: () => import('../../shared/components/provider/about-section/profile-about.component')
                             .then(c => c.ProviderProfileAboutComponent)
-                    },
-                    {
-                        path: 'service_offered',
-                        loadComponent: () => import('../../shared/components/provider/service-section/service-view/service-view.component')
-                            .then(c => c.ServiceViewComponent),
-                    },
-                    {
-                        path: 'service_offered/create',
-                        loadComponent: () => import('../../shared/components/provider/service-section/service-edit/service-create.component')
-                            .then(c => c.ServiceCreateComponent)
-                    },
-                    {
-                        path: 'service_offered/edit/:id',
-                        loadComponent: () => import('../../shared/components/provider/service-section/service-edit/service-create.component')
-                            .then(c => c.ServiceCreateComponent)
                     },
                     {
                         path: 'rules',

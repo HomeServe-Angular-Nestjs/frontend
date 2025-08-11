@@ -24,12 +24,6 @@ export class ProfileBreadcrumbsComponent implements OnInit {
             route: 'about'
         },
         {
-            name: 'Service Offered',
-            icon: 'fa-tools',
-            active: false,
-            route: 'service_offered'
-        },
-        {
             name: 'Slot Rules',
             icon: 'fa-clock',
             active: false,
