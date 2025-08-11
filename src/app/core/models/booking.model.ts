@@ -2,6 +2,7 @@ import { SelectedServiceIdsType } from "../../modules/pages/customer/booking-1-p
 import { BookingStatus, CancelStatus, PaymentStatus } from "../enums/enums";
 import { RazorpayOrder, RazorpayPaymentResponse } from "./payment.model";
 import { ISlotSource } from "./schedules.model";
+import { IAvailableSlot } from "./slot-rule.model";
 import { ILocation } from "./user.model";
 
 // --------------------
@@ -58,7 +59,7 @@ export interface IBookingData {
     providerId: string;
     total: number;
     location: Omit<ILocation, 'type'>;
-    slotData: ISlotSource;
+    slotData: IAvailableSlot;
     serviceIds: SelectedServiceIdsType[];
     transactionId: string | null;
 }

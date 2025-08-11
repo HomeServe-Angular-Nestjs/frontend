@@ -34,3 +34,13 @@ export interface IRuleFilter {
     ruleStatus?: StatusToggleType;
     sort?: RuleSortEnum;
 }
+
+export interface IAvailableSlot {
+    from: string;
+    to: string;
+    ruleId: string;
+}
+
+export interface ISelectedSlot extends IAvailableSlot {
+    date: string;
+}
