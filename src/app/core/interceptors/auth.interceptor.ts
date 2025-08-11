@@ -4,11 +4,15 @@ import { catchError, first, mergeMap, of, throwError } from "rxjs";
 import { Store } from "@ngrx/store";
 import { selectAuthUserType } from "../../store/auth/auth.selector";
 import { authActions } from "../../store/auth/auth.actions";
+import { ErrorHandlerService } from "../services/public/error-handler.service";
+import { ToastNotificationService } from "../services/public/toastr.service";
 
 export const USE_CREDENTIALS = new HttpContextToken(() => true);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const store = inject(Store);
+    const errorHandler = inject(ErrorHandlerService);
+    const toastr = inject(ToastNotificationService);
 
     return store.select(selectAuthUserType).pipe(
         first(),
@@ -24,21 +28,27 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
             return next(modifiedRequest).pipe(
                 catchError((error: HttpErrorResponse) => {
-                    const message = error?.error?.message;
+                    const errorCode = error?.error?.code;
+                    const backendMessage = error?.error?.message;
+
+                    const userMessage = errorHandler.getErrorMessage(
+                        error.status,
+                        errorCode,
+                        backendMessage
+                    );
 
                     if (error.status === 401) {
-                        store.dispatch(authActions.logout({ fromInterceptor: true, message }));
-                        return of();
-                    } else if (error.status === 403) {
-                        console.log(error);
+                        store.dispatch(authActions.logout({ fromInterceptor: true, message: userMessage }));
                         return of();
                     }
 
-                    return throwError(() => {
-                        console.error(error);
-                        const message = error?.error?.error || error?.error?.message || error.message || 'Something went wrong. Please try again!';
-                        throw new Error(message);
-                    });
+                    if (error.status === 403) {
+                        console.warn('Forbidden:', userMessage);
+                        return of();
+                    }
+
+                    toastr.error(userMessage);
+                    return throwError(() => new Error(userMessage));
                 })
             );
         })
