@@ -12,6 +12,7 @@ export const providerRoutes: Routes = [
         path: 'provider',
         component: ProviderLayoutComponent,
         data: { role: 'provider' },
+        canActivate: [AuthGuard],
         children: [
             {
                 path: 'dashboard',
@@ -79,7 +80,7 @@ export const providerRoutes: Routes = [
                                 loadComponent: () => import('../../shared/components/provider/profile-overview/edit-overview/provider-edit-overview.component')
                                     .then(c => c.ProviderEditOverviewComponent)
                             }
-                        ]
+                        ],
                     },
                     {
                         path: 'about',
@@ -102,41 +103,37 @@ export const providerRoutes: Routes = [
                             .then(c => c.ProviderGalleryComponent),
                     }
                 ],
-                canActivate: [AuthGuard],
             },
             {
                 path: 'bookings',
-                canActivate: [AuthGuard],
                 loadComponent: () => import('../../pages/provider/bookings/bookings.component')
                     .then(c => c.ProviderBookingsComponent)
             },
             {
                 path: 'bookings/:id',
-                canActivate: [AuthGuard],
                 loadComponent: () => import('../../shared/components/provider/bookings/booking-details/booking-details.component')
                     .then(c => c.ProviderViewBookingDetailsComponents)
             },
             {
                 path: 'chat',
-                canActivate: [AuthGuard],
                 loadComponent: () => import('../../pages/provider/chat/provider-chat.component')
                     .then(c => c.ProviderChatComponent)
             },
             {
                 path: 'performance',
-                canActivate: [AuthGuard, SubscriptionGuard],
+                canActivate: [SubscriptionGuard],
                 loadComponent: () => import('../../pages/provider/analytics/performance/performance-page.component')
                     .then(c => c.ProviderPerformanceComponent)
             },
             {
                 path: 'area-analytics',
-                canActivate: [AuthGuard, SubscriptionGuard],
+                canActivate: [SubscriptionGuard],
                 loadComponent: () => import('../../pages/provider/analytics/area/area-page.component')
                     .then(c => c.ProviderAreaAnalyticsComponent)
             },
             {
                 path: 'revenue-analytics',
-                canActivate: [AuthGuard, SubscriptionGuard],
+                canActivate: [SubscriptionGuard],
                 loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
                     .then(c => c.ProviderRevenueAnalyticsComponent)
             },
