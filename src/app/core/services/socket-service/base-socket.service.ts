@@ -45,7 +45,6 @@ export abstract class BaseSocketService {
 
     protected abstract onConnect(): void;
     protected abstract onDisconnect(reason: string): void;
-    protected abstract onAuthError(): void;
 
     emit<T>(event: string, data?: T): void {
         this.socket?.emit(event, data);

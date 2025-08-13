@@ -13,6 +13,6 @@ export class ProviderChatComponent implements OnInit {
     private readonly _store = inject(Store);
 
     ngOnInit(): void {
-        this._store.dispatch(chatActions.fetchAllChat());
+        this._store.dispatch(chatActions.fetchAllChat());    
     }
 }

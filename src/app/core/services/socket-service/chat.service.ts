@@ -1,12 +1,13 @@
 import { inject, Injectable } from "@angular/core";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { Store } from "@ngrx/store";
+import { lastValueFrom, Observable } from "rxjs";
 import { BaseSocketService } from "./base-socket.service";
-import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
 import { IChat, IMessage, IParticipant, ISendMessage } from "../../models/chat.model";
-import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { IResponse } from "../../../modules/shared/models/response.model";
 import { API_ENV } from "../../../../environments/env";
-import { Store } from "@ngrx/store";
 import { chatActions } from "../../../store/chat/chat.action";
+import { authActions } from "../../../store/auth/auth.actions";
 
 @Injectable({ providedIn: 'root' })
 export class ChatSocketService extends BaseSocketService {
@@ -14,8 +15,6 @@ export class ChatSocketService extends BaseSocketService {
 
     private readonly _chatApi = API_ENV.chat;
     private readonly _messageApi = API_ENV.message;
-    private readonly _maxRetries = 5;
-    private _retryCount = 0;
 
     constructor(private readonly _http: HttpClient) {
         super();
@@ -24,7 +23,6 @@ export class ChatSocketService extends BaseSocketService {
 
     protected override onConnect(): void {
         console.log('[ChatSocket] Connected');
-        this._retryCount = 0;
         this.onNewMessage((message: IMessage) => {
             this._store.dispatch(chatActions.addMessage({ message }));
         });
@@ -33,23 +31,24 @@ export class ChatSocketService extends BaseSocketService {
     protected override onDisconnect(reason: string): void {
         console.log('[ChatSocket] Disconnected:', reason);
         this.removeListener('newMessage');
+    }
 
-        if (reason !== 'io client disconnect' && this._retryCount < this._maxRetries) {
-            this._retryCount++;
-            this.onAuthError();
+    private async _refreshTokensAndReconnect(): Promise<void> {
+        try {
+            await lastValueFrom(this._refreshAccessToken());
+            console.log('[ChatSocket] Token refreshed successfully. Reconnecting socket...');
+            this.socket?.connect();
+        } catch (error) {
+            console.error('[ChatSocket] Token refresh failed:', error);
+            this.socket?.disconnect();
+            this._store.dispatch(authActions.logout({ fromInterceptor: false, message: `${error}` }));
         }
     }
 
-    protected override onAuthError(): void {
-        console.warn('[ChatSocket] Auth error detected. Attempting to reconnect...');
-        this.socket?.disconnect();
-        setTimeout(() => this.socket?.connect(), 1000 * this._retryCount);
-    }
-
     private _setupAuthErrorHandler(): void {
-        this.socket?.on('auth-error', (msg) => {
-            console.warn('[ChatSocket] Server auth-error event received:', msg);
-            this.onAuthError();
+        this.socket?.on('token:expired', async () => {
+            console.warn('[ChatSocket] Server token:expired event received');
+            await this._refreshTokensAndReconnect();
         });
     }
 
@@ -64,24 +63,20 @@ export class ChatSocketService extends BaseSocketService {
         });
     }
 
-
-
     stopListeningMessages(): void {
         this.removeListener('newMessage');
     }
 
+    private _refreshAccessToken(): Observable<void> {
+        return this._http.post<void>(`${this._chatApi}/new_access_token`, {}, { withCredentials: true });
+    }
 
     // ------------------------------------------------------------------------------------------------------------------------------
-    // **************************************************[API For Chats]*******************************************************
+    // **************************************************[API For Chats]************************************************************
     // ------------------------------------------------------------------------------------------------------------------------------
 
     fetchAllChats(): Observable<IResponse<IChat[]>> {
-        return this._http.get<IResponse<IChat[]>>(`${this._chatApi}/all`).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        );
+        return this._http.get<IResponse<IChat[]>>(`${this._chatApi}/all`);
     }
 
     fetchChat(participant: IParticipant): Observable<IResponse<IChat>> {
@@ -89,12 +84,7 @@ export class ChatSocketService extends BaseSocketService {
             .set('id', participant.id)
             .set('type', participant.type);
 
-        return this._http.get<IResponse<IChat>>(`${this._chatApi}/one`, { params }).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        );
+        return this._http.get<IResponse<IChat>>(`${this._chatApi}/one`, { params });
     }
 
     // ------------------------------------------------------------------------------------------------------------------------------
@@ -108,15 +98,6 @@ export class ChatSocketService extends BaseSocketService {
             params = params.set('beforeMessageId', beforeMessageId);
         }
 
-        return this._http.get<IResponse<IMessage[]>>(`${this._messageApi}`, { params }).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            )
-        );
-    }
-
-    private getErrorMessage(error: HttpErrorResponse): string {
-        return error?.error?.message || 'something went wrong';
+        return this._http.get<IResponse<IMessage[]>>(`${this._messageApi}`, { params });
     }
 }

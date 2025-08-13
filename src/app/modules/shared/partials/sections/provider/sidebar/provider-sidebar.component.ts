@@ -78,7 +78,7 @@ export class ProviderSidebarComponent {
           active: false
         },
         {
-          name: 'messages',
+          name: 'Messages',
           icon: 'fas fa-envelope',
           route: 'chat',
           active: false

@@ -1,21 +1,22 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnDestroy, OnInit, QueryList, signal, ViewChild, ViewChildren } from "@angular/core";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { FormsModule } from "@angular/forms";
-import { filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
+import { delay, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
 import { Store } from "@ngrx/store";
 import { IChat, IMessage, ISendMessage } from "../../../../../../core/models/chat.model";
 import { selectIsAllMessagesFetched, selectSelectedChat, selectSelectedChatsMessage } from "../../../../../../store/chat/chat.selector";
 import { UserType } from "../../../../models/user.model";
 import { selectAuthUserId } from "../../../../../../store/auth/auth.selector";
 import { chatActions } from "../../../../../../store/chat/chat.action";
+import { LoadingCircleAnimationComponent } from "../../loading-Animations/loading-circle/loading-circle.component";
 
 @Component({
     selector: 'app-chat-message-area',
     templateUrl: './chat-message-area.component.html',
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, LoadingCircleAnimationComponent],
 })
-export class ChatMessageComponent implements OnInit, OnDestroy {
+export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly _chatSocketService = inject(ChatSocketService);
     private readonly _store = inject(Store);
     private readonly _ngZone = inject(NgZone);
@@ -23,10 +24,20 @@ export class ChatMessageComponent implements OnInit, OnDestroy {
 
     private readonly _destroy$ = new Subject<void>();
 
-    private _prevScrollHeight: number = 0;
-    private _preserveScroll: boolean = false;
+    // Preserves scrolling when older messages are prepended
+    private _prevScrollHeight = 0;
+    private _prevScrollTop = 0;
+    private _preserveScroll = false;
 
-    @ViewChild('messageScrollBox') messageScrollBox!: ElementRef<HTMLDivElement>;
+    // State flags
+    isLoading = signal(true);
+    private _initialAutoScrollDone = false;
+    private _isFetching = false;
+
+    @ViewChild('messageScrollBox', { static: false })
+    messageScrollBox!: ElementRef<HTMLDivElement>;
+    @ViewChildren('messageItem')
+    messageItems!: QueryList<ElementRef>;
 
     messages$!: Observable<IMessage[]>;
     chat$!: Observable<IChat>;
@@ -38,18 +49,32 @@ export class ChatMessageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.messages$ = this._store.select(selectSelectedChatsMessage).pipe(
+            delay(2000),
             map(messages => (messages ?? []).filter(msg => !!msg)),
+            tap(() => this.isLoading.set(false)),
             takeUntil(this._destroy$),
         );
 
-        this.messages$.subscribe(() => {
-            setTimeout(() => {
+        this.messages$.subscribe((messages) => {
+            this._afterDOMPaint(() => {
                 const el = this.messageScrollBox?.nativeElement;
+                if (!el) return;
+
                 if (this._preserveScroll) {
                     const newScrollHeight = el.scrollHeight;
-                    el.scrollTop = newScrollHeight - this._prevScrollHeight;
-                } else {
-                    this._scrollToBottom();
+                    el.scrollTop = this._prevScrollTop + (newScrollHeight - this._prevScrollHeight);
+                    this._preserveScroll = false;
+                    return;
+                }
+
+                if (!this._isEmpty(messages)) {
+                    this._scrollToBottomImmediate();
+                    this._initialAutoScrollDone = true;
+                    return;
+                }
+
+                if (this._isNear(el, 80)) {
+                    this._scrollToBottomSmooth();
                 }
             });
         });
@@ -59,9 +84,9 @@ export class ChatMessageComponent implements OnInit, OnDestroy {
             takeUntil(this._destroy$)
         );
 
-        this._store.select(selectAuthUserId).pipe(takeUntil(this._destroy$)).subscribe(id => {
-            if (id) this.currentUserId = id;
-        });
+        this._store.select(selectAuthUserId)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(id => { if (id) this.currentUserId = id; });
 
         this.chat$.subscribe(chat => {
             const receiver = chat.receiver;
@@ -72,45 +97,96 @@ export class ChatMessageComponent implements OnInit, OnDestroy {
         });
     }
 
+    ngAfterViewInit(): void {
+        // ensures I am in the bottom after the view is ready (first time).
+        this._afterDOMPaint(() => this._scrollToBottomImmediate());
+
+    }
+
     ngOnDestroy(): void {
         this._destroy$.next();
         this._destroy$.complete();
     }
 
-    private _scrollToBottom(): void {
+    // Runs the fn after angular finishes the current change detection.
+    // and after the DOM is painted.
+    private _afterDOMPaint(fn: () => void): void {
+        this._cdRef.detectChanges();
         this._ngZone.runOutsideAngular(() => {
-            setTimeout(() => {
-                const el = this.messageScrollBox?.nativeElement;
-                if (el) {
-                    el.scrollTo({
-                        top: el.scrollHeight,
-                        behavior: 'smooth'
-                    });
-                }
-            }, 100);
-        })
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => fn());
+            });
+        });
+    }
+
+    private _isEmpty<T>(arr?: T[]): arr is [] {
+        return !arr || arr.length === 0;
+    }
+
+    private _scrollToBottomImmediate(): void {
+        const el = this.messageScrollBox?.nativeElement;
+        if (!el) return;
+        el.scrollTop = el.scrollHeight;
+    }
+
+    private _isNear = (el: HTMLElement, px = 800): boolean => {
+        const distanceFRomBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+        return distanceFRomBottom <= px;
+    }
+
+    private _scrollToBottomSmooth(): void {
+        const el = this.messageScrollBox?.nativeElement;
+        if (!el) return;
+        this._ngZone.runOutsideAngular(() => {
+            requestAnimationFrame(() => {
+                el.scrollTo({
+                    top: el.scrollHeight,
+                    behavior: 'smooth'
+                });
+            })
+        });
     }
 
     onScroll() {
         const el = this.messageScrollBox?.nativeElement;
-        if (el.scrollTop === 0) {
+        if (!el || this._isFetching) return;
+
+        const pixelThreshold = 60; 
+        if (el.scrollTop <= pixelThreshold) {
+            this._isFetching = true;
+
+            // Get first visible message before fetching
+            const firstVisible = this.messageItems.find(item => {
+                const rect = item.nativeElement.getBoundingClientRect();
+                return rect.top >= 0; // first item in view
+            });
+
+            const firstMessageId = firstVisible?.nativeElement.dataset?.messageId;
+
             this._store.select(selectIsAllMessagesFetched).pipe(take(1)).subscribe(isAllFetched => {
-                if (isAllFetched) return;
+                if (isAllFetched) {
+                    this._isFetching = false;
+                    return;
+                }
 
-                this.messages$.pipe(take(1)).subscribe(messages => {
-                    if (messages.length > 0) {
-                        const firstMessage = messages[0].id;
-                        this.chat$.pipe(take(1)).subscribe(chat => {
-                            this._store.dispatch(chatActions.fetchMessages({
-                                chatId: chat.id,
-                                beforeMessageId: firstMessage
-                            }));
-                        });
+                this.chat$.pipe(take(1)).subscribe(chat => {
+                    this._store.dispatch(chatActions.fetchMessages({
+                        chatId: chat.id,
+                        beforeMessageId: firstMessageId
+                    }));
+                });
 
-                        // Store scroll height before messages are added
-                        this._prevScrollHeight = el.scrollHeight;
-                        this._preserveScroll = true
+                // Delay scroll restore until after messages$ updates
+                this.messages$.pipe(take(1)).subscribe(() => {
+                    if (firstMessageId) {
+                        const elFirst = this.messageItems.find(
+                            item => item.nativeElement.dataset?.messageId === firstMessageId
+                        );
+                        if (elFirst) {
+                            el.scrollTop = elFirst.nativeElement.offsetTop;
+                        }
                     }
+                    this._isFetching = false;
                 });
             });
         }
@@ -129,7 +205,6 @@ export class ChatMessageComponent implements OnInit, OnDestroy {
         this._chatSocketService.sendMessage(msgContent);
         this.textMessage = '';
 
-        setTimeout(() => this._scrollToBottom(), 100);
+        this._afterDOMPaint(() => this._scrollToBottomSmooth());
     }
-
 }
