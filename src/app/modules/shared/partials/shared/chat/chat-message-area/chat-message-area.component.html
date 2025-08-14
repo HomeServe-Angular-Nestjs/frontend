@@ -55,6 +55,14 @@
                         [text]="'Please wait while we fetch your conversation...'"></app-loading-circle-animation>
                 </div>
             </ng-template>
+
+            <ng-template #noMessagesContent>
+                <div class="min-h-[450px] flex flex-col items-center justify-center h-full bg-white text-gray-400">
+                    <i class="fas fa-envelope-open-text text-5xl mb-4"></i>
+                    <p class="text-lg font-medium">No messages yet</p>
+                    <p class="text-sm text-gray-500 mt-2">Start the conversation by sending a message!</p>
+                </div>
+            </ng-template>
         </div>
 
         <!-- Input Bar -->
@@ -66,15 +74,6 @@
         </div>
     </div>
 </ng-container>
-
-<ng-template #noMessagesContent>
-    <div class="flex flex-col items-center justify-center h-full bg-white text-gray-400">
-        <i class="fas fa-envelope-open-text text-5xl mb-4"></i>
-        <p class="text-lg font-medium">No messages yet</p>
-        <p class="text-sm text-gray-500 mt-2">Start the conversation by sending a message!</p>
-    </div>
-</ng-template>
-
 
 <ng-template #noChatSelected>
     <div class="flex flex-col items-center justify-center h-full bg-gray-50 text-gray-400">

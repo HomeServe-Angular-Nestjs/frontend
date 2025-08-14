@@ -8,7 +8,11 @@ import { BookingService } from "../../../../../../core/services/booking.service"
 import { IBookingFilter, IResponseProviderBookingLists } from "../../../../../../core/models/booking.model";
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { DebounceService } from "../../../../../../core/services/public/debounce.service";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
+import { Store } from "@ngrx/store";
+import { chatActions } from "../../../../../../store/chat/chat.action";
+import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 
 @Component({
     selector: 'app-provider-booking-recent',
@@ -17,10 +21,14 @@ import { RouterLink } from "@angular/router";
     providers: [DebounceService]
 })
 export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDestroy {
-    private readonly _bookingService = inject(BookingService);
+    private readonly _toastr = inject(ToastNotificationService);
     private readonly _debounceService = inject(DebounceService);
+    private readonly _bookingService = inject(BookingService);
+    private readonly _chatService = inject(ChatSocketService);
     private readonly _sanitizer = inject(DomSanitizer);
-    
+    private readonly _router = inject(Router);
+    private readonly _store = inject(Store);
+
     @Input() filters: IBookingFilter = {};
 
     private _destroy$ = new Subject<void>();
@@ -87,6 +95,24 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
     }
 
     goToChat(customerId: string) {
+        console.log(customerId)
+        if (customerId) {
+            this._chatService.fetchChat({ id: customerId, type: 'customer' })
+                .subscribe({
+                    next: (response) => {
+                        if (response.success && response.data?.id) {
+                            this._store.dispatch(chatActions.selectChat({ chatId: response.data.id }));
+                            this._router.navigate(['provider', 'chat']);
+                        } else {
+                            this._toastr.error('Unable to fetch chat.');
+                        }
+                    },
+                    error: (err) => {
+                        this._toastr.error('An error occurred while fetching chat.');
+                        console.error('Chat error:', err);
+                    }
+                });
+        }
     }
 
     private _emitFilters(): void {

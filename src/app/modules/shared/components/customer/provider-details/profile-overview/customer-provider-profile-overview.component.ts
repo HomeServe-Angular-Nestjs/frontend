@@ -66,7 +66,7 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
             this._toastr.error('An error occurred while fetching chat.');
             console.error('Chat error:', err);
           }
-        })
+        });
     }
   }
 

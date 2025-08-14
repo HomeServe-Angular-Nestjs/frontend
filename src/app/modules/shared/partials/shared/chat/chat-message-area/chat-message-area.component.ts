@@ -49,7 +49,7 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         this.messages$ = this._store.select(selectSelectedChatsMessage).pipe(
-            delay(2000),
+            delay(800),
             map(messages => (messages ?? []).filter(msg => !!msg)),
             tap(() => this.isLoading.set(false)),
             takeUntil(this._destroy$),

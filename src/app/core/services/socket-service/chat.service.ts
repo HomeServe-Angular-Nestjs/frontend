@@ -53,6 +53,7 @@ export class ChatSocketService extends BaseSocketService {
     }
 
     sendMessage(msgContent: ISendMessage): void {
+        console.log(msgContent)
         this.emit<ISendMessage>('sendMessage', msgContent);
     }
 
