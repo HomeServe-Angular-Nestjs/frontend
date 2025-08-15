@@ -56,6 +56,11 @@ export const adminRoute: Routes = [
                         path: 'reports',
                         loadComponent: () => import('../../shared/components/admin/reports/layout/report-layout.component')
                             .then(c => c.AdminReportsComponent)
+                    },
+                    {
+                        path: 'transactions',
+                        loadComponent: () => import('../../shared/components/admin/transactions/admin-transactions.component')
+                            .then(c => c.AdminTransactionsComponent)
                     }
                 ]
             },

@@ -8,6 +8,7 @@ import { selectCheckStatus, selectShowSubscriptionPage } from '../../../../store
 import { Store } from '@ngrx/store';
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
 import { authActions } from '../../../../store/auth/auth.actions';
+import { VideoCallSocketService } from '../../../../core/services/socket-service/video-socket.service';
 
 @Component({
   selector: 'app-customer-landing-page',
@@ -17,6 +18,7 @@ import { authActions } from '../../../../store/auth/auth.actions';
 export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
   private readonly _store = inject(Store);
   private readonly _chatSocket = inject(ChatSocketService);
+  private readonly _videoSocket = inject(VideoCallSocketService);
 
   private _destroy$ = new Subject<void>();
 
@@ -33,6 +35,7 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
       filter(status => status === 'authenticated')
     ).subscribe(() => {
       this._chatSocket.connect();
+      this._videoSocket.connect();
     });
 
     // Disconnect socket when unauthenticated
@@ -40,6 +43,8 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
       filter(status => status !== 'authenticated')
     ).subscribe(() => {
       this._chatSocket.disconnect();
+      this._videoSocket.disconnect();
+
     });
   }
 

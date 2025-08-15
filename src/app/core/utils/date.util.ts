@@ -45,3 +45,4 @@ export function getStartTimeAndEndTime(duration: PlanDurationType): { startTime:
 export function formatDateToYMD(value: Date | string): string {
     return new Date(value).toISOString().slice(0, 10);
 }
+

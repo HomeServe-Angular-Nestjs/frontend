@@ -1,0 +1,74 @@
+<div class="video-call absolute inset-0 flex flex-col bg-[#28282B]">
+    <!-- Video Area -->
+    <div class="flex-1 relative flex">
+        <!-- Remote Video -->
+        <video #remoteVideo autoplay playsinline disablePictureInPicture class="w-full h-full object-cover"></video>
+
+        <!-- Small Local Video -->
+        <!-- <ng-container *ngIf="isVideoEnabled;else videoDisabled"> -->
+            <div class="absolute bottom-6 right-6 w-48 h-32 rounded-lg overflow-hidden shadow-lg border-2 border-white">
+                <video #localVideo autoplay playsinline muted disablePictureInPicture
+                    class="w-full h-full object-cover"></video>
+            </div>
+        <!-- </ng-container> -->
+
+        <ng-template #videoDisabled>
+            <div class="absolute bottom-6 right-6 w-48 h-32 rounded-lg bg-gray-600 overflow-hidden shadow-lg border-2 border-white/25 flex items-center justify-center">
+                <img src="assets/images/profile_placeholder.jpg" width="60px" height="60px" class="rounded-full object-cover">
+            </div>
+        </ng-template>
+
+        <!-- Call Info Top Bar -->
+        <div
+            class="absolute top-0 left-0 w-full flex justify-between items-center bg-[#0066DA]/60 text-white px-6 py-3">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-white overflow-hidden flex items-center justify-center text-[#2684FC] font-bold">
+                    C
+                </div>
+                <span class="font-medium text-lg">Customer Support Call</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <p class="text-sm opacity-80">Live • 12:45</p>
+                <button (click)="toggleFullScreen()">
+                    <i class="fa-solid" [ngClass]="{
+                        'fa-expand': isOnFullScreen,
+                        'fa-compress': !isOnFullScreen
+                        }"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Bar -->
+    <div class="h-20 bg-gray-900 bg-opacity-50 flex justify-center items-center gap-6 px-4">
+        <!-- Mute -->
+        <button (click)="toggleAudioEnabling()"
+            class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center shadow-md transition">
+            <i class="fas" [ngClass]="{
+                'fa-microphone text-white': isAudioEnabled,
+                'fa-microphone-slash text-gray-500': !isAudioEnabled
+            }"></i>
+        </button>
+
+        <!-- Camera -->
+        <button (click)="toggleVideoEnabling()"
+            class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center shadow-md transition">
+            <i class="fas" [ngClass]="{
+                'fa-video text-white': isVideoEnabled,
+                'fa-video-slash text-gray-500': !isVideoEnabled
+            }"></i>
+        </button>
+
+        <!-- Screen Share -->
+        <button class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center shadow-md transition">
+            <i class="fa-solid fa-display text-gray-500"></i>
+        </button>
+
+        <!-- End Call -->
+        <button (click)="endCall()"
+            class="bg-[#E94235] rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-red-700 transition">
+            <i class="fas fa-phone text-white"></i>
+        </button>
+    </div>
+</div>

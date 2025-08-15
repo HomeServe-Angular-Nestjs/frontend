@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnDestroy, OnInit, QueryList, signal, ViewChild, ViewChildren } from "@angular/core";
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, Injector, NgZone, OnDestroy, OnInit, QueryList, signal, ViewChild, ViewChildren } from "@angular/core";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { FormsModule } from "@angular/forms";
 import { delay, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
@@ -10,6 +10,7 @@ import { UserType } from "../../../../models/user.model";
 import { selectAuthUserId } from "../../../../../../store/auth/auth.selector";
 import { chatActions } from "../../../../../../store/chat/chat.action";
 import { LoadingCircleAnimationComponent } from "../../loading-Animations/loading-circle/loading-circle.component";
+import { VideoCallService } from "../../../../../../core/services/video-call.service";
 
 @Component({
     selector: 'app-chat-message-area',
@@ -18,9 +19,10 @@ import { LoadingCircleAnimationComponent } from "../../loading-Animations/loadin
 })
 export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly _chatSocketService = inject(ChatSocketService);
-    private readonly _store = inject(Store);
+    private readonly _videoCallService = inject(VideoCallService);
+    private readonly _cdRef = inject(ChangeDetectorRef);
     private readonly _ngZone = inject(NgZone);
-    private readonly _cdRef = inject(ChangeDetectorRef)
+    private readonly _store = inject(Store);
 
     private readonly _destroy$ = new Subject<void>();
 
@@ -151,7 +153,7 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
         const el = this.messageScrollBox?.nativeElement;
         if (!el || this._isFetching) return;
 
-        const pixelThreshold = 60; 
+        const pixelThreshold = 60;
         if (el.scrollTop <= pixelThreshold) {
             this._isFetching = true;
 
@@ -207,4 +209,8 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this._afterDOMPaint(() => this._scrollToBottomSmooth());
     }
-}
+
+    startVideoCall() {
+        this._videoCallService.startCall();
+    }
+} 

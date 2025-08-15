@@ -16,7 +16,8 @@ export const API_ENV = {
     plans: `${domainName}/plans`,
     subscription: `${domainName}/subscription`,
     uploads: `${domainName}/uploads`,
-    rule: `${domainName}/rule`
+    rule: `${domainName}/rule`,
+    transactions: `${domainName}/transactions`,
 };
 
 export const API_KEY = {
