@@ -26,7 +26,7 @@ export const customerRoutes: Routes = [
                 path: 'homepage',
                 loadComponent: () => import('../../pages/customer/customer-homepage/homepage.component')
                     .then(c => c.CustomerHomepageComponent),
-                canActivate: [ProfileAuthGuard, AuthGuard,],
+                canActivate: [ProfileAuthGuard, AuthGuard],
             },
             {
                 path: 'view_providers',

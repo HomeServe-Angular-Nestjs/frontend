@@ -1,9 +1,10 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ApplicationRef, Component, inject, Injector, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { authActions } from './store/auth/auth.actions';
 import { UserType } from './modules/shared/models/user.model';
+import { DomPortalOutlet } from '@angular/cdk/portal';
 
 @Component({
   selector: 'app-root',

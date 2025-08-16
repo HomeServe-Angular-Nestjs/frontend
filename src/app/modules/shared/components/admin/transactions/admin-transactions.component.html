@@ -1,0 +1,40 @@
+<section class="mb-10">
+    <h2 class="text-2xl font-bold text-gray-900 leading-tight tracking-tight mb-6">
+        Transaction Summary Overview
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <app-admin-overview-card *ngFor="let stat of stats" [icon]="stat.icon" [iconBg]="stat.iconBg"
+            [title]="stat.title" [value]="stat.value" [subtext]="stat.subtext">
+        </app-admin-overview-card>
+    </div>
+</section>
+
+<section class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Transaction Table</h2>
+    <div class="overflow-x-auto border rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Order ID</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Payment ID</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Amount</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Method</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Transaction Type</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+                <tr *ngFor="let tx of transactions">
+                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.orderId }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.paymentId }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">{{ formatINR(tx.amount / 100) }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.method | titlecase }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.transactionType }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-500">{{ tx.createdAt | date:'medium' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <app-admin-pagination [pagination]="pagination" (pageChange)="pageChange($event)"></app-admin-pagination>
+</section>

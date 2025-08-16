@@ -1,18 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router, } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { LoginAuthService } from '../../../../../../core/services/login-auth.service';
-import { AuthState } from '../../../../../../core/models/auth.model';
 import { authActions } from '../../../../../../store/auth/auth.actions';
-import { UserType } from '../../../../models/user.model';
-import { loginNavigation } from '../../../../../../core/utils/navigation.utils';
 
 @Component({
   selector: 'app-admin-sidebar',
   imports: [CommonModule],
   templateUrl: './admin-sidebar.component.html',
-  // styleUrls: ['./admin-sidebar.component.scss'],
 })
 export class AdminSidebarComponent {
   private _router = inject(Router);
@@ -30,7 +25,7 @@ export class AdminSidebarComponent {
       subItems: [
         { name: 'Users', route: 'admin/users' },
         { name: 'Ratings & Reviews', route: 'admin/ratings&reviews' },
-        { name: 'Approvals', route: 'admin/approvals' }
+        // { name: 'Approvals', route: 'admin/approvals' }
       ]
     },
     {
@@ -46,19 +41,16 @@ export class AdminSidebarComponent {
     {
       name: 'Revenue & Transactions',
       icon: 'fa-money-bill-wave',
-      subItems: [
-        { name: 'Earnings', route: 'admin/earnings' },
-        { name: 'Wallet', route: 'admin/wallet' }
-      ]
+      route: 'admin/transactions'
     },
-    {
-      name: 'Messaging & Notifications',
-      icon: 'fa-envelope',
-      subItems: [
-        { name: 'Messaging', route: 'admin/messaging' },
-        { name: 'Notifications', route: 'admin/notifications' }
-      ]
-    },
+    // {
+    //   name: 'Messaging & Notifications',
+    //   icon: 'fa-envelope',
+    //   subItems: [
+    //     { name: 'Messaging', route: 'admin/messaging' },
+    //     { name: 'Notifications', route: 'admin/notifications' }
+    //   ]
+    // },
     {
       name: 'Manage Reports',
       icon: 'fa-chart-bar',

@@ -121,52 +121,12 @@ export class AdminReportsComponent implements OnInit {
             label: 'To Date',
             dependsOn: { name: 'dateFilterType', value: 'Custom Date Range' }
         },
-    ]
-
-    // subscriptionFilters: IFilterConfig[] = [
-    //     {
-    //         type: 'select',
-    //         name: 'duration',
-    //         label: 'Duration',
-    //         options: ['Lifetime', 'Monthly', 'Premium'],
-    //     },
-    //     {
-    //         type: 'select',
-    //         name: 'role',
-    //         label: 'Role',
-    //         options: ['customer', 'provider'],
-    //     },
-    //     {
-    //         type: 'select',
-    //         name: 'paymentStatus',
-    //         label: 'Payment Status',
-    //         options: ['paid', 'failed', 'cancelled'],
-    //     },
-    //     {
-    //         type: 'select',
-    //         name: 'dateFilterType',
-    //         label: 'Date Filter',
-    //         options: ['Custom Date Range']
-    //     },
-    //     {
-    //         type: 'date',
-    //         name: 'fromDate',
-    //         label: 'From Date',
-    //         dependsOn: { name: 'dateFilterType', value: 'Custom Date Range' }
-    //     },
-    //     {
-    //         type: 'date',
-    //         name: 'toDate',
-    //         label: 'To Date',
-    //         dependsOn: { name: 'dateFilterType', value: 'Custom Date Range' }
-    //     },
-    // ]
+    ];
 
     filtersConfig: Record<string, IFilterConfig[]> = {
         booking: this.bookingFilters,
         users: this.userFilters,
         transactions: this.transactionFilter,
-        // subscription: this.subscriptionFilters,
     };
 
     ngOnInit(): void {
@@ -191,8 +151,6 @@ export class AdminReportsComponent implements OnInit {
     }
 
     generateReport() {
-        console.log('Category:', this.selectedCategory);
-        console.log('Filters:', this.selectedFilters);
         this.closeModal();
 
         const downloadBookingData: any = {};
@@ -203,8 +161,6 @@ export class AdminReportsComponent implements OnInit {
                 downloadBookingData[key] = this.selectedFilters[key];
             }
         }
-
-        console.log(downloadBookingData);
 
         switch (this.selectedCategory) {
             case 'booking':
@@ -244,19 +200,6 @@ export class AdminReportsComponent implements OnInit {
                         URL.revokeObjectURL(url);
                     }
                 });
-                this.selectedFilters = {};
-                break;
-            case 'subscription':
-                // this._adminService.downloadTransactionReport(downloadBookingData).subscribe({
-                //     next: (blob: Blob) => {
-                //         const url = window.URL.createObjectURL(blob);
-                //         const a = document.createElement('a');
-                //         a.href = url;
-                //         a.download = 'transaction-report.pdf';
-                //         a.click();
-                //         URL.revokeObjectURL(url);
-                //     }
-                // });
                 this.selectedFilters = {};
                 break;
             default:
