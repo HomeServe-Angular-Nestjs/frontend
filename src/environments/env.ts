@@ -18,6 +18,7 @@ export const API_ENV = {
     uploads: `${domainName}/uploads`,
     rule: `${domainName}/rule`,
     transactions: `${domainName}/transactions`,
+    wallet: `${domainName}/wallet`,
 };
 
 export const API_KEY = {

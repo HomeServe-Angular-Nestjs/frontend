@@ -108,6 +108,11 @@ export const customerRoutes: Routes = [
                         loadComponent: () => import('../../shared/components/customer/bookings/view-details/booking-details.component')
                             .then(c => c.CustomerViewBookingDetailsComponent)
                     },
+                    {
+                        path: 'wallet',
+                        loadComponent: () => import('../../shared/components/customer/wallet/customer-wallet.component')
+                            .then(c => c.CustomerWalletComponent)
+                    }
                 ],
             },
         ],

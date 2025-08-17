@@ -1,0 +1,73 @@
+<div class="max-w-3xl mx-auto p-6 space-y-6">
+    <!-- Wallet Balance -->
+    <div class="bg-white shadow-md rounded-2xl p-6 max-w-md mx-auto text-center">
+        <h2 class="text-lg font-medium text-gray-600">Wallet Balance</h2>
+
+        <!-- Show balance if wallet is available -->
+        <ng-container *ngIf="wallet as w; else walletNotFound">
+            <p class="text-4xl font-bold text-indigo-600 mt-3">₹ {{ w.balance | number:'1.2-2' }}</p>
+            <p class="text-sm text-gray-400 mt-1">Available Balance</p>
+        </ng-container>
+
+        <!-- Fallback -->
+        <ng-template #walletNotFound>
+            <span class="text-sm text-gray-500 italic">Sorry, unable to view balance</span>
+        </ng-template>
+    </div>
+
+
+    <!-- Recent Transactions -->
+    <div class="bg-white shadow rounded-xl p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-700">Recent Transactions</h3>
+            <a href="#" class="text-sm text-indigo-600 hover:underline">View All Transactions</a>
+        </div>
+
+        <div class="space-y-4">
+            <!-- Credit -->
+            <div class="flex justify-between items-center border-b pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-green-500 text-xl">⬇</span>
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Money Added to Wallet</p>
+                        <p class="text-xs text-gray-500">Mar 25, 2024 · Visa ending in 4242</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-green-600 font-medium">+ $100.00</p>
+                    <a href="#" class="text-xs text-indigo-600 hover:underline">View Receipt</a>
+                </div>
+            </div>
+
+            <!-- Debit -->
+            <div class="flex justify-between items-center border-b pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-red-500 text-xl">⬆</span>
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">House Cleaning Service</p>
+                        <p class="text-xs text-gray-500">Mar 20, 2024 · Wallet Payment</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-red-600 font-medium">- $75.00</p>
+                    <a href="#" class="text-xs text-indigo-600 hover:underline">Download Invoice</a>
+                </div>
+            </div>
+
+            <!-- Debit -->
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span class="text-red-500 text-xl">⬆</span>
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Plumbing Service</p>
+                        <p class="text-xs text-gray-500">Mar 18, 2024 · PayPal</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-red-600 font-medium">- $150.00</p>
+                    <a href="#" class="text-xs text-indigo-600 hover:underline">Download Invoice</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

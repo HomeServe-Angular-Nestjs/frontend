@@ -36,7 +36,7 @@ export class CustomerProfileLayout {
         {
             title: 'Payments & Settings',
             items: [
-                { label: 'Wallet & Payments', icon: 'fas fa-wallet', route: '/wallet' },
+                { label: 'Wallet & Payments', icon: 'fas fa-wallet', route: '/profile/wallet' },
                 { label: 'Settings', icon: 'fas fa-cog', route: '/settings' },
             ],
         },
