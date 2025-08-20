@@ -14,7 +14,7 @@ import { SubscriptionService } from "../../../../core/services/subscription.serv
 import { RazorpayOrder, RazorpayPaymentResponse } from "../../../../core/models/payment.model";
 import { ITransaction } from "../../../../core/models/transaction.model";
 import { ICreateSubscription, ISubscription } from "../../../../core/models/subscription.model";
-import { PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
+import { PaymentDirection, PaymentSource, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
 import { getStartTimeAndEndTime } from "../../../../core/utils/date.util";
 import { subscriptionAction } from "../../../../store/subscriptions/subscription.action";
 import { authActions } from "../../../../store/auth/auth.actions";
@@ -102,15 +102,13 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
             id: order.id,
             transactionType: TransactionType.SUBSCRIPTION,
             amount: order.amount,
-            currency: order.currency,
             status: order.status,
-            method: 'debit',
+            direction: PaymentDirection.DEBIT,
+            source: PaymentSource.RAZORPAY,
             receipt: order.receipt,
-            offer_id: order.offer_id,
-            created_at: order.created_at,
         };
 
-        this._paymentService.verifyPaymentSignature(response, orderData, 'provider').subscribe({
+        this._paymentService.verifyPaymentSignature(response, orderData).subscribe({
             next: (response) => {
                 if (response.verified && response.transaction.id) {
                     this._saveSubscription(response.transaction, plan, isUpgrade);
@@ -134,7 +132,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
             role: plan.role,
             features: plan.features,
             price: plan.price,
-            paymentStatus: TransactionStatus.PAID,
+            paymentStatus: 'paid',
             ...getStartTimeAndEndTime(plan.duration),
         };
 

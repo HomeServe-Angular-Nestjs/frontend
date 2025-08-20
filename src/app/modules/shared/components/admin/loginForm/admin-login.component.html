@@ -12,26 +12,11 @@
         </div>
 
         <h1 class="font-light text-2xl text-center text-gray-800">Admin Panel</h1>
-        <span class="text-gray-500 text-sm font-light text-center">{{!fPassword ? 'Sign in to your account' : `Enter
-            your mobile number`}}</span>
     </div>
 
-    <!-- Message Display -->
-    <ng-container *ngIf="errorMessage">
-        <div class="flex items-center gap-3 text-sm p-3 bg-red-100 rounded-md mb-6 text-[#404040]">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                    clip-rule="evenodd" />
-            </svg>
-            <p>{{errorMessage}}</p>
-        </div>
-    </ng-container>
-
-
     <!-- Form -->
-    <form *ngIf="!fPassword" [formGroup]="form" class="space-y-4" (submit)="formSubmit()">
-        <div *ngIf="!fPassword">
+    <form [formGroup]="form" class="space-y-4" (submit)="formSubmit()">
+        <div>
             <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <div class="relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -47,50 +32,38 @@
             </div>
         </div>
 
-        <div *ngIf="!fPassword">
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+                Password
+            </label>
+
             <div class="relative rounded-md shadow-sm">
+                <!-- left lock icon -->
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                            clip-rule="evenodd" />
-                    </svg>
+                    <i class="fas fa-lock text-gray-400"></i>
                 </div>
-                <input type="password" id="password" formControlName="password"
-                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border">
+
+                <!-- input -->
+                <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
+                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-10 sm:text-sm border-gray-300 rounded-md py-2 border" />
+
+                <!-- toggle button -->
+                <button type="button" (click)="showPassword = !showPassword"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                    <!-- show eye -->
+                    <i *ngIf="!showPassword" class="fas fa-eye"></i>
+
+                    <!-- hide eye -->
+                    <i *ngIf="showPassword" class="fas fa-eye-slash"></i>
+                </button>
             </div>
         </div>
 
-        <div class="flex items-center justify-end">
-            <button type="button" (click)="forgotPassword()"
-                class="text-sm font-medium text-[#686767] hover:text-[#454444]">Forgot
-                password?</button>
-        </div>
 
         <button type="submit"
-            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#171717] hover:bg-[#171717] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            {{!fPassword ? 'Sign In' : 'Send OTP'}}
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium
+             text-white bg-[#171717] hover:bg-[#171717] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Sign In
         </button>
     </form>
-
-    <!-- <form *ngIf="fPassword" [formGroup]="phoneForm" class="flex flex-col gap-4">
-        <div class="relative flex items-center gap-2">
-            <ngx-intl-tel-input [cssClass]="'custom-phone-input w-full p-2 border rounded focus:outline-none'"
-                [preferredCountries]="['in']" [enablePlaceholder]="true" formControlName="phone">
-            </ngx-intl-tel-input>
-        </div>
-        <button type="submit"
-            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#171717] hover:bg-[#171717] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Send OTP
-        </button>
-    </form> -->
-
-    <div type="button" *ngIf="fPassword" class="flex justify-center mt-8 items-center gap-1">
-        <button (click)="forgotPassword()"
-            class="hover:bg-gray-200 rounded-full transition-all ease-linear delay-100 cursor-pointer">
-            <i class=" fa fa-arrow-left p-3 "></i>
-        </button>
-    </div>
 </div>

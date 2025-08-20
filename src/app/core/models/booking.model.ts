@@ -1,5 +1,5 @@
 import { SelectedServiceIdsType } from "../../modules/pages/customer/booking-1-pick-service/customer-pick-a-service.component";
-import { BookingStatus, CancelStatus, PaymentStatus } from "../enums/enums";
+import { BookingStatus, CancelStatus, PaymentSource, PaymentStatus } from "../enums/enums";
 import { RazorpayOrder, RazorpayPaymentResponse } from "./payment.model";
 import { ISlotSource } from "./schedules.model";
 import { IAvailableSlot } from "./slot-rule.model";
@@ -102,6 +102,7 @@ export interface IBookingResponse {
     expectedArrivalTime: Date | string;
     bookingStatus: BookingStatus;
     paymentStatus: PaymentStatus;
+    paymentSource: PaymentSource;
     cancelStatus: CancelStatus;
     totalAmount: number;
     createdAt: Date;

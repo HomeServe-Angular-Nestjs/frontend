@@ -30,26 +30,28 @@
 
         <div class="border-t border-gray-200 my-6"></div>
 
+        <div>
+            <app-customer-select-payment (optionSelected)="selectPaymentSource($event)"></app-customer-select-payment>
+        </div>
+
+        <div class="border-t border-gray-200 my-6"></div>
+
         <ng-container *ngIf="!isLoading; else loading">
             <div class="space-y-3">
                 <div class="flex justify-between">
                     <span class="text-gray-600">Subtotal</span>
-                    <span>₹{{priceBreakup.subTotal.toFixed()}}</span>
+                    <span>₹{{priceBreakup.subTotal.toFixed(2)}}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-600">Tax</span>
-                    <span>₹{{priceBreakup.tax.toFixed()}}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Visiting Fee</span>
-                    <span>₹{{priceBreakup.visitingFee.toFixed()}}</span>
+                    <span>₹{{priceBreakup.tax.toFixed(2)}}</span>
                 </div>
             </div>
 
             <div class="border-t border-gray-200 mt-6 pt-4">
                 <div class="flex justify-between items-center">
                     <span class="text-lg font-bold">Total</span>
-                    <span class="text-xl font-bold text-blue-600">₹{{priceBreakup.total.toFixed()}}</span>
+                    <span class="text-xl font-bold text-blue-600">₹{{priceBreakup.total.toFixed(2)}}</span>
                 </div>
             </div>
 

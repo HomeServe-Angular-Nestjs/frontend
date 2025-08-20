@@ -1,21 +1,25 @@
-import { TransactionStatus } from "../enums/enums";
+import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from "../enums/enums";
 import { IPagination } from "./booking.model";
 
 export interface ITransaction {
     id: string;
     userId: string;
-    orderId: string;
-    paymentId: string;
-    signature: string;
+    transactionType: TransactionType
+    direction: PaymentDirection;
+    source: PaymentSource;
+    status: TransactionStatus;
     amount: number;
     currency: string;
-    status: TransactionStatus
-    method?: string;
-    email?: string;
-    contact?: string;
-    receipt?: string;
-    createdAt: Date;
-    updatedAt: Date;
+    gateWayDetails: {
+        orderId: string,
+        paymentId: string,
+        signature: string,
+        receipt: string | null,
+    }
+    userDetails: {
+        email: string,
+        contact: string,
+    }
 }
 
 export interface ITransactionStats {
@@ -41,4 +45,12 @@ export interface ITransactionTableData {
 export interface ITransactionDataWithPagination {
     tableData: ITransactionTableData[];
     pagination: IPagination;
+}
+
+export interface ITransactionHistory {
+    transactionId: string;
+    date: Date;
+    amount: number;
+    transactionType: TransactionType;
+
 }

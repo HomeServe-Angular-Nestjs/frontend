@@ -14,6 +14,7 @@ export class CustomerWalletComponent implements OnInit {
     private readonly _walletService = inject(WalletService);
 
     wallet!: IWallet;
+    transactionHistory: any
 
     ngOnInit(): void {
         this._walletService.getWallet()

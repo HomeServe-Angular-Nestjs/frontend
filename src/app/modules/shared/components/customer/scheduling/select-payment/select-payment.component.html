@@ -1,0 +1,14 @@
+<div class="w-full">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Select Payment Method</h2>
+
+    <div class="space-y-3">
+        <div *ngFor="let option of paymentSources" (click)="selectOption(option.id)"
+            class="flex items-center p-4 border rounded-xl cursor-pointer transition" [ngClass]="
+            'hover:border-' + option.color + '-500 '
+            + 'hover:bg-' + option.color + '-50 ' 
+            + (selectedOption === option.id ? 'border-' + option.color + '-500' : '')">
+            <img [src]="option.logo" [alt]="option.name" class="w-8 h-8 mr-3">
+            <span class="font-medium text-gray-700">{{ option.name }}</span>
+        </div>
+    </div>
+</div>

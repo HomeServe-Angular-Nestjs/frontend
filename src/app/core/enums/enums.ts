@@ -22,7 +22,6 @@ export enum ErrorCodes {
     UNSUPPORTED_FILE_TYPE = 'UNSUPPORTED_FILE_TYPE',
 }
 
-
 export enum BookingStatus {
     PENDING = 'pending',
     CONFIRMED = 'confirmed',
@@ -58,10 +57,20 @@ export enum SortBy {
 }
 
 export enum TransactionStatus {
-    CREATED = 'created',
-    PAID = 'paid',
+    SUCCESS = 'success',
     FAILED = 'failed',
     REFUNDED = 'refunded'
+}
+
+export enum PaymentDirection {
+    DEBIT = 'debit',
+    CREDIT = 'credit',
+
+}
+
+export enum PaymentSource {
+    RAZORPAY = 'razorpay',
+    WALLET = 'wallet'
 }
 
 export enum TransactionType {

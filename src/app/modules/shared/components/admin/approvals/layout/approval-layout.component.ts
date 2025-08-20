@@ -9,16 +9,13 @@ import { USER_TABLE_COLUMNS } from "../../../../../../core/utils/generate-tables
 import { TableRowData } from "../../../../../../core/utils/generate-tables/table.interfaces";
 import { mapApprovalsTableData } from "../../../../../../core/utils/generate-tables/table.mapper";
 import { TableWrapperComponent } from "../../../../partials/shared/table/layout/table-wrapper.component";
-import { TableRowComponent } from "../../../../partials/shared/table/row/table-row.component";
-import { TableColComponent } from "../../../../partials/shared/table/column/table-column.component";
 import { TextCellComponent } from "../../../../partials/shared/table/cells/table-cell-text.component";
 import { ImageTwoTextCellComponent } from "../../../../partials/shared/table/cells/table-cell-2text-img.component";
-import { TableComponent } from "../../../../partials/sections/admin/tables/table.component";
 
 @Component({
     selector: 'app-admin-approval-layout',
     templateUrl: './approval-layout.component.html',
-    imports: [CommonModule, AdminApprovalOverviewComponent, AdminApprovalFilterComponent, TableWrapperComponent, TableRowComponent, TableColComponent, TextCellComponent, ImageTwoTextCellComponent],
+    imports: [CommonModule, AdminApprovalOverviewComponent, AdminApprovalFilterComponent, TableWrapperComponent, TextCellComponent, ImageTwoTextCellComponent],
 })
 export class AdminApprovalLayoutComponent implements OnInit {
     private readonly _adminService = inject(AdminService);

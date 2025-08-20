@@ -31,10 +31,10 @@ export const authEffects = {
                         const url = navigationAfterLogin(user.type);
                         router.navigate([url]);
                     }),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, authActions.loginFailure, toastr
-                        );
-                    })
+                    // catchError((error: HttpErrorResponse) => {
+                    //     return handleApiError(error, authActions.loginFailure, toastr
+                    //     );
+                    // })
                 )
             )
         );

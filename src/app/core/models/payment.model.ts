@@ -1,16 +1,14 @@
-import { TransactionType } from "../enums/enums";
+import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from "../enums/enums";
 import { ITransaction } from "./transaction.model";
 
 export interface RazorpayOrder {
     id: string;
     transactionType: TransactionType;
     amount: number;
-    currency: string;
     receipt: string;
-    offer_id: string | null;
-    status: 'created' | 'attempted' | 'paid';
-    created_at: number;
-    method: string;
+    status: TransactionStatus;
+    direction: PaymentDirection;
+    source: PaymentSource;
 }
 
 export interface RazorpayPaymentResponse {

@@ -22,8 +22,6 @@ export class CustomerProfileOverviewComponent implements OnInit {
                 this.isLoading = false;
             }
         });
-
-        this.customer$.subscribe(d => console.log(d));
     }
 
     onImageError(event: Event) {

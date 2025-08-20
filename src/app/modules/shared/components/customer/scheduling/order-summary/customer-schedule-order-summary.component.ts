@@ -13,14 +13,15 @@ import { RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/m
 import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
 import { ITransaction } from '../../../../../../core/models/transaction.model';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
-import { TransactionType } from '../../../../../../core/enums/enums';
+import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
 import { customerActions } from '../../../../../../store/customer/customer.actions';
 import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
+import { CustomerSelectPaymentComponent } from "../select-payment/select-payment.component";
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
   templateUrl: './customer-schedule-order-summary.component.html',
-  imports: [CommonModule, LoadingCircleAnimationComponent],
+  imports: [CommonModule, LoadingCircleAnimationComponent, CustomerSelectPaymentComponent],
   providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy {
@@ -45,6 +46,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   };
   location!: IAddress
   selectedSlot: IAvailableSlot | null = null;
+  selectedPaymentSource!: PaymentSource;
 
   isLoading = true;
   isProcessing = false;
@@ -124,20 +126,17 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       id: order.id,
       transactionType: TransactionType.BOOKING,
       amount: order.amount,
-      currency: order.currency,
-      status: order.status,
-      method: 'debit',
+      status: TransactionStatus.SUCCESS,
+      direction: PaymentDirection.DEBIT,
+      source: this.selectedPaymentSource,
       receipt: order.receipt,
-      offer_id: order.offer_id,
-      created_at: order.created_at,
     };
 
-    this._paymentService.verifyPaymentSignature(response, orderData, 'customer').subscribe({
+    this._paymentService.verifyPaymentSignature(response, orderData).subscribe({
       next: (response) => {
         this._saveBooking(response.transaction);
       },
-      error: (err) => {
-        console.error(err);
+      error: () => {
         this._toastr.error('Server verification failed.')
       }
     });
@@ -153,7 +152,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
 
     const bookingData: IBookingData = {
       providerId: this.providerId!,
-      total: Number(this.priceBreakup.total.toFixed()),
+      total: Number(this.priceBreakup.total.toFixed(2)),
       location: this.location,
       slotData: this.selectedSlot,
       serviceIds,
@@ -184,6 +183,11 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   }
 
   InitiatePayment() {
+    if (!this.selectedPaymentSource) {
+      this._toastr.error('Please select a payment source.');
+      return;
+    }
+
     this.isProcessing = true;
 
     if (!this._isAllDataAvailable()) {
@@ -192,18 +196,26 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     }
 
     const totalAmount = this.priceBreakup.total;
-    this._paymentService.createRazorpayOrder(totalAmount).subscribe(({
-      next: (order) => {
-        this._razorpayWrapper.openCheckout(order,
-          (paymentResponse: RazorpayPaymentResponse) =>
-            this._verifyPaymentAndConfirmBooking(paymentResponse, order),
-          () => this._saveBooking()
-        );
-      },
-      error: (err) => {
-        console.error(err);
-        this._toastr.error('payment failed');
-      }
-    }));
+    if (this.selectedPaymentSource === PaymentSource.RAZORPAY) {
+      this._paymentService.createRazorpayOrder(totalAmount).subscribe(({
+        next: (order) => {
+          this._razorpayWrapper.openCheckout(order,
+            (paymentResponse: RazorpayPaymentResponse) =>
+              this._verifyPaymentAndConfirmBooking(paymentResponse, order),
+            () => this._saveBooking()
+          );
+        },
+        error: (err) => {
+          console.error(err);
+          this._toastr.error('payment failed');
+        }
+      }));
+    } else if (this.selectedPaymentSource === PaymentSource.WALLET) {
+      this._toastr.warning('selected wallet');
+    }
+  }
+
+  selectPaymentSource(source: PaymentSource) {
+    this.selectedPaymentSource = source;
   }
 }

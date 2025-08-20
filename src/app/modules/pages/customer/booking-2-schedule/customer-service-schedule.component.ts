@@ -12,6 +12,7 @@ import { SelectedServiceIdsType, SelectedServiceType } from '../booking-1-pick-s
 import { selectAllSchedules } from '../../../../store/schedules/schedule.selector';
 import { scheduleActions } from '../../../../store/schedules/schedule.action';
 import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
+import { CustomerSelectPaymentComponent } from "../../../shared/components/customer/scheduling/select-payment/select-payment.component";
 
 @Component({
   selector: 'app-customer-service-schedule',
@@ -20,15 +21,14 @@ import { ToastNotificationService } from '../../../../core/services/public/toast
     CommonModule,
     CustomerScheduleBookingDetailsComponent,
     CustomerScheduleOrderSummaryComponent,
-    CustomerBreadcrumbsComponent
+    CustomerBreadcrumbsComponent,
   ],
   templateUrl: './customer-service-schedule.component.html',
 })
 export class CustomerServiceScheduleComponent implements OnInit {
   private readonly _toastr = inject(ToastNotificationService);
-  // private readonly _route = inject(ActivatedRoute);
   private readonly _sharedDataService = inject(SharedDataService)
-  private _router = inject(Router);
+  private readonly _router = inject(Router);
 
   schedules$!: Observable<ISchedule[]> | null;
   providerId!: string | null;

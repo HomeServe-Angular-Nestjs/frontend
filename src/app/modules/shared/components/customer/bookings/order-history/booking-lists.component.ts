@@ -9,7 +9,7 @@ import { RouterLink } from "@angular/router";
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { FormsModule } from "@angular/forms";
-import { BookingStatus, TransactionType } from "../../../../../../core/enums/enums";
+import { BookingStatus, PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from "../../../../../../core/enums/enums";
 import { PaymentService } from "../../../../../../core/services/payment.service";
 import { RazorpayWrapperService } from "../../../../../../core/services/public/razorpay-wrapper.service";
 import { RazorpayOrder, RazorpayPaymentResponse } from "../../../../../../core/models/payment.model";
@@ -72,23 +72,21 @@ export class CustomerBookingListsComponent implements OnInit {
             error: (err) => {
                 console.error(err);
             }
-        })
+        });
     }
 
     private _verifyPaymentAndUpdateBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {
-        const orderData = {
+        const orderData: RazorpayOrder = {
             id: order.id,
             transactionType: TransactionType.BOOKING,
             amount: order.amount,
-            currency: order.currency,
-            status: order.status,
-            method: 'debit',
+            status: TransactionStatus.SUCCESS,
+            direction: PaymentDirection.DEBIT,
+            source: PaymentSource.RAZORPAY,
             receipt: order.receipt,
-            offer_id: order.offer_id,
-            created_at: order.created_at,
         };
 
-        this._paymentService.verifyPaymentSignature(response, orderData, 'customer').subscribe({
+        this._paymentService.verifyPaymentSignature(response, orderData).subscribe({
             next: (response) => {
                 this._updateBooking(bookingId, response.transaction);
             },
@@ -159,8 +157,12 @@ export class CustomerBookingListsComponent implements OnInit {
             this._toastr.warning('Invalid booking data. Cannot proceed with payment.');
             return;
         }
+        if (booking.paymentSource === PaymentSource.RAZORPAY) {
+            this._initiatePayment(totalAmount, booking.bookingId);
+        } else if (booking.paymentSource === PaymentSource.WALLET) {
 
-        this._initiatePayment(totalAmount, booking.bookingId);
+        }
+
     }
 
     onPageChange(newPage: number) {

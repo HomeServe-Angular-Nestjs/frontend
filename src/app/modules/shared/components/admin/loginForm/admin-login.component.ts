@@ -23,11 +23,10 @@ export class AdminLoginComponent {
   private readonly _regexp = REGEXP_ENV;
 
   errorMessage: string = '';
-  fPassword = false;
-
+  showPassword = false;
   form: FormGroup = this._fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.pattern(this._regexp.password)]],
+    password: ['', [Validators.required]],
   });
 
   formSubmit() {
@@ -36,7 +35,7 @@ export class AdminLoginComponent {
       password: this.form.get('password')
     };
 
-    if (this.form.valid) {
+    if (this.form.valid) {  
       const user: IUser = {
         email: controls.email?.value,
         password: controls.password?.value,
@@ -55,9 +54,5 @@ export class AdminLoginComponent {
         }
       }
     }
-  }
-
-  forgotPassword() {
-    this.fPassword = !this.fPassword;
   }
 }

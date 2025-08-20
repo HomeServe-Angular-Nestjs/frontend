@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
+import { BehaviorSubject, catchError, Observable, shareReplay, throwError } from "rxjs";
 import { IDisplayReviews, IHomeSearch, IProvider, IProviderUpdateBio } from "../models/user.model";
 import { API_ENV } from "../../../environments/env";
 import { SlotType } from "../models/schedules.model";
@@ -56,7 +56,7 @@ export class ProviderService {
     }
 
     getOneProvider(id: string | null = null): Observable<IProvider> {
-        return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?id=${id}`);
+        return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?id=${id}`).pipe(shareReplay(1));
     }
 
     // Updates a provider with full or file-based data (e.g., multipart form).

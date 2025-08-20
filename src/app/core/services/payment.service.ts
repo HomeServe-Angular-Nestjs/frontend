@@ -14,7 +14,7 @@ export class PaymentService {
         return this._http.post<RazorpayOrder>(`${this._apiUrl}/create_order`, { amount });
     }
 
-    verifyPaymentSignature(verifyData: RazorpayPaymentResponse, orderData: RazorpayOrder, role: UType): Observable<IVerifiedPayment> {
-        return this._http.post<IVerifiedPayment>(`${this._apiUrl}/verify_signature`, { verifyData, orderData, role });
+    verifyPaymentSignature(verifyData: RazorpayPaymentResponse, orderData: RazorpayOrder): Observable<IVerifiedPayment> {
+        return this._http.post<IVerifiedPayment>(`${this._apiUrl}/verify_signature`, { verifyData, orderData});
     }
 }

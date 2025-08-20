@@ -10,7 +10,7 @@ export class RazorpayWrapperService {
         const options = {
             key: this._razorpayKey,
             amount: order.amount,
-            currency: order.currency,
+            currency: 'INR',
             name: 'Your App',
             description: 'Payment for services',
             order_id: order.id,
