@@ -5,10 +5,11 @@ import { Store } from '@ngrx/store';
 import { authActions } from './store/auth/auth.actions';
 import { UserType } from './modules/shared/models/user.model';
 import { DomPortalOutlet } from '@angular/cdk/portal';
+import { LoadingSpinnerComponent } from "./UI/spinner/spinner.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, LoadingSpinnerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

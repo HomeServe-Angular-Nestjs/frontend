@@ -1,5 +1,6 @@
 .signup-container {
   @apply min-h-screen flex items-center justify-center relative;
+  width: 100%;
 
   &.customer-theme {
     --primary-color: #ffffff;
@@ -77,9 +78,11 @@
 
   .submit-button {
     background-color: var(--secondary-color);
+
     &:hover {
       background-color: var(--submit-button-hover);
     }
+
     &:focus {
       --ring-color: var(--primary-color);
     }
@@ -87,6 +90,7 @@
 
   .login {
     color: var(--secondary-color);
+
     &:hover {
       color: var(--title-color);
     }

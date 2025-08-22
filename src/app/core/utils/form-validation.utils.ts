@@ -10,6 +10,7 @@ export const FORM_VALIDATION_ERROR_MESSAGES: { [key: string]: string } = {
     pattern: '$FIELD format is invalid.',
     min: '$FIELD must be at least $MIN.',
     max: '$FIELD must be at most $MAX.',
+    passwordMismatch: 'Password not match.',
     invalidTime: `$FIELD is invalid.`,
     pastDate: '$FIELD is invalid. Past dates are not allowed',
     invalidDates: '$FIELD has invalid dates.',
@@ -183,4 +184,27 @@ export function dateRangeValidator(startKey: string, endKey: string): ValidatorF
 
         return null;
     }
+
+}
+
+export function isPasswordMatches(firstPasswordKey: string, secondPasswordKey: string): ValidatorFn {
+    return (group: AbstractControl): ValidationErrors | null => {
+        const firstControl = group.get(firstPasswordKey);
+        const secondControl = group.get(secondPasswordKey);
+
+        if (!firstControl || !secondControl) return null;
+
+        const first = firstControl.value;
+        const second = secondControl.value;
+
+        if (first !== second) {
+            secondControl.setErrors({ passwordMismatch: true });
+            return { passwordMismatch: true };
+        } else {
+            if (secondControl.hasError('passwordMismatch')) {
+                secondControl.setErrors(null);
+            }
+            return null;
+        }
+    };
 }

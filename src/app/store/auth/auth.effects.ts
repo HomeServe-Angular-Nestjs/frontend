@@ -4,7 +4,7 @@ import { Actions } from "@ngrx/effects"
 import { LoginAuthService } from "../../core/services/login-auth.service";
 import { Router } from "@angular/router";
 import { authActions } from "./auth.actions";
-import { catchError, first, map, of, switchMap, tap } from "rxjs";
+import { catchError, finalize, first, map, of, switchMap, tap, timer } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { loginNavigation, navigationAfterLogin } from "../../core/utils/navigation.utils";
@@ -12,18 +12,23 @@ import { Store } from "@ngrx/store";
 import { selectAuthUserType } from "./auth.selector";
 import { UserType } from "../../modules/shared/models/user.model";
 import { ToastNotificationService } from "../../core/services/public/toastr.service";
+import { LoadingService } from "../../core/services/public/loading.service";
 
 export const authEffects = {
     login$: createEffect(() => {
         const actions$ = inject(Actions);
         const loginService = inject(LoginAuthService);
         const router = inject(Router);
-        const toastr = inject(ToastNotificationService);
+        const loadingService = inject(LoadingService);
+
 
         return actions$.pipe(
             ofType(authActions.login),
+            tap(() => loadingService.show('Logging in...')),
             switchMap(({ user }) =>
-                loginService.authCredentials(user).pipe(
+                timer(2000).pipe(
+                    switchMap(() => loginService.authCredentials(user)),
+                    finalize(() => loadingService.hide()),
                     map((response: any) => {
                         return authActions.loginSuccess({ email: user.email, id: response.id as string })
                     }),
@@ -31,10 +36,6 @@ export const authEffects = {
                         const url = navigationAfterLogin(user.type);
                         router.navigate([url]);
                     }),
-                    // catchError((error: HttpErrorResponse) => {
-                    //     return handleApiError(error, authActions.loginFailure, toastr
-                    //     );
-                    // })
                 )
             )
         );

@@ -18,17 +18,22 @@
         <!-- Right side login form -->
         <div class="md:w-1/2 max-w-md w-full">
             <div class="bg-white/95 backdrop-blur-lg p-8 rounded-xl shadow-2xl">
-                <div class="flex items-center justify-center mb-6">
-                    <svg width="30" height="24" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Logo / Title -->
+                <div class="flex items-center justify-center mb-8 group cursor-pointer">
+                    <svg width="32" height="26" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        class="transition-transform group-hover:rotate-12">
                         <path
                             d="M13.7549 5.98438C13.8486 5.89062 13.9893 5.84375 14.1299 5.84375C14.2236 5.84375 14.3643 5.89062 14.458 5.98438L23.1299 13.0625V20.75C23.1299 21.1719 22.7549 21.5 22.3799 21.5H17.083C16.708 21.5 16.333 21.1719 16.333 20.75V16.25C16.333 15.875 16.0049 15.5 15.583 15.5H12.583C12.208 15.5 11.833 15.875 11.833 16.25V20.75C11.833 21.1719 11.5049 21.5 11.1299 21.5H5.87988C5.45801 21.5 5.12988 21.1719 5.12988 20.75V13.1094L13.7549 5.98438ZM27.3955 10.8125C27.5361 10.9062 27.6299 11.0938 27.6299 11.2344C27.6299 11.375 27.583 11.5156 27.4893 11.6094L26.2705 13.0625C26.1768 13.2031 26.0361 13.25 25.8486 13.25C25.708 13.25 25.5674 13.2031 25.4736 13.1094L14.458 4.0625C14.3643 3.96875 14.2236 3.92188 14.1299 3.92188C13.9893 3.92188 13.8486 3.96875 13.7549 4.0625L2.73926 13.1094C2.64551 13.2031 2.50488 13.25 2.36426 13.25C2.17676 13.25 2.03613 13.2031 1.94238 13.0625L0.723633 11.6094C0.676758 11.5156 0.583008 11.375 0.583008 11.2344C0.583008 11.0938 0.676758 10.9062 0.817383 10.8125L12.6768 1.01562C13.0518 0.734375 13.5674 0.546875 14.1299 0.546875C14.6455 0.546875 15.1611 0.734375 15.5361 1.01562L19.7549 4.48438V1.10938C19.7549 0.78125 19.9893 0.546875 20.3174 0.546875H22.9424C23.2236 0.546875 23.5049 0.78125 23.5049 1.10938V7.57812L27.3955 10.8125Z"
-                            [attr.fill]="config.logoColor" />
+                            [ngClass]="{
+                                'fill-blue-600 group-hover:fill-blue-700': config.type === 'customer',
+                                'fill-green-600 group-hover:fill-green-700': config.type === 'provider'
+                                }" class="transition-colors" />
                     </svg>
-                    <span class="title-text text-2xl font-medium">HomeServe</span>
+                    <span class="ml-2 text-3xl font-extrabold bg-gradient-to-r bg-clip-text text-transparent" [ngClass]="{
+                            'from-blue-600 to-blue-400': config.type === 'customer',
+                            'from-green-600 to-green-400': config.type === 'provider',
+                        }">HomeServe</span>
                 </div>
-                <h2 class="text-xl font-medium text-center mb-6" style="color: var(--secondary-color)">
-                    Login to Your Account
-                </h2>
 
                 <form [formGroup]="form" (submit)="submitForm()" class="space-y-4">
                     <div>
@@ -72,8 +77,8 @@
 
                     <div class="mt-4 space-y-3">
                         <button type="button" (click)="getGoogleAuthUrl()" *ngIf="config.socialAuth?.google"
-                            class="w-full flex justify-center items-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 48 48">
+                            class="w-full flex justify-center items-center gap-3 py-2 px-4 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 48 48">
                                 <path fill="#fbc02d"
                                     d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12	s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20	s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z">
                                 </path>
@@ -87,7 +92,7 @@
                                     d="M43.611,20.083L43.595,20L42,20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571	c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z">
                                 </path>
                             </svg>
-                            <span>Login with Google</span>
+                            <span>Sign up with Google</span>
                         </button>
                         <button *ngIf="config.socialAuth?.facebook"
                             class="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200">
@@ -100,7 +105,10 @@
                 <div class="mt-6 text-center text-sm text-gray-600">
                     Don't have an account?
                     <a [routerLink]="config.type === 'customer' ? '/signup' : '/provider/signup'"
-                        class="font-medium login-link cursor-pointer">Sign up</a>
+                        class="ml-1 font-medium  transition hover:underline" [ngClass]="{
+                            'text-blue-600 hover:text-blue-700': config.type === 'customer',
+                            'text-green-600 hover:text-green-700': config.type === 'provider'
+                        }">Sign up</a>
                 </div>
             </div>
         </div>
@@ -115,4 +123,17 @@
     </div>
 </div>
 
-<app-email-input *ngIf="forgotPassword" [userType]="type"></app-email-input>
+<ng-container *ngIf="emailForm">
+    <app-email-input [userType]="type" (closeModalEvent)="closeEmailForm()"
+        (sendOtpEvent)="openOtpModal($event)"></app-email-input>
+</ng-container>
+
+<ng-container *ngIf="otpModal">
+    <app-otp [email]="email" (closeModalEvent)="closeOtpModal()" (code)="verifyOtp($event)" (resendOTP)="resendOtp()"
+        [userType]="config.type"></app-otp>
+</ng-container>
+
+<ng-container *ngIf="changePasswordModal">
+    <app-change-password [userType]="config.type" (closeModalEvent)="closeChangePasswordModal()"
+        (newPasswordEvent)="changePassword($event)"></app-change-password>
+</ng-container>

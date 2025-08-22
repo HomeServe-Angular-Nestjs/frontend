@@ -1,48 +1,37 @@
 import { inject, Injectable } from "@angular/core";
-import { IUser, UserType } from "../../modules/shared/models/user.model";
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { IUser } from "../../modules/shared/models/user.model";
+import { HttpClient } from "@angular/common/http";
 import { API_ENV } from "../../../environments/env";
-import { catchError, map, Observable, tap, throwError } from "rxjs";
-import { IResponse, IVerifyTokenResponse } from "../../modules/shared/models/response.model";
-import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { IResponse } from "../../modules/shared/models/response.model";
 
 
 @Injectable({ providedIn: "root" })
 export class LoginAuthService {
-    private apiUrl = API_ENV.loginAuth;
-    private store = inject(Store)
-
-    constructor(private http: HttpClient) { }
+    private readonly _http = inject(HttpClient);
+    private readonly _apiUrl = API_ENV.loginAuth;
 
     authCredentials(user: IUser) {
-        return this.http.post(`${this.apiUrl}/auth`, user).pipe(
-            catchError((error: HttpErrorResponse) =>
-                throwError(() =>
-                    new Error(this.getErrorMessage(error)))
-            ));
+        return this._http.post(`${this._apiUrl}/auth`, user);
     }
 
-    forgotPassword(user: IUser) {
-        return this.http.post(`${this.apiUrl}/forgot_password`, user, { withCredentials: true });
+    requestOtpForForgotPass(user: IUser) {
+        return this._http.post(`${this._apiUrl}/otp_forgot_password`, user);
     }
 
-    verifyToken(token: string) {
-        return this.http.post<IVerifyTokenResponse>(`${this.apiUrl}/verify_token`, { token });
+    verifyOtpForForgotPass(email: string, code: string) {
+        return this._http.post(`${this._apiUrl}/verify_otp_forgot`, { email, code });
     }
 
-    changePassword(user: IUser) {
-        return this.http.put(`${this.apiUrl}/change_password`, user);
+    changePassword(email: string, password: string, type: string) {
+        return this._http.put(`${this._apiUrl}/change_password`, { email, password, type });
     }
 
     initializeGoogleAuth(type: string) {
-        return this.http.get<IResponse>(`${this.apiUrl}/google/init?type=${type}`);
+        return this._http.get<IResponse>(`${this._apiUrl}/google/init?type=${type}`);
     }
 
     logout(): Observable<void> {
-        return this.http.post<void>(`${this.apiUrl}/logout`, {});
-    }
-
-    private getErrorMessage(error: HttpErrorResponse): string {
-        return error?.error?.message || 'something went wrong';
+        return this._http.post<void>(`${this._apiUrl}/logout`, {});
     }
 }

@@ -1,12 +1,6 @@
 import { Routes } from "@angular/router";
 import { GuestGuard } from "../../../core/guards/guest.guard";
 
-const verifyEmailRoute = {
-    path: 'verify_email',
-    loadComponent: () => import('../../shared/partials/auth/change_password/change_password.component')
-        .then(c => c.ChangePasswordComponent)
-};
-
 export const authRoutes: Routes = [
     {
         path: '',
@@ -23,7 +17,6 @@ export const authRoutes: Routes = [
                     .then(c => c.CustomerLoginComponent),
                 canActivate: [GuestGuard]
             },
-            verifyEmailRoute
         ]
     },
     {
@@ -41,7 +34,6 @@ export const authRoutes: Routes = [
                     .then(c => c.ProviderLoginComponent),
                 canActivate: [GuestGuard]
             },
-            verifyEmailRoute
         ]
     },
 ]
