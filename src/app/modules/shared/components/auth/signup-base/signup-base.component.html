@@ -35,59 +35,76 @@
 
         <!-- Right side signup form -->
         <div class="md:w-1/2 max-w-md w-full">
-            <div class="bg-white/95 backdrop-blur-lg p-8 rounded-xl shadow-2xl">
-                <div class="flex items-center justify-center mb-6">
-                    <svg width="30" height="24" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div class="bg-white/95 backdrop-blur-lg p-10 rounded-2xl shadow-xl border border-gray-100">
+
+                <!-- Logo / Title -->
+                <div class="flex items-center justify-center mb-8 group cursor-pointer">
+                    <svg width="32" height="26" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        class="transition-transform group-hover:rotate-12">
                         <path
                             d="M13.7549 5.98438C13.8486 5.89062 13.9893 5.84375 14.1299 5.84375C14.2236 5.84375 14.3643 5.89062 14.458 5.98438L23.1299 13.0625V20.75C23.1299 21.1719 22.7549 21.5 22.3799 21.5H17.083C16.708 21.5 16.333 21.1719 16.333 20.75V16.25C16.333 15.875 16.0049 15.5 15.583 15.5H12.583C12.208 15.5 11.833 15.875 11.833 16.25V20.75C11.833 21.1719 11.5049 21.5 11.1299 21.5H5.87988C5.45801 21.5 5.12988 21.1719 5.12988 20.75V13.1094L13.7549 5.98438ZM27.3955 10.8125C27.5361 10.9062 27.6299 11.0938 27.6299 11.2344C27.6299 11.375 27.583 11.5156 27.4893 11.6094L26.2705 13.0625C26.1768 13.2031 26.0361 13.25 25.8486 13.25C25.708 13.25 25.5674 13.2031 25.4736 13.1094L14.458 4.0625C14.3643 3.96875 14.2236 3.92188 14.1299 3.92188C13.9893 3.92188 13.8486 3.96875 13.7549 4.0625L2.73926 13.1094C2.64551 13.2031 2.50488 13.25 2.36426 13.25C2.17676 13.25 2.03613 13.2031 1.94238 13.0625L0.723633 11.6094C0.676758 11.5156 0.583008 11.375 0.583008 11.2344C0.583008 11.0938 0.676758 10.9062 0.817383 10.8125L12.6768 1.01562C13.0518 0.734375 13.5674 0.546875 14.1299 0.546875C14.6455 0.546875 15.1611 0.734375 15.5361 1.01562L19.7549 4.48438V1.10938C19.7549 0.78125 19.9893 0.546875 20.3174 0.546875H22.9424C23.2236 0.546875 23.5049 0.78125 23.5049 1.10938V7.57812L27.3955 10.8125Z"
-                            [attr.fill]="config.logoColor" />
+                            [ngClass]="{
+                                'fill-blue-600 group-hover:fill-blue-700': config.type === 'customer',
+                                'fill-green-600 group-hover:fill-green-700': config.type === 'provider'
+                                }" class="transition-colors" />
                     </svg>
-                    <span class="title-text text-2xl font-medium">HomeServe</span>
+                    <span class="ml-2 text-3xl font-extrabold bg-gradient-to-r bg-clip-text text-transparent" [ngClass]="{
+                            'from-blue-600 to-blue-400': config.type === 'customer',
+                            'from-green-600 to-green-400': config.type === 'provider',
+                        }">HomeServe</span>
                 </div>
-                <h2 class="text-xl font-medium text-center mb-6" style="color: var(--secondary-color)">
-                    Create Your Account
-                </h2>
 
-                <!-- Form Email -->
-                <form [formGroup]="form" (ngSubmit)="submitForm()" class="space-y-4">
+                <!-- Form -->
+                <form [formGroup]="form" (ngSubmit)="submitForm()" class="space-y-5">
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                         <input formControlName="email" type="email" id="email" placeholder="Enter your email" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:text-sm form-input" />
+                            class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition outline-none" />
                     </div>
                     <div>
-                        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                         <input formControlName="username" type="text" id="username" placeholder="Enter your username"
                             required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:text-sm form-input" />
+                            class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition outline-none" />
                     </div>
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input formControlName="password" type="text" id="password" placeholder="Enter your password"
-                            required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:text-sm form-input" />
+                    <div class="relative">
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+
+                        <input [type]="showPassword ? 'text' : 'password'" formControlName="password" id="password"
+                            placeholder="Enter your password" required
+                            class="block w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition outline-none" />
+
+                        <!-- Toggle Button -->
+                        <button type="button" (click)="togglePassword()"
+                            class="absolute right-3 top-9 flex items-center  text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i *ngIf="!showPassword" class="fas fa-eye"></i>
+                            <i *ngIf="showPassword" class="fas fa-eye-slash"></i>
+                        </button>
                     </div>
+
                     <button type="submit"
-                        class="w-full text-white py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 submit-button">
+                        class="w-full py-3 px-4 rounded-lg bg-gradient-to-r  text-white font-mediun focus:ring-2 focus:ring-offset-2 transition"
+                        [ngClass]="{
+                            'from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:ring-blue-500': config.type === 'customer',
+                            'from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 focus:ring-green-500': config.type === 'provider'
+                            }">
                         Sign Up
                     </button>
                 </form>
 
-                <div class="mt-6" *ngIf="config.socialAuth?.google || config.socialAuth?.facebook">
-                    <div class=" relative">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white text-gray-500">Or continue with</span>
-                        </div>
+                <!-- Divider -->
+                <div class="mt-8" *ngIf="config.socialAuth?.google || config.socialAuth?.facebook">
+                    <div class="relative flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                        <span class="absolute left-1/2 -translate-x-1/2 bg-white px-3 text-gray-500 text-sm">Or continue
+                            with</span>
                     </div>
 
-                    <div class="mt-4 space-y-3">
+                    <!-- Social buttons -->
+                    <div class="mt-6 space-y-3">
                         <button *ngIf="config.socialAuth?.google"
-                            class="w-full flex justify-center items-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="26" height="26"
-                                viewBox="0 0 48 48">
+                            class="w-full flex justify-center items-center gap-3 py-2 px-4 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 48 48">
                                 <path fill="#fbc02d"
                                     d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12	s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20	s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z">
                                 </path>
@@ -103,22 +120,27 @@
                             </svg>
                             <span>Sign up with Google</span>
                         </button>
-                        <button *ngIf="config.socialAuth.facebook"
-                            class="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
-                            <img src="assets/images/facebook-icon.png" alt="Facebook" class="w-5 h-5 mr-2" />
-                            Sign up with Facebook
+
+                        <button *ngIf="config.socialAuth?.facebook"
+                            class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md transition">
+                            <img src="assets/images/facebook-icon.png" alt="Facebook" class="w-5 h-5" />
+                            <span>Sign up with Facebook</span>
                         </button>
                     </div>
                 </div>
 
-                <div class="mt-6 text-center text-sm text-gray-600">
+                <!-- Footer -->
+                <div class="mt-8 text-center text-sm text-gray-600">
                     Already have an account?
                     <a [routerLink]="config.type === 'customer' ? '/login' : '/provider/login'"
-                        class="font-medium login transition-colors duration-200">Log
-                        In</a>
+                        class="ml-1 font-medium  transition hover:underline" [ngClass]="{
+                            'text-blue-600 hover:text-blue-700': config.type === 'customer',
+                            'text-green-600 hover:text-green-700': config.type === 'provider'
+                        }">Log In</a>
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Trust indicators at the bottom -->
@@ -138,4 +160,7 @@
     </div>
 </div>
 
-<app-otp (code)="verifyOtp($event)" (resendOTP)="resendOtp()" [email]="user.email" *ngIf="isValidForm"></app-otp>
+<ng-container *ngIf="otpModal()">
+    <app-otp (code)="verifyOtp($event)" (resendOTP)="resendOtp()" (closeModalEvent)="closeModal()" [email]="user.email"
+        [userType]="config.type"></app-otp>
+</ng-container>

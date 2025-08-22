@@ -3,8 +3,9 @@ import { provideRouter, RouterConfigOptions, withInMemoryScrolling, withRouterCo
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
-import { provideAnimations } from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations'
 import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { NgxSpinnerModule } from 'ngx-spinner';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 
@@ -33,12 +34,16 @@ export const appConfig: ApplicationConfig = {
   providers: [
     ErrorHandlerService,
     provideAnimations(),
-    importProvidersFrom(ToastrModule.forRoot({
-      positionClass: 'toast-top-center',
-      timeOut: 3000,
-      progressBar: true,
-      closeButton: true
-    })),
+    importProvidersFrom(
+      BrowserAnimationsModule,
+      ToastrModule.forRoot({
+        positionClass: 'toast-top-center',
+        timeOut: 3000,
+        progressBar: true,
+        closeButton: true
+      }),
+      NgxSpinnerModule.forRoot()
+    ),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes,
       withViewTransitions(), // optional

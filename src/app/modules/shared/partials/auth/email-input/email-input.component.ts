@@ -1,10 +1,12 @@
+import { Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { Component, inject, Input } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { LoginAuthService } from "../../../../../core/services/login-auth.service";
 import { IUser, UserType } from "../../../models/user.model";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
+import { LoadingService } from "../../../../../core/services/public/loading.service";
+import { finalize } from "rxjs";
 
 
 @Component({
@@ -13,11 +15,13 @@ import { ToastNotificationService } from "../../../../../core/services/public/to
     imports: [ReactiveFormsModule, CommonModule]
 })
 export class EmailInputComponent {
-    private readonly _fb = inject(FormBuilder);
-    private readonly _loginService = inject(LoginAuthService);
     private readonly _toastr = inject(ToastNotificationService);
+    private readonly _fb = inject(FormBuilder);
 
     @Input({ required: true }) userType!: UserType;
+    @Output() sendOtpEvent = new EventEmitter<IUser>();
+    @Output() closeModalEvent = new EventEmitter();
+
     user!: IUser;
 
     form: FormGroup = this._fb.group({
@@ -38,9 +42,10 @@ export class EmailInputComponent {
             type: this.userType
         }
 
-        this._loginService.forgotPassword(this.user).subscribe({
-            next: (response) => console.log(response),
-            error: (err) => console.error(err)
-        });
+        this.sendOtpEvent.emit(this.user);
+    }
+
+    closeModal() {
+        this.closeModalEvent.emit();
     }
 }

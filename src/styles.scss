@@ -16,7 +16,6 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-
 // Customize notification appearance
 .notyf__toast {
   border-radius: 8px;
@@ -184,6 +183,17 @@ body {
     opacity: 0;
     transform: translateY(-30px);
   }
+}
+
+/* For Chrome, Safari, Edge */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
 }
 
 @layer components {

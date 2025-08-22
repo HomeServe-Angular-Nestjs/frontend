@@ -1,39 +1,58 @@
 <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-inter">
-    <div class="bg-white rounded-lg p-6 w-full max-w-sm">
-        <button type="button" class="text-gray-700 float-end" (click)="closeModal()">
-            <i class="fas fa-close"></i>
-        </button>
-        <!-- Header -->
-        <div class="text-center">
-            <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
-                <i class="fas fa-envelope text-blue-600"></i>
+    <ng-container *ngIf="isLoading; else otpContent">
+        <div class="flex justify-center items-center h-full">
+            <app-loading-spinner></app-loading-spinner>
+        </div>
+    </ng-container>
+    <ng-template #otpContent>
+
+        <div class="bg-white rounded-lg p-6 w-full max-w-sm min-h-[20rem]">
+            <!-- OTP UI -->
+            <button type="button" class="text-gray-700 float-end" (click)="closeModal()">
+                <i class="fas fa-close"></i>
+            </button>
+
+            <!-- Header -->
+            <div class="text-center">
+                <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full"
+                    [ngClass]="{'bg-blue-100 text-blue-600':userType === 'customer','bg-green-100 text-green-600':userType === 'provider'}">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mt-3 font-poppins">
+                    Enter Verification Code
+                </h3>
+                <p class="text-sm text-gray-500 mt-1">We've sent a code to {{ email }}</p>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mt-3 font-poppins">
-                Enter Verification Code
-            </h3>
-            <p class="text-sm text-gray-500 mt-1">We've sent a code to {{email}}</p>
-        </div>
 
-        <!-- OTP Inputs -->
-        <div class="flex justify-center gap-3 mt-5">
-            <input *ngFor="let i of [0,1,2,3]; let idx = index" type="text" maxlength="1" [(ngModel)]="otpDigits[idx]"
-                (input)="onOtpInput($event, idx)"
-                class="w-12 h-12 text-center text-xl border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-        </div>
+            <!-- OTP Inputs -->
+            <div class="flex justify-center gap-3 mt-5">
+                <input *ngFor="let i of [0,1,2,3]; let idx = index" type="text" maxlength="1"
+                    [(ngModel)]="otpDigits[idx]" (input)="onOtpInput($event, idx)"
+                    class="otpInput w-12 h-12 text-center text-xl border rounded-lg outline-none focus:ring-2"
+                    [ngClass]="{
+                        'focus:ring-blue-500 focus:border-blue-500': userType === 'customer',
+                        'focus:ring-green-500 focus:border-green-500': userType === 'provider',
+                }">
+            </div>
 
-        <!-- Resend Option -->
-        <div class="text-center mt-4 text-sm">
-            <span class="text-gray-600">Didn't receive code?</span>
-            <button (click)="resendOtp()" [disabled]="!canResend"
-                class="text-blue-600 font-medium ml-2 disabled:text-gray-400">
-                Resend {{canResend ? '' : '(' + countdown() + 's)'}}
+            <!-- Resend Option -->
+            <div class="text-center mt-4 text-sm">
+                <span class="text-gray-600">Didn't receive code?</span>
+                <button (click)="resendOtp()" [disabled]="!canResend" class="font-medium ml-2 disabled:text-gray-400"
+                    [ngClass]="{'text-blue-600': userType === 'customer', 'text-green-600': userType === 'provider'}">
+                    Resend {{ canResend ? '' : '(' + countdown() + 's)' }}
+                </button>
+            </div>
+
+            <!-- Verify Button -->
+            <button (click)="verifyOtp()" [disabled]="!isOtpComplete"
+                class="mt-6 w-full py-2 text-white rounded-md  disabled:bg-gray-300 transition-colors" [ngClass]="{
+                    'bg-blue-600 hover:bg-blue-700': userType === 'customer',
+                    'bg-green-600 hover:bg-green-700': userType === 'provider',
+                }">
+                Verify
             </button>
         </div>
+    </ng-template>
 
-        <!-- Verify Button -->
-        <button (click)="verifyOtp()" [disabled]="!isOtpComplete"
-            class="mt-6 w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 transition-colors">
-            Verify
-        </button>
-    </div>
 </div>

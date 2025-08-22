@@ -7,7 +7,7 @@ export class ErrorHandlerService {
         switch (status) {
             case 400:
                 return backendMessage || 'Bad request. Please check your input.';
-                
+
             case 401:
                 return backendMessage || 'Unauthorized access. Please log in again.';
 

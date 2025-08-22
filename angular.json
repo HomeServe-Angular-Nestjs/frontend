@@ -32,9 +32,10 @@
               }
             ],
             "styles": [
+              "src/styles.scss",
               "@angular/material/prebuilt-themes/azure-blue.css",
               "node_modules/mapbox-gl/dist/mapbox-gl.css",
-              "src/styles.scss"
+              "node_modules/ngx-spinner/animations/square-jelly-box.css"
             ],
             "scripts": []
           },
