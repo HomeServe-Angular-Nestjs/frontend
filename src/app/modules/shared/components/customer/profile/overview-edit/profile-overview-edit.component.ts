@@ -1,10 +1,10 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
-import { combineLatest, map, Observable, of, startWith } from "rxjs";
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { combineLatest, finalize, map, Observable, of, startWith, Subject, takeUntil } from "rxjs";
 import { ILocation, ICustomer } from "../../../../../../core/models/user.model";
 import { Store } from "@ngrx/store";
 import { selectCustomer } from "../../../../../../store/customer/customer.selector";
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from "@angular/forms";
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { getValidationMessage } from "../../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
@@ -13,6 +13,7 @@ import { customerActions } from "../../../../../../store/customer/customer.actio
 import { API_KEY, REGEXP_ENV } from "../../../../../../../environments/env";
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
 import { LocationService } from "../../../../../../core/services/public/location.service";
+import { LoadingService } from "../../../../../../core/services/public/loading.service";
 
 @Component({
     selector: 'app-customer-profile-overview',
@@ -20,12 +21,16 @@ import { LocationService } from "../../../../../../core/services/public/location
     imports: [CommonModule, ReactiveFormsModule, MapboxMapComponent],
     providers: [LocationService]
 })
-export class CustomerProfileOverviewEditComponent implements OnInit {
-    private readonly _store = inject(Store);
-    private readonly _fb = inject(FormBuilder);
-    private readonly _router = inject(Router);
+export class CustomerProfileOverviewEditComponent implements OnInit, OnDestroy {
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _locationService = inject(LocationService);
+    private readonly _loadingService = inject(LoadingService);
+    private readonly _fb = inject(FormBuilder);
+    private readonly _router = inject(Router);
+    private readonly _store = inject(Store);
+
+    private _destroy$ = new Subject<void>();
+    private _originalCustomerData!: string;
 
     customer$: Observable<ICustomer | null> = this._store.select(selectCustomer);
     googleLogin$: Observable<boolean> = of(false);
@@ -33,8 +38,6 @@ export class CustomerProfileOverviewEditComponent implements OnInit {
 
     passwordRegex = REGEXP_ENV.password;
     phoneRegex = REGEXP_ENV.phone;
-
-    private originalCustomerData!: string;
 
     profileForm: FormGroup = this._fb.group({
         fullname: ['', Validators.required],
@@ -44,11 +47,8 @@ export class CustomerProfileOverviewEditComponent implements OnInit {
         location: this._fb.group(
             {
                 address: ['', Validators.required],
-                coordinates: [[]]
+                coordinates: [[], Validators.required]
             },
-            {
-                validators: [this.locationValidator]
-            }
         )
     });
 
@@ -59,31 +59,31 @@ export class CustomerProfileOverviewEditComponent implements OnInit {
     });
 
     ngOnInit(): void {
-        this.customer$.subscribe(customer => {
-            this.profileForm.patchValue({
-                fullname: customer?.fullname,
-                username: customer?.username,
-                email: customer?.email,
-                phone: customer?.phone,
-                location: customer?.location
-            });
+        this._loadingService.show();
+        this.customer$
+            .pipe(
+                takeUntil(this._destroy$),
+                finalize((() => this._loadingService.hide())))
+            .subscribe(customer => {
+                this.profileForm.patchValue({
+                    fullname: customer?.fullname,
+                    username: customer?.username,
+                    email: customer?.email,
+                    phone: customer?.phone,
+                    location: customer?.location
+                });
 
-            this.originalCustomerData = JSON.parse(JSON.stringify(this.profileForm.getRawValue()));
-        });
+                this._originalCustomerData = JSON.parse(JSON.stringify(this.profileForm.getRawValue()));
+            });
 
         this.googleLogin$ = this.customer$.pipe(
             map(customer => !!customer?.googleId)
         );
     }
 
-    private locationValidator(control: AbstractControl): ValidationErrors | null {
-        const location = control.value;
-        if (!location || typeof location !== 'object') return { locationInvalid: 'Location is required' };
-
-        const hasAddress = typeof location.address === 'string' && location.address.trim().length > 0;
-        const hasCoordinates = Array.isArray(location.coordinates) && location.coordinates.length === 2;
-
-        return hasAddress && hasCoordinates ? null : { locationInvalid: 'Invalid location' };
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
     }
 
     cancelEdit() {
@@ -101,7 +101,7 @@ export class CustomerProfileOverviewEditComponent implements OnInit {
         };
 
         const profileDataStr = this.profileForm.getRawValue();
-        const original = this.originalCustomerData;
+        const original = this._originalCustomerData;
 
         if (this.profileForm.valid) {
             const profileData = {
@@ -119,15 +119,30 @@ export class CustomerProfileOverviewEditComponent implements OnInit {
             }
 
             this._store.dispatch(customerActions.updateProfile({ profileData }));
+            return;
+        }
 
-        } else {
-            for (const [key, control] of Object.entries(controls)) {
-                const message = getValidationMessage(control, key);
-                if (message) {
-                    this._toastr.error(message);
-                    return;
+        const validate = (formGroup: FormGroup): string | null => {
+            for (const [key, control] of Object.entries(formGroup.controls)) {
+                if (control instanceof FormGroup) {
+                    const nestedError = validate(control);
+                    if (nestedError) return nestedError;
+                } else if (control instanceof FormControl) {
+                    const message = getValidationMessage(control, key);
+                    if (message) {
+                        const message = getValidationMessage(control, key);
+                        if (message) return message;
+                    }
                 }
             }
+            return null;
+        };
+
+        const firstError = validate(this.profileForm);
+
+        if (firstError) {
+            this._toastr.error(firstError);
+            return;
         }
     }
 

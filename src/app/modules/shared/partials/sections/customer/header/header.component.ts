@@ -55,12 +55,12 @@ export class CustomerHeaderComponent implements OnInit {
 
     const customer$ = this._store.select(selectCustomer);
 
-    this.avatar$ = customer$.pipe(map(c => c?.avatar ?? null));
-    this.email$ = customer$.pipe(map(c => c?.email ?? ''));
-    this.username$ = customer$.pipe(map(c => c?.username ?? ''));
-    this.fullname$ = customer$.pipe(map(c => c?.fullname ?? ''));
-    this.fallbackChar$ = customer$.pipe(map(c => c?.username?.charAt(0).toUpperCase() ?? ''));
-    this.fallbackColor$ = this.fallbackChar$.pipe(map(char => char ? getColorFromChar(char) : '#4f46e5'));
+    this.avatar$ = customer$.pipe(takeUntil(this._destroy$), map(c => c?.avatar ?? null));
+    this.email$ = customer$.pipe(takeUntil(this._destroy$), map(c => c?.email ?? ''));
+    this.username$ = customer$.pipe(takeUntil(this._destroy$), map(c => c?.username ?? ''));
+    this.fullname$ = customer$.pipe(takeUntil(this._destroy$), map(c => c?.fullname ?? ''));
+    this.fallbackChar$ = customer$.pipe(takeUntil(this._destroy$), map(c => c?.username?.charAt(0).toUpperCase() ?? ''));
+    this.fallbackColor$ = this.fallbackChar$.pipe(takeUntil(this._destroy$), map(char => char ? getColorFromChar(char) : '#4f46e5'));
 
     this._debounceService.onSearch(700)
       .pipe(takeUntil(this._destroy$))
