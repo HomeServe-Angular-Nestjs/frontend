@@ -5,8 +5,6 @@ import { CustomerProviderProfileNavigationComponent } from "../../../shared/comp
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { CustomerProviderProfileAvailabilityAndMatrixComponent } from "../../../shared/components/customer/provider-details/availability-and-metrix/customer-provider-profile-availability-and-matrix.component";
 import { ProviderService } from "../../../../core/services/provider.service";
-import { IProvider } from "../../../../core/models/user.model";
-import { NotificationService } from "../../../../core/services/public/notification.service";
 
 @Component({
     selector: 'customer-provider-profile-layout',

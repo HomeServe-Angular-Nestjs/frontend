@@ -117,14 +117,14 @@
           <!-- Desktop Actions -->
           <div *ngIf="userStatus === 'authenticated'; else elseBlock" class="md:flex items-center space-x-5">
             <!-- Cart with dropdown -->
-            <div class="relative group">
+            <div class="relative">
               <button
                 class="relative p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300">
                 <i class="fas fa-shopping-cart text-xl text-gray-600 hover:text-blue-600 transition-colors"></i>
                 <span
                   class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
               </button>
-              <div x-show="open" x-transition
+              <div
                 class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50 hidden">
                 <div class="px-4 py-3 border-b border-gray-100">
                   <h3 class="font-medium text-gray-900">Your Cart</h3>
@@ -137,29 +137,17 @@
             </div>
 
             <!-- Notifications with dropdown -->
-            <div class="relative group">
-              <button
-                class="relative p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300">
-                <i class="fas fa-bell text-xl text-gray-600 hover:text-blue-600 transition-colors"></i>
-                <!-- want animation? put 'animate-bounce' in the below span class -->
-                <span
-                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-              </button>
-              <div x-show="open" x-transition
-                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50 hidden">
-                <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-                  <h3 class="font-medium text-gray-900">Notifications</h3>
-                  <button class="text-sm text-blue-600 hover:text-blue-800">Mark all as read</button>
-                </div>
-                <div class="max-h-96 overflow-y-auto">
-                  <!-- Notification items would go here -->
-                  <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0">
-                    <p class="text-sm text-gray-700">New service request received</p>
-                    <p class="text-xs text-gray-500 mt-1">2 minutes ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <a routerLink="/profile/notifications"
+              class="relative p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
+              <i class="fas fa-bell text-xl text-gray-600 hover:text-blue-600 transition-colors"></i>
+              <ng-container *ngIf="unReadNotificationCount$ | async as count">
+                <ng-container *ngIf="count > 0">
+                  <span
+                    class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-bounce">
+                    {{count}}</span>
+                </ng-container>
+              </ng-container>
+            </a>
 
             <!-- Profile dropdown -->
             <div class="relative group">

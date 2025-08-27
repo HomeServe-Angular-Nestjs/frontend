@@ -35,6 +35,7 @@ export class CustomerProfileOverviewEditComponent implements OnInit, OnDestroy {
     customer$: Observable<ICustomer | null> = this._store.select(selectCustomer);
     googleLogin$: Observable<boolean> = of(false);
     center: [number, number] = [76.9560, 8.5010];
+    showMap = false;
 
     passwordRegex = REGEXP_ENV.password;
     phoneRegex = REGEXP_ENV.phone;
@@ -44,12 +45,8 @@ export class CustomerProfileOverviewEditComponent implements OnInit, OnDestroy {
         username: ['', Validators.required],
         phone: ['', [Validators.required, Validators.pattern(this.phoneRegex)]],
         email: ['', [Validators.required, Validators.email]],
-        location: this._fb.group(
-            {
-                address: ['', Validators.required],
-                coordinates: [[], Validators.required]
-            },
-        )
+        address: ['', Validators.required],
+        coordinates: [[], Validators.required]
     });
 
     changePasswordForm: FormGroup = this._fb.group({
@@ -62,15 +59,17 @@ export class CustomerProfileOverviewEditComponent implements OnInit, OnDestroy {
         this._loadingService.show();
         this.customer$
             .pipe(
-                takeUntil(this._destroy$),
-                finalize((() => this._loadingService.hide())))
-            .subscribe(customer => {
+                takeUntil(this._destroy$)
+            ).subscribe(customer => {
+                if (!customer?.address) this.showMap = true;
+
                 this.profileForm.patchValue({
                     fullname: customer?.fullname,
                     username: customer?.username,
                     email: customer?.email,
                     phone: customer?.phone,
-                    location: customer?.location
+                    coordinates: customer?.location?.coordinates,
+                    address: customer?.address
                 });
 
                 this._originalCustomerData = JSON.parse(JSON.stringify(this.profileForm.getRawValue()));
@@ -79,6 +78,10 @@ export class CustomerProfileOverviewEditComponent implements OnInit, OnDestroy {
         this.googleLogin$ = this.customer$.pipe(
             map(customer => !!customer?.googleId)
         );
+    }
+
+    ngAfterViewInit() {
+        setTimeout(() => this._loadingService.hide(), 2000);
     }
 
     ngOnDestroy(): void {
@@ -97,7 +100,8 @@ export class CustomerProfileOverviewEditComponent implements OnInit, OnDestroy {
             username: this.profileForm.get('username'),
             email: this.profileForm.get('email'),
             phone: this.profileForm.get('phone'),
-            location: this.profileForm.get('location')
+            address: this.profileForm.get('address'),
+            coordinates: this.profileForm.get('coordinates')
         };
 
         const profileDataStr = this.profileForm.getRawValue();
@@ -107,9 +111,9 @@ export class CustomerProfileOverviewEditComponent implements OnInit, OnDestroy {
             const profileData = {
                 fullname: controls.fullname?.value,
                 username: controls.username?.value,
-                email: controls.email?.value,
                 phone: controls.phone?.value,
-                location: controls.location?.value,
+                address: controls.address?.value,
+                coordinates: controls.coordinates?.value,
             }
 
             const hasChanged = JSON.stringify(profileDataStr) !== JSON.stringify(original);
@@ -189,10 +193,11 @@ export class CustomerProfileOverviewEditComponent implements OnInit, OnDestroy {
         this._locationService.getAddressFromCoordinates(...newCenter).subscribe({
             next: (data) => {
                 const selectedAddress = data.features[0]?.place_name;
+                console.log(selectedAddress);
 
-                this.profileForm.get('location')?.patchValue({
+                this.profileForm.patchValue({
                     address: selectedAddress,
-                    coordinates: newCenter
+                    coordinates: this.center
                 });
 
             },

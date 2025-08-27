@@ -21,7 +21,6 @@ export const authEffects = {
         const router = inject(Router);
         const loadingService = inject(LoadingService);
 
-
         return actions$.pipe(
             ofType(authActions.login),
             tap(() => loadingService.show('Logging in...')),

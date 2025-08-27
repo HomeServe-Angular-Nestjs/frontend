@@ -29,6 +29,8 @@ import { chatEffects } from './store/chat/chats.effect';
 import { metaReducers } from './store/auth/meta.reducer';
 import { subscriptionEffects } from './store/subscriptions/subscription.effects';
 import { ErrorHandlerService } from './core/services/public/error-handler.service';
+import { notificationFeature } from './store/notification/notification.feature';
+import { notificationEffects } from './store/notification/notification.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -62,11 +64,12 @@ export const appConfig: ApplicationConfig = {
       [customerFeature.name]: customerFeature.reducer,
       [chatFeature.name]: chatFeature.reducer,
       [subscriptionFeature.name]: subscriptionFeature.reducer,
-
+      [notificationFeature.name]: notificationFeature.reducer,
     }, { metaReducers }),
     provideEffects(
       offeredServiceEffects,
       subscriptionEffects,
+      notificationEffects,
       scheduleEffects,
       customerEffects,
       providerEffects,

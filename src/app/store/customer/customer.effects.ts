@@ -5,7 +5,6 @@ import { catchError, finalize, map, of, switchMap, tap, throwError } from "rxjs"
 import { CustomerService } from "../../core/services/customer.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
-import { NotificationService } from "../../core/services/public/notification.service";
 import { ToastNotificationService } from "../../core/services/public/toastr.service";
 import { LoadingService } from "../../core/services/public/loading.service";
 

@@ -6,6 +6,8 @@ export class VideoCallSocketService extends BaseSocketService {
 
     private _listeners: Record<string, (msg: any) => void> = {};
 
+    protected override namespace: string = 'video-call';
+
     constructor() {
         super();
     }
@@ -31,7 +33,7 @@ export class VideoCallSocketService extends BaseSocketService {
         }
     }
 
-    stopListeningToSignals() { 
-        
+    stopListeningToSignals() {
+
     }
 }

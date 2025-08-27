@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { CustomerService } from '../../../../../../core/services/customer.service';
 import { ICustomerSearchServices } from '../../../../../../core/models/offeredService.model';
+import { selectTotalUnReadNotificationCount } from '../../../../../../store/notification/notification.selector';
 
 @Component({
   selector: 'app-customer-header',
@@ -38,6 +39,7 @@ export class CustomerHeaderComponent implements OnInit {
   avatar$!: Observable<string | null>;
   fallbackChar$!: Observable<string>;
   fallbackColor$!: Observable<string>;
+  unReadNotificationCount$ = this._store.select(selectTotalUnReadNotificationCount);
 
   // Provider Search
   providerSearch = '';

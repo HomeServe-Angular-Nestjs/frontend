@@ -1,0 +1,56 @@
+<div class="flex bg-gray-50">
+    <div class="flex-1 flex flex-col bg-white shadow-sm">
+        <nav class="border-b bg-white px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-6">
+                <button *ngFor="let opt of buttonOption" (click)="setCurrentSelect(opt.value)"
+                    class="text-sm font-medium pb-2" [ngClass]="{
+                        'border-b-2 border-green-500 hover:text-gray-900': currentSelect === opt.value,
+                        'text-gray-500': currentSelect !== opt.value
+                        }">
+                    {{opt.text}}
+                </button>
+            </div>
+
+            <div class="flex items-center gap-4 flex-wrap">
+                <button class="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                    aria-label="Mark all as read">
+                    <i class="fas fa-check-double"></i>
+                    <span>Mark all</span>
+                </button>
+                <!-- <button class="text-sm text-red-600 hover:text-red-700 flex items-center gap-2" aria-label="Clear all">
+                    <i class="fas fa-trash"></i>
+                    <span>Clear</span>
+                </button> -->
+            </div>
+        </nav>
+
+        <div class="flex-1 mb-4 overflow-y-auto space-y-4 py-4">
+            <ng-container *ngIf="(filteredNotifications$ | async) as filteredNotifications">
+                <ng-container *ngFor="let notification of filteredNotifications">
+                    <div class="flex items-start gap-4 p-4 bg-green-50/30 rounded-xl hover:bg-gray-50 transition-colors relative"
+                        [ngClass]="{'opacity-50': notification.isRead, 'bg-green-50/30': !notification.isRead}">
+                        <div class="flex-shrink-0">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                <i [class]="getIcon(notification.type) + ' ' + getColor(notification.type)"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-sm font-semibold text-gray-900">{{notification.title}}</h4>
+                                <span class="text-xs text-gray-500">{{notification.createdAt | relativeTime}}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">{{notification.message}}</p>
+                        </div>
+                        <ng-container *ngIf="!notification.isRead && notification.type !== 'system'">
+                            <button (click)="markAsRead(notification.id)"
+                                class="absolute bottom-2 right-3 text-xs text-blue-600 hover:underline flex items-center gap-1 cursor-pointer">
+                                mark as read
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>
+</div>
