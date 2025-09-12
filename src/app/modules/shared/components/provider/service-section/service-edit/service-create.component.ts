@@ -11,11 +11,12 @@ import { providerActions } from '../../../../../../store/provider/provider.actio
 import { map } from 'rxjs';
 import { REGEXP_ENV } from '../../../../../../../environments/env';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
+import { ButtonComponent } from "../../../../../../UI/button/button.component";
 
 @Component({
   selector: 'app-service-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, LoadingCircleAnimationComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, LoadingCircleAnimationComponent, ButtonComponent],
   templateUrl: './service-create.component.html',
   styleUrl: './service-create.component.scss'
 })
@@ -203,7 +204,7 @@ export class ServiceCreateComponent implements OnInit {
     return this._fb.group({
       title: ['', Validators.required],
       desc: ['', Validators.required],
-      price: ['', [Validators.required, Validators.pattern(this._validDecimal)]],
+      price: ['', [Validators.required, Validators.pattern(this._validDecimal), Validators.max(10000)]],
       estimatedTime: ['', [Validators.required, Validators.pattern(this._validInteger)]],
       durationOptions: ['', Validators.required],
       image: [null],
@@ -256,7 +257,7 @@ export class ServiceCreateComponent implements OnInit {
 
   private _afterSuccess(message: string) {
     this._toastr.success(message);
-    this._router.navigate(['provider', 'profiles', 'service_offered'])
+    this._router.navigate(['provider', 'manage_services'])
   }
 
   private _scrollToSubService(index: number) {

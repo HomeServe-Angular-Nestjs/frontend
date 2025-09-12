@@ -1,4 +1,4 @@
-<div class="min-h-screen p-6 bg-gray-50 relative">
+<div class="min-h-screen p-6 bg-white relative">
     <!-- Overlay Loading Spinner -->
     <div *ngIf="isLoading" class="fixed inset-0 z-50 bg-white/50 flex items-center justify-center">
         <div class="w-36 h-36 rounded-lg bg-white shadow-lg border border-gray-200 flex items-center justify-center">
@@ -6,7 +6,6 @@
             </app-loading-circle-animation>
         </div>
     </div>
-
 
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <!-- Header -->
@@ -17,20 +16,13 @@
                     Design your service offerings with clear pricing and options.
                 </p>
             </div>
-            <button (click)="onSubmit()"
-                class="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                        clip-rule="evenodd" />
-                </svg>
-                Save Service
-            </button>
+            <app-button [buttonClass]="'px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg'"
+                [text]="'Save Service'" [icon]="'plus'" (clicked)="onSubmit()"></app-button>
         </div>
 
         <!-- Form Card -->
         <form [formGroup]="serviceForm" (submit)="onSubmit()"
-            class=" bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-100">
+            class=" bg-gray-50 rounded-xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-100">
             <!-- Service Information -->
             <div class="p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -208,13 +200,12 @@
             <!-- Form Footer -->
             <div class="p-6 bg-gray-50 flex justify-end gap-3">
                 <a routerLink="/provider/profiles/service_offered"
-                    class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 ">
                     Cancel
                 </a>
-                <button type="submit"
-                    class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-sm hover:shadow-md">
-                    Save Service
-                </button>
+                <app-button [type]="'submit'"
+                    [buttonClass]="'px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg'"
+                    [text]="'Save Service'" [icon]="'plus'"></app-button>
             </div>
         </form>
     </div>
