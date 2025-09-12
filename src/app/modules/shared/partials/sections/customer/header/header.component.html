@@ -5,7 +5,7 @@
 }">
   <div class="px-6 mx-auto  py-3">
     <div class="flex items-center justify-between">
-      <!-- Logo - Enhanced with hover effects -->
+
       <div class="flex items-center">
         <a [routerLink]="['/homepage']" class="flex items-center group rounded-l">
           <div class="flex items-center justify-center">
@@ -21,7 +21,6 @@
         </a>
       </div>
 
-      <!-- Search Bars - Enhanced with floating labels -->
       <div class="flex-1 max-w-2xl mx-8 hidden md:block">
         <div class="flex gap-4">
           <!-- Services Search -->
@@ -29,28 +28,41 @@
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <i class="fas fa-search text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
             </div>
+
             <input type="text" id="service-search" [(ngModel)]="serviceSearch" (ngModelChange)="searchServices()"
               class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition-all outline-none peer"
               placeholder=" " />
-            <ul *ngIf="!isLoadingServices && fetchedServices?.length && serviceSearch.trim()"
+
+            <div *ngIf="isLoadingServices"
+              class="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg py-4 text-center text-sm text-gray-500 z-50">
+              <i class="fas fa-spinner fa-spin mr-2"></i> Searching services...
+            </div>
+
+            <ul *ngIf="!isLoadingServices && serviceSearch.trim()"
               class="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto text-sm text-gray-800">
-              <li *ngFor="let service of fetchedServices" (click)="handleServiceClick(service)"
-                class="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0">
+              <ng-container *ngIf="fetchedServices.length else noServices">
+                <li *ngFor="let service of fetchedServices" (click)="handleServiceClick(service)"
+                  class="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0">
 
-                <!-- Avatar -->
-                <div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
-                  <img [src]="service.image || 'https://via.placeholder.com/48'" alt="image"
-                    class="w-full h-full object-cover" />
-                </div>
+                  <!-- Avatar -->
+                  <div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
+                    <img [src]="service.image || 'https://via.placeholder.com/48'" alt="image"
+                      class="w-full h-full object-cover" />
+                  </div>
 
-                <!-- Info -->
-                <div class="flex-1 min-w-0">
-                  <p class="font-medium truncate">{{ service.title }}</p>
-                </div>
-              </li>
+                  <!-- Info -->
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium truncate">{{ service.title }}</p>
+                  </div>
+                </li>
+              </ng-container>
+              <ng-template #noServices>
+                <li class="px-4 py-3 text-center text-sm text-gray-500">No services found.</li>
+              </ng-template>
             </ul>
-            <label for="service-search"
-              class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-10 pointer-events-none">
+            <label for="service-search" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white 
+              px-2 peer-focus:px-2 peer-focus:text-gray-900 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+              peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-10 pointer-events-none">
               Search services
             </label>
           </div>
@@ -71,30 +83,36 @@
             </div>
 
             <!-- Suggestions List -->
-            <ul *ngIf="!isLoadingProviders && fetchedProviders?.length && providerSearch"
+            <ul *ngIf="!isLoadingProviders && providerSearch"
               class="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto text-sm text-gray-800">
-              <li *ngFor="let provider of fetchedProviders" (click)="handleProviderClick(provider)"
-                class="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0">
 
-                <!-- Avatar -->
-                <div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
-                  <img [src]="provider.avatar || 'https://via.placeholder.com/48'" alt="Avatar"
-                    class="w-full h-full object-cover" />
-                </div>
+              <ng-container *ngIf="fetchedProviders.length && providerSearch else noProviders">
+                <li *ngFor="let provider of fetchedProviders" (click)="handleProviderClick(provider)"
+                  class="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0">
 
-                <!-- Info -->
-                <div class="flex-1 min-w-0">
-                  <p class="font-medium truncate">{{ provider.name }}</p>
-                  <p class="text-xs text-gray-500 leading-tight line-clamp-2">{{ provider.address }}</p>
-                </div>
+                  <!-- Avatar -->
+                  <div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
+                    <img [src]="provider.avatar || 'https://via.placeholder.com/48'" alt="Avatar"
+                      class="w-full h-full object-cover" />
+                  </div>
 
-              </li>
+                  <!-- Info -->
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium truncate">{{ provider.name }}</p>
+                    <p class="text-xs text-gray-500 leading-tight line-clamp-2">{{ provider.address }}</p>
+                  </div>
+                </li>
+              </ng-container>
+
+              <ng-template #noProviders>
+                <li class="px-4 py-3 text-center text-sm text-gray-500">No providers found.</li>
+              </ng-template>
             </ul>
 
-
-            <label for="location-search"
-              class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-10 pointer-events-none">
-              Search location
+            <label for="location-search" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white/85
+              px-2 peer-focus:px-2 peer-focus:text-gray-900 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 
+              peer-focus:-translate-y-4 left-10 pointer-events-none">
+              Enter location
             </label>
           </div>
         </div>

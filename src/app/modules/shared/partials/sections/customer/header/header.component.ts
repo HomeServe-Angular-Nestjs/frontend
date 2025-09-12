@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { authActions } from '../../../../../../store/auth/auth.actions';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { authActions } from '../../../../../../store/auth/auth.actions';
 import { selectCheckStatus } from '../../../../../../store/auth/auth.selector';
 import { StatusType } from '../../../../../../core/models/auth.model';
 import { selectCustomer } from '../../../../../../store/customer/customer.selector';
 import { getColorFromChar } from '../../../../../../core/utils/style.utils';
 import { customerActions } from '../../../../../../store/customer/customer.actions';
-import { FormsModule } from '@angular/forms';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { CustomerService } from '../../../../../../core/services/customer.service';
 import { ICustomerSearchServices } from '../../../../../../core/models/offeredService.model';
@@ -75,46 +75,43 @@ export class CustomerHeaderComponent implements OnInit {
       });
   }
 
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
+  }
+
   private fetchProviders(search: string): void {
-    this.isLoadingProviders = true;
     this._customerService.searchProviders(search).subscribe({
       next: (res) => {
         if (res.success && res.data) this.fetchedProviders = res.data;
-        this.isLoadingProviders = false;
       },
-      error: (err) => {
-        console.error(err);
-        this.isLoadingProviders = false;
-      }
+      complete: () => this.isLoadingProviders = false
     });
   }
 
   private fetchServices(search: string): void {
-    if (!search.trim()) return;
-    this.isLoadingServices = true;
     this._customerService.searchService(search).subscribe({
       next: (res) => {
-        if (res.success) this.fetchedServices = res.data;
-        this.isLoadingServices = false;
-
+        if (res.success && res.data) this.fetchedServices = res.data;
       },
-      error: (err) => {
-        console.error(err);
-        this.isLoadingServices = false;
-      }
+      complete: () => this.isLoadingServices = false
     });
   }
 
   searchProviders(): void {
+    if (!this.providerSearch.trim()) return;
+    this.isLoadingProviders = true;
     this._debounceService.delay({ search: this.providerSearch, type: 'provider' });
   }
 
   searchServices(): void {
+    if (!this.serviceSearch.trim()) return;
+    this.isLoadingServices = true;
     this._debounceService.delay({ search: this.serviceSearch, type: 'service' });
   }
 
   handleProviderClick(provider: any): void {
-    this.providerSearch = provider.address || '';
+    this.providerSearch = '';
     this.fetchedProviders = [];
     this.isLoadingProviders = false;
     this._router.navigate(['provider_details', provider.id, 'about']);
@@ -131,11 +128,6 @@ export class CustomerHeaderComponent implements OnInit {
 
   logout(): void {
     this._store.dispatch(authActions.logout({ fromInterceptor: false }));
-  }
-
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
   }
 
 }
