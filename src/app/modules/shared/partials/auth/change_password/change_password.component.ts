@@ -1,10 +1,7 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, inject, Input, OnInit, Output } from "@angular/core";
-import { RouterLink } from "@angular/router";
+import { Component, EventEmitter, inject, Input, Output } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { LoginAuthService } from "../../../../../core/services/login-auth.service";
 import { IUser } from "../../../models/user.model";
-import { NotificationService } from "../../../../../core/services/public/notification.service";
 import { REGEXP_ENV } from "../../../../../../environments/env";
 import { getValidationMessage, isPasswordMatches } from "../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
@@ -16,7 +13,6 @@ import { ToastNotificationService } from "../../../../../core/services/public/to
     imports: [ReactiveFormsModule, CommonModule]
 })
 export class ChangePasswordComponent {
-    private readonly _loginService = inject(LoginAuthService);
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _fb = inject(FormBuilder);
 

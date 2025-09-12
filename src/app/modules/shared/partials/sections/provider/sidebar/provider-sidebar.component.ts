@@ -1,8 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { LoginAuthService } from '../../../../../../core/services/login-auth.service';
-import { NotificationService } from '../../../../../../core/services/public/notification.service';
+import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { authActions } from '../../../../../../store/auth/auth.actions';
 

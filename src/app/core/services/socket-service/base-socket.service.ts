@@ -4,6 +4,7 @@ import { SOCKET_URL } from '../../../../environments/env';
 export abstract class BaseSocketService {
     protected socket: Socket | null = null;
     protected readonly _socketUrl = SOCKET_URL;
+    protected abstract namespace: string;
 
     connect(): void {
         if (this.socket && this.socket.connected) {
@@ -11,9 +12,10 @@ export abstract class BaseSocketService {
         }
 
         if (!this.socket) {
-            this.socket = io(this._socketUrl, {
+            this.socket = io(`${this._socketUrl}/${this.namespace}`, {
                 withCredentials: true,
-                autoConnect: false,
+                transports: ['websocket'],
+                forceNew: true,
             });
 
             this.socket.on('connect', () => {
@@ -25,6 +27,10 @@ export abstract class BaseSocketService {
                 console.log('Disconnected from server:', reason);
                 this.onDisconnect(reason);
             });
+
+            // this.socket.onAny((event, ...args) => {
+            //     console.log("📩 Event received:", event, args);
+            // });
         }
 
         this.socket.connect();

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Input, Output } from "@angular/core";
-import { IOfferedService,  IToggleServiceStatus, IUpdateSubservice } from "../../../../../../core/models/offeredService.model";
+import { IOfferedService, IToggleServiceStatus, IUpdateSubservice } from "../../../../../../core/models/offeredService.model";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
 import { OfferedServicesService } from "../../../../../../core/services/service-management.service";
@@ -34,13 +34,13 @@ export class ServiceListViewComponent {
     }
 
     goToEditPage(index: number, id: string) {
-        this._router.navigate(['provider', 'profiles', 'service_offered', 'edit', id], {
+        this._router.navigate(['provider', 'manage_services', 'edit', id], {
             queryParams: { subIdx: index }
         });
     }
 
     addSubService(id: string) {
-        this._router.navigate(['provider', 'profiles', 'service_offered', 'edit', id], {
+        this._router.navigate(['provider', 'manage_services', 'edit', id], {
             queryParams: { addSs: true }
         });
     }

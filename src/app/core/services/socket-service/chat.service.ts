@@ -16,13 +16,17 @@ export class ChatSocketService extends BaseSocketService {
     private readonly _chatApi = API_ENV.chat;
     private readonly _messageApi = API_ENV.message;
 
+    protected override namespace: string = 'chat';
+
     constructor(private readonly _http: HttpClient) {
         super();
-        this._setupAuthErrorHandler();
     }
 
     protected override onConnect(): void {
         console.log('[ChatSocket] Connected');
+
+        this._setupAuthErrorHandler();
+
         this.onNewMessage((message: IMessage) => {
             this._store.dispatch(chatActions.addMessage({ message }));
         });

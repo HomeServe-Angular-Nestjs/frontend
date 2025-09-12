@@ -19,26 +19,29 @@ export class CustomerProfileLayout {
 
     menuSections = [
         {
-            title: 'Profile & Account',
+            title: 'Account',
             items: [
                 { label: 'Profile Overview', icon: 'fas fa-chart-line', route: '/profile/overview' },
                 { label: 'Edit Profile', icon: 'fas fa-edit', route: '/profile/overview/edit' },
             ],
         },
         {
-            title: 'Service & Bookings',
+            title: 'Activity',
             items: [
                 { label: 'My Bookings', icon: 'fas fa-calendar-alt', route: '/profile/bookings' },
                 { label: 'Saved Providers', icon: 'fas fa-heart', route: '/saved' },
                 { label: 'Reviews & Ratings', icon: 'fas fa-star', route: '/reviews' },
+                { label: 'Notifications', icon: 'fas fa-bell', route: '/profile/notifications' },
             ],
         },
         {
-            title: 'Payments & Settings',
+            title: 'Settings & Payments',
             items: [
                 { label: 'Wallet & Payments', icon: 'fas fa-wallet', route: '/profile/wallet' },
                 { label: 'Settings', icon: 'fas fa-cog', route: '/settings' },
             ],
         },
     ];
+
+
 }

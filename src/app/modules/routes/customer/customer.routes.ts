@@ -112,6 +112,11 @@ export const customerRoutes: Routes = [
                         path: 'wallet',
                         loadComponent: () => import('../../shared/components/customer/wallet/customer-wallet.component')
                             .then(c => c.CustomerWalletComponent)
+                    },
+                    {
+                        path: 'notifications',
+                        loadComponent: () => import('../../shared/components/customer/notifications/notifications.component')
+                            .then(c => c.CustomerNotificationComponent)
                     }
                 ],
             },
@@ -122,5 +127,5 @@ export const customerRoutes: Routes = [
         loadComponent: () => import('../../pages/customer/chat/customer-chat.component')
             .then(c => c.CustomerChatComponent),
         canActivate: [AuthGuard]
-    }
+    },
 ]

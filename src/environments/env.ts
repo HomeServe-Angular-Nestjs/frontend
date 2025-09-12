@@ -19,6 +19,7 @@ export const API_ENV = {
     rule: `${domainName}/rule`,
     transactions: `${domainName}/transactions`,
     wallet: `${domainName}/wallet`,
+    notification: `${domainName}/notification`,
 };
 
 export const API_KEY = {
@@ -52,5 +53,5 @@ export const ICONS = {
                             <polygon class="st0" points="18.4,0 12.76,21.47 8.89,21.47 12.7,6.93 6.86,10.78 7.9,6.95 18.4,0"/>
                         </g>
                     </svg>`,
-                    
+
 };

@@ -18,7 +18,7 @@ export enum ErrorCodes {
     TOKEN_EXPIRED = 'TOKEN_EXPIRED',
     OPERATION_NOT_ALLOWED = 'OPERATION_NOT_ALLOWED',
     FILE_TOO_LARGE = 'FILE_TOO_LARGE',
-    
+
     UNSUPPORTED_FILE_TYPE = 'UNSUPPORTED_FILE_TYPE',
 }
 
@@ -118,4 +118,19 @@ export enum RuleSortEnum {
     OLDEST = 'oldest',
     HIGH_PRIORITY = 'high_priority',
     LOW_PRIORITY = 'low_priority',
+}
+
+export enum NotificationType {
+    SYSTEM = 'system',
+    EVENT = 'event',
+    REMINDER = 'reminder',
+    CUSTOM = 'custom'
+}
+
+export enum NotificationTemplateId {
+    INCOMPLETE_PROFILE = 'INCOMPLETE_PROFILE',
+    PAYMENT_FAILED = 'PAYMENT_FAILED',
+    PAYMENT_SUCCESS = 'PAYMENT_SUCCESS',
+    BOOKING_CONFIRMED = 'BOOKING_CONFIRMED',
+    BOOKING_CANCELLED = 'BOOKING_CANCELLED',
 }

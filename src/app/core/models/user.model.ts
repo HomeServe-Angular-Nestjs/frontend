@@ -174,9 +174,9 @@ export interface IApprovalTableDetails {
 export interface ICustomerProfileData {
     fullname: string;
     username: string;
-    email: string;
     phone: string;
-    location: ILocation;
+    address:string;
+    coordinates: [number, number];
 }
 
 export interface IChangePassword {
