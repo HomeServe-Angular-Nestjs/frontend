@@ -140,12 +140,12 @@ export interface IScheduleDetailFilters {
     availableType?: AvailabilityType;
 }
 
-export interface ISelectedSlot {
-    scheduleId: string,
-    month: string;
-    dayId: string;
-    slotId: string;
-}
+// export interface ISelectedSlot {
+//     scheduleId: string,
+//     month: string;
+//     dayId: string;
+//     slotId: string;
+// }
 
 export interface IAddress {
     coordinates: [number, number];

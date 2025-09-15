@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { IAvailableSlot, IRuleFilter, ISlotRule, ISlotRulePaginatedResponse } from "../models/slot-rule.model";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, map, Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 
 @Injectable({ providedIn: 'root' })
@@ -16,6 +16,9 @@ export class SlotRuleService {
 
     private _ruleFilterSource = new BehaviorSubject<IRuleFilter>({});
     _ruleFilter$ = this._ruleFilterSource.asObservable();
+
+    private _availableSlotSource = new BehaviorSubject<IAvailableSlot[]>([]);
+    _availableSlots$ = this._availableSlotSource.asObservable();
 
     setSlotRules(rules: ISlotRule[]): void {
         this._slotRuleSource.next(rules);
@@ -74,8 +77,14 @@ export class SlotRuleService {
         return this._http.delete<IResponse>(`${this._slotApi}/${ruleId}`);
     }
 
-    fetchAvailableSlots(providerId: string, date: string): Observable<IResponse<IAvailableSlot[]>> {
+    fetchAvailableSlots(providerId: string, date: string): void {
         const params = new HttpParams().set('date', date);
-        return this._http.get<IResponse<IAvailableSlot[]>>(`${this._slotApi}/available_slots/${providerId}`, { params })
+        this._http.get<IResponse<IAvailableSlot[]>>(`${this._slotApi}/available_slots/${providerId}`, { params }).pipe(
+            map(res => {
+                console.log(res)
+                if (res.success && res.data) return res.data;
+                else return [];
+            })
+        ).subscribe(slots => this._availableSlotSource.next(slots));
     }
 }

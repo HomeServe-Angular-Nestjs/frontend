@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
-import { BaseSocketService } from "./base-socket.service";
+import { BaseSocketService, ISocketError } from "./base-socket.service";
 import { API_ENV } from "../../../../environments/env";
-import { INotification, IReadNotification, ISendNewNotification } from "../../models/notification.model";
+import { INotification, ISendNewNotification } from "../../models/notification.model";
 import { lastValueFrom, Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { Store } from "@ngrx/store";
@@ -9,7 +9,6 @@ import { authActions } from "../../../store/auth/auth.actions";
 import { IResponse } from "../../../modules/shared/models/response.model";
 import { notificationAction } from "../../../store/notification/notification.action";
 import { NotificationTemplateId, NotificationType } from "../../enums/enums";
-import { ToastNotificationService } from "../public/toastr.service";
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSocketService extends BaseSocketService {
@@ -27,7 +26,7 @@ export class NotificationSocketService extends BaseSocketService {
         super();
     }
 
-    override onConnect(): void {
+    protected override onConnect(): void {
         console.log('[NotificationSocket] Connected');
         this._setupAuthErrorHandler();
 
@@ -44,7 +43,7 @@ export class NotificationSocketService extends BaseSocketService {
         );
     }
 
-    override onDisconnect(): void {
+    protected override onDisconnect(): void {
         this.stopListeningNotifications();
         this.removeListener(this.MARK_AS_READ);
     }
@@ -68,6 +67,7 @@ export class NotificationSocketService extends BaseSocketService {
         })
     }
 
+    // !TODO - make this private
     onNewNotification(callback: (notification: INotification) => void): void {
         this.stopListeningNotifications();
         this.listen<INotification>(this.NEW_NOTIFICATION, (notification: INotification) => callback(notification));

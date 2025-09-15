@@ -12,6 +12,7 @@ import { VideoCallSocketService } from '../../../../core/services/socket-service
 import { NotificationSocketService } from '../../../../core/services/socket-service/notification.service';
 import { selectCustomer } from '../../../../store/customer/customer.selector';
 import { NotificationTemplateId, NotificationType } from '../../../../core/enums/enums';
+import { ReservationSocketService } from '../../../../core/services/socket-service/reservation-socket.service';
 
 @Component({
   selector: 'app-customer-landing-page',
@@ -20,6 +21,7 @@ import { NotificationTemplateId, NotificationType } from '../../../../core/enums
 })
 export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
   private readonly _notificationService = inject(NotificationSocketService);
+  private readonly _reservationService = inject(ReservationSocketService);
   private readonly _videoSocket = inject(VideoCallSocketService);
   private readonly _chatSocket = inject(ChatSocketService);
   private readonly _store = inject(Store);
@@ -46,6 +48,7 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
       this._chatSocket.connect();
       // this._videoSocket.connect();
       this._notificationService.connect();
+      this._reservationService.connect();
     });
 
     // Disconnect socket when unauthenticated
@@ -55,6 +58,7 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
       this._chatSocket.disconnect();
       // this._videoSocket.disconnect();
       this._notificationService.disconnect();
+      this._reservationService.disconnect();
     });
 
     customer$.pipe(
@@ -74,7 +78,6 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
       )
     ).subscribe(customer => {
       const isIncomplete = !customer.address || !customer.fullname || !customer.phone || !customer.avatar;
-      console.log(customer);
 
       if (isIncomplete) {
         this._notificationService.sendNewNotification({
@@ -93,7 +96,8 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
     this._destroy$.next();
     this._destroy$.complete();
     this._chatSocket.stopListeningMessages();
-    // this._notificationService.stopListeningNotifications();
+    this._notificationService.stopListeningNotifications();
+    this._reservationService.stopListeningReservationUpdates();
   }
 
   proceedWithSub() {

@@ -2,7 +2,7 @@ import { inject, Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Store } from "@ngrx/store";
 import { lastValueFrom, Observable } from "rxjs";
-import { BaseSocketService } from "./base-socket.service";
+import { BaseSocketService, ISocketError } from "./base-socket.service";
 import { IChat, IMessage, IParticipant, ISendMessage } from "../../models/chat.model";
 import { IResponse } from "../../../modules/shared/models/response.model";
 import { API_ENV } from "../../../../environments/env";
@@ -61,6 +61,7 @@ export class ChatSocketService extends BaseSocketService {
         this.emit<ISendMessage>('sendMessage', msgContent);
     }
 
+    // !TODO - make this private
     onNewMessage(callback: (msg: IMessage) => void): void {
         this.removeListener('newMessage');
         this.listen<IMessage>('newMessage', (msg: IMessage) => {
