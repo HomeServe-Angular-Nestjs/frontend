@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { map, Observable, of } from 'rxjs';
+import { distinctUntilChanged, map, } from 'rxjs';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
 import { IAddress, } from '../../../../../../core/models/schedules.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
@@ -13,6 +13,7 @@ import { LocationService } from '../../../../../../core/services/public/location
 import { ILocation } from '../../../../../../core/models/user.model';
 import { SlotRuleService } from '../../../../../../core/services/slot-rule.service';
 import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
+import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
 
 @Component({
   selector: 'app-customer-schedule-booking-details',
@@ -22,12 +23,13 @@ import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
   providers: [LocationService]
 })
 export class CustomerScheduleBookingDetailsComponent implements OnInit {
-  private readonly _store = inject(Store);
+  private readonly _reservationService = inject(ReservationSocketService);
   private readonly _slotRuleService = inject(SlotRuleService);
-  private readonly _bookingService = inject(BookingService);
-  private readonly _route = inject(ActivatedRoute);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _locationService = inject(LocationService);
+  private readonly _bookingService = inject(BookingService);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _store = inject(Store);
 
   mapVisible = false;
   center!: [number, number];
@@ -36,7 +38,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   phoneNumber: string | null = null;
   selectedSlot: IAvailableSlot | null = null;
   providerId: string = '';
-  availableSlots$: Observable<IAvailableSlot[]> = of([]);
+  availableSlots: IAvailableSlot[] = [];
 
   readonly minDate = new Date().toISOString().split('T')[0];
 
@@ -63,6 +65,31 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
 
         this._bookingService.setSelectedAddress(locationData);
       }
+
+      this._reservationService.informReservation$
+        .pipe(
+          distinctUntilChanged((prev, curr) =>
+            prev?.from === curr?.from &&
+            prev?.to === curr?.to &&
+            prev?.date === curr?.date
+          )
+        )
+        .subscribe(slot => {
+          if (!slot) return;
+
+          this.availableSlots = this.availableSlots.map(s => {
+            const isSameSlot =
+              s.from === slot.from &&
+              s.to === slot.to &&
+              this.selectedDate === slot.date;
+
+            return isSameSlot
+              ? { ...s, status: false }
+              : s;
+          });
+        });
+
+      this._slotRuleService._availableSlots$.subscribe(slots => this.availableSlots = slots)
     });
   }
 
@@ -81,12 +108,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
       return;
     }
 
-    this.availableSlots$ = this._slotRuleService.fetchAvailableSlots(this.providerId, this.selectedDate).pipe(
-      map(res => {
-        console.log(res)
-        if (res.success && res.data) return res.data;
-        else return [];
-      }));
+    this._slotRuleService.fetchAvailableSlots(this.providerId, this.selectedDate);
   }
 
   selectSlot(slot: IAvailableSlot) {
@@ -94,6 +116,8 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
       this._toastr.error('Date is missing.');
       return;
     }
+
+    this.selectedSlot = slot;
 
     this._bookingService.setSelectedSlot({
       ...slot,
@@ -103,7 +127,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
 
   async onMapLocationChanged(newCenter: [number, number]) {
     this.center = newCenter;
-    const [lng, lat] = newCenter; 
+    const [lng, lat] = newCenter;
 
     this._locationService.getAddressFromCoordinates(lng, lat).subscribe({
       next: (response) => {

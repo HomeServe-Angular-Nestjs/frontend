@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BaseSocketService } from "./base-socket.service";
+import { BaseSocketService, ISocketError } from "./base-socket.service";
 
 @Injectable({ providedIn: 'root' })
 export class VideoCallSocketService extends BaseSocketService {
@@ -7,6 +7,7 @@ export class VideoCallSocketService extends BaseSocketService {
     private _listeners: Record<string, (msg: any) => void> = {};
 
     protected override namespace: string = 'video-call';
+
 
     constructor() {
         super();
@@ -17,6 +18,7 @@ export class VideoCallSocketService extends BaseSocketService {
     }
 
     protected override onDisconnect(reason: string): void { }
+
 
     sendSignal(data: any) {
         this.emit('signal', data);

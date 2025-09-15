@@ -1,7 +1,17 @@
 import { io, Socket } from 'socket.io-client';
 import { SOCKET_URL } from '../../../../environments/env';
+import { ToastNotificationService } from '../public/toastr.service';
+import { inject } from '@angular/core';
+
+export interface ISocketError {
+    type: string;
+    message: string;
+    error: any;
+    data?: any;
+}
 
 export abstract class BaseSocketService {
+    protected readonly _toastr = inject(ToastNotificationService);
     protected socket: Socket | null = null;
     protected readonly _socketUrl = SOCKET_URL;
     protected abstract namespace: string;

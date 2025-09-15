@@ -20,6 +20,7 @@ export const API_ENV = {
     transactions: `${domainName}/transactions`,
     wallet: `${domainName}/wallet`,
     notification: `${domainName}/notification`,
+    reservation: `${domainName}/reservation`,
 };
 
 export const API_KEY = {

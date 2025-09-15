@@ -1,18 +1,15 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { SharedDataService } from '../../../../core/services/public/shared-data.service';
 import { ISchedule } from '../../../../core/models/schedules.model';
 import { CustomerScheduleBookingDetailsComponent } from "../../../shared/components/customer/scheduling/booking-details/customer-schedule-booking-details.component";
 import { CustomerScheduleOrderSummaryComponent } from "../../../shared/components/customer/scheduling/order-summary/customer-schedule-order-summary.component";
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
 import { SelectedServiceIdsType, SelectedServiceType } from '../booking-1-pick-service/customer-pick-a-service.component';
-import { selectAllSchedules } from '../../../../store/schedules/schedule.selector';
-import { scheduleActions } from '../../../../store/schedules/schedule.action';
 import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
-import { CustomerSelectPaymentComponent } from "../../../shared/components/customer/scheduling/select-payment/select-payment.component";
+import { ReservationSocketService } from '../../../../core/services/socket-service/reservation-socket.service';
 
 @Component({
   selector: 'app-customer-service-schedule',
@@ -25,31 +22,49 @@ import { CustomerSelectPaymentComponent } from "../../../shared/components/custo
   ],
   templateUrl: './customer-service-schedule.component.html',
 })
-export class CustomerServiceScheduleComponent implements OnInit {
+export class CustomerServiceScheduleComponent implements OnInit, OnDestroy {
+  private readonly _reservationService = inject(ReservationSocketService);
+  private readonly _sharedDataService = inject(SharedDataService);
   private readonly _toastr = inject(ToastNotificationService);
-  private readonly _sharedDataService = inject(SharedDataService)
+  private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
 
+  private readonly _destroy$ = new Subject<void>();
+  private _lastJoinedId: string | null = null;
   schedules$!: Observable<ISchedule[]> | null;
-  providerId!: string | null;
   selectedServiceData: SelectedServiceType[] = [];
   preparedDataForCalculation: SelectedServiceIdsType[] = [];
+  providerId$ = new BehaviorSubject<string | null>(null);
 
-  /**
-    * Angular lifecycle hook that runs after component is initialized.
-    * It loads selected service data, validates the state, and prepares calculation data.
-    */
+  // It loads selected service data, validates the state, and prepares calculation data.
   ngOnInit(): void {
-    // Extract provider ID from URL
-    // this._route.paramMap.subscribe(param => {
-    //   this.providerId = param.get('id');
+    this._route.paramMap
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(paramMap => {
+        const id = paramMap.get('id');
+        if (id) {
+          this.providerId$.next(id);
+        } else {
+          this.providerId$.next(null);
+        }
+      });
 
-    //   if (this.providerId) {
-    //     // Dispatch schedule fetch action only when provider ID is available
-    //     // this._store.dispatch(scheduleActions.fetchSchedules({ providerId: this.providerId }));
-    //     // this.schedules$ = this._store.select(selectAllSchedules);
-    //   }
-    // });
+    this.providerId$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(id => {
+        if (id) {
+          if (this._lastJoinedId && this._lastJoinedId !== id) {
+            this._reservationService.onLeaveProviderRoom(this._lastJoinedId);
+          }
+
+          this._reservationService.onJoinProviderRoom(id);
+          this._lastJoinedId = id;
+        } else if (this._lastJoinedId) {
+          this._reservationService.onLeaveProviderRoom(this._lastJoinedId);
+          this._lastJoinedId = null;
+        }
+      });
+
 
     // Try fetching from shared data service
     this.selectedServiceData = this._sharedDataService.getSelectedServiceData();
@@ -79,6 +94,16 @@ export class CustomerServiceScheduleComponent implements OnInit {
 
     // Prepare data structure needed for calculation
     this.preparedDataForCalculation = this.prepareTheDataForPriceCalculation(this.selectedServiceData);
+  }
+
+  ngOnDestroy(): void {
+    if (this._lastJoinedId) {
+      this._reservationService.onLeaveProviderRoom(this._lastJoinedId);
+      this._lastJoinedId = null;
+    }
+    
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 
   /**

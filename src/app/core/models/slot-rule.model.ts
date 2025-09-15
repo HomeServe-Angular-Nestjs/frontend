@@ -39,6 +39,7 @@ export interface IAvailableSlot {
     from: string;
     to: string;
     ruleId: string;
+    status?: boolean;
 }
 
 export interface ISelectedSlot extends IAvailableSlot {

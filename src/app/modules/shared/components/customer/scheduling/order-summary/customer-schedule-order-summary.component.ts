@@ -16,19 +16,20 @@ import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loa
 import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
 import { customerActions } from '../../../../../../store/customer/customer.actions';
 import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
-import { CustomerSelectPaymentComponent } from "../select-payment/select-payment.component";
+import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
   templateUrl: './customer-schedule-order-summary.component.html',
-  imports: [CommonModule, LoadingCircleAnimationComponent, CustomerSelectPaymentComponent],
+  imports: [CommonModule, LoadingCircleAnimationComponent],
   providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy {
-  private readonly _bookingService = inject(BookingService);
-  private readonly _toastr = inject(ToastNotificationService);
-  private readonly _paymentService = inject(PaymentService);
+  private readonly _reservationService = inject(ReservationSocketService);
   private readonly _razorpayWrapper = inject(RazorpayWrapperService);
+  private readonly _toastr = inject(ToastNotificationService);
+  private readonly _bookingService = inject(BookingService);
+  private readonly _paymentService = inject(PaymentService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _store = inject(Store);
@@ -128,7 +129,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       amount: order.amount,
       status: TransactionStatus.SUCCESS,
       direction: PaymentDirection.DEBIT,
-      source: this.selectedPaymentSource,
+      source: PaymentSource.RAZORPAY,
       receipt: order.receipt,
     };
 
@@ -138,7 +139,8 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       },
       error: () => {
         this._toastr.error('Server verification failed.')
-      }
+      },
+      complete: () => this._paymentService.setOngoingPayment(false)
     });
   }
 
@@ -150,11 +152,13 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       return;
     }
 
+    const { status, ...slotData } = this.selectedSlot;
+
     const bookingData: IBookingData = {
       providerId: this.providerId!,
       total: Number(this.priceBreakup.total.toFixed(2)),
       location: this.location,
-      slotData: this.selectedSlot,
+      slotData,
       serviceIds,
       transactionId: transactionData?.id ?? null
     };
@@ -182,11 +186,17 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     });
   }
 
-  InitiatePayment() {
-    if (!this.selectedPaymentSource) {
-      this._toastr.error('Please select a payment source.');
+  initiatePayment() {
+    // if (!this.selectedPaymentSource) {
+    //   this._toastr.error('Please select a payment source.');
+    //   return;
+    // }
+
+    if (this._paymentService.checkOngoingPayments()) {
+      this._toastr.warning('You already have an ongoing payment!');
       return;
     }
+    this._paymentService.setOngoingPayment(true);
 
     this.isProcessing = true;
 
@@ -195,27 +205,46 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       return;
     }
 
-    const totalAmount = this.priceBreakup.total;
-    if (this.selectedPaymentSource === PaymentSource.RAZORPAY) {
-      this._paymentService.createRazorpayOrder(totalAmount).subscribe(({
-        next: (order) => {
-          this._razorpayWrapper.openCheckout(order,
-            (paymentResponse: RazorpayPaymentResponse) =>
-              this._verifyPaymentAndConfirmBooking(paymentResponse, order),
-            () => this._saveBooking()
-          );
-        },
-        error: (err) => {
-          console.error(err);
-          this._toastr.error('payment failed');
-        }
-      }));
-    } else if (this.selectedPaymentSource === PaymentSource.WALLET) {
-      this._toastr.warning('selected wallet');
+    const slotData = this._bookingService.getSelectedSlot();
+    if (!slotData) {
+      this._toastr.error('Oops something went wrong.');
+      console.error('Slot data is missing.');
+      return;
     }
+
+    const totalAmount = this.priceBreakup.total;
+    const reservationData = { ...slotData, providerId: this.providerId as string };
+    this._reservationService.canInitiatePayment = true;
+
+    // if (this.selectedPaymentSource === PaymentSource.RAZORPAY) {
+    this._reservationService.checkReservationUpdates(reservationData);
+
+    if (!this._reservationService.canInitiatePayment) {
+      this._toastr.error('Slot is already reserved. Please select another.');
+      return;
+    }
+
+    this._reservationService.createReservation(reservationData);
+
+    this._paymentService.createRazorpayOrder(totalAmount).subscribe(({
+      next: (order) => {
+        this._razorpayWrapper.openCheckout(order,
+          (paymentResponse: RazorpayPaymentResponse) =>
+            this._verifyPaymentAndConfirmBooking(paymentResponse, order),
+          () => this._paymentService.setOngoingPayment(false) //// !Todo this._saveBooking()  - handle cancelled payment
+        );
+      },
+      error: (err) => {
+        console.error(err);
+        this._toastr.error('payment failed');
+      }
+    }));
+    // } else if (this.selectedPaymentSource === PaymentSource.WALLET) {
+    //   this._toastr.warning('selected wallet');
+    // }
   }
 
-  selectPaymentSource(source: PaymentSource) {
-    this.selectedPaymentSource = source;
-  }
+  // selectPaymentSource(source: PaymentSource) {
+  //   this.selectedPaymentSource = source;
+  // }
 }

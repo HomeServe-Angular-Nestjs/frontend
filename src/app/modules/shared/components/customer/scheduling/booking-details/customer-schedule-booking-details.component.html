@@ -59,18 +59,32 @@
             class="w-full px-4 py-2 rounded-md border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
 
         <div class="mt-4">
-            <ng-container *ngIf="availableSlots$ | async as availableSlots">
-                <div *ngIf="availableSlots?.length; else noSlots" class="grid grid-cols-2 gap-2">
-                    <button *ngFor="let slot of availableSlots" (click)="selectSlot(slot)"
-                        class="w-full px-3 py-2 rounded-lg transition bg-blue-50 text-blue-900 font-medium shadow hover:bg-blue-100 focus:ring-2 focus:ring-blue-500">
-                        {{ slot.from }} &#45; {{ slot.to }}
-                    </button>
-                </div>
+            <div *ngIf="availableSlots.length; else noSlots" class="grid grid-cols-2 gap-2">
+                <ng-container *ngIf="selectedDate">
+                    <ng-container *ngFor="let slot of availableSlots">
+                        <div class="relative">
+                            <button (click)="selectSlot(slot)" [disabled]="!slot.status" [ngClass]="{
+                            'enabled:bg-blue-50 enabled:text-blue-900 enabled:hover:bg-blue-100 enabled:focus:ring-2 enabled:focus:ring-blue-500' : selectedSlot?.from === slot.from
+                        }" class="w-full px-3 py-2 rounded-lg font-medium shadow transition 
+                            text-sm sm:text-base border flex flex-col items-center disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-300 disabled:cursor-not-allowed">
 
-                <ng-template #noSlots>
-                    <div class="text-gray-500 mt-4 text-center">No slots available for this date. Please try another.</div>
-                </ng-template>
-            </ng-container>
+                                <!-- Time -->
+                                <span>{{ slot.from }} – {{ slot.to }}</span>
+
+                                <!-- Reserved text (like BookMyShow) -->
+                                <span *ngIf="!slot.status" class="text-xs text-red-500 font-semibold mt-1">
+                                    Reserved
+                                </span>
+                            </button>
+                        </div>
+                    </ng-container>
+                </ng-container>
+
+            </div>
+
+            <ng-template #noSlots>
+                <div class="text-gray-500 mt-4 text-center">No slots available for this date. Please try another.</div>
+            </ng-template>
         </div>
     </div>
 </div>
