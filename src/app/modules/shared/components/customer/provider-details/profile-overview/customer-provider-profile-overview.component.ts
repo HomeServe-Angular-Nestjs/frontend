@@ -17,6 +17,7 @@ import { IReportSubmit, ReportService } from '../../../../../../core/services/re
 @Component({
   selector: 'app-customer-provider-profile-overview',
   imports: [CommonModule, IsSavedPipe, ReportModalComponent],
+  providers: [ReportService],
   templateUrl: './customer-provider-profile-overview.component.html',
 })
 export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestroy {
@@ -102,11 +103,11 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
       targetId: this.providerData?.id,
     }
 
-    console.log(reportData);
     this._reportService.submit(reportData).subscribe({
       next: (res) => {
         if (res.success) this._toastr.success('Report has been submitted.')
-      }
+      },
+      complete: () => this.openReportModal = false
     });
   }
 }

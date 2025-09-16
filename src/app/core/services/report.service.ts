@@ -16,7 +16,7 @@ export class ReportService {
 
     private readonly _reportAPI = API_ENV.report;
 
-    submit(report: IReportSubmit): Observable<IResponse<boolean>> {
-        return this._http.post<IResponse<boolean>>(`${this._reportAPI}`, report);
+    submit(report: IReportSubmit): Observable<IResponse> {
+        return this._http.post<IResponse>(`${this._reportAPI}`, report);
     }
 }
