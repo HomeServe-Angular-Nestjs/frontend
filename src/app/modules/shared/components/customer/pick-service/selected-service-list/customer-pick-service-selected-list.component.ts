@@ -12,13 +12,8 @@ import { SelectedServiceIdType } from '../service-list/customer-pick-service-lis
 export class CustomerServiceSelectedListComponent {
   @Input({ required: true }) purchasedServiceList: SelectedServiceType[] = [];
   @Output() serviceRemoveFromListEvent = new EventEmitter<SelectedServiceIdType>();
-  @Output() scheduleEvent = new EventEmitter<boolean>();
 
   removeFromSelectedList(data: SelectedServiceIdType): void {
     this.serviceRemoveFromListEvent.emit(data);
-  }
-
-  triggerSchedule(): void {
-    this.scheduleEvent.emit(true);
   }
 } 

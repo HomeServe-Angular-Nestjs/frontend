@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -42,6 +42,8 @@ export class CustomerPickAServiceComponent {
   private readonly _sharedDataService = inject(SharedDataService);
   private _router = inject(Router);
 
+  cartItemCount = signal(0);
+  scrollPos = false;
   providerId!: string | null;
   serviceIds: string[] = [];   // Array of service IDs from query parameters
   serviceData: IOfferedService[] = [];
@@ -70,6 +72,13 @@ export class CustomerPickAServiceComponent {
     }
   }
 
+  scrollToCart(pos: boolean) {
+    this.scrollPos = pos;
+    pos
+      ? document.getElementById('cart-section')?.scrollIntoView({ behavior: 'smooth' })
+      : window.scrollTo(0, 0)
+  }
+
   /**
   * Fetches the full data of the services based on given IDs.
   * Populates both serviceData (full objects) and serviceCategories (for display).
@@ -96,8 +105,6 @@ export class CustomerPickAServiceComponent {
   /**
    * Sets the currently selected category and loads its sub-services.
    * Used when a category is clicked in the UI.
-   * 
-   * @param categoryTitle - Title of the selected service category
    */
   getServiceOfSelectedCategory(categoryTitle: string) {
     const selectedService = this.serviceData.find(service => service.title === categoryTitle);
@@ -112,8 +119,6 @@ export class CustomerPickAServiceComponent {
   /**
    * Adds a selected sub-service to the purchased list.
    * Ensures no duplicate category or sub-service is added.
-   * Provides feedback through the notification service.
-   * 
    * @param data - Contains category ID and selected sub-service ID
    */
   addSelectedService(data: SelectedServiceIdType) {
@@ -142,6 +147,7 @@ export class CustomerPickAServiceComponent {
 
       if (!alreadyExists) {
         existingCategory.subService.push(selectedSub);
+        this.cartItemCount.update((n) => n += 1);
       }
     } else {
       // Add new category with the selected sub-service
@@ -149,18 +155,19 @@ export class CustomerPickAServiceComponent {
         id,
         subService: [selectedSub],
       });
+      this.cartItemCount.update((n) => n += 1);
     }
   }
 
   /**
  * Removes a specific sub-service from the purchased list.
- * 
  * @param data - Contains category ID and sub-service ID to be removed
  */
   removeFromList(data: SelectedServiceIdType): void {
     this.purchasedServiceList.forEach(item => {
       if (item.id === data.id) {
-        item.subService = item.subService.filter(s => s.id !== data.selectedId)
+        item.subService = item.subService.filter(s => s.id !== data.selectedId);
+        this.cartItemCount.update((n) => n -= 1);
       }
     });
   }
@@ -168,13 +175,10 @@ export class CustomerPickAServiceComponent {
   /**
   * Finalizes the selection and navigates to the scheduling page if valid.
   * Saves the selected service data via shared service.
-  * 
-  * @param event - Boolean trigger (e.g. from a UI event)
   */
-  scheduleTime(event: boolean) {
-    if (event) {
-      this._sharedDataService.setSelectedServiceData(this.purchasedServiceList);
-      this._router.navigate(['schedule_service', this.providerId]);
-    }
+  scheduleTime() {
+    if (this.purchasedServiceList.length <= 0) return;
+    this._sharedDataService.setSelectedServiceData(this.purchasedServiceList);
+    this._router.navigate(['schedule_service', this.providerId]);
   }
 }

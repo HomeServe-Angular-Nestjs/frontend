@@ -1,5 +1,5 @@
-<app-customer-breadcrumbs></app-customer-breadcrumbs>
-<div class="container mx-auto p-4 md:p-6 lg:p-8">
+<div class="px-8">
+    <app-customer-breadcrumbs></app-customer-breadcrumbs>
     <!-- Header Section with improved styling -->
     <header class="mb-8 md:mb-12">
         <div class="flex items-center justify-between mb-6">
@@ -14,30 +14,84 @@
         </div>
     </header>
 
-    <div class="flex flex-col lg:flex-row items-stretch gap-6 mb-8 h-[450px] overflow-y-auto">
+    <button class="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full p-3 shadow-lg
+         hover:bg-blue-700 focus:outline-none transition-transform duration-300 z-50
+         flex items-center justify-center gap-2" [ngClass]="{
+    'animate-bounce': cartItemCount() > 0
+  }" (click)="scrollToCart(!scrollPos)">
+        <!-- Cart Icon -->
+        <i class="fas fa-shopping-cart text-lg"></i>
+
+        <!-- Up/Down Icon -->
+        <i class="fas" [ngClass]="scrollPos ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+
+        <!-- Badge -->
+        <span *ngIf="cartItemCount() > 0"
+            class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            {{ cartItemCount() }}
+        </span>
+    </button>
+
+
+    <section class="flex flex-col lg:flex-row mb-14 h-[450px]">
         <!-- Categories Section -->
-        <div class="w-full lg:w-1/4 h-full">
-            <app-customer-pick-service-category-list [serviceCategories]="serviceCategories"
-                (categorySelectEvent)="getServiceOfSelectedCategory($event)">
-            </app-customer-pick-service-category-list>
-        </div>
+        <section class="w-full lg:w-1/3 h-[450px] flex flex-col">
+            <h2 class="text-xl font-semibold text-gray-800 flex items-center mb-2">
+                <i class="fas fa-th-large text-blue-500 mr-2"></i>
+                Categories
+            </h2>
+            <div class="flex-1 overflow-y-auto">
+                <app-customer-pick-service-category-list [serviceCategories]="serviceCategories"
+                    (categorySelectEvent)="getServiceOfSelectedCategory($event)">
+                </app-customer-pick-service-category-list>
+            </div>
+        </section>
 
         <!-- Available Services Section -->
-        <div class="w-full lg:w-2/4 h-full">
-            <app-customer-pick-service-list [selectedServices]="servicesOfSelectedCategory"
-                (serviceSelectEvent)="addSelectedService($event)">
-            </app-customer-pick-service-list>
-        </div>
+        <section class="w-full lg:w-2/3 h-[450px] flex flex-col">
+            <div class="flex items-center justify-between px-5">
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-list-ul text-blue-500 mr-2"></i>
+                    Available Services
+                </h2>
 
-        <!-- Cart/Selected Services Section -->
-        <div class="w-full lg:w-1/4 h-full">
-            <app-customer-pick-service-selected-list [purchasedServiceList]="purchasedServiceList"
-                (serviceRemoveFromListEvent)="removeFromList($event)" (scheduleEvent)="scheduleTime($event)">
-            </app-customer-pick-service-selected-list>
-        </div>
-    </div>
-
+                <div class="relative">
+                    <input type="text" placeholder="Search services..."
+                        class="pl-9 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <app-customer-pick-service-list [selectedServices]="servicesOfSelectedCategory"
+                    (serviceSelectEvent)="addSelectedService($event)">
+                </app-customer-pick-service-list>
+            </div>
+        </section>
+    </section>
 
     <app-reassurance></app-reassurance>
 
+    <!-- Cart/Selected Services Section -->
+    <section id="cart-section" class="w-full border rounded-xl shadow-md p-4 bg-white mb-4">
+        <h2 class="text-xl font-semibold mb-2 text-gray-800 flex items-center">
+            <i class="fas fa-shopping-cart text-blue-500 mr-2"></i>
+            Your Pick&apos;s
+        </h2>
+
+        <div class="w-full lg:wh-[450px] flex flex-col">
+            <div class="overflow-y-auto">
+                <app-customer-pick-service-selected-list [purchasedServiceList]="purchasedServiceList"
+                    (serviceRemoveFromListEvent)="removeFromList($event)">
+                </app-customer-pick-service-selected-list>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+                <button (click)="scheduleTime()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-md transition text-sm font-medium flex items-center justify-center shadow">
+                    <i class="fas fa-calendar-alt text-sm mr-2"></i>
+                    Schedule
+                </button>
+            </div>
+        </div>
+    </section>
 </div>

@@ -1,64 +1,56 @@
 <div class="bg-white rounded-xl shadow-sm p-5 h-full">
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 flex items-center">
-            <i class="fas fa-list-ul text-blue-500 mr-2"></i>
-            Available Services
-        </h2>
 
-        <div class="relative">
-            <input type="text" placeholder="Search services..."
-                class="pl-9 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
-            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
-        </div>
-    </div>
 
     <div class="space-y-4">
         <!-- Service Card 1 - enhanced visual appeal -->
         <ng-container *ngIf="selectedServices && selectedServices.subService.length > 0; else elseBlock">
-            <div *ngFor="let service of selectedServices.subService"
-                class="service-card bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all duration-300">
-                <div class="p-4 md:p-5">
-                    <div class="flex flex-col md:flex-row justify-between">
+            <div *ngFor="let service of selectedServices.subService" class="service-card bg-white border border-gray-200 rounded-xl overflow-hidden 
+         shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-300 
+         mb-4 p-4 md:p-5">
 
-                        <div class="mb-4 md:mb-0 flex-1">
-                            <div class="flex items-center mb-4">
-                                <img [src]="service.image" alt="Complete Home Wiring"
-                                    class="w-16 h-16 rounded-lg mr-4 object-cover" />
-                                <div>
-                                    <h3 class="font-bold text-lg text-gray-800">{{service.title}}</h3>
-                                    <span
-                                        class="ml-0 mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        <!-- {{service.tag}} -->
-                                    </span>
-                                </div>
-                            </div>
+                <div class="flex flex-col md:flex-row justify-between gap-4">
 
-                            <p class="text-gray-600 text-sm">
-                                {{service.desc}}
-                            </p>
-
-                            <div class="mt-4 flex items-center text-sm text-gray-500">
-                                <div class="flex items-center mr-4">
-                                    <span>{{service.estimatedTime}}</span>
-                                </div>
-
+                    <!-- Left Section -->
+                    <div class="flex-1">
+                        <div class="flex items-center mb-4">
+                            <img [src]="service.image" alt="{{service.title}}"
+                                class="w-16 h-16 rounded-lg mr-4 object-cover border border-gray-200" />
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800">{{service.title}}</h3>
+                                <span
+                                    class="ml-0 mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <!-- {{service.tag}} -->
+                                    Popular
+                                </span>
                             </div>
                         </div>
 
-                        <div class="flex flex-col items-end space-y-2 md:ml-6">
-                            <div class="text-xl font-bold text-blue-600">
-                                ₹{{ service.price }}
-                            </div>
-                            <button (click)="addService({id: selectedServices.id, selectedId: service.id})"
-                                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center text-sm font-medium">
-                                <i class="fa fas-cart mr-2"></i>
-                                Add
-                            </button>
-                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            {{service.desc}}
+                        </p>
 
+                        <div class="mt-4 flex items-center text-sm text-gray-500">
+                            <div class="flex items-center mr-4">
+                                <i class="fas fa-clock mr-1"></i>
+                                <span>{{service.estimatedTime}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Section -->
+                    <div class="flex flex-col items-end justify-between space-y-2 md:ml-6">
+                        <div class="text-xl font-bold text-blue-600">
+                            ₹{{ service.price }}
+                        </div>
+                        <button (click)="addService({id: selectedServices.id, selectedId: service.id})" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg 
+               transition flex items-center text-sm font-medium shadow-sm hover:shadow-md">
+                            <i class="fas fa-cart-plus mr-2"></i>
+                            Add
+                        </button>
                     </div>
                 </div>
             </div>
+
         </ng-container>
         <ng-template #elseBlock>
             <div
