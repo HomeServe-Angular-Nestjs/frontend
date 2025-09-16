@@ -11,29 +11,38 @@ import { ChatSocketService } from '../../../../../../core/services/socket-servic
 import { Router } from '@angular/router';
 import { chatActions } from '../../../../../../store/chat/chat.action';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
+import { ReportModalComponent } from '../../../../partials/shared/report-modal/report-modal.component';
+import { IReportSubmit, ReportService } from '../../../../../../core/services/report.service';
 
 @Component({
   selector: 'app-customer-provider-profile-overview',
-  standalone: true,
-  imports: [CommonModule, IsSavedPipe],
+  imports: [CommonModule, IsSavedPipe, ReportModalComponent],
   templateUrl: './customer-provider-profile-overview.component.html',
 })
 export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestroy {
+  private readonly _toastr = inject(ToastNotificationService);
   private readonly _providerService = inject(ProviderService);
   private readonly _chatService = inject(ChatSocketService);
-  private readonly _store = inject(Store);
+  private readonly _reportService = inject(ReportService);
   private readonly _router = inject(Router);
-  private readonly _toastr = inject(ToastNotificationService);
+  private readonly _store = inject(Store);
 
   private providerDataSub!: Subscription;
 
   providerData!: IProvider | null;
   fallbackChar: string = '';
+  openReportModal = false;
 
   ngOnInit(): void {
     this.providerDataSub = this._providerService.providerData$.subscribe(data => {
       this.providerData = data;
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.providerDataSub) {
+      this.providerDataSub.unsubscribe();
+    }
   }
 
   fallbackColor(text: string | undefined): string {
@@ -77,9 +86,27 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
     return 'empty';
   }
 
-  ngOnDestroy(): void {
-    if (this.providerDataSub) {
-      this.providerDataSub.unsubscribe();
+  reportProvider(providerId?: string) {
+    if (!providerId) return;
+    this.openReportModal = true;
+  }
+
+  submitReport(report: Omit<IReportSubmit, 'targetId'>) {
+    if (!this.providerData?.id) {
+      console.error('[ERROR] Provider ID is missing.');
+      return;
+    };
+
+    const reportData = {
+      ...report,
+      targetId: this.providerData?.id,
     }
+
+    console.log(reportData);
+    this._reportService.submit(reportData).subscribe({
+      next: (res) => {
+        if (res.success) this._toastr.success('Report has been submitted.')
+      }
+    });
   }
 }

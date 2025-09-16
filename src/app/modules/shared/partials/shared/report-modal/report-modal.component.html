@@ -1,0 +1,53 @@
+<!-- Overlay -->
+<div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <!-- Modal -->
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-gray-800">Report</h2>
+            <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Radio Options -->
+        <div class="space-y-3 mb-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input [(ngModel)]="option" type="radio" name="reportReason" value="spam"
+                    class="text-red-600 focus:ring-red-500">
+                <span class="text-gray-700 text-sm">Spam</span>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input [(ngModel)]="option" type="radio" name="reportReason" value="inappropriate"
+                    class="text-red-600 focus:ring-red-500">
+                <span class="text-gray-700 text-sm">Inappropriate Service</span>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input [(ngModel)]="option" type="radio" name="reportReason" value="harassment"
+                    class="text-red-600 focus:ring-red-500">
+                <span class="text-gray-700 text-sm">Harassment</span>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input [(ngModel)]="option" type="radio" name="reportReason" value="other"
+                    class="text-red-600 focus:ring-red-500">
+                <span class="text-gray-700 text-sm">Other</span>
+            </label>
+        </div>
+
+        <!-- Text Area -->
+        <textarea [(ngModel)]="text" rows="4" placeholder="Add additional details..."
+            class="w-full border border-gray-300 rounded-lg p-2 text-sm mb-4"></textarea>
+
+        <!-- Actions -->
+        <div class="flex justify-end">
+            <button (click)="submitReport()"
+                class="bg-blue-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow">
+                Submit
+            </button>
+        </div>
+    </div>
+</div>
