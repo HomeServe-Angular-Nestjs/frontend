@@ -1,7 +1,7 @@
 import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { BehaviorSubject, Observable, Subject, takeUntil } from "rxjs";
+import { BehaviorSubject, map, Observable, Subject, takeUntil } from "rxjs";
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagination/provider-pagination.component";
 import { BookingService } from "../../../../../../core/services/booking.service";
@@ -64,6 +64,15 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
         this._destroy$.complete();
     }
 
+    private _emitFilters(): void {
+        const filter: IBookingFilter = {
+            search: this.searchTerm,
+            ...this.filters
+        };
+
+        this._filters$.next(filter);
+    }
+
     loadBookings(page: number, filter: IBookingFilter = {}) {
         this.bookingResponseData$ = this._bookingService.getBookingList(page, filter);
     }
@@ -115,12 +124,4 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
         }
     }
 
-    private _emitFilters(): void {
-        const filter: IBookingFilter = {
-            search: this.searchTerm,
-            ...this.filters
-        };
-
-        this._filters$.next(filter);
-    }
 }
