@@ -1,0 +1,100 @@
+<div class="bg-white w-full max-w-3xl rounded-lg border p-5">
+    <ng-container *ngIf="reportId && report">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-lg font-semibold text-gray-800">Report Details</h2>
+            <span class="px-2 py-0.5 text-xs font-medium rounded-md" [ngClass]="getReportStatusClasses(report.status)">
+                {{ report.status | titlecase }}
+            </span>
+        </div>
+
+        <!-- Reporter & Reported -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+            <!-- Reporter -->
+            <div class="p-4 border rounded-lg flex items-start gap-3">
+                <img [src]="report.reportedBy.avatar" alt="Reporter"
+                    class="w-12 h-12 rounded-full border object-cover" />
+                <div>
+                    <h3 class="text-xs text-gray-500">Reporter</h3>
+                    <p class="text-sm font-medium text-gray-800">{{ report.reportedBy.name }}</p>
+                    <p class="text-xs text-gray-500">ID: {{ report.reportedBy.reportedId }}</p>
+                    <p class="text-xs text-gray-500">{{ report.reportedBy.email }}</p>
+                </div>
+            </div>
+
+            <!-- Reported Party -->
+            <div class="p-4 border rounded-lg flex items-start gap-3">
+                <img [src]="report.target.avatar" alt="Reported Party"
+                    class="w-12 h-12 rounded-full border object-cover" />
+                <div>
+                    <h3 class="text-xs text-gray-500">Reported Party</h3>
+                    <p class="text-sm font-medium text-gray-800">{{ report.target.name }}</p>
+                    <p class="text-xs text-gray-500">ID: {{ report.target.targetId }}</p>
+                    <p class="text-xs text-gray-500">{{ report.target.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Info -->
+        <div class="p-4 border rounded-lg mb-5">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <i class="fas fa-info-circle text-blue-500"></i>
+                Report Information
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div>
+                    <p class="text-xs text-gray-500">Type</p>
+                    <p class="font-medium text-gray-800">{{ report.type | titlecase }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Reason</p>
+                    <p class="font-medium text-gray-800">{{ report.reason }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Created On</p>
+                    <p class="font-medium text-gray-800">{{ report.createdAt | date:'medium' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Last Updated</p>
+                    <p class="font-medium text-gray-800">{{ report.updatedAt | date:'medium' }}</p>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <p class="text-xs text-gray-500">Description</p>
+                <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                    {{ report.description }}
+                </p>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex justify-end gap-2">
+            <app-button
+                buttonClass="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition"
+                text="Close" (clicked)="closeModal()">
+            </app-button>
+
+            <!-- <app-button 
+                buttonClass="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 flex items-center gap-2 transition shadow-sm"
+                icon="comment-alt" text="Ask for Clarification"></app-button> -->
+
+            <app-button (clicked)="updateStatus(report.id, ReportStatus.REJECTED)"
+                [disabled]="isActionDisabled(report.status)" [ngClass]="{
+                    'opacity-50 cursor-not-allowed': isActionDisabled(report.status)
+                }"
+                buttonClass="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition"
+                icon="ban" text="Reject">
+            </app-button>
+
+            <app-button (clicked)="updateStatus(report.id, ReportStatus.RESOLVED)"
+                [disabled]="isActionDisabled(report.status)" [ngClass]="{
+                    'opacity-50 cursor-not-allowed': isActionDisabled(report.status)
+                }"
+                buttonClass="px-3 py-1.5 text-sm font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100 transition"
+                icon="check-circle" text="Resolve">
+            </app-button>
+        </div>
+    </ng-container>
+</div>

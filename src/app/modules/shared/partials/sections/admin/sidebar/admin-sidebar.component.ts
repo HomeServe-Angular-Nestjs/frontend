@@ -51,10 +51,15 @@ export class AdminSidebarComponent {
     //     { name: 'Notifications', route: 'admin/notifications' }
     //   ]
     // },
+    // {
+    //   name: 'Manage Reports',
+    //   icon: 'fa-chart-bar',
+    //   route: 'admin/reports'
+    // }
     {
-      name: 'Manage Reports',
-      icon: 'fa-chart-bar',
-      route: 'admin/reports'
+      name: 'Complaint Management',
+      icon: 'fa-bullhorn',
+      route: 'admin/complaints'
     }
   ];
 
