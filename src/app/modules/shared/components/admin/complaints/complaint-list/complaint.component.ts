@@ -117,8 +117,9 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
     private _updateStatus(reportId: string, status: ReportStatus) {
         this.reports = this.reports.map(r => ({
             ...r,
-            status: r.reportedId === reportId ? status : r.status
+            status: r.id === reportId ? status : r.status
         }));
+        this._fetchOverviewData();
     }
 
     private _fetchOverviewData() {
@@ -170,7 +171,7 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
             },
             {
                 title: 'Flagged',
-                value: data.resolved || 0,
+                value: data.flagged || 0,
                 icon: 'fas fa-flag',
                 iconBg: 'bg-purple-100 text-purple-700',
                 subtext: 'Needs further review',
@@ -182,6 +183,10 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
         return this._dialog.open(ConfirmDialogComponent, {
             data: { title, message },
         });
+    }
+
+    trackByReportId(index: number, report: IReport): string {
+        return report.id;
     }
 
     searchReport() {
@@ -199,18 +204,25 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
     toggleReportViewModal(reportId?: string) {
         if (reportId) {
             this.selectedReportId = reportId;
-            this._updateStatus(reportId, ReportStatus.IN_PROGRESS)
+            this._reportService.changeStatus(reportId, ReportStatus.IN_PROGRESS)
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: () => {
+                        this._updateStatus(reportId, ReportStatus.IN_PROGRESS)
+                    }
+                });
         }
         this.isReportViewModalOpen.update(v => v = !v);
     }
 
     statusChanged(event: { status: ReportStatus, reportId: string }) {
-        alert(event)
         this._updateStatus(event.reportId, event.status);
     }
 
     resolveReport(reportId: string) {
-        this._openConfirmationDialog('Mark as resolved?', 'The report will be closed permanently.')
+        this._openConfirmationDialog(
+            'The report will be closed permanently.',
+            'Mark as resolved?')
             .afterClosed()
             .pipe(
                 takeUntil(this.destroy$),
@@ -220,9 +232,7 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
             )
             .subscribe({
                 next: () => {
-                    this.reports = this.reports.map(r => ({
-                        ...r, status: r.id === reportId ? ReportStatus.RESOLVED : r.status
-                    }));
+                    this._updateStatus(reportId, ReportStatus.RESOLVED);
                 }
             });
     }

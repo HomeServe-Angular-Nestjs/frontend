@@ -75,9 +75,12 @@ export class AdminComplaintViewComponent implements OnInit, OnDestroy {
                 switchMap(() => this._reportService.changeStatus(reportId, status)),
                 filter(res => res.success)
             )
-            .subscribe(() => {
-                this.report.status = status;
-                this.statusEvent.emit({ status, reportId });
+            .subscribe({
+                next: () => {
+                    this.report.status = status;
+                    this.statusEvent.emit({ status, reportId });
+                    this.closeModal();
+                }
             });
     }
 

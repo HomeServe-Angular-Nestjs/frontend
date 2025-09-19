@@ -34,7 +34,7 @@
                         <option value="">All Status</option>
                         <option value="pending">Pending</option>
                         <option value="resolved">Resolved</option>
-                        <option value="rejected">Rejected</option> 
+                        <option value="rejected">Rejected</option>
                         <option value="flagged">Flagged</option>
                     </select>
                     <i
@@ -71,7 +71,8 @@
             </thead>
             <tbody>
                 <ng-container *ngIf="reports.length > 0; else noData">
-                    <tr *ngFor="let report of reports" class="border-b hover:bg-gray-50 transition ">
+                    <tr *ngFor="let report of reports; trackBy: trackByReportId"
+                        class="border-b hover:bg-gray-50 transition ">
                         <td class="p-4 font-mono text-xs">{{report.id | slice:0:10 | uppercase}}</td>
                         <td class="p-4">{{report.reportedId | slice:0:10 | uppercase}}</td>
                         <td class="p-4">{{report.targetId | slice:0:10 | uppercase}}</td>
@@ -85,9 +86,11 @@
                         <td class="p-3 flex justify-end gap-2">
                             <app-button buttonClass="text-blue-600 hover:text-blue-700 text-md" icon="eye"
                                 (clicked)="toggleReportViewModal(report.id)"></app-button>
-                            <app-button buttonClass="text-green-600 hover:text-green-700 text-md" icon="check-circle"
-                                [disabled]="isActionDisabled(report.status)"
-                                (clicked)="resolveReport(report.id)"></app-button>
+                            <app-button buttonClass="text-green-600 hover:text-green-700 text-md 
+                            disabled:text-green-300 disabled:hover:text-green-300" icon="check-circle"
+                                [disabled]="isActionDisabled(report.status)" (clicked)="resolveReport(report.id)">
+                            </app-button>
+
                         </td>
                     </tr>
                 </ng-container>
