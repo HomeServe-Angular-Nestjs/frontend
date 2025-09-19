@@ -61,7 +61,12 @@ export const adminRoute: Routes = [
                         path: 'transactions',
                         loadComponent: () => import('../../shared/components/admin/transactions/admin-transactions.component')
                             .then(c => c.AdminTransactionsComponent)
-                    }
+                    },
+                    {
+                        path: 'complaints',
+                        loadComponent: () => import('../../shared/components/admin/complaints/complaint-list/complaint.component')
+                            .then(c => c.AdminComplaintManagementComponent),
+                    },
                 ]
             },
         ]

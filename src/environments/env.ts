@@ -21,6 +21,7 @@ export const API_ENV = {
     wallet: `${domainName}/wallet`,
     notification: `${domainName}/notification`,
     reservation: `${domainName}/reservation`,
+    report: `${domainName}/report`,
 };
 
 export const API_KEY = {

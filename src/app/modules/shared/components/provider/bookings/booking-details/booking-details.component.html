@@ -1,110 +1,100 @@
-<section *ngIf="bookingData$ | async as bookingDetails"
-    class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10 overflow-auto">
+<div class="max-w-screen-xl mx-auto p-6">
+    <section *ngIf="bookingData$ | async as bookingDetails" class="bg-white rounded-xl shadow-md p-6 space-y-6 mt-10">
 
-    <!-- Header -->
-    <div class="mb-6 border-b pb-4">
-        <div class="flex justify-between items-start">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800 mb-2">Order Details</h1>
+        <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4 border-b pb-4">
+            <div class="space-y-1">
+                <h1 class="text-2xl font-bold text-gray-800">Order Details</h1>
                 <div class="text-sm text-gray-600 space-y-1">
-                    <p><span class="font-semibold">Booking ID:</span>
-                        #{{ bookingDetails.bookingId.toUpperCase() | slice:0:10 }}
-                    </p>
+                    <p><span class="font-semibold">Booking ID:</span> #{{ bookingDetails.bookingId | slice:0:10 |
+                        uppercase }}</p>
                     <p><span class="font-semibold">Booking Date:</span> {{ formateData(bookingDetails.createdAt) }}</p>
                     <p><span class="font-semibold">Expected Arrival:</span> {{
                         formateData(bookingDetails.expectedArrivalTime) }}</p>
                     <p><span class="font-semibold">Total Amount:</span> ₹{{ bookingDetails.totalAmount }}</p>
                 </div>
             </div>
+
             <div class="flex items-center gap-3 text-gray-600 text-xl">
-                <i class="fas fa-comments hover:text-black cursor-pointer" title="Chat"></i>
-                <i class="fas fa-bell hover:text-black cursor-pointer" title="Send Notification"></i>
+                <i class="fas fa-comments hover:text-indigo-600 cursor-pointer" title="Chat"></i>
+                <i class="fas fa-bell hover:text-indigo-600 cursor-pointer" title="Send Notification"></i>
             </div>
         </div>
-    </div>
 
-    <!-- Status Badges -->
-    <div class="flex flex-wrap items-center gap-4 mb-6">
-        <span [ngClass]="getBookingBadgeClass(bookingDetails.bookingStatus)"
-            class="inline-flex items-center gap-2 transition duration-300 ease-in-out">
-            {{ bookingDetails.bookingStatus }}
-        </span>
+        <div class="flex flex-wrap gap-2">
+            <span [ngClass]="getBookingBadgeClass(bookingDetails.bookingStatus)"
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium transition">
+                {{ bookingDetails.bookingStatus }}
+            </span>
 
-        <span [ngClass]="getPaymentBadgeClass(bookingDetails.paymentStatus)"
-            class="inline-flex items-center gap-2 transition duration-300 ease-in-out">
-            {{ bookingDetails.paymentStatus }}
-        </span>
-    </div>
-
-    <!-- Customer Info -->
-    <div class="mb-6 mt-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-2">Customer Information</h2>
-        <div class="text-sm text-gray-600 space-y-1">
-            <p><span class="font-medium">Name:</span> {{ bookingDetails.customer.name || 'N/A' }}</p>
-            <p><span class="font-medium">Email:</span> {{ bookingDetails.customer.email || 'N/A' }}</p>
-            <p><span class="font-medium">Address:</span> {{ bookingDetails.customer.location || 'N/A' }}</p>
-            <p><span class="font-medium">Phone:</span> {{ bookingDetails.customer.phone || 'N/A' }}</p>
+            <span [ngClass]="getPaymentBadgeClass(bookingDetails.paymentStatus)"
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium transition">
+                {{ bookingDetails.paymentStatus }}
+            </span>
         </div>
-    </div>
 
-    <!-- Services Booked -->
-    <div class="mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-2">Services Booked</h2>
-        <div class="bg-gray-50 rounded-lg p-4 divide-y divide-gray-200">
-            <div class="grid grid-cols-3 text-sm font-semibold text-gray-700 pb-2">
+        <div class="bg-gray-50 rounded-lg p-4 relative">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-lg font-semibold text-gray-800">Customer Information</h2>
+                <app-button (clicked)="toggleReportModal()"
+                    buttonClass="px-2 py-0.5 text-xs font-medium text-red-600 border border-red-600 rounded hover:bg-red-100 transition"
+                    text='Report'>
+                </app-button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
+                <p><span class="font-medium">Name:</span> {{ bookingDetails.customer.name || 'N/A' }}</p>
+                <p><span class="font-medium">Email:</span> {{ bookingDetails.customer.email || 'N/A' }}</p>
+                <p><span class="font-medium">Address:</span> {{ bookingDetails.customer.location || 'N/A' }}</p>
+                <p><span class="font-medium">Phone:</span> {{ bookingDetails.customer.phone || 'N/A' }}</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Services Booked</h2>
+            <div class="grid grid-cols-3 text-sm font-semibold text-gray-700 pb-2 border-b border-gray-200">
                 <span>Service</span>
                 <span>Price</span>
                 <span>Estimated Time</span>
             </div>
-            <div *ngFor="let service of bookingDetails.orderedServices" class="py-3 grid grid-cols-3 gap-4 text-sm">
+            <div *ngFor="let service of bookingDetails.orderedServices"
+                class="grid grid-cols-3 gap-4 text-sm py-3 border-b last:border-b-0">
                 <span class="text-gray-800">{{ service.title }}</span>
                 <span class="text-gray-900 font-medium">₹{{ service.price }}</span>
                 <span class="text-gray-600">{{ service.estimatedTime }}</span>
             </div>
         </div>
-    </div>
 
-    <div *ngIf="bookingDetails.cancelStatus" class=" bg-red-50 p-4 rounded-md border border-red-200">
-        <h4 class="text-sm font-semibold text-red-700 mb-1">
-            {{bookingDetails.cancelStatus === 'in_progress' ? 'Cancel Requested' : 'Cancelled Booking' }}
-        </h4>
-
-        <p class="text-sm text-gray-800">
-            Reason: <span class="font-medium">{{ bookingDetails.cancelReason || 'No reason provided.' }}</span>
-        </p>
-
-        <p class="text-sm text-gray-600 mt-1">
-            Cancelled At:
-            <span class="font-medium">
-                {{ bookingDetails.cancelledAt | date: 'medium' }}
-            </span>
-        </p>
-    </div>
-
-
-    <!-- Action Controls -->
-    <div class="flex flex-wrap justify-between items-center mt-6">
-        <div class="flex items-center gap-2">
-            <label for="bookingStatus" class="text-sm font-medium text-gray-700">Update Status:</label>
-            <select id="bookingStatus" [(ngModel)]="bookingDetails.bookingStatus"
-                (change)="changeBookingStatus(bookingDetails.bookingId, bookingDetails.bookingStatus)"
-                class="text-sm border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-gray-300">
-
-                <option *ngFor="let status of bookingSelectOption" [value]="status.value"
-                    [disabled]="isStatusDisabled(status.value, bookingDetails.bookingStatus)">
-                    {{ status.label }}
-                </option>
-            </select>
+        <div *ngIf="bookingDetails.cancelStatus" class="bg-red-50 p-4 rounded-md border border-red-200">
+            <h4 class="text-sm font-semibold text-red-700 mb-1">
+                {{ bookingDetails.cancelStatus === 'in_progress' ? 'Cancel Requested' : 'Cancelled Booking' }}
+            </h4>
+            <p class="text-sm text-gray-800">Reason: <span class="font-medium">{{ bookingDetails.cancelReason || `No
+                    reason provided.` }}</span></p>
+            <p class="text-sm text-gray-600 mt-1">Cancelled At: <span class="font-medium">{{ bookingDetails.cancelledAt
+                    | date:'medium' }}</span></p>
         </div>
-        <div class="flex gap-3 mt-4 sm:mt-0">
-            <!-- <button *ngIf="!['cancelled', 'completed'].includes(bookingDetails.bookingStatus)"
-                (click)="updateStatus('cancelled')"
-                class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700">
-                Cancel Booking
-            </button> -->
-            <button class="px-4 py-2 border border-gray-300 text-sm rounded hover:bg-gray-100">
-                Download Invoice
-            </button>
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mt-6">
+            <div class="flex items-center gap-2">
+                <label for="bookingStatus" class="text-sm font-medium text-gray-700">Update Status:</label>
+                <select id="bookingStatus" [(ngModel)]="bookingDetails.bookingStatus"
+                    (change)="changeBookingStatus(bookingDetails.bookingId, bookingDetails.bookingStatus)"
+                    class="text-sm border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                    <option *ngFor="let status of bookingSelectOption" [value]="status.value"
+                        [disabled]="isStatusDisabled(status.value, bookingDetails.bookingStatus)">
+                        {{ status.label }}
+                    </option>
+                </select>
+            </div>
+            <div class="flex gap-3">
+                <button class="px-4 py-2 border border-gray-300 text-sm rounded hover:bg-gray-100">Download
+                    Invoice</button>
+            </div>
         </div>
-    </div>
-</section>
+
+        <ng-container *ngIf="showReportModal()">
+            <app-report-modal (submitEvent)="submitReport($event,bookingDetails.customer.id)"
+                (closeEvent)="toggleReportModal()"></app-report-modal>
+        </ng-container>
+    </section>
+</div>

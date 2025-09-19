@@ -179,6 +179,7 @@ export interface IResponseProviderBookingLists {
 
 export interface IBookingDetailProvider extends IBookingDetailsBase {
     customer: {
+        id: string;
         name: string;
         email: string;
         phone: string;

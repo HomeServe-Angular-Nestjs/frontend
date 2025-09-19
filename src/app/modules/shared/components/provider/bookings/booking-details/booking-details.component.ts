@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { Observable, filter, map, of, switchMap } from "rxjs";
@@ -9,17 +9,23 @@ import { BookingService } from "../../../../../../core/services/booking.service"
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { BookingStatus, PaymentStatus } from "../../../../../../core/enums/enums";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
+import { ButtonComponent } from "../../../../../../UI/button/button.component";
+import { ReportModalComponent } from "../../../../partials/shared/report-modal/report-modal.component";
+import { IReportSubmit, ReportService } from "../../../../../../core/services/report.service";
+import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 
 @Component({
     selector: 'app-provider-view-booking-details',
     templateUrl: './booking-details.component.html',
-    standalone: true,
-    imports: [CommonModule, FormsModule]
+    imports: [CommonModule, FormsModule, ButtonComponent, ReportModalComponent],
+    providers: [ReportService]
 })
 export class ProviderViewBookingDetailsComponents implements OnInit {
-    private readonly _bookingService = inject(BookingService);
     private readonly _toastr = inject(ToastNotificationService);
-    private _route = inject(ActivatedRoute);
+    private readonly _bookingService = inject(BookingService);
+    private readonly _sharedData = inject(SharedDataService);
+    private readonly _reportService = inject(ReportService);
+    private readonly _route = inject(ActivatedRoute);
 
     bookingData$!: Observable<IBookingDetailProvider>;
 
@@ -38,8 +44,11 @@ export class ProviderViewBookingDetailsComponents implements OnInit {
         { value: BookingStatus.CANCELLED, label: 'Cancelled' },
     ];
 
+    showReportModal = signal(false);
 
     ngOnInit(): void {
+        this._sharedData.setProviderHeader('Bookings');
+
         this.bookingData$ = this._route.paramMap.pipe(
             map(param => param.get('id')),
             filter((id): id is string => !!id),
@@ -116,5 +125,28 @@ export class ProviderViewBookingDetailsComponents implements OnInit {
         const allowed = allowedTransitions[currentStatus];
 
         return !allowed.includes(optionStatus) && optionStatus !== currentStatus;
+    }
+
+    toggleReportModal() {
+        this.showReportModal.update(v => v = !v);
+    }
+
+    submitReport(report: Omit<IReportSubmit, 'targetId'>, customerId: string) {
+        if (!customerId) {
+            console.error('[ERROR] Provider ID is missing.');
+            return;
+        };
+
+        const reportData = {
+            ...report,
+            targetId: customerId,
+        }
+
+        this._reportService.submit(reportData).subscribe({
+            next: (res) => {
+                if (res.success) this._toastr.success('Report has been submitted.')
+            },
+            complete: () => this.toggleReportModal()
+        });
     }
 }

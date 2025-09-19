@@ -8,7 +8,7 @@ export class ToastNotificationService {
     toasterClass = 'toast-customer-custom';
 
     constructor() {
-        const url = window.location.href;
+        const url = window.location.href.split('/');
         this.toasterClass = url.includes('provider') ? 'toast-provider-custom' : 'toast-customer-custom';
     }
 

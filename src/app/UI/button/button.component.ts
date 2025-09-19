@@ -5,7 +5,7 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
     selector: 'app-button',
     imports: [CommonModule],
     template: `
-        <button [type]="type" (click)="handleClicked()" [ngClass]="buttonClass">
+        <button [type]="type" (click)="handleClicked()" [ngClass]="buttonClass" [disabled]="disabled">
             <i *ngIf="icon" [ngClass]="'fas fa-' + icon"></i> <span *ngIf="text" [ngClass]="{'ml-2':icon}">{{text}}</span>
         </button>
     `,
@@ -19,6 +19,9 @@ export class ButtonComponent {
 
     @Input()
     icon = '';
+
+    @Input()
+    disabled: boolean = false;
 
     @Input()
     buttonClass = 'px-4 py-2 bg-[#16A34A] text-white text-sm';

@@ -69,19 +69,31 @@
                     <div class="text-sm text-gray-600">Years Experience</div>
                 </div>
             </div>
-            <div class="flex gap-4">
-                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    Book Now
-                </button>
-                <button (click)="chat()"
-                    class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                    Message
-                </button>
-                <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-                    (click)="addToSaved(providerData?.id)">
-                    <span [class.text-red-500]="(providerData?.id | isSaved | async)">❤</span> Favorite
+            <div class="flex justify-between">
+                <div class="flex gap-4">
+                    <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Book Now
+                    </button>
+                    <button (click)="chat()"
+                        class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        Message
+                    </button>
+                    <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                        (click)="addToSaved(providerData?.id)">
+                        <span [class.text-red-500]="(providerData?.id | isSaved | async)">❤</span> Favorite
+                    </button>
+                </div>
+                <button type="button" (click)="reportProvider(providerData?.id)"
+                    class="flex items-center gap-1 text-xs text-red-700 hover:text-red-800 rounded transition">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Report</span>
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<ng-container *ngIf="openReportModal">
+    <app-report-modal (closeEvent)="openReportModal=!openReportModal"
+        (submitEvent)="submitReport($event)"></app-report-modal>
+</ng-container>

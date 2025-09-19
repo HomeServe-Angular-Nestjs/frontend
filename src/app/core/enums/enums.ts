@@ -134,3 +134,10 @@ export enum NotificationTemplateId {
     BOOKING_CONFIRMED = 'BOOKING_CONFIRMED',
     BOOKING_CANCELLED = 'BOOKING_CANCELLED',
 }
+
+export enum ReportStatus {
+    PENDING = 'pending',
+    REJECTED = 'rejected',
+    RESOLVED = 'resolved',
+    IN_PROGRESS = 'in_progress'
+}
