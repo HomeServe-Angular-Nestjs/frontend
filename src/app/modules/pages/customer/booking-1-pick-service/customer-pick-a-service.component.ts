@@ -1,7 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { combineLatest, forkJoin, Subject, takeUntil } from 'rxjs';
 import { IOfferedService, ISubService } from '../../../../core/models/offeredService.model';
 import { OfferedServicesService } from '../../../../core/services/service-management.service';
 import { SharedDataService } from '../../../../core/services/public/shared-data.service';
@@ -22,10 +22,9 @@ export type SelectedServiceIdsType = {
   selectedIds: string[]
 };
 
-
 @Component({
   selector: 'app-customer-pick-a-service',
-  standalone: true,
+  templateUrl: './customer-pick-a-service.component.html',
   imports: [
     CommonModule,
     CustomerBreadcrumbsComponent,
@@ -34,42 +33,46 @@ export type SelectedServiceIdsType = {
     CustomerServiceSelectedListComponent,
     ReassuranceComponent,
   ],
-  templateUrl: './customer-pick-a-service.component.html',
 })
-export class CustomerPickAServiceComponent {
+export class CustomerPickAServiceComponent implements OnInit, OnDestroy {
   private readonly _serviceOfferedServices = inject(OfferedServicesService);
-  private readonly _toastr = inject(ToastNotificationService);
   private readonly _sharedDataService = inject(SharedDataService);
-  private _router = inject(Router);
+  private readonly _toastr = inject(ToastNotificationService);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
+
+  private destroy$ = new Subject<void>();
 
   cartItemCount = signal(0);
   scrollPos = false;
+
   providerId!: string | null;
+  selectedServiceId: string = '';
   serviceIds: string[] = [];   // Array of service IDs from query parameters
   serviceData: IOfferedService[] = [];
-  serviceCategories: { title: string, image: string }[] = [];
+  serviceCategories: { title: string, image: string, id: string }[] = [];
   servicesOfSelectedCategory!: SelectedServiceType;   // Currently selected category and its corresponding sub-services
   purchasedServiceList: SelectedServiceType[] = [];   // List of selected services with their sub-services to be scheduled
 
-  /**
-  * On initialization, fetch route params and query params, then load services.
-  */
-  //!TODO - Not properly wrote (paramMap refactor)  
-  constructor(private route: ActivatedRoute) {
-    // Capture provider ID from route params
-    this.route.paramMap.subscribe(param => {
-      this.providerId = param.get('id');
-    })
+  ngOnInit() {
+    const pathParams$ = this._route.paramMap;
+    const queryParams$ = this._route.queryParamMap;
 
-    // Capture service IDs from query parameters and initiate fetch
-    this.route.queryParamMap.subscribe(params => {
-      const idsParam = params.get('ids');
-      this.serviceIds = idsParam ? idsParam.split(',') : [];
-    });
+    combineLatest([pathParams$, queryParams$])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([pathParam, queryParam]) => {
+        this.providerId = pathParam.get('id') ?? '';
+        this.serviceIds = queryParam?.get('ids')?.split(',') || [];
+      });
 
     if (this.serviceIds.length > 0) {
       this.fetchService(this.serviceIds);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   scrollToCart(pos: boolean) {
@@ -88,18 +91,21 @@ export class CustomerPickAServiceComponent {
       this._serviceOfferedServices.fetchOneService(id)
     );
 
-    forkJoin(observables).subscribe({
-      next: (services) => {
-        this.serviceData = services
-        services.forEach(service => {
-          this.serviceCategories.push({
-            title: service.title,
-            image: service.image
-          });
-        })
-      },
-      error: (err) => this._toastr.error(err)
-    })
+    forkJoin(observables)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (services) => {
+          this.serviceData = services
+          services.forEach(service => {
+            this.serviceCategories.push({
+              title: service.title,
+              image: service.image,
+              id: service.id
+            });
+          })
+        },
+        error: (err) => this._toastr.error(err)
+      })
   }
 
   /**

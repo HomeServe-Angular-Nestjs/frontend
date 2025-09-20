@@ -3,7 +3,7 @@
         <button *ngFor="let category of serviceCategories" (click)="selectCategory(category.title)" class="relative flex flex-col items-center justify-between w-[120px] h-[120px] rounded-xl border
              border-gray-200 bg-white shadow-sm overflow-hidden transition-all duration-300 
              hover:shadow-md hover:border-blue-400 hover:scale-105 active:scale-95" [ngClass]="{
-        'bg-blue-100 border-blue-500 text-blue-800 font-semibold ring-2 ring-blue-300': selectedCategory === category.title
+        'bg-blue-100 border-blue-500 text-blue-800 font-semibold ring-2 ring-blue-300': selectedCategoryTitle === category.title
       }">
             <!-- Image at top -->
             <div class="w-full h-2/4 overflow-hidden">
