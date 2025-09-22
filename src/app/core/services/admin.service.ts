@@ -9,6 +9,7 @@ import { IAdminBookingFilter, IAdminBookingForTable, IBookingStats, IPaginatedBo
 import { IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
 import { IAdminDashboardSubscription } from "../models/subscription.model";
 import { IReportDownloadBookingData, IReportDownloadTransactionData, IReportDownloadUserData } from "../models/admin-report.model";
+import { IAdminSettings } from "../models/admin-settings.model";
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -213,5 +214,13 @@ export class AdminService {
         return this._http.post<Blob>(`${this._adminUrl}/transactions/download_report`, data, {
             responseType: 'blob' as 'json'
         });
+    }
+
+    fetchSettings(): Observable<IResponse<IAdminSettings>> {
+        return this._http.get<IResponse<IAdminSettings>>(`${this._adminUrl}/settings`);
+    }
+
+    updateSettings(field: Partial<IAdminSettings>): Observable<IResponse<IAdminSettings>> {
+        return this._http.patch<IResponse<IAdminSettings>>(`${this._adminUrl}/settings`, field);
     }
 }
