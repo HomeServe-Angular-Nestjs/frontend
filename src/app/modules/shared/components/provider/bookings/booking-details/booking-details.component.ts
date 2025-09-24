@@ -182,7 +182,7 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
     }
 
     downloadInvoice(bookingId: string) {
-        this._bookingService.downloadPInvoice(bookingId)
+        this._bookingService.downloadInvoice(bookingId)
             .pipe(takeUntil(this._destroy$))
             .subscribe({
                 next: (blob) => {

@@ -101,7 +101,7 @@ export class BookingService {
         return this._http.patch<IResponse<IBookingDetailProvider>>(`${this._providerApi}/bookings/b_status`, { bookingId, newStatus });
     }
 
-    downloadPInvoice(bookingId: string): Observable<Blob> {
+    downloadInvoice(bookingId: string): Observable<Blob> {
         return this._http.post<Blob>(`${this._providerApi}/bookings/download_invoice`, { bookingId }, {
             responseType: 'blob' as 'json'
         });
