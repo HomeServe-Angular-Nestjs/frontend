@@ -1,6 +1,5 @@
 <div class="w-64 h-screen bg-white border-r border-gray-200 shadow-md flex flex-col justify-between">
 
-    <!-- Header / Logo -->
     <div class="px-6 py-4 border-b border-gray-200 flex items-center gap-3">
         <svg viewBox="0 0 48 48" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill="#1E293B"
@@ -9,12 +8,10 @@
         <span class="text-lg font-semibold text-gray-800">HomeServe Admin</span>
     </div>
 
-    <!-- Navigation Menu with Tailwind Scrollbar -->
     <div
         class="flex-1 overflow-y-auto px-4 py-6 space-y-2 scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100">
 
         <ng-container *ngFor="let item of menuItems">
-            <!-- Main Item -->
             <div (click)="item.subItems ? toggleMenu(item.name) : (item.route ? navigateTo(item.route) : null)"
                 class="flex items-center justify-between px-3 py-2 text-sm rounded-md cursor-pointer transition-all duration-200 group"
                 [ngClass]="{
@@ -22,18 +19,15 @@
                     'text-gray-700 hover:bg-blue-50': !item.route || !isActive(item.route)
                 }">
 
-                <!-- Icon + Name -->
                 <div class="flex items-center gap-2">
                     <i class="fas {{ item.icon }} text-sm"></i>
                     <span class="group-hover:text-blue-700">{{ item.name }}</span>
                 </div>
 
-                <!-- Arrow for submenus -->
                 <i *ngIf="item.subItems" class="fas fa-chevron-down text-xs transition-transform duration-200"
                     [ngClass]="{ 'rotate-180': openedMenu === item.name }"></i>
             </div>
 
-            <!-- Sub Items -->
             <div *ngIf="item.subItems && openedMenu === item.name" class="ml-6 mt-1 space-y-1">
                 <div *ngFor="let subItem of item.subItems" (click)="navigateTo(subItem.route)"
                     class="px-3 py-2 rounded-md text-sm cursor-pointer transition-all duration-200" [ngClass]="{
@@ -47,21 +41,24 @@
 
     </div>
 
-    <!-- User Section + Logout -->
-    <div class="px-4 pb-5 border-t border-gray-100 pt-4">
-        <div class="flex items-center gap-2 mb-3">
+    <div class="px-5 py-4 border border-gray-200 rounded-xl shadow-sm bg-white">
+        <!-- User Info -->
+        <div class="flex items-center gap-3 mb-4">
             <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
-                class="w-8 h-8 rounded-full shadow-sm" alt="Admin Avatar">
-            <div>
-                <p class="text-sm font-medium text-gray-800">Admin</p>
+                class="w-10 h-10 rounded-full shadow-md" alt="Admin Avatar">
+            <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-900">Admin</p>
                 <p class="text-xs text-gray-500">Administrator</p>
             </div>
+            <a routerLink="settings"
+                class="p-2 text-gray-600 hover:text-blue-600 rounded-full transition-colors duration-200 cursor-pointer">
+                <i class="fas fa-cog"></i>
+            </a>
         </div>
 
-        <button (click)="logout()"
-            class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-all duration-200">
-            <i class="fas fa-sign-out-alt"></i>
-            Logout
-        </button>
+        <!-- Logout Button -->
+        <app-button (clicked)="logout()" icon="sign-out-alt" text="Logout"
+            buttonClass="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm transition-all duration-200">
+        </app-button>
     </div>
 </div>

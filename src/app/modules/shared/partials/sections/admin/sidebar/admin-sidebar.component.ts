@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, } from '@angular/router';
+import { Router, RouterLink, } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { authActions } from '../../../../../../store/auth/auth.actions';
+import { ButtonComponent } from '../../../../../../UI/button/button.component';
 
 @Component({
   selector: 'app-admin-sidebar',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, ButtonComponent], 
   templateUrl: './admin-sidebar.component.html',
 })
 export class AdminSidebarComponent {

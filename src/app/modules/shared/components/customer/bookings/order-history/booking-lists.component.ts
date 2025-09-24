@@ -1,10 +1,10 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit, } from "@angular/core";
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { CommonModule } from "@angular/common";
 import { FullDateWithTimePipe } from "../../../../../../core/pipes/to-full-date-with-time.pipe";
 import { IBookingResponse, IBookingWithPagination } from "../../../../../../core/models/booking.model";
 import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
-import { map, Observable, shareReplay } from "rxjs";
+import { map, Observable, pipe, Subject, takeUntil } from "rxjs";
 import { RouterLink } from "@angular/router";
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
@@ -14,34 +14,45 @@ import { PaymentService } from "../../../../../../core/services/payment.service"
 import { RazorpayWrapperService } from "../../../../../../core/services/public/razorpay-wrapper.service";
 import { RazorpayOrder, RazorpayPaymentResponse } from "../../../../../../core/models/payment.model";
 import { ITransaction } from "../../../../../../core/models/transaction.model";
+import { ButtonComponent } from "../../../../../../UI/button/button.component";
+import { CancelBookingModalComponent } from "../../../../partials/shared/cancel-booking-modal/cancel-booking-modal.component";
 
 @Component({
     selector: 'app-customer-booking-lists',
     templateUrl: './booking-lists.component.html',
-    imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent],
+    imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent, ButtonComponent, CancelBookingModalComponent],
     providers: [PaymentService, RazorpayWrapperService]
 })
-export class CustomerBookingListsComponent implements OnInit {
+export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     private readonly _bookingService = inject(BookingService);
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _paymentService = inject(PaymentService);
     private readonly _razorpayWrapperService = inject(RazorpayWrapperService);
+
+    private destroy$ = new Subject<void>();
 
     bookingsData$!: Observable<IBookingWithPagination>;
     cancellationReasonModal = false;
     cancelReason = '';
     bookingSelectedForCancellation = '';
 
-    private _fetchBookings(page: number) {
-        this.bookingsData$ = this._bookingService.fetchBookings(page);
-    }
-
     ngOnInit(): void {
         this._fetchBookings(1);
     }
 
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    private _fetchBookings(page: number) {
+        this.bookingsData$ = this._bookingService.fetchBookings(page)
+            .pipe(takeUntil(this.destroy$));
+    }
+
     private _updateCancelledBookingData(cancelledBookingId: string) {
         this.bookingsData$ = this.bookingsData$.pipe(
+            takeUntil(this.destroy$),
             map(response => {
                 return {
                     bookingData: response.bookingData.map(bookings => {
@@ -65,19 +76,19 @@ export class CustomerBookingListsComponent implements OnInit {
             transactionId: transactionData?.id ?? null,
         };
 
-        this._bookingService.updateBooking(bookingData).subscribe({
-            next: (res) => {
-                console.log(res);
-            },
-            error: (err) => {
-                console.error(err);
-            }
-        });
+        this._bookingService.updateBooking(bookingData)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (res) => {
+                    console.log(res);
+                }
+            });
     }
 
     private _verifyPaymentAndUpdateBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {
         const orderData: RazorpayOrder = {
             id: order.id,
+            bookingId:'wqw',
             transactionType: TransactionType.BOOKING,
             amount: order.amount,
             status: TransactionStatus.SUCCESS,
@@ -86,27 +97,31 @@ export class CustomerBookingListsComponent implements OnInit {
             receipt: order.receipt,
         };
 
-        this._paymentService.verifyPaymentSignature(response, orderData).subscribe({
-            next: (response) => {
-                this._updateBooking(bookingId, response.transaction);
-            },
-            error: (err) => {
-                console.error(err);
-                this._toastr.error('Server verification failed.')
-            }
-        });
+        this._paymentService.verifyPaymentSignature(response, orderData)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (response) => {
+                    this._updateBooking(bookingId, response.transaction);
+                },
+                error: (err) => {
+                    console.error(err);
+                    this._toastr.error('Server verification failed.')
+                }
+            });
     }
 
     private _initiatePayment(totalAmount: number, bookingId: string) {
-        this._paymentService.createRazorpayOrder(totalAmount).subscribe({
-            next: (order) => {
-                this._razorpayWrapperService.openCheckout(
-                    order,
-                    (paymentResponse: RazorpayPaymentResponse) =>
-                        this._verifyPaymentAndUpdateBooking(paymentResponse, order, bookingId),
-                );
-            }
-        });
+        this._paymentService.createRazorpayOrder(totalAmount)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (order) => {
+                    this._razorpayWrapperService.openCheckout(
+                        order,
+                        (paymentResponse: RazorpayPaymentResponse) =>
+                            this._verifyPaymentAndUpdateBooking(paymentResponse, order, bookingId),
+                    );
+                }
+            });
     }
 
     canBeCancelled(booking: IBookingResponse): boolean {
@@ -135,19 +150,21 @@ export class CustomerBookingListsComponent implements OnInit {
             return;
         }
 
-        this._bookingService.cancelBooking(this.bookingSelectedForCancellation, this.cancelReason).subscribe({
-            next: (res) => {
-                this._updateCancelledBookingData(this.bookingSelectedForCancellation);
-                this.bookingSelectedForCancellation = '';
-                this.cancellationReasonModal = false;
-                this.cancelReason = '';
-                this._toastr.success(res.message);
-            },
-            error: (err) => {
-                console.error('Cancellation failed:', err);
-                this._toastr.error(err);
-            }
-        })
+        this._bookingService.cancelBooking(this.bookingSelectedForCancellation, this.cancelReason)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (res) => {
+                    this._updateCancelledBookingData(this.bookingSelectedForCancellation);
+                    this.bookingSelectedForCancellation = '';
+                    this.cancellationReasonModal = false;
+                    this.cancelReason = '';
+                    this._toastr.success(res.message);
+                },
+                error: (err) => {
+                    console.error('Cancellation failed:', err);
+                    this._toastr.error(err);
+                }
+            })
     }
 
     completePayment(booking: IBookingResponse) {
@@ -159,8 +176,6 @@ export class CustomerBookingListsComponent implements OnInit {
         }
         if (booking.paymentSource === PaymentSource.RAZORPAY) {
             this._initiatePayment(totalAmount, booking.bookingId);
-        } else if (booking.paymentSource === PaymentSource.WALLET) {
-
         }
 
     }

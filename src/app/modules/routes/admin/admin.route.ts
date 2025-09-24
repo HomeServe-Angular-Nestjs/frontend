@@ -15,6 +15,7 @@ export const adminRoute: Routes = [
             },
             {
                 path: '',
+                canActivate: [AuthGuard],
                 loadComponent: () => import('../../pages/admin/layout/admin-layout.component').then(c => c.AdminHomepageComponent),
                 children: [
                     {
@@ -25,12 +26,12 @@ export const adminRoute: Routes = [
                     {
                         path: 'dashboard',
                         loadComponent: () => import('../../shared/components/admin/dashboard/layout/admin-dashboard.component').then(c => c.AdminDashboardComponent),
-                        canActivate: [AuthGuard]
+                        // canActivate: [AuthGuard]
                     },
                     {
                         path: 'users',
                         loadComponent: () => import('../../shared/components/admin/users/user-management.component').then(c => c.UserManagementComponent),
-                        canActivate: [AuthGuard]
+                        // canActivate: [AuthGuard]
                     },
                     {
                         path: 'approvals',
@@ -67,6 +68,11 @@ export const adminRoute: Routes = [
                         loadComponent: () => import('../../shared/components/admin/complaints/complaint-list/complaint.component')
                             .then(c => c.AdminComplaintManagementComponent),
                     },
+                    {
+                        path: 'settings',
+                        loadComponent: () => import('../../shared/components/admin/settings/settings.component')
+                            .then(c => c.AdminSettingsComponent)
+                    }
                 ]
             },
         ]

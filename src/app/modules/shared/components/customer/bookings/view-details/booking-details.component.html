@@ -4,7 +4,7 @@
     <div class="mb-6 border-b pb-4">
         <h1 class="text-2xl font-bold text-gray-800">Booking Details</h1>
         <p class="text-sm text-gray-500 mt-1">Booking ID: <span
-                class="font-medium text-gray-700">#{{bookingDetails.bookingId.toUpperCase()}}</span></p>
+                class="font-medium text-gray-700 uppercase">#{{bookingDetails.bookingId}}</span></p>
     </div>
 
     <!-- Booking Summary -->
@@ -78,11 +78,12 @@
 
     <!-- Actions -->
     <div class="flex flex-wrap gap-4 mt-6 border-t pt-6">
-        <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">Download
-            Invoice</button>
-        <button class="px-4 py-2 text-sm font-medium text-red-600 border border-red-500 rounded hover:bg-red-50">Cancel
-            Booking</button>
-        <button class="px-4 py-2 text-sm font-medium text-gray-700 border rounded hover:bg-gray-100">Rebook
-            Service</button>
+        <app-button (clicked)="downloadInvoice(bookingDetails.bookingId)"
+            buttonClass="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+            text="Download Invoice"></app-button>
+        <!-- <button class="px-4 py-2 text-sm font-medium text-red-600 border border-red-500 rounded hover:bg-red-50">Cancel
+            Booking</button> -->
+        <!-- <button class="px-4 py-2 text-sm font-medium text-gray-700 border rounded hover:bg-gray-100">Rebook
+            Service</button> -->
     </div>
 </section>

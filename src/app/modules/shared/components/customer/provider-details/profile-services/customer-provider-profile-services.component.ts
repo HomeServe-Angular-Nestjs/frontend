@@ -10,6 +10,7 @@ import { OfferedServicesService } from '../../../../../../core/services/service-
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { IFilter, IPriceRange, IServiceDurationRange, ServiceDurationKey, SortOption } from '../../../../../../core/models/filter.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
+import { selectAllUnReadNotifications } from '../../../../../../store/notification/notification.selector';
 
 @Component({
   selector: 'app-customer-provider-profile-services',
@@ -80,6 +81,20 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
       })
   }
 
+  private _emitFilters() {
+    const filter: IFilter = {
+      search: this.searchTerm,
+      sort: this.sortOption,
+      priceRange: {
+        min: this.priceRange.min ?? 0,
+        max: this.priceRange.max ?? undefined
+      },
+      category: this.selectedServiceCategory,
+      duration: this.selectedDuration
+    };
+    this._filters$.next(filter);
+  }
+
   loadAllServices(serviceIds: string[]) {
     const observables = serviceIds.map(id =>
       this._serviceOfferedService.fetchOneService(id)
@@ -94,10 +109,10 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
     });
   }
 
-  bookService(ids: string[]) {
-    if (ids.length < 0) return;
+  bookService(selectedServiceId: string, ids: string[]) {
+    if (ids.length < 0 || !selectedServiceId) return;
     this._router.navigate(['pick_a_service', this.providerId], {
-      queryParams: { ids: ids.join(',') }
+      queryParams: { ids: ids.join(','), selectedServiceId }
     });
   }
 
@@ -143,20 +158,5 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
     }
     this._destroy$.next();
     this._destroy$.complete();
-  }
-
-
-  private _emitFilters() {
-    const filter: IFilter = {
-      search: this.searchTerm,
-      sort: this.sortOption,
-      priceRange: {
-        min: this.priceRange.min ?? 0,
-        max: this.priceRange.max ?? undefined
-      },
-      category: this.selectedServiceCategory,
-      duration: this.selectedDuration
-    };
-    this._filters$.next(filter);
   }
 }

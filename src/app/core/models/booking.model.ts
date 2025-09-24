@@ -23,8 +23,10 @@ export interface IPriceBreakup {
 export interface IPriceBreakupData {
     subTotal: number;
     tax: number;
-    visitingFee: number;
+    fee: number;
     total: number;
+    taxRate?: number;
+    feeRate?: number;
 }
 
 export type CustomerLocationType = Omit<ILocation, 'type'> & { phone: string };
@@ -65,6 +67,7 @@ export interface IBookingData {
 }
 
 export interface IBooking {
+    id: string;
     customerId: string;
     providerId: string;
     totalAmount: number;
@@ -145,6 +148,12 @@ export interface IBookingOverviewData {
     cancelledBookings: number;
     totalBookings: number;
     changes?: IBookingOverviewChanges;
+}
+
+export interface IUpdateBookingsPaymentStatus {
+    transactionId: string;
+    paymentStatus: PaymentStatus;
+    bookingId: string;
 }
 
 // --------------------

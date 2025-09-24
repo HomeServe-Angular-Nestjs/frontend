@@ -30,14 +30,11 @@ export interface ITransactionStats {
 }
 
 export interface ITransactionTableData {
-    orderId: string;
-    paymentId: string;
+    transactionId: string;
+    paymentId: string | null;
     amount: number;
-    userId: string;
-    receipt: string;
-    userEmail: string;
-    contact: string;
     method: string;
+    source: PaymentSource,
     transactionType: string;
     createdAt: Date;
 }

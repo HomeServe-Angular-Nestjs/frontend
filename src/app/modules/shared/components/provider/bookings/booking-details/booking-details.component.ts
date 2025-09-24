@@ -1,8 +1,8 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { Observable, filter, map, of, switchMap } from "rxjs";
+import { Observable, Subject, filter, finalize, map, of, switchMap, takeUntil } from "rxjs";
 
 import { IBookingDetailProvider } from "../../../../../../core/models/booking.model";
 import { BookingService } from "../../../../../../core/services/booking.service";
@@ -13,20 +13,22 @@ import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { ReportModalComponent } from "../../../../partials/shared/report-modal/report-modal.component";
 import { IReportSubmit, ReportService } from "../../../../../../core/services/report.service";
 import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
+import { CancelBookingModalComponent } from "../../../../partials/shared/cancel-booking-modal/cancel-booking-modal.component";
 
 @Component({
     selector: 'app-provider-view-booking-details',
     templateUrl: './booking-details.component.html',
-    imports: [CommonModule, FormsModule, ButtonComponent, ReportModalComponent],
+    imports: [CommonModule, FormsModule, ButtonComponent, ReportModalComponent, CancelBookingModalComponent],
     providers: [ReportService]
 })
-export class ProviderViewBookingDetailsComponents implements OnInit {
+export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _bookingService = inject(BookingService);
     private readonly _sharedData = inject(SharedDataService);
     private readonly _reportService = inject(ReportService);
     private readonly _route = inject(ActivatedRoute);
 
+    private _destroy$ = new Subject<void>();
     bookingData$!: Observable<IBookingDetailProvider>;
 
     paymentSelectOptions: { value: PaymentStatus; label: string; }[] = [
@@ -45,18 +47,30 @@ export class ProviderViewBookingDetailsComponents implements OnInit {
     ];
 
     showReportModal = signal(false);
+    showCancelBookingModal = signal(false);
 
     ngOnInit(): void {
         this._sharedData.setProviderHeader('Bookings');
 
         this.bookingData$ = this._route.paramMap.pipe(
+            takeUntil(this._destroy$),
             map(param => param.get('id')),
             filter((id): id is string => !!id),
             switchMap(id => this._bookingService.getBookingDetails(id))
         );
     }
 
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
+    }
+
     changeBookingStatus(bookingId: string, newStatus: BookingStatus): void {
+        if (newStatus === BookingStatus.CANCELLED) {
+            this.toggleCancelBookingModal();
+            return;
+        }
+
         this._bookingService.changeBookingStatus(bookingId, newStatus).subscribe({
             next: (response) => {
                 if (response.success && response.data) {
@@ -110,21 +124,19 @@ export class ProviderViewBookingDetailsComponents implements OnInit {
     }
 
     isStatusDisabled(optionStatus: BookingStatus, currentStatus: BookingStatus): boolean {
-        if (currentStatus === BookingStatus.COMPLETED || currentStatus === BookingStatus.CANCELLED) {
-            return optionStatus !== currentStatus;
-        }
-
         const allowedTransitions: Record<BookingStatus, BookingStatus[]> = {
-            [BookingStatus.PENDING]: [BookingStatus.CONFIRMED, BookingStatus.CANCELLED],
-            [BookingStatus.CONFIRMED]: [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
-            [BookingStatus.IN_PROGRESS]: [BookingStatus.COMPLETED, BookingStatus.CANCELLED],
+            [BookingStatus.PENDING]: [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
+            [BookingStatus.IN_PROGRESS]: [BookingStatus.COMPLETED, BookingStatus.CANCELLED, BookingStatus.CONFIRMED],
+            [BookingStatus.CONFIRMED]: [BookingStatus.COMPLETED, BookingStatus.CANCELLED],
             [BookingStatus.COMPLETED]: [],
-            [BookingStatus.CANCELLED]: []
+            [BookingStatus.CANCELLED]: [],
         };
 
-        const allowed = allowedTransitions[currentStatus];
+        if (optionStatus === currentStatus) return false;
 
-        return !allowed.includes(optionStatus) && optionStatus !== currentStatus;
+        const allowed = allowedTransitions[currentStatus] ?? [];
+
+        return !allowed.includes(optionStatus);
     }
 
     toggleReportModal() {
@@ -142,11 +154,45 @@ export class ProviderViewBookingDetailsComponents implements OnInit {
             targetId: customerId,
         }
 
-        this._reportService.submit(reportData).subscribe({
+        this._reportService.submit(reportData).pipe(
+            takeUntil(this._destroy$),
+        ).subscribe({
             next: (res) => {
                 if (res.success) this._toastr.success('Report has been submitted.')
             },
             complete: () => this.toggleReportModal()
         });
+    }
+
+    toggleCancelBookingModal() {
+        this.showCancelBookingModal.update(v => v = !v);
+    }
+
+    submitCancellation(bookingId: string, reason: string) {
+        this._bookingService.cancelBooking(bookingId, reason)
+            .pipe(
+                takeUntil(this._destroy$),
+                finalize(() => this.toggleCancelBookingModal())
+            )
+            .subscribe({
+                next: () => {
+
+                }
+            })
+    }
+
+    downloadInvoice(bookingId: string) {
+        this._bookingService.downloadInvoice(bookingId)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe({
+                next: (blob) => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'booking-invoice.pdf';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            });
     }
 }

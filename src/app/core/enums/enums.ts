@@ -70,12 +70,16 @@ export enum PaymentDirection {
 
 export enum PaymentSource {
     RAZORPAY = 'razorpay',
-    WALLET = 'wallet'
+    INTERNAL = 'internal', // for wallet/commission transfers
 }
 
 export enum TransactionType {
-    BOOKING = 'Booking',
-    SUBSCRIPTION = 'Subscription',
+    BOOKING = 'booking',
+    SUBSCRIPTION = 'subscription',
+    CUSTOMER_COMMISSION = 'customer_commission',
+    PROVIDER_COMMISSION = 'provider_commission',
+    REFUND = 'refund',
+    BOOKING_RELEASE = 'booking_release',
 }
 
 export enum SortEnum {

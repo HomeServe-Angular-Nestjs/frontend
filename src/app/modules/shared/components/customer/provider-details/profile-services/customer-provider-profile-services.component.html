@@ -1,5 +1,4 @@
 <div *ngIf="providerData" class="bg-white rounded-lg shadow-lg p-6">
-    <!-- Services Header with Search and Filters -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
             <h2 class="text-xl font-semibold">Services Offered</h2>
@@ -34,21 +33,18 @@
         <h3 class="text-sm font-medium text-gray-700 mb-2">Price Range</h3>
 
         <div class="flex items-center gap-4">
-            <!-- Min Price -->
             <div class="flex-1">
                 <label class="block text-xs text-gray-600 mb-1">Min Price</label>
                 <input type="number" min="0" class="border rounded-lg px-3 py-1.5 text-sm w-full" placeholder="$0"
                     [(ngModel)]="priceRange.min" />
             </div>
 
-            <!-- Max Price -->
             <div class="flex-1">
                 <label class="block text-xs text-gray-600 mb-1">Max Price</label>
                 <input type="number" min="0" class="border rounded-lg px-3 py-1.5 text-sm w-full" placeholder="$2000"
                     [(ngModel)]="priceRange.max" />
             </div>
 
-            <!-- Apply Button -->
             <button (click)="selectPriceRange()"
                 class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition-colors mt-6">
                 Apply
@@ -56,8 +52,6 @@
         </div>
     </div>
 
-
-    <!-- Service Duration Filter -->
     <div class="mb-6 p-4 bg-gray-50 rounded-lg">
         <h3 class="text-sm font-medium text-gray-700 mb-2">Service Duration</h3>
         <div class="flex flex-wrap gap-2">
@@ -72,27 +66,22 @@
         </div>
     </div>
 
-
-    <!-- Services List -->
     <div class="space-y-6">
-        <!-- Emergency Services -->
         <ng-container *ngIf="serviceData && serviceData.length > 0; else noData">
 
             <div *ngFor="let service of serviceData" class="bg-white border rounded-xl shadow-md overflow-hidden">
 
-                <!-- Service Header -->
                 <div class="flex justify-between items-start px-6 py-4 border-b bg-gray-50">
                     <div>
                         <h3 class="text-xl font-semibold text-gray-800">{{ service.title }}</h3>
                         <p class="text-sm text-gray-500 mt-1">{{ service.desc }}</p>
                     </div>
-                    <button (click)="bookService(providerData.servicesOffered)"
+                    <button (click)="bookService(service.id, providerData.servicesOffered)"
                         class="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
                         Book Now
                     </button>
                 </div>
 
-                <!-- Sub-services Table -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
                         <thead class="bg-gray-100 text-gray-700 uppercase tracking-wide">
@@ -116,7 +105,6 @@
 
         </ng-container>
 
-        <!-- No Data Placeholder -->
         <ng-template #noData>
             <div class="text-center text-gray-500 py-10">
                 <p class="text-lg">No services available at the moment.</p>
