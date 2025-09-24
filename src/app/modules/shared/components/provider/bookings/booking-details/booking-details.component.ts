@@ -180,4 +180,19 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
                 }
             })
     }
+
+    downloadInvoice(bookingId: string) {
+        this._bookingService.downloadPInvoice(bookingId)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe({
+                next: (blob) => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'booking-invoice.pdf';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            });
+    }
 }

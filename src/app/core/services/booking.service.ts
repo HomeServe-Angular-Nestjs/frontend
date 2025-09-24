@@ -67,7 +67,7 @@ export class BookingService {
         return this._http.get<IBookingDetailCustomer>(`${this._customerApi}/booking/view_details`, { params })
     }
 
-    cancelBooking(bookingId: string, reason: string, ): Observable<IResponse> {
+    cancelBooking(bookingId: string, reason: string,): Observable<IResponse> {
         return this._http.patch<IResponse>(`${this._customerApi}/booking/cancel`, { bookingId, reason });
     }
 
@@ -99,5 +99,11 @@ export class BookingService {
 
     changeBookingStatus(bookingId: string, newStatus: BookingStatus): Observable<IResponse<IBookingDetailProvider>> {
         return this._http.patch<IResponse<IBookingDetailProvider>>(`${this._providerApi}/bookings/b_status`, { bookingId, newStatus });
+    }
+
+    downloadPInvoice(bookingId: string): Observable<Blob> {
+        return this._http.post<Blob>(`${this._providerApi}/bookings/download_invoice`, { bookingId }, {
+            responseType: 'blob' as 'json'
+        });
     }
 }
