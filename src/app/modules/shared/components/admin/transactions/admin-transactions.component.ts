@@ -88,7 +88,7 @@ export class AdminTransactionsComponent implements OnInit {
                 icon: 'fas fa-rupee-sign',
                 iconBg: 'bg-green-100 text-green-700',
                 title: 'Total Revenue',
-                value: this.formatINR(data.totalRevenue),
+                value: this.formatINR(data.totalRevenue/100),
             },
             {
                 icon: 'fas fa-percentage',
@@ -100,7 +100,7 @@ export class AdminTransactionsComponent implements OnInit {
                 icon: 'fas fa-balance-scale',
                 iconBg: 'bg-purple-100 text-purple-700',
                 title: 'Average Transaction Value',
-                value: data.avgTransactionValue.toFixed(2),
+                value: (data.avgTransactionValue / 100).toFixed(2),
             },
         ];
     }

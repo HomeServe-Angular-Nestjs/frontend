@@ -11,13 +11,14 @@
 </section>
 
 <section class="mb-6">
-  <h2 class="text-xl font-semibold text-gray-900 mb-4">Wallet</h2>
-  <div class="flex items-center rounded-lg shadow p-6 text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-      <div>
-          <div class="text-3xl font-extrabold">{{(walletBalance/100).toFixed(2)}}</div>
-          <div class="text-sm opacity-90">Available Balance</div>
-      </div>
-  </div>
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Wallet</h2>
+    <div
+        class="flex items-center rounded-lg shadow p-6 text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+        <div>
+            <div class="text-3xl font-extrabold">{{(walletBalance/100).toFixed(2)}}</div>
+            <div class="text-sm opacity-90">Available Balance</div>
+        </div>
+    </div>
 </section>
 
 <section class="mb-8">
@@ -27,21 +28,23 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Order ID</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Payment ID</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Amount</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Method</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Payment ID</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Source</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Transaction Type</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Date</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Method</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
                 <tr *ngFor="let tx of transactions">
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.orderId }}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.paymentId }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 uppercase">{{ tx.transactionId | slice:0:10}}</td>
                     <td class="px-4 py-2 text-sm text-gray-900">{{ formatINR(tx.amount / 100) }}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.method | titlecase }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.paymentId ? tx.paymentId : 'N/A'}}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.source }}</td>
                     <td class="px-4 py-2 text-sm text-gray-900">{{ tx.transactionType }}</td>
                     <td class="px-4 py-2 text-sm text-gray-500">{{ tx.createdAt | date:'medium' }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.method | titlecase }}</td> <!--TODO output-->
                 </tr>
             </tbody>
         </table>
