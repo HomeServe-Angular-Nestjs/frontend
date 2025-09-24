@@ -2,23 +2,29 @@ import { Component, inject, OnInit } from "@angular/core";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
 import { IAdminOverViewCard, OverviewCardComponent } from "../../../partials/sections/admin/overview-card/admin-overview-card.component";
 import { TransactionService } from "../../../../../core/services/public/transaction.service";
-import { filter, map } from "rxjs";
+import {  Subject, takeUntil } from "rxjs";
 import { ITransactionStats, ITransactionTableData } from "../../../../../core/models/transaction.model";
 import { CommonModule } from "@angular/common";
 import { IPagination } from "../../../../../core/models/booking.model";
 import { AdminPaginationComponent } from "../../../partials/sections/admin/pagination/pagination.component";
+import { WalletService } from "../../../../../core/services/wallet.service";
 
 @Component({
     selector: 'app-admin-transactions',
     templateUrl: './admin-transactions.component.html',
     imports: [CommonModule, OverviewCardComponent, AdminPaginationComponent],
+    providers: [WalletService]
 })
 export class AdminTransactionsComponent implements OnInit {
-    private readonly _sharedService = inject(SharedDataService);
     private readonly _transactionService = inject(TransactionService);
+    private readonly _sharedService = inject(SharedDataService);
+    private readonly _walletService = inject(WalletService);
+
+    private destroy$ = new Subject<void>();
 
     stats: IAdminOverViewCard[] = [];
     transactions: ITransactionTableData[] = [];
+    walletBalance: number = 0;
     pagination: IPagination = {
         limit: 1,
         page: 1,
@@ -29,27 +35,45 @@ export class AdminTransactionsComponent implements OnInit {
         this._sharedService.setAdminHeader('Revenues & Transactions');
         this._loadOverviewData();
         this._loadTableData();
+        this._fetchWalletAmount();
+    }
+
+    ngDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     private _loadTableData(page = 1) {
-        this._transactionService.getTransactionTableData(page).subscribe({
-            next: (res) => {
-                if (res.success && res.data) {
-                    this.transactions = res.data.tableData;
-                    this.pagination = res.data.pagination;
+        this._transactionService.getTransactionTableData(page)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (res) => {
+                    if (res.success && res.data) {
+                        this.transactions = res.data.tableData;
+                        this.pagination = res.data.pagination;
+                    }
                 }
-            }
-        });
+            });
     }
 
     private _loadOverviewData() {
-        this._transactionService.getTransactionStats().subscribe({
-            next: (res) => {
-                if (res && res.data) {
-                    this.stats = this._buildOverviewCards(res.data);
+        this._transactionService.getTransactionStats()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (res) => {
+                    if (res && res.data) {
+                        this.stats = this._buildOverviewCards(res.data);
+                    }
                 }
-            }
-        });
+            });
+    }
+
+    private _fetchWalletAmount() {
+        this._walletService.getWallet()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (res) => this.walletBalance = res?.data?.balance ?? 0
+            });
     }
 
     private _buildOverviewCards(data: ITransactionStats): IAdminOverViewCard[] {

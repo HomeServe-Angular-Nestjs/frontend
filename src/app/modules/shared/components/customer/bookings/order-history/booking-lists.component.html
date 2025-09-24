@@ -62,33 +62,33 @@
 
                             <!-- Action Buttons -->
                             <div class="space-y-2">
-                                <button *ngIf="list.paymentStatus === 'unpaid' || list.paymentStatus === 'failed'"
-                                    (click)="completePayment(list)"
-                                    class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
-                                    <i class="fas fa-credit-card mr-2"></i> Complete Payment
-                                </button>
+
+                                <app-button *ngIf="list.paymentStatus === 'unpaid' || list.paymentStatus === 'failed'"
+                                    (clicked)="completePayment(list)" icon="fa-credit-card  mr-2"
+                                    text="Complete Payment"
+                                    buttonClass="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
+                                </app-button>
 
                                 <div *ngIf="list.cancelStatus === 'in_progress'"
                                     class="w-full px-4 py-2 text-sm font-medium text-red-600 border border-red-500 rounded text-center">
                                     Cancellation In Progress
                                 </div>
 
-                                <button *ngIf="canBeCancelled(list)" (click)="openModal(list.bookingId)"
-                                    class="w-full px-4 py-2 text-sm font-medium text-red-600 border border-red-500 rounded hover:bg-red-50">
-                                    Cancel Booking
-                                </button>
+                                <app-button *ngIf="canBeCancelled(list)" text="Cancel Booking"
+                                    (clicked)="openModal(list.bookingId)"
+                                    buttonClass="w-full px-4 py-2 text-sm font-medium text-red-600 border border-red-500 rounded hover:bg-red-50">
+                                </app-button>
 
                                 <div class="flex gap-2 items-center">
-                                    <div class="text-sm text-gray-600 relative group w-fit">
-                                        <span class="flex items-center gap-1">
+                                    <div class="text-sm text-gray-600 w-fit relative">
+                                        <span class="relative group inline-block">
                                             <i class="fas fa-circle-info text-blue-500 cursor-pointer"></i>
+                                            <div
+                                                class="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-max max-w-xs px-3 py-2 text-xs text-white bg-gray-800 rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-10">
+                                                After 24 hours of booking, cancellation is restricted for policy
+                                                reasons.
+                                            </div>
                                         </span>
-
-                                        <!-- Tooltip -->
-                                        <div
-                                            class="absolute left-0 top-6 mt-1 w-max max-w-xs px-3 py-2 text-xs text-white bg-gray-800 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                                            After 24 hours of booking, cancellation is restricted for policy reasons.
-                                        </div>
                                     </div>
 
                                     <button [routerLink]="[list.bookingId]"

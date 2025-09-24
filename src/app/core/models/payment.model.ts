@@ -3,6 +3,7 @@ import { ITransaction } from "./transaction.model";
 
 export interface RazorpayOrder {
     id: string;
+    bookingId: string;
     transactionType: TransactionType;
     amount: number;
     receipt: string;
@@ -20,4 +21,6 @@ export interface RazorpayPaymentResponse {
 export interface IVerifiedPayment {
     verified: boolean,
     transaction: ITransaction
+    bookingId?: string;
+    subscriptionId?: string;
 }

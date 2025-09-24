@@ -100,6 +100,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     private _verifyPaymentAndConfirmSubscription(response: RazorpayPaymentResponse, order: RazorpayOrder, plan: IPlan, isUpgrade: boolean = false) {
         const orderData: RazorpayOrder = {
             id: order.id,
+            bookingId:'ajd',
             transactionType: TransactionType.SUBSCRIPTION,
             amount: order.amount,
             status: order.status,
