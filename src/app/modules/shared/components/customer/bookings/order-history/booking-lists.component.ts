@@ -15,11 +15,12 @@ import { RazorpayWrapperService } from "../../../../../../core/services/public/r
 import { RazorpayOrder, RazorpayPaymentResponse } from "../../../../../../core/models/payment.model";
 import { ITransaction } from "../../../../../../core/models/transaction.model";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
+import { CancelBookingModalComponent } from "../../../../partials/shared/cancel-booking-modal/cancel-booking-modal.component";
 
 @Component({
     selector: 'app-customer-booking-lists',
     templateUrl: './booking-lists.component.html',
-    imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent, ButtonComponent],
+    imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent, ButtonComponent, CancelBookingModalComponent],
     providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerBookingListsComponent implements OnInit, OnDestroy {

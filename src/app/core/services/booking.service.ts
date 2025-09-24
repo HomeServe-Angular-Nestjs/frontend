@@ -67,10 +67,9 @@ export class BookingService {
         return this._http.get<IBookingDetailCustomer>(`${this._customerApi}/booking/view_details`, { params })
     }
 
-    cancelBooking(bookingId: string, reason: string): Observable<IResponse> {
+    cancelBooking(bookingId: string, reason: string, ): Observable<IResponse> {
         return this._http.patch<IResponse>(`${this._customerApi}/booking/cancel`, { bookingId, reason });
     }
-
 
     // ------------------------------------------------------------------------------------------------------------------------------
     // **************************************************[Provider Related APIs]*******************************************************
