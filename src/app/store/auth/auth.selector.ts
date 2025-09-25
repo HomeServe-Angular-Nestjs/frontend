@@ -27,8 +27,3 @@ export const selectAuthUserId = createSelector(
     selectAuthState,
     (state) => state.id
 );
-
-export const selectShowSubscriptionPage = createSelector(
-    selectAuthState,
-    (state) => state.showSubscriptionPage
-)
