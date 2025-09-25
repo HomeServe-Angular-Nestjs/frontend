@@ -13,18 +13,6 @@ export interface IPlan {
     createdAt: Date;
 }
 
-export interface ISavePlan {
-    name: string;
-    price: number;
-    role: PlanRoleType;
-    duration: PlanDurationType;
-    features: string[];
-}
-
-export interface IUpdatePlan extends ISavePlan {
-    id: string;
-}
-
 export interface IUpdatePlanStatus {
     id: string;
     status: boolean;
