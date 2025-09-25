@@ -74,22 +74,16 @@ export const createPlansTable = (columns: string[], plans: IPlan[]): ITable => {
             actions: [
                 {
                     toolTip: plan.isActive ? 'Deactivate Plan' : 'Activate Plan',
-                    icon: plan.isActive ? 'visibility_off' : 'visibility',
-                    styles: plan.isActive ? 'text-yellow-500' : 'text-green-500',
+                    icon: plan.isActive ? 'fas fa-circle-check' : 'fas fa-circle-xmark',
+                    styles: plan.isActive ? 'text-green-500' : 'text-red-400',
                     action: 'toggle',
                 },
                 {
-                    toolTip: 'Edit Plan',
-                    icon: 'edit',
+                    toolTip: 'View Plan',
+                    icon: 'fas fa-eye',
                     styles: 'text-blue-600',
-                    action: 'edit',
+                    action: 'view',
                 },
-                {
-                    toolTip: 'Delete Plan',
-                    icon: 'delete',
-                    styles: 'text-red-600',
-                    action: 'delete',
-                }
             ]
         }))
     };

@@ -1,0 +1,53 @@
+<!-- Plan Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl relative">
+        <h2 class="text-xl font-semibold mb-6">Plan Detail</h2>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block font-medium mb-1">Plan Name</label>
+                <p class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
+                    {{ plan.name}}
+                </p>
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1">Price</label>
+                <p class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
+                    {{ plan.price }}
+                </p>
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1">Role</label>
+                <p class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
+                    {{ plan.role}}
+                </p>
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1">Duration</label>
+                <p class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
+                    {{ plan.duration }}
+                </p>
+            </div>
+
+            <div>
+                <label class="block font-medium mb-2">Features</label>
+                <ul class="list-disc list-inside space-y-1">
+                    <li *ngFor="let feature of plan.features">
+                        {{ feature}}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-6 text-right">
+            <button type="button" (click)="closeModal()"
+                class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2 rounded-lg transition cursor-pointer">
+                Close
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,7 +1,6 @@
 import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from "@angular/core";
-import { ITable, ITableAction, ITableRow } from "../../../../../../core/models/table.model";
-import { IPagination } from "../../../../../../core/models/booking.model";
-import { BehaviorSubject, filter, map, Observable, Subject, takeUntil } from "rxjs";
+import { ITableRow } from "../../../../../../core/models/table.model";
+import { filter, map, Subject, takeUntil } from "rxjs";
 import { CommonModule } from "@angular/common";
 import { PlanService } from "../../../../../../core/services/plans.service";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
@@ -22,7 +21,7 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
     private _dialog = inject(MatDialog);
 
     @Output() createPlanEvent = new EventEmitter<string>();
-    @Output() editPlanEvent = new EventEmitter<any>();
+    @Output() viewPlanEvent = new EventEmitter();
 
     private _destroy$ = new Subject<void>();
 
@@ -59,22 +58,16 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
             actions: [
                 {
                     toolTip: plan.isActive ? 'Deactivate Plan' : 'Activate Plan',
-                    icon: plan.isActive ? 'visibility_off' : 'visibility',
-                    styles: plan.isActive ? 'text-yellow-500' : 'text-green-500',
+                    icon: plan.isActive ? 'fas fa-circle-check' : 'fas fa-circle-xmark',
+                    styles: plan.isActive ? 'text-green-500' : 'text-red-400',
                     action: 'toggle',
                 },
                 {
-                    toolTip: 'Edit Plan',
-                    icon: 'edit',
+                    toolTip: 'View Plan',
+                    icon: 'fas fa-eye',
                     styles: 'text-blue-600',
-                    action: 'edit',
+                    action: 'view',
                 },
-                {
-                    toolTip: 'Delete Plan',
-                    icon: 'delete',
-                    styles: 'text-red-600',
-                    action: 'delete',
-                }
             ]
         };
     }
@@ -110,28 +103,6 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
         });
     }
 
-    private _deletePlan(planId: string) {
-        this._planService.deletePlan(planId).subscribe({
-            next: (res) => {
-                if (res.success) {
-                    const currentTable = this._planService.getTableData;
-                    const updatedRows = currentTable.rows.filter(r => r['id'] !== planId);
-                    this._planService.setTableData = {
-                        ...currentTable,
-                        rows: updatedRows
-                    };
-                    this._toastr.success(res.message);
-                } else {
-                    this._toastr.error(res.message);
-                }
-            },
-            error: (err) => {
-                console.error(err);
-                this._toastr.error('Server error while deleting plan');
-            }
-        });
-    }
-
     public updateOrInsertRow(plan: IPlan) {
         const currentTable = this._planService.getTableData;
         const newRow = this._mapPlanToRow(plan);
@@ -150,14 +121,15 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
         };
     }
 
-    createPlans() {
-        this.createPlanEvent.emit('create plan button clicked!');
-    }
-
     adminTableActionTriggered(event: { action: string; row: any }) {
         let action = event.action;
         if (action === 'toggle') {
             action = event.row.status ? 'inactivate' : 'activate';
+        }
+
+        if (action === 'view') {
+            this.viewPlanEvent.emit(event.row.id);
+            return;
         }
 
         this._openConfirmationDialog(`Are you sure you want to ${action} the plan?`, 'Confirm Action')
@@ -169,15 +141,10 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
                     case 'toggle':
                         this._togglePlanStatus(event.row);
                         break;
-                    case 'edit':
-                        this.editPlanEvent.emit(event.row.id);
-                        break;
-                    case 'delete':
-                        this._deletePlan(event.row.id);
+                    case 'view':
+                        this.viewPlanEvent.emit(event.row.id);
                         break;
                 }
             });
     }
-
-    onPageChange(page: number) { }
 }
