@@ -6,7 +6,7 @@ import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { ProviderSidebarComponent } from '../../../shared/partials/sections/provider/sidebar/provider-sidebar.component';
 import { ProviderHeaderComponent } from "../../../shared/partials/sections/provider/header/provider-header.component";
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
-import { selectCheckStatus, selectShowSubscriptionPage } from '../../../../store/auth/auth.selector';
+import { selectCheckStatus } from '../../../../store/auth/auth.selector';
 import { PaymentService } from '../../../../core/services/payment.service';
 import { RazorpayWrapperService } from '../../../../core/services/public/razorpay-wrapper.service';
 

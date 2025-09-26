@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
-import { IVerifiedPayment, RazorpayOrder, RazorpayPaymentResponse } from "../models/payment.model";
+import { IBookingPaymentVerification, ISubscriptionOrder, ISubscriptionPaymentVerification, IVerifiedPayment, RazorpayOrder, RazorpayPaymentResponse } from "../models/payment.model";
 import { UType } from "../models/user.model";
 
 @Injectable()
@@ -38,7 +38,11 @@ export class PaymentService {
         return this._http.post<RazorpayOrder>(`${this._apiUrl}/create_order`, { amount });
     }
 
-    verifyPaymentSignature(verifyData: RazorpayPaymentResponse, orderData: RazorpayOrder ): Observable<IVerifiedPayment> {
-        return this._http.post<IVerifiedPayment>(`${this._apiUrl}/verify_signature`, { verifyData, orderData });
+    verifyBookingPayment(verifyData: RazorpayPaymentResponse, orderData: RazorpayOrder): Observable<IBookingPaymentVerification> {
+        return this._http.post<IBookingPaymentVerification>(`${this._apiUrl}/verify_booking`, { verifyData, orderData });
+    }
+
+    verifySubscriptionPayment(verifyData: RazorpayPaymentResponse, orderData: ISubscriptionOrder): Observable<ISubscriptionPaymentVerification> {
+        return this._http.post<ISubscriptionPaymentVerification>(`${this._apiUrl}/verify_subscription`, { verifyData, orderData });
     }
 }

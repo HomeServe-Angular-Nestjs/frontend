@@ -9,7 +9,7 @@ import { BookingService } from '../../../../../../core/services/booking.service'
 import { IAddress } from '../../../../../../core/models/schedules.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { PaymentService } from '../../../../../../core/services/payment.service';
-import { RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
+import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
 import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
 import { ITransaction } from '../../../../../../core/models/transaction.model';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
@@ -132,7 +132,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
   }
 
   private _verifyPaymentAndConfirmBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {
-    const orderData: RazorpayOrder = {
+    const orderData: IBookingOrder = {
       id: order.id,
       bookingId,
       transactionType: TransactionType.BOOKING,
@@ -143,7 +143,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
       receipt: order.receipt,
     };
 
-    return this._paymentService.verifyPaymentSignature(response, orderData).pipe(
+    return this._paymentService.verifyBookingPayment(response, orderData).pipe(
       switchMap((verificationResponse) => {
         const { verified, bookingId, transaction } = verificationResponse;
 
@@ -238,6 +238,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
         if (!bookingResponse?.data?.id) {
           return throwError(() => new Error('Failed to confirm booking.'));
         }
+        
         return this._paymentService.createRazorpayOrder(totalAmount).pipe(
           map(order => ({ order, bookingId: bookingResponse.data.id }))
         );

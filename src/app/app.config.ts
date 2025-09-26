@@ -15,7 +15,6 @@ import { offeredServiceFeature } from './store/offered-services/offeredServices.
 import { providerFeature } from './store/provider/provider.feature';
 import { scheduleFeature } from './store/schedules/schedule.feature';
 import { customerFeature } from './store/customer/customer.feature';
-import { subscriptionFeature } from './store/subscriptions/subscription.features';
 import { chatFeature } from './store/chat/chat.feature';
 
 import { authEffects } from './store/auth/auth.effects';
@@ -27,7 +26,6 @@ import { customerEffects } from './store/customer/customer.effects';
 import { ToastrModule } from 'ngx-toastr';
 import { chatEffects } from './store/chat/chats.effect';
 import { metaReducers } from './store/auth/meta.reducer';
-import { subscriptionEffects } from './store/subscriptions/subscription.effects';
 import { ErrorHandlerService } from './core/services/public/error-handler.service';
 import { notificationFeature } from './store/notification/notification.feature';
 import { notificationEffects } from './store/notification/notification.effects';
@@ -63,12 +61,10 @@ export const appConfig: ApplicationConfig = {
       [scheduleFeature.name]: scheduleFeature.reducer,
       [customerFeature.name]: customerFeature.reducer,
       [chatFeature.name]: chatFeature.reducer,
-      [subscriptionFeature.name]: subscriptionFeature.reducer,
       [notificationFeature.name]: notificationFeature.reducer,
     }, { metaReducers }),
     provideEffects(
       offeredServiceEffects,
-      subscriptionEffects,
       notificationEffects,
       scheduleEffects,
       customerEffects,

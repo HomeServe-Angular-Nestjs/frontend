@@ -1,9 +1,8 @@
-import { EntityState } from "@ngrx/entity";
 import { PlanRoleType } from "./plan.model";
+import { PaymentStatus } from "../enums/enums";
 
 export type RenewalType = 'auto' | 'manual';
 export type SubsDurationType = 'monthly' | 'yearly';
-export type SubsPaymentStatus = 'pending' | 'paid' | 'failed';
 
 export interface ISubscription {
     id: string;
@@ -22,19 +21,19 @@ export interface ISubscription {
     isDeleted: boolean;
 
     renewalType?: RenewalType;
-    paymentStatus?: SubsPaymentStatus;
+    paymentStatus?: PaymentStatus;
     cancelledAt?: string;
     metadata?: Record<string, any>;
 }
 
 export interface ICreateSubscription {
     planId: string;
-    transactionId: string;
+    transactionId: string | null;
     name: string;
     duration: SubsDurationType;
     role: PlanRoleType;
     features: string[];
-    paymentStatus?: SubsPaymentStatus;
+    paymentStatus?: PaymentStatus;
     startTime: string;
     endDate: string | null;
     price: number;
@@ -51,4 +50,10 @@ export interface IAdminDashboardSubscription {
     totalPremium: number;
     monthlyPremium: number;
     yearlyPremium: number;
+}
+
+export interface IUpdateSubscriptionPaymentStatus {
+    transactionId: string;
+    paymentStatus: PaymentStatus;
+    subscriptionId: string;
 }

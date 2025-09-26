@@ -3,7 +3,7 @@ import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from "@ang
 import { Store } from "@ngrx/store";
 import { Router } from "@angular/router";
 import { selectAuthUserType } from "../../../../store/auth/auth.selector";
-import { combineLatest, filter, map, Observable, of, pairwise, shareReplay, Subject, switchMap, takeUntil } from "rxjs";
+import { combineLatest, filter, map, Observable, of, pairwise, shareReplay, Subject, switchMap, takeUntil, tap, throwError } from "rxjs";
 import { IPlan } from "../../../../core/models/plan.model";
 import { PlanService } from "../../../../core/services/plans.service";
 import { CapitalizeFirstPipe } from "../../../../core/pipes/capitalize-first.pipe";
@@ -11,14 +11,10 @@ import { PaymentService } from "../../../../core/services/payment.service";
 import { RazorpayWrapperService } from "../../../../core/services/public/razorpay-wrapper.service";
 import { ToastNotificationService } from "../../../../core/services/public/toastr.service";
 import { SubscriptionService } from "../../../../core/services/subscription.service";
-import { RazorpayOrder, RazorpayPaymentResponse } from "../../../../core/models/payment.model";
-import { ITransaction } from "../../../../core/models/transaction.model";
+import { ISubscriptionOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../core/models/payment.model";
 import { ICreateSubscription, ISubscription } from "../../../../core/models/subscription.model";
-import { PaymentDirection, PaymentSource, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
+import { PaymentDirection, PaymentSource, PaymentStatus, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
 import { getStartTimeAndEndTime } from "../../../../core/utils/date.util";
-import { subscriptionAction } from "../../../../store/subscriptions/subscription.action";
-import { authActions } from "../../../../store/auth/auth.actions";
-import { selectSelectedSubscription } from "../../../../store/subscriptions/subscription.selector";
 import { SharedDataService } from "../../../../core/services/public/shared-data.service";
 
 @Component({
@@ -50,22 +46,29 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Plans');
 
-        this._store.dispatch(subscriptionAction.fetchSubscriptions());
+        this.currentSubscription$ = this._subscriptionService.fetchSubscription().pipe(
+            map(res => res.data ?? null),
+            shareReplay(1)
+        );
+
+        const allPlans$ = this._planService.fetchPlans().pipe(
+            map(res => res.data ?? []),
+            shareReplay(1)
+        );
+
         const userType$ = this._store.select(selectAuthUserType);
-        const allPlans$ = this._planService.fetchPlans();
-        this.currentSubscription$ = this._store.select(selectSelectedSubscription);
 
         this.plans$ = combineLatest([userType$, allPlans$, this.currentSubscription$]).pipe(
-            map(([userType, planResponse, subscription]) => {
+            takeUntil(this._destroy$),
+            map(([userType, plans, subscription]) => {
                 this.userType = userType ?? 'customer';
                 this.currentPlanId = subscription?.planId ?? null;
                 this.currentPlanDuration = subscription?.duration ?? '';
 
-                return (planResponse.data || []).filter(plan => {
-                    const matchedUser = plan.role.toLowerCase() === this.userType.toLowerCase();
-                    const isSubscriptionAlreadyExist = !!this.currentPlanId && plan.duration.toLowerCase() === PlanDuration.LIFETIME;
-
-                    return matchedUser && !isSubscriptionAlreadyExist;
+                return plans.filter(plan => {
+                    const isRoleMatched = plan.role.toLowerCase() === this.userType.toLowerCase();
+                    const isLifetimeConflict = !!this.currentPlanId && plan.duration.toLowerCase() === PlanDuration.LIFETIME;
+                    return isRoleMatched && !isLifetimeConflict;
                 });
             }),
             shareReplay(1)
@@ -84,109 +87,106 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     }
 
     private _initializePayment(plan: IPlan) {
-        this._paymentService.createRazorpayOrder(Number(plan.price)).subscribe({
-            next: (order: RazorpayOrder) => {
-                this._razorpayWrapper.openCheckout(order,
-                    (paymentResponse: RazorpayPaymentResponse) => this._verifyPaymentAndConfirmSubscription(paymentResponse, order, plan),
-                    () => this._toastr.warning('payment dismissed')
-                );
-            },
-            error: (err) => {
-                console.error(err);
-            }
-        });
-    }
-
-    private _verifyPaymentAndConfirmSubscription(response: RazorpayPaymentResponse, order: RazorpayOrder, plan: IPlan, isUpgrade: boolean = false) {
-        const orderData: RazorpayOrder = {
-            id: order.id,
-            bookingId:'ajd',
-            transactionType: TransactionType.SUBSCRIPTION,
-            amount: order.amount,
-            status: order.status,
-            direction: PaymentDirection.DEBIT,
-            source: PaymentSource.RAZORPAY,
-            receipt: order.receipt,
-        };
-
-        this._paymentService.verifyPaymentSignature(response, orderData).subscribe({
-            next: (response) => {
-                if (response.verified && response.transaction.id) {
-                    this._saveSubscription(response.transaction, plan, isUpgrade);
-                } else {
-                    this._toastr.error('Payment verification failed');
-                }
-            },
-            error: (err) => {
-                console.error(err);
-                this._toastr.error('Server verification failed.')
-            }
-        });
-    }
-
-    private _saveSubscription(transactionData: ITransaction, plan: IPlan, isUpgrade: boolean) {
         const subscriptionData: ICreateSubscription = {
             planId: plan.id,
-            transactionId: transactionData.id,
+            transactionId: null,
             name: plan.name,
             duration: plan.duration !== PlanDuration.LIFETIME ? plan.duration : PlanDuration.MONTHLY,
             role: plan.role,
             features: plan.features,
             price: plan.price,
-            paymentStatus: 'paid',
+            paymentStatus: PaymentStatus.UNPAID,
             ...getStartTimeAndEndTime(plan.duration),
         };
 
-        if (isUpgrade) {
-            this._subscriptionService.upgradeSubscription(subscriptionData).subscribe({
-                next: (response) => {
-                    if (response.success && response.data) {
-                        this._afterSuccessfulSubscription(response.data);
-                    } else {
-                        this._store.dispatch(subscriptionAction.subscriptionFailedAction({ error: response.message }));
-                    }
-                },
-                error: (err) => {
-                    console.error(err);
-                }
-            });
-        } else {
-            this._subscriptionService.createSubscription(subscriptionData).subscribe({
-                next: (response) => {
-                    if (response.success && response.data) {
-                        this._afterSuccessfulSubscription(response.data);
-                    } else {
-                        this._store.dispatch(subscriptionAction.subscriptionFailedAction({ error: response.message }));
-                    }
-                },
-                error: (err) => {
-                    console.error(err);
-                }
-            });
-        }
+        this._subscriptionService.createSubscription(subscriptionData).pipe(
+            takeUntil(this._destroy$),
+            switchMap((subscriptionResponse) => {
+                const sub = subscriptionResponse?.data;
+                if (!sub?.id) throw new Error('Failed to confirm subscription.');
+
+                return this._paymentService.createRazorpayOrder(Number(plan.price))
+                    .pipe(map(order => ({ order, subscriptionId: sub.id }))
+                    );
+            }),
+            switchMap(({ order, subscriptionId }) =>
+                new Observable<void>((observer) => {
+                    this._razorpayWrapper.openCheckout(
+                        order,
+                        (paymentResponse: RazorpayPaymentResponse) => {
+                            this._verifyPaymentAndConfirmSubscription(paymentResponse, order, subscriptionId)
+                                .pipe(takeUntil(this._destroy$))
+                                .subscribe({
+                                    next: () => observer.next(),
+                                    error: (err) => observer.error(err),
+                                    complete: () => observer.complete()
+                                });
+                        },
+                        () => {
+                            this._toastr.warning('payment dismissed')
+                            observer.complete();
+                        }
+                    );
+                })
+            )
+        ).subscribe({
+            error: (err) => {
+                console.error(err);
+                this._toastr.error(err.message || err);
+            }
+        });
     }
 
-    private _afterSuccessfulSubscription(newSubscription: ISubscription) {
-        this._store.dispatch(subscriptionAction.subscriptionSuccessAction({ selectedSubscription: newSubscription }));
+    private _verifyPaymentAndConfirmSubscription(response: RazorpayPaymentResponse, order: RazorpayOrder, subscriptionId: string, isUpgrade: boolean = false) {
+        const orderData: ISubscriptionOrder = {
+            id: order.id,
+            subscriptionId,
+            transactionType: TransactionType.SUBSCRIPTION,
+            amount: order.amount,
+            status: TransactionStatus.SUCCESS,
+            direction: PaymentDirection.DEBIT,
+            source: PaymentSource.RAZORPAY,
+            receipt: order.receipt,
+        };
+
+        return this._paymentService.verifySubscriptionPayment(response, orderData).pipe(
+            switchMap((verificationResponse) => {
+                const { verified, subscriptionId, transaction } = verificationResponse;
+
+                if (!transaction || !subscriptionId || !transaction.id || !verified) {
+                    this._toastr.error('Payment verification failed or transaction missing.');
+                    return throwError(() => new Error('Payment verification failed'));
+                }
+                return this._subscriptionService.updatePaymentStatus({
+                    transactionId: transaction.id,
+                    subscriptionId,
+                    paymentStatus: PaymentStatus.PAID
+                });
+            }),
+            tap(() => this._afterSuccessfulSubscription())
+        );
+    }
+
+    private _afterSuccessfulSubscription() {
+        this._toastr.success('Payment verified. Subscription completed.');
         this._router.navigate(['/provider/subscriptions']);
     }
 
     private _initializeUpgrade(amount: number, plan: IPlan) {
-        this._paymentService.createRazorpayOrder(amount).subscribe({
-            next: (order) => {
-                this._razorpayWrapper.openCheckout(order,
-                    (paymentResponse: RazorpayPaymentResponse) => this._verifyPaymentAndConfirmSubscription(paymentResponse, order, plan,),
-                    () => this._toastr.warning('payment dismissed')
-                );
-            },
-            error: (err) => {
-                console.error(err);
-            }
-        })
+        // this._paymentService.createRazorpayOrder(amount).subscribe({
+        //     next: (order) => {
+        //         this._razorpayWrapper.openCheckout(order,
+        //             (paymentResponse: RazorpayPaymentResponse) => this._verifyPaymentAndConfirmSubscription(paymentResponse, order, plan,),
+        //             () => this._toastr.warning('payment dismissed')
+        //         );
+        //     },
+        //     error: (err) => {
+        //         console.error(err);
+        //     }
+        // })
     }
 
     private _handleFreePlan() {
-        this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value: false }));
         this._router.navigate(['provider', 'dashboard']);
     }
 
@@ -208,7 +208,6 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
         const isUpgrade = this.currentPlanDuration === PlanDuration.MONTHLY;
 
         if (isUpgrade) {
-            console.log('yoo');
             this._handleUpgrade(plan);
         } else {
             this._initializePayment(plan);
@@ -234,8 +233,6 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     }
 
     goBack() {
-        this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value: false }));
-
         if (this.previousPage === 'Subscription') {
             this._router.navigate(['/provider/subscriptions']);
         } else {

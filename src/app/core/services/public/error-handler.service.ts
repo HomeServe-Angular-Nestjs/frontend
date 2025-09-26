@@ -12,7 +12,13 @@ export class ErrorHandlerService {
                 return backendMessage || 'Unauthorized access. Please log in again.';
 
             case 403:
-                return backendMessage || 'Forbidden. You do not have permission.';
+                switch (errorCode) {
+                    case ErrorCodes.NO_ACTIVE_SUBSCRIPTION:
+
+                        return backendMessage || 'Forbidden. You do not have permission.';
+                    default:
+                        return backendMessage || 'Forbidden. You do not have permission.';
+                }
 
             case 404:
                 return backendMessage || 'Resource not found.';

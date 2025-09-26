@@ -3,10 +3,8 @@ import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { ISubscription } from "../../../../core/models/subscription.model";
 import { Store } from "@ngrx/store";
 import { combineLatest, Observable, Subject, takeUntil } from "rxjs";
-import { selectAuthUserType, selectShowSubscriptionPage } from "../../../../store/auth/auth.selector";
-import { selectSelectedSubscription } from "../../../../store/subscriptions/subscription.selector";
+import { selectAuthUserType} from "../../../../store/auth/auth.selector";
 import { CapitalizeFirstPipe } from "../../../../core/pipes/capitalize-first.pipe";
-import { subscriptionAction } from "../../../../store/subscriptions/subscription.action";
 import { Router, RouterLink } from "@angular/router";
 import { SharedDataService } from "../../../../core/services/public/shared-data.service";
 
@@ -28,9 +26,9 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Subscription');
 
-        this._store.dispatch(subscriptionAction.fetchSubscriptions());
-        this.subscription$ = this._store.select(selectSelectedSubscription).pipe(takeUntil(this._destroy$));
-        const isSubscriptionPageRendered$ = this._store.select(selectShowSubscriptionPage).pipe(takeUntil(this._destroy$));
+        // this._store.dispatch(subscriptionAction.fetchSubscriptions());
+        // this.subscription$ = this._store.select(selectSelectedSubscription).pipe(takeUntil(this._destroy$));
+        // const isSubscriptionPageRendered$ = this._store.select(selectShowSubscriptionPage).pipe(takeUntil(this._destroy$));
 
         this._store.select(selectAuthUserType).pipe(
             takeUntil(this._destroy$)
@@ -38,9 +36,9 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
             if (type) this.userType = type;
         });
 
-        combineLatest([this.subscription$, isSubscriptionPageRendered$]).subscribe(([subscription]) => {
-            if (!subscription) this._router.navigate(['/provider/plans']);
-        });
+        // combineLatest([this.subscription$, isSubscriptionPageRendered$]).subscribe(([subscription]) => {
+        //     if (!subscription) this._router.navigate(['/provider/plans']);
+        // });
     }
 
     ngOnDestroy(): void {

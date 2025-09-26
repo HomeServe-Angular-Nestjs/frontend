@@ -4,10 +4,9 @@ import { RouterOutlet } from '@angular/router';
 import { CustomerHeaderComponent } from '../../../shared/partials/sections/customer/header/header.component';
 import { CustomerFooterComponent } from "../../../shared/partials/sections/customer/footer/customer-footer.component";
 import { distinctUntilChanged, filter, map, Subject, takeUntil } from 'rxjs';
-import { selectCheckStatus, selectShowSubscriptionPage } from '../../../../store/auth/auth.selector';
+import { selectCheckStatus,  } from '../../../../store/auth/auth.selector';
 import { Store } from '@ngrx/store';
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
-import { authActions } from '../../../../store/auth/auth.actions';
 import { VideoCallSocketService } from '../../../../core/services/socket-service/video-socket.service';
 import { NotificationSocketService } from '../../../../core/services/socket-service/notification.service';
 import { selectCustomer } from '../../../../store/customer/customer.selector';
@@ -28,7 +27,7 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  showSubscriptionPage$ = this._store.select(selectShowSubscriptionPage);
+  // showSubscriptionPage$ = this._store.select(selectShowSubscriptionPage);
 
   ngOnInit(): void {
     const authStatus$ = this._store.select(selectCheckStatus).pipe(
@@ -101,6 +100,6 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
   }
 
   proceedWithSub() {
-    this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value: false }));
+    // this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value: false }));
   }
 }
