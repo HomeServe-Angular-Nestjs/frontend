@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { combineLatest, finalize, map, Observable, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
-import { IBooking, IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
+import { IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { IAddress } from '../../../../../../core/models/schedules.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
@@ -17,7 +17,6 @@ import { PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, Tran
 import { customerActions } from '../../../../../../store/customer/customer.actions';
 import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
-import { IResponse } from '../../../../models/response.model';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
@@ -160,10 +159,9 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
       }),
       tap(() => {
         this._toastr.success('Booking confirmed and payment successful!');
-        localStorage.removeItem('selectedServiceData'); //!TODO move to a storage service
         this._router.navigate(['profile', 'bookings']);
       }),
-      finalize(() => this._paymentService.setOngoingPayment(false))
+      finalize(() => this._paymentService.unlockPayment())
     );
   }
 
@@ -194,13 +192,13 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
     );
   }
 
-
   initiatePayment() {
-    if (this._paymentService.checkOngoingPayments()) {
+    if (this._paymentService.isPaymentInProgress()) {
       this._toastr.warning('You already have an ongoing payment!');
       return;
     }
-    // this._paymentService.setOngoingPayment(true);
+
+    this._paymentService.lockPayment();
 
     this.isProcessing = true;
 
@@ -238,7 +236,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
         if (!bookingResponse?.data?.id) {
           return throwError(() => new Error('Failed to confirm booking.'));
         }
-        
+
         return this._paymentService.createRazorpayOrder(totalAmount).pipe(
           map(order => ({ order, bookingId: bookingResponse.data.id }))
         );
@@ -251,23 +249,33 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
               this._verifyPaymentAndConfirmBooking(paymentResponse, order, bookingId)
                 .pipe(takeUntil(this._destroy$))
                 .subscribe({
-                  next: () => observer.next(),
-                  error: (err) => observer.error(err),
-                  complete: () => observer.complete()
+                  next: () => {
+                    this._paymentService.unlockPayment()
+                    observer.next();
+                    observer.complete()
+                  },
+                  error: (err) => {
+                    this._paymentService.unlockPayment()
+                    observer.error(err)
+                  },
                 });
             },
             () => {
-              this._paymentService.setOngoingPayment(false);
+              this._paymentService.unlockPayment();
               observer.complete();
             }
           );
         })
       )
     ).subscribe({
+      next: () => {
+        this._paymentService.unlockPayment();
+      },
       error: (err) => {
         console.error(err);
         this._toastr.error(err.message || err);
         this.isProcessing = false;
+        this._paymentService.unlockPayment();
       }
     });
   }

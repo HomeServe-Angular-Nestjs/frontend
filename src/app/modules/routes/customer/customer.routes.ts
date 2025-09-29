@@ -134,4 +134,10 @@ export const customerRoutes: Routes = [
             .then(c => c.ProviderSubscriptionPlansPage),
         canActivate: [AuthGuard]
     },
+    {
+        path: 'subscription',
+        loadComponent: () => import('../../pages/subscription/view-subscription/subscription-view.component')
+            .then(c => c.ProviderViewSubscriptionPage),
+        canActivate: [AuthGuard]
+    },
 ]

@@ -5,18 +5,19 @@ import { Store } from "@ngrx/store";
 import { map, Observable, Subject, takeUntil } from "rxjs";
 import { selectAuthUserType } from "../../../../store/auth/auth.selector";
 import { CapitalizeFirstPipe } from "../../../../core/pipes/capitalize-first.pipe";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { SharedDataService } from "../../../../core/services/public/shared-data.service";
 import { SubscriptionService } from "../../../../core/services/subscription.service";
 
 @Component({
     selector: 'app-subscription-view-page',
     templateUrl: './subscription-view.component.html',
-    imports: [CommonModule, CapitalizeFirstPipe, RouterLink]
+    imports: [CommonModule, CapitalizeFirstPipe]
 })
 export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
     private readonly _subscriptionService = inject(SubscriptionService);
     private readonly _sharedService = inject(SharedDataService);
+    private readonly _router = inject(Router);
     private readonly _store = inject(Store);
 
     private _destroy$ = new Subject<void>();
@@ -42,5 +43,12 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this._destroy$.next();
         this._destroy$.complete();
+    }
+
+    navigateToPlans() {
+        let url = this.userType === 'customer'
+            ? 'plans'
+            : 'provider/plans'
+        this._router.navigate([url]);
     }
 }

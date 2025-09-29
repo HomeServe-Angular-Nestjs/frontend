@@ -21,17 +21,17 @@ import { SharedDataService } from "../../../../core/services/public/shared-data.
     selector: 'app-subscription-plan-page',
     templateUrl: './subscription-plan.component.html',
     imports: [CommonModule, CapitalizeFirstPipe],
-    providers: [PaymentService,RazorpayWrapperService]
+    providers: [PaymentService, RazorpayWrapperService]
 })
 export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     private readonly _store = inject(Store);
     private readonly _router = inject(Router);
     private readonly _planService = inject(PlanService);
-    private readonly _paymentService = inject(PaymentService);
     private readonly _sharedService = inject(SharedDataService);
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _razorpayWrapper = inject(RazorpayWrapperService);
     private readonly _subscriptionService = inject(SubscriptionService);
+    readonly _paymentService = inject(PaymentService);
 
     private _destroy$ = new Subject<void>();
 
@@ -115,28 +115,43 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
                     transactionId: transaction.id,
                     subscriptionId,
                     paymentStatus: PaymentStatus.PAID
-                });
-            }));
+                })
+            }),
+            map(() => void 0)
+        );
     }
 
-    private _openRazorPayCheckout(order: RazorpayOrder, subscriptionId: string): Observable<void> {
-        return new Observable<void>(observer => {
+    private _openRazorPayCheckout(order: RazorpayOrder, subscriptionId: string): Observable<'success' | 'dismissed'> {
+        return new Observable<'success' | 'dismissed'>(observer => {
             this._razorpayWrapper.openCheckout(
                 order,
                 (paymentResponse: RazorpayPaymentResponse) => {
                     this._verifyPaymentAndConfirmSubscription(paymentResponse, order, subscriptionId)
                         .subscribe({
                             next: () => {
-                                observer.next();
+                                this._paymentService.unlockPayment()
+                                observer.next('success');
                                 observer.complete();
                             },
-                            error: (err) => observer.error(err)
+                            error: (err) => {
+                                this._paymentService.unlockPayment()
+                                observer.error(err)
+                            }
                         });
                 },
                 () => {
-                    this._toastr.warning('Payment dismissed');
-                    observer.complete();
-                    // !toto- remove subscription doc when payment failed.
+                    this._subscriptionService.removeSubscription(subscriptionId)
+                        .pipe(
+                            catchError(err => {
+                                console.error('Failed to remove subscription after dismissal', err);
+                                return of(null);
+                            })
+                        )
+                        .subscribe(() => {
+                            this._paymentService.unlockPayment()
+                            observer.next('dismissed');
+                            observer.complete();
+                        })
                 }
             )
         });
@@ -144,7 +159,10 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
     private _afterSuccessfulSubscription() {
         this._toastr.success('Payment verified. Subscription completed.');
-        this._router.navigate(['/provider/subscriptions']);
+        let url = this.userType == 'customer'
+            ? '/subscriptions'
+            : '/provider/subscriptions'
+        this._router.navigate([url]);
     }
 
     private _initializePayment(plan: IPlan) {
@@ -230,20 +248,36 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     }
 
     proceedSub(plan: IPlan): void {
+        if (this._paymentService.isPaymentInProgress()) {
+            this._toastr.error('Another payment is already in progress. Please wait.');
+            return;
+        }
+
         if (plan.duration === PlanDuration.LIFETIME) {
             this._handleFreePlan();
             return;
         }
 
         const isUpgrade = this.currentPlanDuration === PlanDuration.MONTHLY;
+        if (isUpgrade) {
+            this._toastr.warning('You are already in subscription. wait for it to expire.')
+            return;
+        };
 
-        const flow$ = isUpgrade
-            ? this._handleUpgrade(plan)
-            : this._initializePayment(plan);
+        const flow$ = this._initializePayment(plan);
 
-        flow$.subscribe({
-            next: () => this._afterSuccessfulSubscription(),
-            error: (err) => this._toastr.error(err.message || 'Subscription failed'),
+        this._paymentService.lockPayment();
+
+        flow$.pipe(takeUntil(this._destroy$)).subscribe({
+            next: (status) => {
+                if (status === "success") {
+                    this._afterSuccessfulSubscription();
+                } else if (status === "dismissed") {
+                    this._toastr.info('Payment dismissed.');
+                }
+                this._paymentService.unlockPayment()
+            },
+            error: () => this._paymentService.unlockPayment(),
         });
     }
 

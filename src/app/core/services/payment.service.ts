@@ -1,37 +1,39 @@
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { inject, Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { inject, Injectable, signal } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
-import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
+import { Observable } from "rxjs";
 import { IBookingPaymentVerification, ISubscriptionOrder, ISubscriptionPaymentVerification, IVerifiedPayment, RazorpayOrder, RazorpayPaymentResponse } from "../models/payment.model";
-import { UType } from "../models/user.model";
+
+const PAYMENT_LOCK_KEY = 'payment_in_progress';
 
 @Injectable()
 export class PaymentService {
     private _http = inject(HttpClient);
     private _apiUrl = API_ENV.payment;
 
-    private readonly _ongoingPayment$ = new BehaviorSubject<boolean>(this._loadInitialStatus());
+    private _paymentInProgress = signal(false);
+    readonly isPaymentInProgress = this._paymentInProgress.asReadonly();
 
-    get ongoingPayment$() {
-        return this._ongoingPayment$.asObservable();
+    constructor() {
+        window.addEventListener('storage', (event) => {
+            if (event.key === PAYMENT_LOCK_KEY) {
+                this._paymentInProgress.set(event.newValue === 'true')
+            }
+        });
     }
 
-    private _loadInitialStatus(): boolean {
-        try {
-            const status = localStorage.getItem('paymentStatus');
-            return status ? JSON.parse(status) === true : false;
-        } catch {
-            return false;
-        }
+    private _getFromStorage(): boolean {
+        return localStorage.getItem(PAYMENT_LOCK_KEY) === 'true';
     }
 
-    setOngoingPayment(status: boolean) {
-        localStorage.setItem('paymentStatus', JSON.stringify(status));
-        this._ongoingPayment$.next(status);
+    lockPayment(): void {
+        localStorage.setItem(PAYMENT_LOCK_KEY, 'true');
+        this._paymentInProgress.set(true);
     }
 
-    checkOngoingPayments(): boolean {
-        return this._ongoingPayment$.getValue();
+    unlockPayment(): void {
+        localStorage.setItem(PAYMENT_LOCK_KEY, 'false');
+        this._paymentInProgress.set(false);
     }
 
     createRazorpayOrder(amount: number): Observable<RazorpayOrder> {

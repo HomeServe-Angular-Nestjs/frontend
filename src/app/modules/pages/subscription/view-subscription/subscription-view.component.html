@@ -68,13 +68,13 @@
 
                 <!-- Actions -->
                 <div class="flex flex-col justify-start gap-3 sm:items-end">
-                    <a [routerLink]="['/provider/plans']"
+                    <button (click)="navigateToPlans()"
                         class="text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition" [ngClass]="{
                             'bg-blue-600 hover:bg-blue-700': userType === 'customer',
                             'bg-green-600 hover:bg-green-700': userType === 'provider'
                         }">
                         Upgrade Plan
-                    </a>
+                    </button>
                 </div>
             </div>
         </section> 

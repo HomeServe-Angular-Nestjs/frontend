@@ -21,7 +21,7 @@ export class SubscriptionService {
     }
 
     upgradeSubscription(data: ICreateSubscription): Observable<IResponse<ISubscription>> {
-        return this._http.post<IResponse<ISubscription>>(`${this._apiUrl}/upgrade`, data );
+        return this._http.post<IResponse<ISubscription>>(`${this._apiUrl}/upgrade`, data);
     }
 
     fetchSubscription(): Observable<IResponse<ISubscription | null>> {
@@ -30,5 +30,9 @@ export class SubscriptionService {
 
     updatePaymentStatus(data: IUpdateSubscriptionPaymentStatus): Observable<IResponse> {
         return this._http.patch<IResponse<boolean>>(`${this._apiUrl}/payment_status`, data);
+    }
+
+    removeSubscription(subscriptionId: string): Observable<IResponse> {
+        return this._http.delete<IResponse>(`${this._apiUrl}/${subscriptionId}`);
     }
 }
