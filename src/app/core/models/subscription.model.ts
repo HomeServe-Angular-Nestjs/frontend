@@ -1,8 +1,7 @@
 import { PlanRoleType } from "./plan.model";
-import { PaymentStatus } from "../enums/enums";
+import { PaymentStatus, PlanDuration } from "../enums/enums";
 
 export type RenewalType = 'auto' | 'manual';
-export type SubsDurationType = 'monthly' | 'yearly';
 
 export interface ISubscription {
     id: string;
@@ -11,7 +10,7 @@ export interface ISubscription {
     planId: string;
 
     name: string;
-    duration: SubsDurationType;
+    duration: PlanDuration;
     role: PlanRoleType;
     features: string[];
 
@@ -30,7 +29,7 @@ export interface ICreateSubscription {
     planId: string;
     transactionId: string | null;
     name: string;
-    duration: SubsDurationType;
+    duration: PlanDuration;
     role: PlanRoleType;
     features: string[];
     paymentStatus?: PaymentStatus;

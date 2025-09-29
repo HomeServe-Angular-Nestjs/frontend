@@ -21,7 +21,7 @@ export class SubscriptionService {
     }
 
     upgradeSubscription(data: ICreateSubscription): Observable<IResponse<ISubscription>> {
-        return this._http.post<IResponse<ISubscription>>(`${this._apiUrl}/upgrade`, { data });
+        return this._http.post<IResponse<ISubscription>>(`${this._apiUrl}/upgrade`, data );
     }
 
     fetchSubscription(): Observable<IResponse<ISubscription | null>> {

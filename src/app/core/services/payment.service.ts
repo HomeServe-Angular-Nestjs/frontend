@@ -45,4 +45,9 @@ export class PaymentService {
     verifySubscriptionPayment(verifyData: RazorpayPaymentResponse, orderData: ISubscriptionOrder): Observable<ISubscriptionPaymentVerification> {
         return this._http.post<ISubscriptionPaymentVerification>(`${this._apiUrl}/verify_subscription`, { verifyData, orderData });
     }
+
+    verifyUpgradePayment(verifyData: RazorpayPaymentResponse, orderData: ISubscriptionOrder): Observable<ISubscriptionPaymentVerification> {
+        return this._http.post<ISubscriptionPaymentVerification>(`${this._apiUrl}/verify_subscription`, { verifyData, orderData });
+    }
+
 }
