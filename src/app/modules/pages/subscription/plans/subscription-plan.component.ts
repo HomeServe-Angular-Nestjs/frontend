@@ -3,7 +3,7 @@ import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from "@ang
 import { Store } from "@ngrx/store";
 import { Router } from "@angular/router";
 import { selectAuthUserType } from "../../../../store/auth/auth.selector";
-import { catchError, combineLatest, filter, map, mapTo, Observable, of, pairwise, shareReplay, Subject, switchMap, takeUntil, tap, throwError } from "rxjs";
+import { catchError, combineLatest, filter, map, Observable, of, pairwise, shareReplay, Subject, switchMap, takeUntil, throwError } from "rxjs";
 import { IPlan } from "../../../../core/models/plan.model";
 import { PlanService } from "../../../../core/services/plans.service";
 import { CapitalizeFirstPipe } from "../../../../core/pipes/capitalize-first.pipe";
@@ -20,7 +20,8 @@ import { SharedDataService } from "../../../../core/services/public/shared-data.
 @Component({
     selector: 'app-subscription-plan-page',
     templateUrl: './subscription-plan.component.html',
-    imports: [CommonModule, CapitalizeFirstPipe]
+    imports: [CommonModule, CapitalizeFirstPipe],
+    providers: [PaymentService,RazorpayWrapperService]
 })
 export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     private readonly _store = inject(Store);

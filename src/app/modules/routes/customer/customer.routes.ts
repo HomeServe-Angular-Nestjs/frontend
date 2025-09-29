@@ -128,4 +128,10 @@ export const customerRoutes: Routes = [
             .then(c => c.CustomerChatComponent),
         canActivate: [AuthGuard]
     },
+    {
+        path: 'plans',
+        loadComponent: () => import('../../pages/subscription/plans/subscription-plan.component')
+            .then(c => c.ProviderSubscriptionPlansPage),
+        canActivate: [AuthGuard]
+    },
 ]

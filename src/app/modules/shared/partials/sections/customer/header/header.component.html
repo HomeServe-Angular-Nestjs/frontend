@@ -134,6 +134,9 @@
 
           <!-- Desktop Actions -->
           <div *ngIf="userStatus === 'authenticated'; else elseBlock" class="md:flex items-center space-x-5">
+            <a routerLink="plans" class="cursor-pointer"><i
+                class="fa-brands fa-square-web-awesome-stroke text-2xl text-indigo-500 hover:text-indigo-700 transition-colors"></i></a>
+
             <!-- Cart with dropdown -->
             <div class="relative">
               <button

@@ -46,9 +46,8 @@
                     <!-- Renewal Type -->
                     <div class="flex items-center text-xs text-gray-500 mt-4 gap-2">
                         <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only" [checked]="subscription.renewalType === 'auto'"
-                                (change)="toggleRenewalType($event)" />
-                            <i class="fas text-base transition-all duration-200" [ngClass]="{
+                            <input type="checkbox" class="sr-only" [checked]="subscription.renewalType === 'auto'" />
+                            <i class="fas text-base transition-all duration-200" [ngClass]="{ 
                                 'fa-toggle-on text-green-600': subscription.renewalType === 'auto',
                                 'fa-toggle-off text-gray-400': subscription.renewalType === 'manual'
                                 }"></i>
@@ -76,13 +75,9 @@
                         }">
                         Upgrade Plan
                     </a>
-                    <button class=" bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg shadow-sm
-                        transition" (click)="cancelPlan()">
-                        Cancel Plan
-                    </button>
                 </div>
             </div>
-        </section>
+        </section> 
 
 
     </div>
