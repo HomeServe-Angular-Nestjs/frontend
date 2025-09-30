@@ -8,7 +8,6 @@ export const initialState: AuthState = {
     status: 'pending',
     error: null,
     type: null,
-    showSubscriptionPage: true,
 };
 
 export const authFeature = createFeature({
@@ -48,11 +47,6 @@ export const authFeature = createFeature({
         on(authActions.setUserType, (state, { userType }): AuthState => ({
             ...state,
             type: userType
-        })),
-
-        on(authActions.updateShowSubscriptionPageValue, (state, { value }) => ({
-            ...state,
-            showSubscriptionPage: value
         })),
 
         //When logs out

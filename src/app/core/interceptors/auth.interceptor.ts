@@ -6,11 +6,14 @@ import { selectAuthUserType } from "../../store/auth/auth.selector";
 import { authActions } from "../../store/auth/auth.actions";
 import { ErrorHandlerService } from "../services/public/error-handler.service";
 import { ToastNotificationService } from "../services/public/toastr.service";
+import { ErrorCodes } from "../enums/enums";
+import { Router } from "@angular/router";
 
 export const USE_CREDENTIALS = new HttpContextToken(() => true);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const store = inject(Store);
+    const router = inject(Router);
     const errorHandler = inject(ErrorHandlerService);
     const toastr = inject(ToastNotificationService);
 
@@ -44,7 +47,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     }
 
                     if (error.status === 403) {
-                        console.warn('Forbidden:', userMessage);
+                        if (errorCode === ErrorCodes.NO_ACTIVE_SUBSCRIPTION) {
+                            router.navigate(['provider', 'plans']);
+                            toastr.error(userMessage);
+                            return throwError(() => new Error(userMessage));
+                        }
                         return of();
                     }
 

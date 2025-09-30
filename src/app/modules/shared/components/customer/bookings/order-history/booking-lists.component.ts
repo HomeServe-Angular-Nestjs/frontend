@@ -12,7 +12,7 @@ import { FormsModule } from "@angular/forms";
 import { BookingStatus, PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from "../../../../../../core/enums/enums";
 import { PaymentService } from "../../../../../../core/services/payment.service";
 import { RazorpayWrapperService } from "../../../../../../core/services/public/razorpay-wrapper.service";
-import { RazorpayOrder, RazorpayPaymentResponse } from "../../../../../../core/models/payment.model";
+import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../../../core/models/payment.model";
 import { ITransaction } from "../../../../../../core/models/transaction.model";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { CancelBookingModalComponent } from "../../../../partials/shared/cancel-booking-modal/cancel-booking-modal.component";
@@ -86,9 +86,9 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     }
 
     private _verifyPaymentAndUpdateBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {
-        const orderData: RazorpayOrder = {
+        const orderData: IBookingOrder = {
             id: order.id,
-            bookingId:'wqw',
+            bookingId,
             transactionType: TransactionType.BOOKING,
             amount: order.amount,
             status: TransactionStatus.SUCCESS,
@@ -97,7 +97,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
             receipt: order.receipt,
         };
 
-        this._paymentService.verifyPaymentSignature(response, orderData)
+        this._paymentService.verifyBookingPayment(response, orderData)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (response) => {

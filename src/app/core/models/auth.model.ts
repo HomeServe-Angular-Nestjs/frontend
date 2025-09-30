@@ -8,6 +8,4 @@ export interface AuthState {
     status: StatusType;
     error: string | null;
     type: UserType | null;
-    showSubscriptionPage: boolean;
-
 }

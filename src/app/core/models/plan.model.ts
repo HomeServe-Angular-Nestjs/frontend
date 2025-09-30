@@ -1,4 +1,5 @@
-export type PlanDurationType = 'monthly' | 'yearly' | 'lifetime';
+import { PlanDuration } from "../enums/enums";
+
 export type PlanRoleType = 'customer' | 'provider';
 export type PlanName = 'free' | 'premium';
 
@@ -7,22 +8,10 @@ export interface IPlan {
     name: string | PlanName;
     price: number;
     role: PlanRoleType;
-    duration: PlanDurationType;
+    duration: PlanDuration;
     features: string[];
     isActive: boolean;
     createdAt: Date;
-}
-
-export interface ISavePlan {
-    name: string;
-    price: number;
-    role: PlanRoleType;
-    duration: PlanDurationType;
-    features: string[];
-}
-
-export interface IUpdatePlan extends ISavePlan {
-    id: string;
 }
 
 export interface IUpdatePlanStatus {

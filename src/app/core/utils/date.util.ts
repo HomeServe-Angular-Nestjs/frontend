@@ -1,4 +1,4 @@
-import { PlanDurationType } from "../models/plan.model";
+import { PlanDuration } from "../enums/enums";
 
 export function formatFullDateWithTimeHelper(dateInput: string | Date): string {
     const date = new Date(dateInput);
@@ -20,7 +20,7 @@ export function formatFullDateWithTimeHelper(dateInput: string | Date): string {
     return date.toLocaleString('en-US', options).replace(',', '');
 }
 
-export function getStartTimeAndEndTime(duration: PlanDurationType): { startTime: string, endDate: string | null } {
+export function getStartTimeAndEndTime(duration: PlanDuration): { startTime: string, endDate: string | null } {
     const startTime = new Date();
     let endDate: string | null = null;
 

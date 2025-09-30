@@ -36,8 +36,8 @@
                             </ul>
                         </div>
 
-                        <!-- CTA Button -->
-                        <button (click)="proceedSub(plan)" [disabled]="isCurrentPlan(plan) || isYearly()"
+                        <button (click)="proceedSub(plan)"
+                            [disabled]="isCurrentPlan(plan) || _paymentService.isPaymentInProgress()"
                             class="mt-auto w-full py-3 rounded-xl font-semibold border transition duration-200 ease-in-out"
                             [ngClass]="{
                                 'bg-gray-800 text-white border-transparent hover:bg-gray-700': isCurrentPlan(plan),
@@ -47,7 +47,8 @@
                                 }">
                             <span *ngIf="isCurrentPlan(plan)">Current Plan</span>
                             <ng-container *ngIf="!isCurrentPlan(plan)">
-                                {{ getPlanButtonText(plan) | titlecase }}
+                                {{ _paymentService.isPaymentInProgress() ? 'processing...' :
+                                getPlanButtonText(plan) | titlecase }}
                             </ng-container>
                         </button>
                     </div>

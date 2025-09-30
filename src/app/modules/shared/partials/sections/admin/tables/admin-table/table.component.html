@@ -1,4 +1,4 @@
-<table class="min-w-full table-auto rounded-xl shadow ring-1 ring-gray-200 bg-white text-sm">
+<table class="min-w-full table-auto bg-white text-sm">
     <thead class="bg-gray-100 text-xs text-gray-600 uppercase tracking-wide">
         <tr>
             <th *ngFor="let column of table.columns" class="px-4 py-3 text-left border-b border-gray-300 font-semibold">
@@ -30,8 +30,8 @@
 
                     <!-- ID (SHORT) -->
                     <span *ngSwitchCase="'id'">
-                        <code class="bg-gray-100 text-xs font-mono px-2 py-0.5 rounded text-gray-700">
-            {{ row[column] | uppercase | slice: 0:10 }}
+                        <code class="bg-gray-100 uppercase text-xs font-mono px-2 py-0.5 rounded text-gray-700">
+            {{ row[column] | slice: 0:10 }}
           </code>
                     </span>
 
@@ -48,7 +48,7 @@
                 <button *ngFor="let action of row.actions" (click)="actionsTriggered(action, row)"
                     [title]="action.toolTip" [ngClass]="action.styles"
                     class="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-200 transition duration-150">
-                    <i class="material-icons text-[18px]">{{ action.icon }}</i>
+                    <i [class]="'text-[18px] ' + action.icon"></i>
                 </button>
             </td>
         </tr>

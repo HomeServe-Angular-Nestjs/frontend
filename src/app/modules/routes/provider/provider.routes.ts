@@ -5,7 +5,7 @@ import { ProfilesLayoutComponent } from "../../pages/provider/profiles/profiles-
 import { ProviderProfileOverviewLayoutComponent } from "../../shared/components/provider/profile-overview/layout/provider-profile-overview-layout.component";
 import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
-import { SubscriptionGuard } from "../../../core/guards/subscription.guard";
+// import { SubscriptionGuard } from "../../../core/guards/subscription.guard";
 
 export const providerRoutes: Routes = [
     {
@@ -134,19 +134,19 @@ export const providerRoutes: Routes = [
             },
             {
                 path: 'performance',
-                canActivate: [SubscriptionGuard, AuthGuard],
+                canActivate: [AuthGuard],
                 loadComponent: () => import('../../pages/provider/analytics/performance/performance-page.component')
                     .then(c => c.ProviderPerformanceComponent)
             },
             {
                 path: 'area-analytics',
-                canActivate: [SubscriptionGuard, AuthGuard],
+                canActivate: [AuthGuard],
                 loadComponent: () => import('../../pages/provider/analytics/area/area-page.component')
                     .then(c => c.ProviderAreaAnalyticsComponent)
             },
             {
                 path: 'revenue-analytics',
-                canActivate: [SubscriptionGuard, AuthGuard],
+                canActivate: [AuthGuard],
                 loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
                     .then(c => c.ProviderRevenueAnalyticsComponent)
             },

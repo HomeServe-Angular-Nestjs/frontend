@@ -1,19 +1,9 @@
-<div>
-    <app-admin-view-plans (createPlanEvent)="isCreatePlanModalOpen = true"
-        (editPlanEvent)="enableEdit($event)"></app-admin-view-plans>
-</div>
+<app-admin-view-plans (viewPlanEvent)="viewPlan($event)"></app-admin-view-plans>
 
-<ng-container *ngIf="isCreatePlanModalOpen">
+<ng-container *ngIf="isViewPlanModalOpen">
     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-
         <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
-            <!-- Close Button (optional) -->
-            <button class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl" (click)="closeModal()">
-                &times;
-            </button>
-
-            <app-admin-create-plan (closeModalEvent)="closeModal()" [planToEdit]="planToEdit"
-                (updatePlanTableEvent)="onPlanEdit($event)"></app-admin-create-plan>
+            <app-admin-plan-details (closeModalEvent)="closeModal()" [plan]="planToView"></app-admin-plan-details>
         </div>
     </div>
 </ng-container>
