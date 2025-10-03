@@ -22,6 +22,7 @@ export const API_ENV = {
     notification: `${domainName}/notification`,
     reservation: `${domainName}/reservation`,
     report: `${domainName}/report`,
+    analytics: `${domainName}/analytics`
 };
 
 export const API_KEY = {

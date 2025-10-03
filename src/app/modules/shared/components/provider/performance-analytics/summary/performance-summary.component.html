@@ -1,0 +1,95 @@
+<style>
+    #performance-summary {
+            font-family: 'Inter', sans-serif;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+</style>
+<section id="performance-summary" class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen p-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold text-slate-800 mb-8">Performance Summary</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Completion Rate Card -->
+            <div class="bg-white rounded-2xl p-6 card-shadow card-hover border border-slate-200">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="bg-green-100 p-3 rounded-xl">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">Excellent</span>
+                </div>
+                <h3 class="text-slate-600 text-sm font-medium mb-2">Completion Rate</h3>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-bold text-slate-900">92</span>
+                    <span class="text-2xl font-semibold text-slate-900">%</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">Completed jobs ÷ Total bookings</p>
+            </div>
+
+            <!-- Average Rating Card -->
+            <div class="bg-white rounded-2xl p-6 card-shadow card-hover border border-slate-200">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="bg-amber-100 p-3 rounded-xl">
+                        <svg class="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                    </div>
+                    <span class="bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full">Good</span>
+                </div>
+                <h3 class="text-slate-600 text-sm font-medium mb-2">Average Rating</h3>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-bold text-slate-900">4.6</span>
+                    <span class="text-2xl text-amber-500">★</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">Based on customer feedback</p>
+            </div>
+
+            <!-- Response Time Card -->
+            <div class="bg-white rounded-2xl p-6 card-shadow card-hover border border-slate-200">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="bg-blue-100 p-3 rounded-xl">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full">Great</span>
+                </div>
+                <h3 class="text-slate-600 text-sm font-medium mb-2">Response Time</h3>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-bold text-slate-900">15</span>
+                    <span class="text-xl font-medium text-slate-600">mins</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">Average time to reply</p>
+            </div>
+
+            <!-- On-Time Arrival Card -->
+            <div class="bg-white rounded-2xl p-6 card-shadow card-hover border border-slate-200">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="bg-orange-100 p-3 rounded-xl">
+                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full">Needs Work</span>
+                </div>
+                <h3 class="text-slate-600 text-sm font-medium mb-2">On-Time Arrival</h3>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-bold text-slate-900">88</span>
+                    <span class="text-2xl font-semibold text-slate-900">%</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">Punctuality performance</p>
+            </div>
+        </div>
+    </div>
+</section>
