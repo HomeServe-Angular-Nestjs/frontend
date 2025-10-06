@@ -212,10 +212,23 @@ export interface IAdminDashboardUserStats {
     provider: IStats;
 }
 
-
 export interface ITopProviders {
     totalEarnings: number;
     providerId: string;
     username: string;
     email: string;
+}
+
+export interface IProviderCardView {
+  id: string;
+  fullname: string;
+  username: string;
+  isCertified: boolean;
+  avgRating: number;
+  totalReviews: number;
+  experience: number;
+  profession: string;
+  address: string;
+  isActive: boolean;
+  avatar: string;
 }

@@ -1,28 +1,37 @@
-import { Component, inject, Input, OnDestroy } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IProvider } from '../../../../../core/models/user.model';
+import { IProvider, IProviderCardView } from '../../../../../core/models/user.model';
 import { Router } from '@angular/router';
 import { getColorFromChar } from '../../../../../core/utils/style.utils';
 import { Store } from '@ngrx/store';
 import { customerActions } from '../../../../../store/customer/customer.actions';
-import { selectSavedProviders } from '../../../../../store/customer/customer.selector';
-import { Subject, takeUntil } from 'rxjs';
+import { map, Observable, shareReplay, Subject, takeUntil } from 'rxjs';
 import { IsSavedPipe } from '../../../../../core/pipes/is-saved-provider.pipe';
+import { ProviderService } from '../../../../../core/services/provider.service';
 
 @Component({
   selector: 'app-customer-provider-view-card',
-  standalone: true,
   imports: [CommonModule, IsSavedPipe],
   templateUrl: './customer-provider-view-card.component.html',
 })
-export class CustomerProviderViewCardComponent implements OnDestroy {
-  private _router = inject(Router);
-  private _store = inject(Store);
+export class CustomerProviderViewCardComponent implements OnInit, OnDestroy {
+  private readonly _providerService = inject(ProviderService);
+  private readonly _router = inject(Router);
+  private readonly _store = inject(Store);
 
   private _destroy$ = new Subject<void>();
 
-  @Input({ required: true }) providers!: IProvider[];
+  @Input({ required: true }) providers!: IProviderCardView[];
   fallbackChar: string = '';
+
+  ngOnInit(): void {
+
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete()
+  }
 
   toggleFavorite(provider: IProvider) {
     provider.isActive = !provider.isActive;
@@ -34,7 +43,7 @@ export class CustomerProviderViewCardComponent implements OnDestroy {
   }
 
   addToSaved(providerId: string) {
-    this._store.dispatch(customerActions.updateAddToSaved({ providerId }))
+    this._store.dispatch(customerActions.updateAddToSaved({ providerId }));
   }
 
   viewProvider(providerId: string) {
@@ -47,8 +56,11 @@ export class CustomerProviderViewCardComponent implements OnDestroy {
     return 'empty';
   }
 
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete()
+  getAvgRating(providerId: string): Observable<number> {
+    return this._providerService.getAvgRating(providerId).pipe(
+      takeUntil(this._destroy$),
+      map(res => res.data ?? 0),
+      shareReplay(1)
+    );
   }
 }

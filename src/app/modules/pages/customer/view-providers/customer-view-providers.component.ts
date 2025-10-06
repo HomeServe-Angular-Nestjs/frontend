@@ -1,14 +1,11 @@
-import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { map, Observable, shareReplay } from 'rxjs';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { decode as base64Decode } from 'js-base64';
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
-import { userActions } from '../../../../store/users/user.actions';
-import { IHomeSearch, IProvider } from '../../../../core/models/user.model';
-import { selectAllProviderEntities } from '../../../../store/users/user.selector';
+import { IHomeSearch, IProviderCardView } from '../../../../core/models/user.model';
 import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 import { ProviderViewCardFilterComponent } from "../../../shared/partials/sections/customer/provider-view-card-filter/provider-view-card-filter.component";
 import { IFilter } from '../../../../core/models/filter.model';
@@ -17,16 +14,17 @@ import { ToastNotificationService } from '../../../../core/services/public/toast
 
 @Component({
   selector: 'app-customer-view-providers',
-  standalone: true,
   imports: [CommonModule, CustomerBreadcrumbsComponent, FormsModule, CustomerProviderViewCardComponent, ProviderViewCardFilterComponent],
   templateUrl: './customer-view-providers.component.html',
 })
-export class CustomerViewProvidersComponent implements OnInit {
+export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
   private readonly _providerService = inject(ProviderService);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _route = inject(ActivatedRoute);
 
-  providers$!: Observable<IProvider[]>;
+  private _destroy$ = new Subject<void>();
+
+  providers$!: Observable<IProviderCardView[]>;
 
   @ViewChild(ProviderViewCardFilterComponent)
   filterComponent!: ProviderViewCardFilterComponent
@@ -49,8 +47,14 @@ export class CustomerViewProvidersComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
+  }
+
   private _fetchProviders(filter?: IFilter, locationSearch?: IHomeSearch) {
     this.providers$ = this._providerService.getProviders(filter, locationSearch).pipe(
+      takeUntil(this._destroy$),
       map(res => res.data ?? [])
     );
   }
