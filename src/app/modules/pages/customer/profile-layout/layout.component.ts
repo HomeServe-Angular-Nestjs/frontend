@@ -30,7 +30,6 @@ export class CustomerProfileLayout {
             items: [
                 { label: 'My Bookings', icon: 'fas fa-calendar-alt', route: '/profile/bookings' },
                 { label: 'Saved Providers', icon: 'fas fa-heart', route: '/saved' },
-                { label: 'Reviews & Ratings', icon: 'fas fa-star', route: '/reviews' },
                 { label: 'Notifications', icon: 'fas fa-bell', route: '/profile/notifications' },
             ],
         },

@@ -1,17 +1,15 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IReview } from '../../../../../../../core/models/reviews.model';
-import { BehaviorSubject, filter, map, Observable, switchMap } from 'rxjs';
-import { ProviderService } from '../../../../../../../core/services/provider.service';
+import { BehaviorSubject, filter, map, switchMap } from 'rxjs';
+import { ProviderService } from '../../../../../../core/services/provider.service';
 import { ActivatedRoute } from '@angular/router';
-import { IDisplayReviews } from '../../../../../../../core/models/user.model';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { IDisplayReviews } from '../../../../../../core/models/user.model';
 
 @Component({
   selector: 'app-customer-reviews-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './customer-provider-profile-review.component.html',
+  templateUrl: './review-list.component.html',
 })
 export class CustomerReviewListComponent {
   private readonly _route = inject(ActivatedRoute);
