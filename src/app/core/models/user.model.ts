@@ -1,7 +1,6 @@
 import { EntityState } from '@ngrx/entity';
-import { ISlot, SlotType } from './schedules.model';
-import { IPagination } from './booking.model';
-import { IReview } from './reviews.model';
+import { SlotType } from './schedules.model';
+import { IPagination, IReview } from './booking.model';
 export type UType = 'customer' | 'provider';
 
 export interface IDocs {
@@ -88,7 +87,6 @@ export interface IProvider extends IBaseUser {
     defaultSlots: SlotType[];
     verificationStatus: VerificationStatusType;
     avgRating: number;
-    reviews: IReview[];
 }
 
 export interface IUserState {
@@ -175,7 +173,7 @@ export interface ICustomerProfileData {
     fullname: string;
     username: string;
     phone: string;
-    address:string;
+    address: string;
     coordinates: [number, number];
 }
 
@@ -184,12 +182,17 @@ export interface IChangePassword {
     currentPassword: string;
 }
 
-export interface IDisplayReviews {
-    avatar: string;
+interface IDisplayReviewItem extends IReview {
     name: string;
+    avatar: string;
+    email: string;
+}
+
+export interface IDisplayReviews {
+    reviews: IDisplayReviewItem[];
     avgRating: number;
-    writtenAt: string;
-    desc: string;
+    totalReviews: number;
+    allFetched: boolean;
 }
 
 export interface ISearchedLocation {
@@ -214,10 +217,23 @@ export interface IAdminDashboardUserStats {
     provider: IStats;
 }
 
-
 export interface ITopProviders {
     totalEarnings: number;
     providerId: string;
     username: string;
     email: string;
+}
+
+export interface IProviderCardView {
+    id: string;
+    fullname: string;
+    username: string;
+    isCertified: boolean;
+    avgRating: number;
+    totalReviews: number;
+    experience: number;
+    profession: string;
+    address: string;
+    isActive: boolean;
+    avatar: string;
 }

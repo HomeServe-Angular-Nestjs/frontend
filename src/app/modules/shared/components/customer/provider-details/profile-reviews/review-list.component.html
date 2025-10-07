@@ -1,0 +1,66 @@
+<ng-container *ngIf="reviewResponse$ | async as reviewResponse">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+                <h2 class="text-xl font-semibold">Customer Reviews</h2>
+                <p class="text-sm text-gray-600">
+                    {{ reviewResponse.totalReviews }} reviews with an average rating of
+                    {{ reviewResponse.avgRating | number:'1.1-1' }}
+                </p>
+            </div>
+
+            <!--!todo <div class="flex flex-wrap gap-3">
+                <select class="border rounded-lg px-3 py-1.5 text-sm">
+                    <option>Most Recent</option>
+                    <option>Highest Rated</option>
+                    <option>Lowest Rated</option>
+                </select>
+
+                <select class="border rounded-lg px-3 py-1.5 text-sm">
+                    <option>All Ratings</option>
+                    <option>5 Stars</option>
+                    <option>4 Stars</option>
+                    <option>3 Stars</option>
+                    <option>2 Stars</option>
+                    <option>1 Star</option>
+                </select>
+            </div> -->
+        </div>
+
+        <!-- Reviews -->
+        <div class="space-y-6">
+            <ng-container *ngIf="reviewResponse.reviews.length">
+
+                <div *ngFor="let review of reviewResponse.reviews" class="border-b pb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                                <img [src]="review.avatar"
+                                    (error)="review.avatar = 'assets/images/profile_placeholder.jpg'"
+                                    class="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                                <p class="font-medium">{{ review.name }}</p>
+                                <p class="text-sm text-gray-500">{{ review.email }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-yellow-400">⭐</span>
+                            <span class="font-medium">{{ review.rating }}</span>
+                            <span class="text-gray-500 text-sm pl-2">{{ review.writtenAt | date }}</span>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 mb-3">{{ review.desc }}</p>
+
+                </div>
+            </ng-container>
+
+            <div class="text-center pt-4">
+                <app-button *ngIf="!reviewResponse.allFetched" text="Load More Reviews" (clicked)="loadMoreReviews()"
+                    buttonClass="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                </app-button>
+            </div>
+        </div>
+    </div>
+</ng-container>

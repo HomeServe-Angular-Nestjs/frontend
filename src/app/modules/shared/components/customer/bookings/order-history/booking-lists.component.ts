@@ -1,26 +1,27 @@
 import { Component, inject, OnDestroy, OnInit, } from "@angular/core";
-import { BookingService } from "../../../../../../core/services/booking.service";
 import { CommonModule } from "@angular/common";
-import { FullDateWithTimePipe } from "../../../../../../core/pipes/to-full-date-with-time.pipe";
-import { IBookingResponse, IBookingWithPagination } from "../../../../../../core/models/booking.model";
-import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
-import { map, Observable, pipe, Subject, takeUntil } from "rxjs";
 import { RouterLink } from "@angular/router";
+import { FormsModule } from "@angular/forms";
+import { BehaviorSubject, finalize, map, Subject, takeUntil, tap, withLatestFrom } from "rxjs";
+import { BookingService } from "../../../../../../core/services/booking.service";
+import { FullDateWithTimePipe } from "../../../../../../core/pipes/to-full-date-with-time.pipe";
+import { IBookingResponse, IPagination, IReview } from "../../../../../../core/models/booking.model";
+import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
-import { FormsModule } from "@angular/forms";
 import { BookingStatus, PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from "../../../../../../core/enums/enums";
 import { PaymentService } from "../../../../../../core/services/payment.service";
 import { RazorpayWrapperService } from "../../../../../../core/services/public/razorpay-wrapper.service";
 import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../../../core/models/payment.model";
 import { ITransaction } from "../../../../../../core/models/transaction.model";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
-import { CancelBookingModalComponent } from "../../../../partials/shared/cancel-booking-modal/cancel-booking-modal.component";
+import { CustomerLeaveAReviewComponent } from "../leave-a-review/leave-a-review.component";
+import { ISubmitReview } from "../../../../../../core/models/reviews.model";
 
 @Component({
     selector: 'app-customer-booking-lists',
     templateUrl: './booking-lists.component.html',
-    imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent, ButtonComponent, CancelBookingModalComponent],
+    imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent, ButtonComponent, CustomerLeaveAReviewComponent],
     providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerBookingListsComponent implements OnInit, OnDestroy {
@@ -29,45 +30,52 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     private readonly _paymentService = inject(PaymentService);
     private readonly _razorpayWrapperService = inject(RazorpayWrapperService);
 
-    private destroy$ = new Subject<void>();
+    private _destroy$ = new Subject<void>();
+    private _bookingsData$ = new BehaviorSubject<IBookingResponse[]>([]);
 
-    bookingsData$!: Observable<IBookingWithPagination>;
+    bookingData$ = this._bookingsData$.asObservable();
+    isReviewModalOpen = false;
     cancellationReasonModal = false;
     cancelReason = '';
+    selectedBookingIdForReview = '';
     bookingSelectedForCancellation = '';
+    prevReview: IReview | null = null;
+    pagination: IPagination = {
+        limit: 0,
+        page: 1,
+        total: 0
+    };
 
     ngOnInit(): void {
         this._fetchBookings(1);
     }
 
     ngOnDestroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
+        this._destroy$.next();
+        this._destroy$.complete();
     }
 
     private _fetchBookings(page: number) {
-        this.bookingsData$ = this._bookingService.fetchBookings(page)
-            .pipe(takeUntil(this.destroy$));
+        this._bookingService.fetchBookings(page)
+            .pipe(
+                takeUntil(this._destroy$),
+                map(res => {
+                    this.pagination = res.paginationData;
+                    return res.bookingData ?? []
+                })
+            )
+            .subscribe(bookingData => this._bookingsData$.next(bookingData));
     }
 
     private _updateCancelledBookingData(cancelledBookingId: string) {
-        this.bookingsData$ = this.bookingsData$.pipe(
-            takeUntil(this.destroy$),
-            map(response => {
-                return {
-                    bookingData: response.bookingData.map(bookings => {
-                        if (bookings.bookingId === cancelledBookingId) {
-                            return {
-                                ...bookings,
-                                bookingStatus: BookingStatus.CANCELLED
-                            };
-                        }
-                        return bookings;
-                    }),
-                    paginationData: response.paginationData,
-                }
-            })
-        );
+        const bookingData = this._bookingsData$.getValue();
+        const updatedBookingData = bookingData.map(bookings => ({
+            ...bookings,
+            bookingStatus: bookings.bookingId === cancelledBookingId
+                ? BookingStatus.CANCELLED
+                : bookings.bookingStatus
+        }));
+        this._bookingsData$.next(updatedBookingData);
     }
 
     private _updateBooking(bookingId: string, transactionData?: ITransaction) {
@@ -77,7 +85,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
         };
 
         this._bookingService.updateBooking(bookingData)
-            .pipe(takeUntil(this.destroy$))
+            .pipe(takeUntil(this._destroy$))
             .subscribe({
                 next: (res) => {
                     console.log(res);
@@ -98,7 +106,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
         };
 
         this._paymentService.verifyBookingPayment(response, orderData)
-            .pipe(takeUntil(this.destroy$))
+            .pipe(takeUntil(this._destroy$))
             .subscribe({
                 next: (response) => {
                     this._updateBooking(bookingId, response.transaction);
@@ -112,7 +120,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
 
     private _initiatePayment(totalAmount: number, bookingId: string) {
         this._paymentService.createRazorpayOrder(totalAmount)
-            .pipe(takeUntil(this.destroy$))
+            .pipe(takeUntil(this._destroy$))
             .subscribe({
                 next: (order) => {
                     this._razorpayWrapperService.openCheckout(
@@ -151,7 +159,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
         }
 
         this._bookingService.cancelBooking(this.bookingSelectedForCancellation, this.cancelReason)
-            .pipe(takeUntil(this.destroy$))
+            .pipe(takeUntil(this._destroy$))
             .subscribe({
                 next: (res) => {
                     this._updateCancelledBookingData(this.bookingSelectedForCancellation);
@@ -165,6 +173,55 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
                     this._toastr.error(err);
                 }
             })
+    }
+
+    openReviewModal(bookingStatus: BookingStatus, review: IReview | null, bookingId: string) {
+        const isPossible = bookingStatus === BookingStatus.COMPLETED
+            || bookingStatus === BookingStatus.CANCELLED;
+
+        if (!isPossible) {
+            this._toastr.info('Please complete the booking to review.');
+            return;
+        }
+
+        this.selectedBookingIdForReview = bookingId;
+        this.prevReview = review ?? null;
+        this.isReviewModalOpen = true;
+    }
+
+    submitReview(reviewData: ISubmitReview) {
+        alert(this.selectedBookingIdForReview)
+        this._bookingService.addReview(this.selectedBookingIdForReview, reviewData)
+            .pipe(
+                takeUntil(this._destroy$),
+                tap(res => {
+                    if (!res.success) {
+                        this._toastr.error(res.message);
+                    } else {
+                        this._toastr.success(res.message);
+                    }
+                }),
+                withLatestFrom(this.bookingData$),
+                tap(([res, bookings]) => {
+                    if (!bookings || bookings.length == 0) return;
+                    const updatedBooking = bookings.map(booking => ({
+                        ...booking,
+                        review: {
+                            desc: reviewData.description,
+                            rating: reviewData.ratings,
+                            writtenAt: new Date(),
+                        }
+                    }));
+
+                    this._bookingsData$.next(updatedBooking);
+                }),
+
+                finalize(() => {
+                    this.isReviewModalOpen = false;
+                }),
+
+            )
+            .subscribe();
     }
 
     completePayment(booking: IBookingResponse) {
@@ -193,6 +250,4 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
         this.bookingSelectedForCancellation = '';
         this.cancellationReasonModal = false;
     }
-
-
 }

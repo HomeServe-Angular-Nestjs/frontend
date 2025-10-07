@@ -5,7 +5,7 @@ import { IAdminDashboardUserStats, IApprovalOverviewData, IApprovalTableDetails,
 import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { IAdminBookingFilter, IAdminBookingForTable, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
+import { IAdminBookingFilter, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
 import { IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
 import { IAdminDashboardSubscription } from "../models/subscription.model";
 import { IReportDownloadBookingData, IReportDownloadTransactionData, IReportDownloadUserData } from "../models/admin-report.model";
