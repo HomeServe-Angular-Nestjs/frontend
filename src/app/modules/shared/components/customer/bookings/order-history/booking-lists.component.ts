@@ -8,9 +8,9 @@ import { FullDateWithTimePipe } from "../../../../../../core/pipes/to-full-date-
 import { IBookingResponse, IPagination, IReview } from "../../../../../../core/models/booking.model";
 import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
-import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service"; 
+import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { BookingStatus, PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from "../../../../../../core/enums/enums";
-import { PaymentService } from "../../../../../../core/services/payment.service"; 
+import { PaymentService } from "../../../../../../core/services/payment.service";
 import { RazorpayWrapperService } from "../../../../../../core/services/public/razorpay-wrapper.service";
 import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../../../core/models/payment.model";
 import { ITransaction } from "../../../../../../core/models/transaction.model";
@@ -37,6 +37,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     isReviewModalOpen = false;
     cancellationReasonModal = false;
     cancelReason = '';
+    selectedBookingIdForReview = '';
     bookingSelectedForCancellation = '';
     prevReview: IReview | null = null;
     pagination: IPagination = {
@@ -174,19 +175,23 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
             })
     }
 
-    openReviewModal(bookingStatus: BookingStatus, review: IReview | null) {
+    openReviewModal(bookingStatus: BookingStatus, review: IReview | null, bookingId: string) {
         const isPossible = bookingStatus === BookingStatus.COMPLETED
-            || bookingStatus === BookingStatus.CANCELLED
+            || bookingStatus === BookingStatus.CANCELLED;
+
         if (!isPossible) {
             this._toastr.info('Please complete the booking to review.');
             return;
         }
+
+        this.selectedBookingIdForReview = bookingId;
         this.prevReview = review ?? null;
         this.isReviewModalOpen = true;
     }
 
-    submitReview(reviewData: ISubmitReview, bookingId: string) {
-        this._bookingService.addReview(bookingId, reviewData)
+    submitReview(reviewData: ISubmitReview) {
+        alert(this.selectedBookingIdForReview)
+        this._bookingService.addReview(this.selectedBookingIdForReview, reviewData)
             .pipe(
                 takeUntil(this._destroy$),
                 tap(res => {
@@ -198,14 +203,13 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
                 }),
                 withLatestFrom(this.bookingData$),
                 tap(([res, bookings]) => {
-                    console.log(res, bookings)
                     if (!bookings || bookings.length == 0) return;
                     const updatedBooking = bookings.map(booking => ({
                         ...booking,
                         review: {
                             desc: reviewData.description,
                             rating: reviewData.ratings,
-                            writtenAt: new Date()
+                            writtenAt: new Date(),
                         }
                     }));
 

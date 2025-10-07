@@ -105,7 +105,7 @@
                             <button class="flex items-center hover:text-indigo-600">
                                 <i class="fas fa-comments mr-2"></i> Chat with Provider
                             </button>
-                            <button (click)="openReviewModal(list.bookingStatus, list.review)" 
+                            <button (click)="openReviewModal(list.bookingStatus, list.review, list.bookingId)"
                                 class="flex items-center hover:text-yellow-600">
                                 <i class="fas fa-star mr-2"></i>
                                 {{ list?.review ? 'Edit review' : 'Leave a Review' }}
@@ -114,19 +114,19 @@
 
                         <button class="text-indigo-600 font-medium hover:underline">Reorder</button>
                     </div>
-
-                    <!-- Modal -->
-                    <div *ngIf="isReviewModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
-                        <!-- Backdrop -->
-                        <button class="absolute inset-0 bg-black bg-opacity-50"
-                            (click)="isReviewModalOpen = false"></button>
-
-                        <app-customer-leave-a-review [review]="prevReview"
-                            (submitModalEvent)="submitReview($event, list.bookingId)"
-                            (closeModalEvent)="isReviewModalOpen = false"></app-customer-leave-a-review>
-                    </div>
-
                 </div>
+
+                <!-- Modal -->
+                <div *ngIf="isReviewModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
+                    <!-- Backdrop -->
+                    <button class="absolute inset-0 bg-black bg-opacity-50"
+                        (click)="isReviewModalOpen = false"></button>
+
+                    <app-customer-leave-a-review [review]="prevReview"
+                        (submitModalEvent)="submitReview($event)"
+                        (closeModalEvent)="isReviewModalOpen = false"></app-customer-leave-a-review>
+                </div>
+
             </div>
 
         </ng-container>
