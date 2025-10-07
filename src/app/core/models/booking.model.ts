@@ -57,6 +57,8 @@ export interface IReview {
     desc: string;
     rating: number;
     writtenAt: Date | string;
+    // isActive: boolean;
+    // isReported: boolean;
 }
 
 // --------------------
@@ -94,6 +96,7 @@ export interface IBooking {
     }[];
     paymentStatus: PaymentStatus;
     transactionId: string | null;
+    review: IReview | null;
 }
 
 export interface IBookingResponse {

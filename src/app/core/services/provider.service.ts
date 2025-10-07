@@ -76,9 +76,11 @@ export class ProviderService {
         return this._http.delete(`${this._apiUrl}/default_slots`);
     }
 
-    getReviews(providerId: string): Observable<IResponse<IDisplayReviews[]>> {
-        const params = new HttpParams().set('providerId', providerId);
-        return this._http.get<IResponse<IDisplayReviews[]>>(`${this._apiUrl}/reviews`, { params });
+    getReviews(providerId: string, count: number = 0): Observable<IResponse<IDisplayReviews>> {
+        const params = new HttpParams()
+            .set('providerId', providerId)
+            .set('count', count);
+        return this._http.get<IResponse<IDisplayReviews>>(`${this._apiUrl}/reviews`, { params });
     }
 
     uploadImage(imageData: FormData): Observable<IResponse> {
