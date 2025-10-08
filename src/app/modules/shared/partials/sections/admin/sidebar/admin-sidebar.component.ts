@@ -56,7 +56,7 @@ export class AdminSidebarComponent {
     //   name: 'Manage Reports',
     //   icon: 'fa-chart-bar',
     //   route: 'admin/reports'
-    // }
+    // },
     {
       name: 'Complaint Management',
       icon: 'fa-bullhorn',
