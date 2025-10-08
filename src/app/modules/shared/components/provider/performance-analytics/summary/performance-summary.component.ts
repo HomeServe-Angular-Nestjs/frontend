@@ -10,7 +10,7 @@ import { MetricPerformanceBadgePipe } from "../../../../../../core/pipes/perform
     selector: 'app-performance-summary',
     templateUrl: './performance-summary.component.html',
     styleUrl: 'performance-summary.component.scss',
-    imports: [CommonModule, TimeFormatterPipe, MetricPerformanceBadgePipe],
+    imports: [CommonModule, TimeFormatterPipe, MetricPerformanceBadgePipe], 
     providers: [AnalyticService]
 })
 export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {

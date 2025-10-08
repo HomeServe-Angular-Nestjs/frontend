@@ -1,1 +1,31 @@
-<app-performance-summary></app-performance-summary> 
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+
+    <!-- Header Section -->
+    <div class="p-6">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-3xl font-semibold text-gray-900 mb-1">Performance Analytics</h1>
+            <p class="text-gray-500 text-sm">Comprehensive insights into your service metrics</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+        <!-- KPI Summary Cards -->
+        <app-performance-summary></app-performance-summary>
+
+        <!-- Bookings & Customer Satisfaction Row -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <app-performance-bookings></app-performance-bookings>
+            <app-performance-ratings></app-performance-ratings>
+        </div>
+
+        <!-- Reliability Metrics -->
+        <app-provider-reliability></app-provider-reliability>
+
+        <!-- Comparison Trends -->
+        <app-performance-comparison></app-performance-comparison>
+
+    </div>
+
+</div>

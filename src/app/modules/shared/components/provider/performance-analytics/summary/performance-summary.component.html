@@ -1,104 +1,132 @@
-<section id="performance-summary" class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen p-8">
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold text-slate-800 mb-8">Performance Summary</h1>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Completion Rate Card -->
-            <div class="bg-white rounded-2xl p-6 card-shadow card-hover border border-slate-200">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="bg-green-100 p-3 rounded-xl">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full"
-                        [ngClass]="(performanceOverviewStats.completionRate | metricPerformanceBadge:'completionRate').classes">
-                        {{ (performanceOverviewStats.completionRate | metricPerformanceBadge:'completionRate').label }}
-                    </span>
-                </div>
-                <h3 class="text-slate-600 text-sm font-medium mb-2">Completion Rate</h3>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-bold text-slate-900">{{performanceOverviewStats.completionRate}}</span>
-                    <span class="text-2xl font-semibold text-slate-900">%</span>
-                </div>
-                <p class="text-xs text-slate-500 mt-3">Completed jobs ÷ Total bookings</p>
+    <!-- Completion Rate Card -->
+    <div
+        class="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-100">
+        <div class="flex items-start justify-between mb-4">
+            <div class="bg-gradient-to-br from-green-400 to-emerald-600 p-3 rounded-xl shadow-md">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
             </div>
-
-            <!-- Average Rating Card -->
-            <div class="bg-white rounded-2xl p-6 card-shadow card-hover border border-slate-200">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="bg-amber-100 p-3 rounded-xl">
-                        <svg class="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
-                            </path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full"
-                        [ngClass]="(performanceOverviewStats.avgRating | metricPerformanceBadge:'avgRating').classes">
-                        {{ (performanceOverviewStats.avgRating | metricPerformanceBadge:'avgRating').label }}
-                    </span>
-                </div>
-                <h3 class="text-slate-600 text-sm font-medium mb-2">Average Rating</h3>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-bold text-slate-900">{{performanceOverviewStats.avgRating}}</span>
-                    <span class="text-2xl text-amber-500">★</span>
-                </div>
-                <p class="text-xs text-slate-500 mt-3">Based on customer feedback</p>
-            </div>
-
-            <!-- Response Time Card -->
-            <div class="bg-white rounded-2xl p-6 card-shadow card-hover border border-slate-200">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="bg-blue-100 p-3 rounded-xl">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full"
-                        [ngClass]="(performanceOverviewStats.avgResponseTime | metricPerformanceBadge:'avgResponseTime').classes">
-                        {{ (performanceOverviewStats.avgResponseTime | metricPerformanceBadge:'avgResponseTime').label
-                        }}
-                    </span>
-                </div>
-                <h3 class="text-slate-600 text-sm font-medium mb-2">Response Time</h3>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-bold text-slate-900">
-                        {{ performanceOverviewStats.avgResponseTime | timeFormatter:'value' }}
-                    </span>
-                    <span class="text-xl font-medium text-slate-600">
-                        {{ performanceOverviewStats.avgResponseTime | timeFormatter:'unit' }}
-                    </span>
-                </div>
-                <p class="text-xs text-slate-500 mt-3">Average time to reply</p>
-            </div>
-
-            <!-- On-Time Arrival Card -->
-            <div class="bg-white rounded-2xl p-6 card-shadow card-hover border border-slate-200">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="bg-orange-100 p-3 rounded-xl">
-                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                            </path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full"
-                        [ngClass]="(performanceOverviewStats.onTimePercent | metricPerformanceBadge:'onTimePercent').classes">
-                        {{ (performanceOverviewStats.onTimePercent | metricPerformanceBadge:'onTimePercent').label }}
-                    </span>
-                </div>
-                <h3 class="text-slate-600 text-sm font-medium mb-2">On-Time Arrival</h3>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-bold text-slate-900">{{performanceOverviewStats.onTimePercent}}</span>
-                    <span class="text-2xl font-semibold text-slate-900">%</span>
-                </div>
-                <p class="text-xs text-slate-500 mt-3">Punctuality performance</p>
-            </div>
+            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-green-100 text-green-700">
+                Excellent
+            </span>
         </div>
+        <h3 class="text-slate-600 text-sm font-semibold mb-2 uppercase tracking-wide">Completion Rate</h3>
+        <div class="flex items-baseline gap-2 mb-3">
+            <span
+                class="text-5xl font-black text-slate-900 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                {{performanceOverviewStats.completionRate}}
+            </span>
+            <span class="text-3xl font-bold text-slate-700">%</span>
+        </div>
+        <p class="text-xs text-slate-500 flex items-center gap-1">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 9.586V7z" />
+            </svg>
+            Completed jobs ÷ Total bookings
+        </p>
     </div>
-</section>
+
+    <!-- Average Rating Card -->
+    <div
+        class="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-100">
+        <div class="flex items-start justify-between mb-4">
+            <div class="bg-gradient-to-br from-amber-400 to-orange-600 p-3 rounded-xl shadow-md">
+                <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                    </path>
+                </svg>
+            </div>
+            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-amber-100 text-amber-700">
+                Top Rated
+            </span>
+        </div>
+        <h3 class="text-slate-600 text-sm font-semibold mb-2 uppercase tracking-wide">Average Rating</h3>
+        <div class="flex items-baseline gap-2 mb-3">
+            <span
+                class="text-5xl font-black text-slate-900 bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
+                {{performanceOverviewStats.avgRating}}
+            </span>
+            <span class="text-3xl text-amber-400">★</span>
+        </div>
+        <p class="text-xs text-slate-500 flex items-center gap-1">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+            </svg>
+            Based on customer feedback
+        </p>
+    </div>
+
+    <!-- Response Time Card -->
+    <div
+        class="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-100">
+        <div class="flex items-start justify-between mb-4">
+            <div class="bg-gradient-to-br from-blue-400 to-indigo-600 p-3 rounded-xl shadow-md">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-100 text-blue-700">
+                Fast
+            </span>
+        </div>
+        <h3 class="text-slate-600 text-sm font-semibold mb-2 uppercase tracking-wide">Response Time</h3>
+        <div class="flex items-baseline gap-2 mb-3">
+            <span
+                class="text-5xl font-black text-slate-900 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                {{performanceOverviewStats.avgResponseTime}}
+            </span>
+            <span class="text-xl font-semibold text-slate-600">min</span>
+        </div>
+        <p class="text-xs text-slate-500 flex items-center gap-1">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                    clip-rule="evenodd" />
+            </svg>
+            Average time to reply
+        </p>
+    </div>
+
+    <!-- On-Time Arrival Card -->
+    <div
+        class="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-100">
+        <div class="flex items-start justify-between mb-4">
+            <div class="bg-gradient-to-br from-purple-400 to-pink-600 p-3 rounded-xl shadow-md">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </div>
+            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-purple-100 text-purple-700">
+                Reliable
+            </span>
+        </div>
+        <h3 class="text-slate-600 text-sm font-semibold mb-2 uppercase tracking-wide">On-Time Arrival</h3>
+        <div class="flex items-baseline gap-2 mb-3">
+            <span
+                class="text-5xl font-black text-slate-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                {{performanceOverviewStats.onTimePercent}}
+            </span>
+            <span class="text-3xl font-bold text-slate-700">%</span>
+        </div>
+        <p class="text-xs text-slate-500 flex items-center gap-1">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                    clip-rule="evenodd" />
+            </svg>
+            Punctuality performance
+        </p>
+    </div>
+
+</div>
