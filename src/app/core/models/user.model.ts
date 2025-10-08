@@ -237,10 +237,3 @@ export interface IProviderCardView {
     isActive: boolean;
     avatar: string;
 }
-
-export interface IProviderPerformanceOverview {
-  avgResponseTime: number;
-  onTimePercent: number;
-  avgRating: number;
-  completionRate: number;
-}

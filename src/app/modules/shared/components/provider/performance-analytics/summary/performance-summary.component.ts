@@ -1,10 +1,11 @@
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { AnalyticService } from "../../../../../../core/services/analytics.service";
 import { takeUntil, filter, Subject } from 'rxjs';
-import { IProviderPerformanceOverview } from "../../../../../../core/models/user.model";
 import { TimeFormatterPipe } from "../../../../../../core/pipes/time-formatter.pipe";
 import { CommonModule } from "@angular/common";
 import { MetricPerformanceBadgePipe } from "../../../../../../core/pipes/performance-label.pipe";
+import { IResponse } from "../../../../models/response.model";
+import { IProviderPerformanceOverview } from "../../../../../../core/models/analytics.model";
 
 interface OverviewCard {
     label: string;
@@ -90,7 +91,7 @@ export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
         this._analyticService.getPerformanceSummary()
             .pipe(
                 takeUntil(this._destroy$),
-                filter(res => !!res.data)
+                filter((res): res is Required<IResponse<IProviderPerformanceOverview>> => !!res.data)
             )
             .subscribe(res => this.performanceOverviewStats = res.data);
     }
