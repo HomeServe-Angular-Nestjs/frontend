@@ -51,7 +51,6 @@ import { EChartsOption } from 'echarts';
 })
 export class ProviderPerformanceReliabilityChartComponent {
 
-    /** Response Time Breakdown */
     responseTimeOptions: EChartsOption = {
         tooltip: {
             trigger: 'item',

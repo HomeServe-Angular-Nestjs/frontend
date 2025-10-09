@@ -11,3 +11,15 @@ export interface IBookingPerformanceData {
     cancelled: number;
     total: number;
 }
+
+export interface IReviewChartData {
+    distributions: {
+        rating: number;
+        count: number;
+    }[];
+    reviews: {
+        name: string;
+        desc: string;
+        rating: number;
+    }[];
+}

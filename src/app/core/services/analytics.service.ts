@@ -3,7 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IProviderPerformanceOverview } from "../models/analytics.model";
+import { IBookingPerformanceData, IProviderPerformanceOverview, IReviewChartData } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
@@ -16,5 +16,9 @@ export class AnalyticService {
 
     getPerformanceBookingOverview(): Observable<IResponse<IBookingPerformanceData[]>> {
         return this._http.get<IResponse<IBookingPerformanceData[]>>(`${this._apiUrl}/booking_overview`);
+    }
+
+    getPerformanceRatingTrends(): Observable<IResponse<IReviewChartData>> {
+        return this._http.get<IResponse<IReviewChartData>>(`${this._apiUrl}/rating_trends`);
     }
 }
