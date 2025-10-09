@@ -5,13 +5,14 @@ import { SharedDataService } from "../../../../../core/services/public/shared-da
 import { AnalyticService } from "../../../../../core/services/analytics.service";
 import { ProviderPerformanceBookingChartComponent } from "../../../../shared/components/provider/performance-analytics/booking-chart/booking-chart.component";
 import * as echarts from 'echarts/core';
-import { BarChart, GaugeChart, HeatmapChart, LineChart, PieChart } from "echarts/charts";
+import { BarChart, HeatmapChart, LineChart, PieChart } from "echarts/charts";
 import { provideEchartsCore } from 'ngx-echarts';
 import { CanvasRenderer } from "echarts/renderers";
 import { GridComponent, LegendComponent, TitleComponent, ToolboxComponent, TooltipComponent, VisualMapComponent } from 'echarts/components';
 import { ProviderPerformanceRatingChartComponent } from "../../../../shared/components/provider/performance-analytics/customer-ratings/customer-ratings.component";
-import { ProviderPerformanceReliabilityChartComponent } from "../../../../shared/components/provider/performance-analytics/reliability-chart/reliability-chart.component";
+import { ProviderPerformanceResponseTimeChartComponent } from "../../../../shared/components/provider/performance-analytics/reliability-chart/response-time-chart.component";
 import { ProviderPerformanceComparisonChartComponent } from "../../../../shared/components/provider/performance-analytics/comparison-chart/comparison-chart.component";
+import { ProviderPerformanceOnTimeArrivalChartComponent } from "../../../../shared/components/provider/performance-analytics/reliability-chart/on-time-arrival-chart.component";
 
 
 echarts.use([
@@ -35,8 +36,9 @@ echarts.use([
         ProviderPerformanceSummaryComponent,
         ProviderPerformanceBookingChartComponent,
         ProviderPerformanceRatingChartComponent,
-        ProviderPerformanceReliabilityChartComponent,
         ProviderPerformanceComparisonChartComponent,
+        ProviderPerformanceResponseTimeChartComponent,
+        ProviderPerformanceOnTimeArrivalChartComponent
     ],
     providers: [AnalyticService, provideEchartsCore({ echarts })],
 

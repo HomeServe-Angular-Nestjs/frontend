@@ -23,3 +23,13 @@ export interface IReviewChartData {
         rating: number;
     }[];
 }
+
+export interface IResponseTimeChartData {
+    name: string;
+    count: number;
+}
+
+export interface IOnTimeArrivalChartData {
+    month: string;
+    percentage: number;
+}
