@@ -13,6 +13,7 @@ import { ProviderPerformanceRatingChartComponent } from "../../../../shared/comp
 import { ProviderPerformanceResponseTimeChartComponent } from "../../../../shared/components/provider/performance-analytics/reliability-chart/response-time-chart.component";
 import { ProviderPerformanceComparisonChartComponent } from "../../../../shared/components/provider/performance-analytics/comparison-chart/comparison-chart.component";
 import { ProviderPerformanceOnTimeArrivalChartComponent } from "../../../../shared/components/provider/performance-analytics/reliability-chart/on-time-arrival-chart.component";
+import { ProviderPerformanceDisputesChartComponent } from "../../../../shared/components/provider/performance-analytics/reliability-chart/disputes-chart.component";
 
 
 echarts.use([
@@ -33,13 +34,12 @@ echarts.use([
     selector: 'app-performance-page',
     templateUrl: './performance-page.component.html',
     imports: [CommonModule,
-        ProviderPerformanceSummaryComponent,
-        ProviderPerformanceBookingChartComponent,
-        ProviderPerformanceRatingChartComponent,
-        ProviderPerformanceComparisonChartComponent,
-        ProviderPerformanceResponseTimeChartComponent,
-        ProviderPerformanceOnTimeArrivalChartComponent
-    ],
+    ProviderPerformanceSummaryComponent,
+    ProviderPerformanceBookingChartComponent,
+    ProviderPerformanceRatingChartComponent,
+    ProviderPerformanceComparisonChartComponent,
+    ProviderPerformanceResponseTimeChartComponent,
+    ProviderPerformanceOnTimeArrivalChartComponent, ProviderPerformanceDisputesChartComponent],
     providers: [AnalyticService, provideEchartsCore({ echarts })],
 
 })

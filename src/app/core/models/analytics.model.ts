@@ -33,3 +33,16 @@ export interface IOnTimeArrivalChartData {
     month: string;
     percentage: number;
 }
+
+export interface IDisputeData {
+    disputeType: string;
+    data: number[];
+}
+
+export interface IDisputeAnalyticsChartData {
+    month: string;
+    other: number;
+    harassment: number;
+    spam: number;
+    inappropriate: number;
+}

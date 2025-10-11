@@ -11,19 +11,19 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
         <!-- KPI Summary Cards -->
-        <!-- <app-performance-summary></app-performance-summary> -->
+        <app-performance-summary></app-performance-summary>
 
         <!-- Ratings & Bookings Section -->
-        <!-- <div class="mb-6">
+        <div class="mb-6">
             <h3 class="text-xl font-semibold text-slate-800">Ratings & Bookings</h3>
             <p class="text-sm text-slate-500 mt-1">Insights into customer satisfaction and booking trends</p>
-        </div> -->
+        </div>
 
         <!-- Bookings & Customer Satisfaction Row -->
-        <!-- <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <app-performance-ratings></app-performance-ratings>
             <app-performance-bookings></app-performance-bookings>
-        </div> -->
+        </div>
 
         <!-- Reliability Metrics -->
         <div class="mb-6">
@@ -31,13 +31,16 @@
             <p class="text-sm text-slate-500 mt-1">Insights intoService quality & punctuality indicators</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <app-performance-response-time></app-performance-response-time>
-            <app-performance-on-time-arrival></app-performance-on-time-arrival>
+        <div class="flex flex-col gap-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <app-performance-response-time></app-performance-response-time>
+                <app-performance-on-time-arrival></app-performance-on-time-arrival>
+            </div>
+            <app-performance-disputes></app-performance-disputes>
         </div>
 
         <!-- Comparison Trends -->
-        <!-- <app-performance-comparison></app-performance-comparison> -->
+        <app-performance-comparison></app-performance-comparison>
 
     </div>
 

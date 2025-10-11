@@ -5,11 +5,13 @@ import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../confirm-dialog-box/confirm-dialog.component";
 import { Subject, takeUntil } from "rxjs";
 import { IReportSubmit } from "../../../../../core/services/report.service";
+import { CommonModule } from "@angular/common";
+import { ComplaintReason } from "../../../../../core/enums/enums";
 
 @Component({
     selector: 'app-report-modal',
     templateUrl: 'report-modal.component.html',
-    imports: [FormsModule]
+    imports: [CommonModule, FormsModule]
 })
 export class ReportModalComponent implements OnDestroy {
     private readonly _toastr = inject(ToastNotificationService);
@@ -22,6 +24,12 @@ export class ReportModalComponent implements OnDestroy {
 
     option = '';
     text = '';
+    reportReasons = [
+        { value: ComplaintReason.SPAM, label: 'Spam' },
+        { value:  ComplaintReason.INAPPROPRIATE, label: 'Inappropriate Service' },
+        { value: ComplaintReason.HARASSMENT, label: 'Harassment' },
+        { value:  ComplaintReason.OTHER, label: 'Other' }
+    ];
 
     ngOnDestroy(): void {
         this.destroy$.next();

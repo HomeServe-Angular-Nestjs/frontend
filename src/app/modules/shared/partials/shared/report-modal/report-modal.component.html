@@ -13,28 +13,10 @@
 
         <!-- Radio Options -->
         <div class="space-y-3 mb-4">
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input [(ngModel)]="option" type="radio" name="reportReason" value="spam"
-                    class="text-red-600 focus:ring-red-500">
-                <span class="text-gray-700 text-sm">Spam</span>
-            </label>
-
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input [(ngModel)]="option" type="radio" name="reportReason" value="inappropriate"
-                    class="text-red-600 focus:ring-red-500">
-                <span class="text-gray-700 text-sm">Inappropriate Service</span>
-            </label>
-
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input [(ngModel)]="option" type="radio" name="reportReason" value="harassment"
-                    class="text-red-600 focus:ring-red-500">
-                <span class="text-gray-700 text-sm">Harassment</span>
-            </label>
-
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input [(ngModel)]="option" type="radio" name="reportReason" value="other"
-                    class="text-red-600 focus:ring-red-500">
-                <span class="text-gray-700 text-sm">Other</span>
+            <label *ngFor="let reason of reportReasons" class="flex items-center gap-2 cursor-pointer">
+                <input [(ngModel)]="option" type="radio" name="reportReason" [value]="reason.value"
+                    class="text-red-600 focus:ring-red-500" />
+                <span class="text-gray-700 text-sm">{{ reason.label }}</span>
             </label>
         </div>
 
