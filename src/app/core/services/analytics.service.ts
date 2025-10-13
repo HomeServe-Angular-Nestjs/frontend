@@ -3,7 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IResponseTimeChartData, IReviewChartData } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IResponseTimeChartData, IReviewChartData } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
@@ -34,5 +34,11 @@ export class AnalyticService {
         return this._http.get<IResponse<IDisputeAnalyticsChartData[]>>(`${this._apiUrl}/performance/monthly_disputes`);
     }
 
+    getComparisonOverviewData(): Observable<IResponse<IComparisonOverviewData>> {
+        return this._http.get<IResponse<IComparisonOverviewData>>(`${this._apiUrl}/performance/comparison_overview`);
+    }
 
+    getComparisonStats(): Observable<IResponse<IComparisonChartData[]>> {
+        return this._http.get<IResponse<IComparisonChartData[]>>(`${this._apiUrl}/performance/comparison_stats`);
+    }
 }
