@@ -1,12 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
+import { AnalyticService } from '../../../../../core/services/analytics.service';
+import { Subject, takeUntil } from 'rxjs';
+import { IRevenueCompositionData } from '../../../../../core/models/analytics.model';
+import { CallbackDataParams } from 'echarts/types/dist/shared';
 
 @Component({
     selector: 'app-revenue-composition-chart',
-    standalone: true,
     imports: [CommonModule, NgxEchartsModule],
+    providers: [AnalyticService],
     template: `
       <div class="p-4 bg-white rounded-2xl shadow-md">
         <h2 class="text-lg font-semibold mb-3 text-gray-800">
@@ -16,32 +20,46 @@ import type { EChartsOption } from 'echarts';
       </div>
   `
 })
-export class RevenueCompositionChartsComponent {
+export class RevenueCompositionChartsComponent implements OnInit, OnDestroy {
+    private readonly _analyticService = inject(AnalyticService);
+    private _destroy$ = new Subject<void>();
+
     compositionOptions: EChartsOption = {};
+    compositionChartData: IRevenueCompositionData[] = [];
 
-
-    constructor() {
-        this.setRevenueCompositionChart();
+    ngOnInit(): void {
+        this._analyticService.getRevenueCompositionChartData()
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(res => {
+                this.compositionChartData = res.data ?? [];
+                this.setRevenueCompositionChart();
+            });
     }
 
-    // 🥧 Donut Chart — Revenue Composition
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
+    }
+
     private setRevenueCompositionChart() {
-        const data = [
-            { name: 'Consulting', value: 40000 },
-            { name: 'Maintenance', value: 30000 },
-            { name: 'Support', value: 20000 },
-            { name: 'Training', value: 10000 }
-        ];
+        const data = this.compositionChartData.map(item => ({
+            name: item.category,
+            value: item.totalRevenue
+        }));
 
         this.compositionOptions = {
             tooltip: {
                 trigger: 'item',
-                formatter: '{b}: ₹{c} ({d}%)'
+                formatter: (params) => {
+                    const item = Array.isArray(params) ? params[0] : params;
+                    return `${(item as any).name ?? ''}: ₹${(item as any).value ?? ''}`;
+                },
+                textStyle: { fontSize: 12 }
             },
             legend: {
                 orient: 'vertical',
                 left: 'left',
-                textStyle: { color: '#374151' } // gray-700
+                textStyle: { color: '#374151' }
             },
             series: [
                 {
@@ -64,17 +82,36 @@ export class RevenueCompositionChartsComponent {
                     },
                     labelLine: { show: false },
                     data,
-                    color: [
-                        '#16A34A', // primary green
-                        '#22C55E',
-                        '#4ADE80',
-                        '#86EFAC',
-                        '#BBF7D0'
-                    ]
+                    color: this._getColorPalette()
                 }
-            ]
+            ],
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0,0,0,0.3)'
+                },
+                label: {
+                    show: true,
+                    fontSize: 14,
+                    fontWeight: 'bold'
+                }
+            },
+            label: {
+                show: true,
+                formatter: '{b}: ₹{c}\n({d}%)',
+                fontSize: 12,
+                color: '#374151'
+            },
+            labelLine: { show: true }
         };
     }
 
-
+    private _getColorPalette(): string[] {
+        return this.compositionChartData.map((_, index) => {
+            const hue = 120; // green
+            const lightness = 40 + index * 10; // adjust brightness per slice
+            return `hsl(${hue}, 70%, ${lightness}%)`;
+        });
+    }
 }

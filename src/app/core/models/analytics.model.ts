@@ -99,3 +99,8 @@ export interface IRevenueMonthlyGrowthRateData {
     month: string;
     growthRate: number;
 }
+
+export interface IRevenueCompositionData {
+    totalRevenue:number;
+    category:string;
+}

@@ -3,7 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
@@ -57,6 +57,10 @@ export class AnalyticService {
 
     getMonthlyRevenueGrowthRate(): Observable<IResponse<IRevenueMonthlyGrowthRateData[]>> {
         return this._http.get<IResponse<IRevenueMonthlyGrowthRateData[]>>(`${this._apiUrl}/revenue/growth_rate`);
+    }
+
+    getRevenueCompositionChartData(): Observable<IResponse<IRevenueCompositionData[]>> {
+        return this._http.get<IResponse<IRevenueCompositionData[]>>(`${this._apiUrl}/revenue/composition`);
     }
 
 }
