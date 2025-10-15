@@ -1,9 +1,9 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IReviewChartData } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueTrendData, IReviewChartData, RevenueChartView } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
@@ -45,9 +45,14 @@ export class AnalyticService {
     }
 
     // ------------ Revenue Analytics APIs ------------
-    
+
     getRevenueOverview(): Observable<IResponse<IProviderRevenueOverview>> {
         return this._http.get<IResponse<IProviderRevenueOverview>>(`${this._apiUrl}/revenue/overview`);
+    }
+
+    getRevenueTrendOverTime(view: RevenueChartView = 'monthly'): Observable<IResponse<IRevenueTrendData>> {
+        const params = new HttpParams().set('view', view);
+        return this._http.get<IResponse<IRevenueTrendData>>(`${this._apiUrl}/revenue/trends`, { params });
     }
 
 }

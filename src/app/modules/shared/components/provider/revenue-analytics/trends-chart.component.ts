@@ -1,12 +1,15 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
+import { AnalyticService } from '../../../../../core/services/analytics.service';
+import { IRevenueTrendData, RevenueChartView } from '../../../../../core/models/analytics.model';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-revenue-trend-chart',
-    standalone: true,
     imports: [CommonModule, NgxEchartsModule],
+    providers: [AnalyticService],
     template: `
     <div class="p-4 bg-white rounded-2xl shadow-md">
       <h2 class="text-lg font-semibold mb-3 text-gray-800">
@@ -17,7 +20,7 @@ import type { EChartsOption } from 'echarts';
 
       <div class="flex justify-end mt-3 space-x-2">
         <button
-          *ngFor="let view of ['Monthly', 'Quarterly', 'Yearly']"
+          *ngFor="let view of viewOptions"
           (click)="onViewChange(view)"
           class="px-3 py-1 rounded-md border text-sm transition"
           [class.bg-green-600]="currentView === view"
@@ -26,69 +29,50 @@ import type { EChartsOption } from 'echarts';
           [class.text-gray-700]="currentView !== view"
           [class.hover\\:bg-green-100]="currentView !== view"
         >
-          {{ view }}
+          {{ view | titlecase}}
         </button>
       </div>
     </div>
   `,
 })
-export class RevenueTrendChartComponent implements OnChanges {
-    @Input() userRevenue: number[] = [];
-    @Input() platformAvg: number[] = [];
-    @Input() months: string[] = [];
+export class RevenueTrendChartComponent implements OnInit, OnDestroy {
+    private readonly _analyticService = inject(AnalyticService);
+
+    private _destroy$ = new Subject<void>();
 
     chartOptions: EChartsOption = {};
-    currentView = 'Monthly';
-
-    revenueData: any = {
-        Monthly: {
-            labels: [
-                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-            ],
-            user: [1200, 1450, 1600, 2100, 2500, 2300, 2800, 3000, 3400, 3200, 3700, 4000],
-            avg: [1000, 1200, 1400, 1800, 2000, 2100, 2300, 2600, 2900, 3100, 3300, 3500]
-        },
-        Quarterly: {
-            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-            user: [4250, 6900, 9200, 10900],
-            avg: [3600, 6000, 8500, 9700]
-        },
-        Yearly: {
-            labels: ['2022', '2023', '2024', '2025'],
-            user: [25000, 31000, 38500, 42000],
-            avg: [23000, 29000, 35000, 39000]
-        }
-    };
-
-    ngOnChanges(changes: SimpleChanges) {
-        if (changes['userRevenue'] || changes['platformAvg'] || changes['months']) {
-            this.setChartOptions();
-        }
-    }
-
+    viewOptions: RevenueChartView[] = ['monthly', 'quarterly', 'yearly'];
+    currentView: RevenueChartView = 'monthly';
+    revenueTrendData: IRevenueTrendData = { providerRevenue: [], platformAvg: [], labels: [] };
+    
     ngOnInit() {
-        this.updateChartData('Monthly');
+        this.updateChartData();
     }
 
-    onViewChange(view: string) {
+    ngOnDestroy() {
+        this._destroy$.next();
+        this._destroy$.complete();
+    }
+
+    onViewChange(view: RevenueChartView) {
         this.currentView = view;
-        this.updateChartData(view);
+        this.updateChartData();
     }
 
-    private updateChartData(view: string) {
-        const selected = this.revenueData[view];
-        this.months = selected.labels;
-        this.userRevenue = selected.user;
-        this.platformAvg = selected.avg;
-        this.setChartOptions();
+    private updateChartData() {
+        this._analyticService.getRevenueTrendOverTime(this.currentView)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(res => {
+                this.revenueTrendData = res.data || this.revenueTrendData;
+                this.setChartOptions();
+            });
     }
 
     private setChartOptions() {
         this.chartOptions = {
             tooltip: {
                 trigger: 'axis',
-                backgroundColor: 'rgba(16,185,129,0.9)', // green tooltip
+                backgroundColor: 'rgba(16,185,129,0.9)',
                 textStyle: { color: '#fff' },
             },
             legend: {
@@ -104,7 +88,7 @@ export class RevenueTrendChartComponent implements OnChanges {
             xAxis: {
                 type: 'category',
                 boundaryGap: false,
-                data: this.months,
+                data: this.revenueTrendData.labels,
                 axisLine: { lineStyle: { color: '#ccc' } },
             },
             yAxis: {
@@ -116,11 +100,11 @@ export class RevenueTrendChartComponent implements OnChanges {
                 {
                     name: 'Your Revenue',
                     type: 'line',
-                    data: this.userRevenue,
+                    data: this.revenueTrendData.providerRevenue,
                     smooth: true,
-                    lineStyle: { width: 3, color: '#16A34A' }, // emerald-600
+                    lineStyle: { width: 3, color: '#16A34A' },
                     areaStyle: {
-                        color: 'rgba(22,163,74,0.15)', // soft green fill
+                        color: 'rgba(22,163,74,0.15)',
                     },
                     symbol: 'circle',
                     symbolSize: 6,
@@ -135,9 +119,9 @@ export class RevenueTrendChartComponent implements OnChanges {
                 {
                     name: 'Platform Average',
                     type: 'line',
-                    data: this.platformAvg,
+                    data: this.revenueTrendData.platformAvg,
                     smooth: true,
-                    lineStyle: { width: 2, color: '#6EE7B7', type: 'dashed' }, // mint green
+                    lineStyle: { width: 2, color: '#6EE7B7', type: 'dashed' },
                     symbol: 'none',
                     animationDuration: 800,
                     animationEasing: 'cubicOut',

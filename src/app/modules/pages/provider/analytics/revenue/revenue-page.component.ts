@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from "@angular/core";
-import { RevenueOverviewComponent } from "../../../../shared/components/provider/revenue-analytics/revenue-overview.component";
-import { RevenueTrendChartComponent } from "../../../../shared/components/provider/revenue-analytics/revenue-trends-chart.component";
+import { RevenueOverviewComponent } from "../../../../shared/components/provider/revenue-analytics/overview.component";
+import { RevenueTrendChartComponent } from "../../../../shared/components/provider/revenue-analytics/trends-chart.component";
 import * as echarts from 'echarts/core';
 import { GridComponent, LegendComponent, TitleComponent, ToolboxComponent, TooltipComponent, VisualMapComponent } from 'echarts/components';
 import { BarChart, HeatmapChart, LineChart, PieChart } from "echarts/charts";
@@ -9,7 +9,7 @@ import { provideEchartsCore } from "ngx-echarts";
 import { CanvasRenderer } from "echarts/renderers";
 import { RevenueCompositionChartsComponent } from "../../../../shared/components/provider/revenue-analytics/composition.component";
 import { RevenueMonthlyGrowthRateChartComponent } from "../../../../shared/components/provider/revenue-analytics/monthly-growth-rate.component";
-import { RevenueTopSourcesChartComponent } from "../../../../shared/components/provider/revenue-analytics/avg-transaction-value-chart.component";
+import { RevenueTopSourcesChartComponent } from "../../../../shared/components/provider/revenue-analytics/top-sources-chart.component";
 import { RevenueRepeatVsNewCustomersChartComponent } from "../../../../shared/components/provider/revenue-analytics/repeat-vs-new-customers-chart.component";
 import { RevenueEarningsForecastChartComponent } from "../../../../shared/components/provider/revenue-analytics/earning-forcast-chart.component";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";

@@ -79,10 +79,17 @@ export interface IComparisonChartData {
 }
 
 // ----------- Revenue Analytics Models ------------
+export type RevenueChartView = 'monthly' | 'quarterly' | 'yearly';
 
 export interface IProviderRevenueOverview {
     totalRevenue: number;
     revenueGrowth: number;
     completedTransactions: number;
     avgTransactionValue: number;
+}
+
+export interface IRevenueTrendData {
+    providerRevenue: number[];
+    platformAvg: number[];
+    labels: string[];
 }
