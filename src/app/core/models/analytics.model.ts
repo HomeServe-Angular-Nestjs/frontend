@@ -93,3 +93,9 @@ export interface IRevenueTrendData {
     platformAvg: number[];
     labels: string[];
 }
+
+export interface IRevenueMonthlyGrowthRateData {
+    totalRevenue: number;
+    month: string;
+    growthRate: number;
+}

@@ -1,11 +1,15 @@
-import { Component } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { EChartsOption } from "echarts";
 import { NgxEchartsModule } from "ngx-echarts";
+import { AnalyticService } from "../../../../../core/services/analytics.service";
+import { Subject, takeUntil } from "rxjs";
+import { IRevenueMonthlyGrowthRateData } from "../../../../../core/models/analytics.model";
+import { TopLevelFormatterParams } from "echarts/types/dist/shared";
 
 @Component({
     selector: "app-revenue-monthly-growth-rate-chart",
     imports: [NgxEchartsModule],
-    providers: [],
+    providers: [AnalyticService],
     template: `
       <div class="p-4 bg-white rounded-2xl shadow-md">
         <h2 class="text-lg font-semibold mb-3 text-gray-800">
@@ -15,31 +19,57 @@ import { NgxEchartsModule } from "ngx-echarts";
       </div>
     `
 })
-export class RevenueMonthlyGrowthRateChartComponent {
-    growthOptions: EChartsOption = {};
-    constructor() {
-        this.setGrowthRateChart();
+export class RevenueMonthlyGrowthRateChartComponent implements OnInit, OnDestroy {
+    private readonly _analyticService = inject(AnalyticService);
+    private _destroy$ = new Subject<void>();
 
+    growthOptions: EChartsOption = {};
+    growthChartData: IRevenueMonthlyGrowthRateData[] = [];
+
+    ngOnInit() {
+        this._analyticService.getMonthlyRevenueGrowthRate()
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(res => {
+                this.growthChartData = res.data || this.growthChartData;
+                this.setGrowthRateChart();
+            });
     }
+
+    ngOnDestroy() {
+        this._destroy$.next();
+        this._destroy$.complete();
+    }
+
     private setGrowthRateChart() {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-        const revenue = [10000, 12000, 15000, 13000, 17000, 19000];
-        const growth = [0, 20, 25, -13, 31, 12];
+        const months: string[] = [];
+        const revenue: number[] = [];
+        const growth: number[] = [];
+
+        this.growthChartData.forEach(item => {
+            months.push(item.month);
+            revenue.push(item.totalRevenue);
+            growth.push(item.growthRate);
+        });
 
         this.growthOptions = {
             tooltip: {
                 trigger: 'axis',
-                formatter: (params: any) => {
-                    const rev = params[0]?.value;
-                    const gr = params[1]?.value;
-                    const grColor = gr >= 0 ? '#16A34A' : '#DC2626';
+                formatter: (params: TopLevelFormatterParams) => {
+                    const p = Array.isArray(params) ? params : [params];
+                    const rev = (p[0]?.value as number) ?? 0;
+                    const gr = p[1]?.value;
+                    const axis = (p[0] as any)?.axisValue ?? '';
+
+                    const grNum = typeof gr === 'number' ? gr : Number(gr);
+                    const grColor = !isNaN(grNum) && grNum >= 0 ? '#16A34A' : '#DC2626';
+
                     return `
-            <div>
-              <strong>${params[0].axisValue}</strong><br/>
-              Revenue: ₹${rev}<br/>
-              <span style="color:${grColor}">Growth: ${gr}%</span>
-            </div>
-          `;
+                        <div>
+                            <strong>${axis}</strong><br/>
+                            Revenue: ₹${rev}
+                            ${!isNaN(grNum) ? `<br/><span style="color:${grColor}">Growth: ${grNum}%</span>` : ''}
+                        </div>
+                        `;
                 }
             },
             legend: {
@@ -63,12 +93,20 @@ export class RevenueMonthlyGrowthRateChartComponent {
                 {
                     type: 'value',
                     name: 'Revenue (₹)',
-                    position: 'left'
+                    position: 'left',
+                    splitLine: {
+                        show: true,
+                        lineStyle: { type: 'dashed', color: '#eee' }
+                    }
                 },
                 {
                     type: 'value',
                     name: 'Growth (%)',
-                    position: 'right'
+                    position: 'right',
+                    splitLine: {
+                        show: true,
+                        lineStyle: { type: 'dashed', color: '#eee' }
+                    }
                 }
             ],
             series: [
