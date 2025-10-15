@@ -1,60 +1,56 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
 
-    <!-- Header Section -->
-    <div class="p-6">
-        <div class="max-w-7xl mx-auto">
-            <h1 class="text-3xl font-semibold text-gray-900 mb-1">Performance Analytics</h1>
-            <p class="text-gray-500 text-sm">Comprehensive insights into your service metrics</p>
-        </div>
-    </div>
+        <!-- KPI Summary -->
+        <section>
+            <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Key Performance Metrics</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                A summary of your key service performance indicators and quality metrics
+            </p>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <app-performance-summary></app-performance-summary>
+        </section>
 
-        <!-- KPI Summary Cards -->
-        <app-performance-summary></app-performance-summary>
-
-        <!-- Ratings & Bookings Section -->
-        <div class="mb-6">
-            <h3 class="text-xl font-semibold text-slate-800">Ratings & Bookings</h3>
-            <p class="text-sm text-slate-500 mt-1">Insights into customer satisfaction and booking trends</p>
-        </div>
-
-        <!-- Bookings & Customer Satisfaction Row -->
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <app-performance-ratings></app-performance-ratings>
-            <app-performance-bookings></app-performance-bookings>
-        </div>
+        <!-- Ratings & Bookings -->
+        <section>
+            <div class="mb-4">
+                <h2 class="text-2xl font-semibold text-emerald-700">Ratings & Bookings</h2>
+                <p class="text-sm text-slate-500 mt-1">Analyze customer satisfaction levels and booking activity over
+                    time</p>
+            </div>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <app-performance-ratings></app-performance-ratings>
+                <app-performance-bookings></app-performance-bookings>
+            </div>
+        </section>
 
         <!-- Reliability Metrics -->
-        <div class="mb-6">
-            <h3 class="text-xl font-semibold text-slate-800"> Reliability Metrics</h3>
-            <p class="text-sm text-slate-500 mt-1">Insights intoService quality & punctuality indicators</p>
-        </div>
-
-        <div class="flex flex-col gap-y-4">
+        <section>
+            <div class="mb-4">
+                <h2 class="text-2xl font-semibold text-emerald-700">Reliability Metrics</h2>
+                <p class="text-sm text-slate-500 mt-1">Evaluate service quality, response time, and punctuality</p>
+            </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <app-performance-response-time></app-performance-response-time>
                 <app-performance-on-time-arrival></app-performance-on-time-arrival>
             </div>
-            <app-performance-disputes></app-performance-disputes>
-        </div>
+            <div class="mt-6">
+                <app-performance-disputes></app-performance-disputes>
+            </div>
+        </section>
 
-        <!-- Comparison Trends -->
+        <!-- Performance Comparison -->
+        <section>
+            <div class="mb-4">
+                <h2 class="text-2xl font-semibold text-emerald-700">Performance Comparison</h2>
+                <p class="text-sm text-slate-500 mt-1">Compare your performance against platform benchmarks and
+                    competitors</p>
+            </div>
+            <div class="space-y-6">
+                <app-performance-comparison-overview></app-performance-comparison-overview>
+                <app-performance-comparison></app-performance-comparison>
+            </div>
+        </section>
 
-        <div class="mb-6">
-            <h2 class="text-2xl font-semibold text-slate-800 flex items-center gap-2">
-                Performance Comparison
-            </h2>
-            <p class="text-sm text-slate-500 mt-1">Compare your metrics with the platform benchmark</p>
-
-            <app-performance-comparison-overview></app-performance-comparison-overview>
-        </div>
-
-        <div class="flex flex-col gap-y-4">
-            <app-performance-comparison></app-performance-comparison>
-        </div>
-
-    </div>
-
-
+    </main>
 </div>

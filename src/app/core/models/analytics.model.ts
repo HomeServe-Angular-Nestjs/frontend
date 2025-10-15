@@ -1,3 +1,16 @@
+// ----------- Performance Analytics Models ------------
+
+export interface IOverviewCard<T> {
+    label: string;
+    valueKey: keyof T;
+    icon: string;
+    iconColor: string;
+    badge: string;
+    badgeColor: string;
+    unit?: string;
+    description: string;
+}
+
 export interface IProviderPerformanceOverview {
     avgResponseTime: number;
     onTimePercent: number;
@@ -63,4 +76,13 @@ export interface IComparisonChartData {
     month: string;
     performance: number;
     platformAvg: number;
+}
+
+// ----------- Revenue Analytics Models ------------
+
+export interface IProviderRevenueOverview {
+    totalRevenue: number;
+    revenueGrowth: number;
+    completedTransactions: number;
+    avgTransactionValue: number;
 }

@@ -5,18 +5,7 @@ import { TimeFormatterPipe } from "../../../../../../core/pipes/time-formatter.p
 import { CommonModule } from "@angular/common";
 import { MetricPerformanceBadgePipe } from "../../../../../../core/pipes/performance-label.pipe";
 import { IResponse } from "../../../../models/response.model";
-import { IProviderPerformanceOverview } from "../../../../../../core/models/analytics.model";
-
-interface OverviewCard {
-    label: string;
-    valueKey: keyof IProviderPerformanceOverview;
-    icon: string;
-    iconColor: string;
-    badge: string;
-    badgeColor: string;
-    unit?: string;
-    description: string;
-}
+import { IOverviewCard, IProviderPerformanceOverview } from "../../../../../../core/models/analytics.model";
 
 @Component({
     selector: 'app-performance-summary',
@@ -35,7 +24,7 @@ export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
         onTimePercent: 0
     };
 
-    overviewCards: OverviewCard[] = [
+    overviewCards: IOverviewCard<IProviderPerformanceOverview>[] = [
         {
             label: 'Completion Rate',
             valueKey: 'completionRate',

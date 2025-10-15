@@ -2,7 +2,6 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from "@angular/core";
 import { ProviderPerformanceSummaryComponent } from "../../../../shared/components/provider/performance-analytics/summary/performance-summary.component";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
-import { AnalyticService } from "../../../../../core/services/analytics.service";
 import { ProviderPerformanceBookingChartComponent } from "../../../../shared/components/provider/performance-analytics/booking-chart/booking-chart.component";
 import * as echarts from 'echarts/core';
 import { BarChart, HeatmapChart, LineChart, PieChart } from "echarts/charts";
@@ -44,15 +43,13 @@ echarts.use([
         ProviderPerformanceDisputesChartComponent,
         ProviderPerformanceComparisonOverviewComponent
     ],
-    providers: [AnalyticService, provideEchartsCore({ echarts })],
+    providers: [provideEchartsCore({ echarts })],
 
 })
 export class ProviderPerformanceLayoutComponent implements OnInit {
     private readonly _sharedService = inject(SharedDataService);
-    private readonly _analyticsService = inject(AnalyticService)
 
     ngOnInit(): void {
-        this._sharedService.setProviderHeader('Analytics');
-        this._analyticsService.getPerformanceSummary().subscribe();
+        this._sharedService.setProviderHeader('Performance Analytics');
     }
 }

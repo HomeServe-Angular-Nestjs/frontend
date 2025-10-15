@@ -3,12 +3,14 @@ import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IResponseTimeChartData, IReviewChartData } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IReviewChartData } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
     private readonly _http = inject(HttpClient);
     private readonly _apiUrl = API_ENV.analytics;
+
+    // ------------ Performance Analytics APIs ------------
 
     getPerformanceSummary(): Observable<IResponse<IProviderPerformanceOverview>> {
         return this._http.get<IResponse<IProviderPerformanceOverview>>(`${this._apiUrl}/performance/summary`)
@@ -41,4 +43,11 @@ export class AnalyticService {
     getComparisonStats(): Observable<IResponse<IComparisonChartData[]>> {
         return this._http.get<IResponse<IComparisonChartData[]>>(`${this._apiUrl}/performance/comparison_stats`);
     }
+
+    // ------------ Revenue Analytics APIs ------------
+    
+    getRevenueOverview(): Observable<IResponse<IProviderRevenueOverview>> {
+        return this._http.get<IResponse<IProviderRevenueOverview>>(`${this._apiUrl}/revenue/overview`);
+    }
+
 }
