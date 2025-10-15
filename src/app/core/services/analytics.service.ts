@@ -3,7 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
@@ -65,6 +65,10 @@ export class AnalyticService {
 
     getTopServicesByRevenue(): Observable<IResponse<ITopServicesByRevenue[]>> {
         return this._http.get<IResponse<ITopServicesByRevenue[]>>(`${this._apiUrl}/revenue/top_services`);
+    }
+
+    getNewAndReturningClientData(): Observable<IResponse<INewOrReturningClientData[]>> {
+        return this._http.get<IResponse<INewOrReturningClientData[]>>(`${this._apiUrl}/revenue/new_returning_clients`);
     }
 
 }

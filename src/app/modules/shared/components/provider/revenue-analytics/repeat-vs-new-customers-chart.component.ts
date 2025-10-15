@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import * as echarts from 'echarts';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { AnalyticService } from '../../../../../core/services/analytics.service';
+import { Subject, takeUntil } from 'rxjs';
+import { EChartsOption } from 'echarts';
+import { INewOrReturningClientData } from '../../../../../core/models/analytics.model';
 
 @Component({
     selector: 'app-revenue-repeat-vs-new-customers-chart',
     imports: [NgxEchartsModule],
-    providers: [],
+    providers: [AnalyticService],
     template: `
      <div class="p-4 bg-white rounded-2xl shadow-md">
         <h2 class="text-lg font-semibold mb-3 text-gray-800">
@@ -15,17 +18,39 @@ import { NgxEchartsModule } from 'ngx-echarts';
       </div>
     `
 })
-export class RevenueRepeatVsNewCustomersChartComponent implements OnInit {
-    chartOption: echarts.EChartsOption = {};
+export class RevenueRepeatVsNewCustomersChartComponent implements OnInit, OnDestroy {
+    private readonly _analyticService = inject(AnalyticService);
+    private _destroy$ = new Subject<void>();
+
+    chartOption: EChartsOption = {};
+    chartData: INewOrReturningClientData[] = [];
 
     ngOnInit(): void {
-        this._setChartOptions();
+        this._analyticService.getNewAndReturningClientData()
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(res => {
+                this.chartData = res.data ?? [];
+                this._setChartOptions();
+            });
+    }
+
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
     }
 
     private _setChartOptions() {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-        const newClients = [120, 150, 180, 130, 160, 200];
-        const returningClients = [80, 100, 110, 90, 120, 140];
+        const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const months: string[] = [];
+        const newClients: number[] = [];
+        const returningClients: number[] = [];
+
+        m.forEach(mth=> {
+            const monthData = this.chartData.find(d => d.month === mth);
+            months.push(mth);
+            newClients.push(monthData?.newClients ?? 0);
+            returningClients.push(monthData?.returningClients ?? 0);    
+        });
 
         this.chartOption = {
             title: {

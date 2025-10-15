@@ -111,3 +111,9 @@ export interface ITopServicesByRevenue {
     totalBookings: number;
     avgRevenue: number;
 }
+
+export interface INewOrReturningClientData {
+    month: string;
+    newClients: number;
+    returningClients: number;
+}
