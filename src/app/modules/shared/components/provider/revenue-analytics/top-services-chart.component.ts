@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
+import { AnalyticService } from '../../../../../core/services/analytics.service';
+import { Subject, takeUntil } from 'rxjs';
+import { ITopServicesByRevenue } from '../../../../../core/models/analytics.model';
 
 @Component({
-    selector: 'app-revenue-top-sources-chart',
+    selector: 'app-revenue-top-services-chart',
     imports: [CommonModule, NgxEchartsModule],
-    providers: [],
+    providers: [AnalyticService],
     template: `
     <div class="bg-white p-5 rounded-2xl shadow-md">
       <h2 class="text-lg font-semibold mb-3 text-gray-800">
@@ -16,17 +19,25 @@ import type { EChartsOption } from 'echarts';
     </div>
   `
 })
-export class RevenueTopSourcesChartComponent {
+export class RevenueTopServicesChartComponent implements OnInit, OnDestroy {
+    private readonly _analyticService = inject(AnalyticService);
+    private _destroy$ = new Subject<void>();
+
     chartOptions: EChartsOption = {};
-    services = [
-        { name: 'Consulting', revenue: 48000, bookings: 120, avgValue: 400 },
-        { name: 'Maintenance', revenue: 42000, bookings: 150, avgValue: 280 },
-        { name: 'Support', revenue: 36000, bookings: 200, avgValue: 180 },
-        { name: 'Training', revenue: 27000, bookings: 90, avgValue: 300 },
-        { name: 'Implementation', revenue: 23000, bookings: 70, avgValue: 328 }
-    ];
-    constructor() {
-        this.setChartOptions();
+    chartData: ITopServicesByRevenue[] = [];
+
+    ngOnInit(): void {
+        this._analyticService.getTopServicesByRevenue()
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(res => {
+                this.chartData = res.data ?? [];
+                this.setChartOptions();
+            });
+    }
+
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
     }
 
     private setChartOptions() {
@@ -35,13 +46,13 @@ export class RevenueTopSourcesChartComponent {
             tooltip: {
                 trigger: 'item',
                 formatter: (params: any) => {
-                    const service = this.services[params.dataIndex];
+                    const service = this.chartData[params.dataIndex];
                     return `
             <div>
-              <strong>${service.name}</strong><br/>
+              <strong>${service.service}</strong><br/>
               Revenue: ₹${service.revenue.toLocaleString()}<br/>
-              Bookings: ${service.bookings}<br/>
-              Avg. Value: ₹${service.avgValue}
+              Bookings: ${service.totalBookings}<br/>
+              Avg. Value: ₹${service.avgRevenue}
             </div>
           `;
                 }
@@ -59,16 +70,23 @@ export class RevenueTopSourcesChartComponent {
             },
             yAxis: {
                 type: 'category',
-                data: this.services.map(s => s.name),
+                data: this.chartData.map(s => s.service),
                 axisLine: { lineStyle: { color: '#ccc' } },
                 axisTick: { show: false },
-                axisLabel: { color: '#374151', fontWeight: 500 }
+                axisLabel: {
+                    color: '#374151',
+                    fontWeight: 500,
+                    formatter: function (value) {
+                        const maxLength = 12;
+                        return value.length > maxLength ? value.substring(0, maxLength) + '…' : value;
+                    }
+                }
             },
             series: [
                 {
                     name: 'Revenue',
                     type: 'bar',
-                    data: this.services.map(s => s.revenue),
+                    data: this.chartData.map(s => s.revenue),
                     barWidth: 18,
                     itemStyle: {
                         borderRadius: [0, 8, 8, 0],

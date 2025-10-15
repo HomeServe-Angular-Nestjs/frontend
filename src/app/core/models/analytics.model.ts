@@ -104,3 +104,10 @@ export interface IRevenueCompositionData {
     totalRevenue: number;
     category: string;
 }
+
+export interface ITopServicesByRevenue {
+    service: string;
+    revenue: number;
+    totalBookings: number;
+    avgRevenue: number;
+}

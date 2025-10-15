@@ -8,7 +8,7 @@ import { BarChart, HeatmapChart, LineChart, PieChart } from "echarts/charts";
 import { provideEchartsCore } from "ngx-echarts";
 import { CanvasRenderer } from "echarts/renderers";
 import { RevenueCompositionChartsComponent } from "../../../../shared/components/provider/revenue-analytics/composition.component";
-import { RevenueTopSourcesChartComponent } from "../../../../shared/components/provider/revenue-analytics/top-sources-chart.component";
+import { RevenueTopServicesChartComponent } from "../../../../shared/components/provider/revenue-analytics/top-services-chart.component";
 import { RevenueRepeatVsNewCustomersChartComponent } from "../../../../shared/components/provider/revenue-analytics/repeat-vs-new-customers-chart.component";
 import { RevenueEarningsForecastChartComponent } from "../../../../shared/components/provider/revenue-analytics/monthly-growth-rate-chart.component";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
@@ -35,7 +35,7 @@ echarts.use([
         RevenueOverviewComponent,
         RevenueTrendChartComponent,
         RevenueCompositionChartsComponent,
-        RevenueTopSourcesChartComponent,
+        RevenueTopServicesChartComponent,
         RevenueRepeatVsNewCustomersChartComponent,
         RevenueEarningsForecastChartComponent
     ],
