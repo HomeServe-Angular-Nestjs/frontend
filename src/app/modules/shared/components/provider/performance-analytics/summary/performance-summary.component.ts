@@ -39,9 +39,9 @@ export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
             label: 'Average Rating',
             valueKey: 'avgRating',
             icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
-            iconColor: 'from-amber-400 to-orange-600',
+            iconColor: 'from-green-300 to-green-500',
             badge: 'Top Rated',
-            badgeColor: 'bg-amber-100 text-amber-700',
+            badgeColor: 'bg-green-100 text-green-700',
             unit: '★',
             description: 'Based on customer feedback'
         },
@@ -49,9 +49,9 @@ export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
             label: 'Response Time',
             valueKey: 'avgResponseTime',
             icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-            iconColor: 'from-blue-400 to-indigo-600',
+            iconColor: 'from-green-200 to-green-400',
             badge: 'Fast',
-            badgeColor: 'bg-blue-100 text-blue-700',
+            badgeColor: 'bg-green-100 text-green-700',
             unit: 'min',
             description: 'Average time to reply'
         },
@@ -59,9 +59,9 @@ export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
             label: 'On-Time Arrival',
             valueKey: 'onTimePercent',
             icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z',
-            iconColor: 'from-purple-400 to-pink-600',
+            iconColor: 'from-green-400 to-green-600',
             badge: 'Reliable',
-            badgeColor: 'bg-purple-100 text-purple-700',
+            badgeColor: 'bg-green-100 text-green-700',
             unit: '%',
             description: 'Punctuality performance'
         }
@@ -84,5 +84,4 @@ export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
             )
             .subscribe(res => this.performanceOverviewStats = res.data);
     }
-
 }

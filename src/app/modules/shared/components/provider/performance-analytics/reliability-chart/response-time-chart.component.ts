@@ -47,10 +47,10 @@ export class ProviderPerformanceResponseTimeChartComponent implements OnInit, On
         const labels = ["< 1 min", "1–10 min", "10–60 min", "1–24 hrs", "> 1 day"];
         const colorMap: Record<string, string> = {
             "< 1 min": "#10b981",
-            "1–10 min": "#3b82f6",
-            "10–60 min": "#f59e0b",
-            "1–24 hrs": "#8b5cf6",
-            "> 1 day": "#ef4444",
+            "1–10 min": "#22c55e",
+            "10–60 min": "#a3e635",
+            "1–24 hrs": "#84cc16",
+            "> 1 day": "#166534",
         };
 
         const dataMap = Object.fromEntries(this.responseTimeData.map(d => [d.name, d.count]));

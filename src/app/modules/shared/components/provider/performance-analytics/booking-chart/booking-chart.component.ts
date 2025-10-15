@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { NgxEchartsModule } from "ngx-echarts";
 import { EChartsOption } from 'echarts';
 import { AnalyticService } from "../../../../../../core/services/analytics.service";
-import { Subject, takeUntil, tap } from "rxjs";
+import { Subject, takeUntil } from "rxjs";
 import { IBookingPerformanceData } from "../../../../../../core/models/analytics.model";
 import { CallbackDataParams } from "echarts/types/dist/shared";
 
@@ -12,19 +12,18 @@ import { CallbackDataParams } from "echarts/types/dist/shared";
     providers: [AnalyticService],
     template: `
       <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-100 hover:shadow-xl transition-shadow duration-300">
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h2 class="text-2xl font-semibold text-slate-900">
-        Bookings Overview
-      </h2>
-      <p class="text-sm text-slate-500 mt-1">
-        Monthly performance metrics
-      </p>
-    </div>
-  </div>
-  <div echarts [options]="barChartOptions" class="h-80"></div>
-</div>
-
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-semibold text-slate-900">
+              Bookings Overview
+            </h2>
+            <p class="text-sm text-slate-500 mt-1">
+              Monthly performance metrics
+            </p>
+          </div>
+        </div>
+        <div echarts [options]="barChartOptions" class="h-80"></div>
+      </div>
     `,
 })
 export class ProviderPerformanceBookingChartComponent implements OnInit, OnDestroy {
@@ -33,7 +32,6 @@ export class ProviderPerformanceBookingChartComponent implements OnInit, OnDestr
 
     bookingStats: IBookingPerformanceData[] = [];
     barChartOptions: EChartsOption = {};
-
 
     ngOnInit(): void {
         this._analyticService.getPerformanceBookingOverview()
@@ -68,33 +66,31 @@ export class ProviderPerformanceBookingChartComponent implements OnInit, OnDestr
             tooltip: {
                 trigger: 'axis',
                 backgroundColor: 'rgba(255,255,255,0.95)',
-                borderColor: '#e5e7eb',
+                borderColor: '#d1fae5',
                 borderWidth: 1,
-                textStyle: { color: '#374151' },
-                axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(99,102,241,0.05)' } },
+                textStyle: { color: '#065f46' },
+                axisPointer: {
+                    type: 'shadow',
+                    shadowStyle: { color: 'rgba(16,185,129,0.08)' }
+                },
                 formatter: (params: CallbackDataParams[] | any) => {
-                    // ensure it's an array
                     const paramArr = Array.isArray(params) ? params : [params];
-
-                    // get values
                     const completed = paramArr.find((p: CallbackDataParams) => p.seriesName === 'Completed')?.value ?? 0;
                     const cancelled = paramArr.find((p: CallbackDataParams) => p.seriesName === 'Cancelled')?.value ?? 0;
                     const total = completed + cancelled;
 
                     let tooltipText = `<strong>${paramArr[0].axisValue}</strong><br/>`;
                     tooltipText += `Total: ${total}<br/>`;
-
                     paramArr.forEach((p: CallbackDataParams) => {
                         tooltipText += `${p.seriesName}: ${p.value}<br/>`;
                     });
-
                     return tooltipText;
                 }
             },
             legend: {
                 data: ['Completed', 'Cancelled'],
                 bottom: 0,
-                textStyle: { fontSize: 13, color: '#64748b' },
+                textStyle: { fontSize: 13, color: '#065f46' },
             },
             grid: {
                 left: '3%',
@@ -106,16 +102,16 @@ export class ProviderPerformanceBookingChartComponent implements OnInit, OnDestr
             xAxis: {
                 type: 'category',
                 data: months,
-                axisLine: { lineStyle: { color: '#e5e7eb' } },
-                axisLabel: { color: '#64748b', fontSize: 12 }
+                axisLine: { lineStyle: { color: '#bbf7d0' } },
+                axisLabel: { color: '#047857', fontSize: 12 }
             },
             yAxis: {
                 type: 'value',
                 name: 'Bookings',
-                nameTextStyle: { color: '#64748b', fontSize: 12 },
+                nameTextStyle: { color: '#047857', fontSize: 12 },
                 axisLine: { show: false },
-                splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
-                axisLabel: { color: '#64748b' }
+                splitLine: { lineStyle: { color: '#d1fae5', type: 'dashed' } },
+                axisLabel: { color: '#047857' }
             },
             series: [
                 {
@@ -127,7 +123,7 @@ export class ProviderPerformanceBookingChartComponent implements OnInit, OnDestr
                             type: 'linear',
                             x: 0, y: 0, x2: 0, y2: 1,
                             colorStops: [
-                                { offset: 0, color: '#10b981' },
+                                { offset: 0, color: '#34d399' },
                                 { offset: 1, color: '#059669' }
                             ]
                         },
@@ -148,6 +144,4 @@ export class ProviderPerformanceBookingChartComponent implements OnInit, OnDestr
             ]
         };
     }
-
-
 }
