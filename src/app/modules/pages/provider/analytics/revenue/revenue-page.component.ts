@@ -8,10 +8,9 @@ import { BarChart, HeatmapChart, LineChart, PieChart } from "echarts/charts";
 import { provideEchartsCore } from "ngx-echarts";
 import { CanvasRenderer } from "echarts/renderers";
 import { RevenueCompositionChartsComponent } from "../../../../shared/components/provider/revenue-analytics/composition.component";
-import { RevenueMonthlyGrowthRateChartComponent } from "../../../../shared/components/provider/revenue-analytics/monthly-growth-rate.component";
 import { RevenueTopSourcesChartComponent } from "../../../../shared/components/provider/revenue-analytics/top-sources-chart.component";
 import { RevenueRepeatVsNewCustomersChartComponent } from "../../../../shared/components/provider/revenue-analytics/repeat-vs-new-customers-chart.component";
-import { RevenueEarningsForecastChartComponent } from "../../../../shared/components/provider/revenue-analytics/earning-forcast-chart.component";
+import { RevenueEarningsForecastChartComponent } from "../../../../shared/components/provider/revenue-analytics/monthly-growth-rate-chart.component";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
 
 echarts.use([
@@ -36,7 +35,6 @@ echarts.use([
         RevenueOverviewComponent,
         RevenueTrendChartComponent,
         RevenueCompositionChartsComponent,
-        RevenueMonthlyGrowthRateChartComponent,
         RevenueTopSourcesChartComponent,
         RevenueRepeatVsNewCustomersChartComponent,
         RevenueEarningsForecastChartComponent
@@ -44,9 +42,9 @@ echarts.use([
     providers: [provideEchartsCore({ echarts })]
 })
 export class ProviderRevenueAnalyticsComponent implements OnInit {
-    private readonly _sharedService = inject(SharedDataService);
+    private readonly _sharedService = inject(SharedDataService); 
 
-    ngOnInit(): void {
+    ngOnInit(): void { 
         this._sharedService.setProviderHeader('Revenue Analytics');
     }
 }

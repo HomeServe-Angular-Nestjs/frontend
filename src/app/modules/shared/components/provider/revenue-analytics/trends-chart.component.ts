@@ -12,26 +12,28 @@ import { Subject, takeUntil } from 'rxjs';
     providers: [AnalyticService],
     template: `
     <div class="p-4 bg-white rounded-2xl shadow-md">
-      <h2 class="text-lg font-semibold mb-3 text-gray-800">
-        Revenue Trend Over Time
-      </h2>
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-lg font-semibold text-gray-800">
+                Revenue Trend Over Time
+            </h2>
+            <div class="flex justify-end mt-3 space-x-2">
+                <button
+                *ngFor="let view of viewOptions"
+                (click)="onViewChange(view)"
+                class="px-3 py-1 rounded-md border text-sm transition"
+                [class.bg-green-600]="currentView === view"
+                [class.text-white]="currentView === view"
+                [class.border-gray-300]="currentView !== view"
+                [class.text-gray-700]="currentView !== view"
+                [class.hover\\:bg-green-100]="currentView !== view"
+                >
+                {{ view | titlecase}}
+                </button>
+            </div>
+        </div>
 
       <div echarts [options]="chartOptions" class="h-80 w-full"></div>
 
-      <div class="flex justify-end mt-3 space-x-2">
-        <button
-          *ngFor="let view of viewOptions"
-          (click)="onViewChange(view)"
-          class="px-3 py-1 rounded-md border text-sm transition"
-          [class.bg-green-600]="currentView === view"
-          [class.text-white]="currentView === view"
-          [class.border-gray-300]="currentView !== view"
-          [class.text-gray-700]="currentView !== view"
-          [class.hover\\:bg-green-100]="currentView !== view"
-        >
-          {{ view | titlecase}}
-        </button>
-      </div>
     </div>
   `,
 })
@@ -44,7 +46,7 @@ export class RevenueTrendChartComponent implements OnInit, OnDestroy {
     viewOptions: RevenueChartView[] = ['monthly', 'quarterly', 'yearly'];
     currentView: RevenueChartView = 'monthly';
     revenueTrendData: IRevenueTrendData = { providerRevenue: [], platformAvg: [], labels: [] };
-    
+
     ngOnInit() {
         this.updateChartData();
     }

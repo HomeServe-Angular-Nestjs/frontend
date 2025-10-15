@@ -95,12 +95,12 @@ export interface IRevenueTrendData {
 }
 
 export interface IRevenueMonthlyGrowthRateData {
-    totalRevenue: number;
     month: string;
+    totalRevenue: number;
     growthRate: number;
 }
 
 export interface IRevenueCompositionData {
-    totalRevenue:number;
-    category:string;
+    totalRevenue: number;
+    category: string;
 }
