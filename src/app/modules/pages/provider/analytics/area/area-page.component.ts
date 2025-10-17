@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { ServiceDemandHeatmapComponent } from "../../../../shared/components/provider/area-analytics/service-demand-chart.component";
 import * as echarts from 'echarts/core';
 import { GeoComponent, GridComponent, LegendComponent, TitleComponent, ToolboxComponent, TooltipComponent, VisualMapComponent } from 'echarts/components';
@@ -10,6 +10,7 @@ import { TopAreasRevenueComponent } from "../../../../shared/components/provider
 import { UnderperformingAreasComponent } from "../../../../shared/components/provider/area-analytics/uderperforming-service.component";
 import { PeakServiceTimesComponent } from "../../../../shared/components/provider/area-analytics/peak-service-time-chart.component";
 import { AreaKpiComponent } from "../../../../shared/components/provider/area-analytics/summary.component";
+import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
 
 echarts.use([
     TooltipComponent,
@@ -31,13 +32,19 @@ echarts.use([
     selector: 'app-area-analytics-page',
     templateUrl: './area-page.component.html',
     imports: [
-    ServiceDemandHeatmapComponent,
-    RevenueByLocationComponent,
-    TopAreasRevenueComponent,
-    UnderperformingAreasComponent,
-    PeakServiceTimesComponent,
-    AreaKpiComponent
-],
+        ServiceDemandHeatmapComponent,
+        RevenueByLocationComponent,
+        TopAreasRevenueComponent,
+        UnderperformingAreasComponent,
+        PeakServiceTimesComponent,
+        AreaKpiComponent
+    ],
     providers: [provideEchartsCore({ echarts })]
 })
-export class ProviderAreaAnalyticsComponent { }
+export class ProviderAreaAnalyticsComponent implements OnInit {
+    private readonly _sharedService = inject(SharedDataService);
+
+    ngOnInit(): void {
+        this._sharedService.setProviderHeader('Area Analytics');
+    }
+}

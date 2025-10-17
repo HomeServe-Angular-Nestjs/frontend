@@ -1,18 +1,8 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { AnalyticService } from '../../../../../core/services/analytics.service';
-
-interface IAreaKpi {
-    label: string;
-    value: number | string;
-    icon: string;
-    iconColor: string;
-    badge?: string;
-    badgeColor?: string;
-    description: string;
-    isNegative?: boolean;
-}
+import { IAreaSummary, IOverviewCard } from '../../../../../core/models/analytics.model';
 
 @Component({
     selector: 'app-area-analytics-summary',
@@ -51,7 +41,7 @@ interface IAreaKpi {
             class="text-2xl font-semibold"
             [ngClass]="card.isNegative ? 'text-red-500' : 'text-green-600'"
           >
-            {{ card.value }}
+            {{getCardValue(card)}}
           </span>
         </div>
 
@@ -66,52 +56,61 @@ export class AreaKpiComponent implements OnInit, OnDestroy {
     private _analyticService = inject(AnalyticService);
     private _destroy$ = new Subject<void>();
 
-    areaKpis: IAreaKpi[] = [
+    areaSummary = {
+        totalBookings: 0,
+        topPerformingArea: 'N/A',
+        underperformingArea: 'N/A',
+        peakBookingHour: 'N/A'
+    }
+
+    areaKpis: IOverviewCard<IAreaSummary>[] = [
         {
-            label: 'Revenue',
-            value: '₹1.2M',
-            icon: 'fa-solid fa-money-bill-wave',
-            iconColor: 'bg-green-500',
-            badge: 'Growth',
-            badgeColor: 'bg-green-100 text-green-700',
-            description: 'Revenue from top area',
+            label: 'Total Bookings',
+            valueKey: 'totalBookings',
+            icon: 'fa-solid fa-calendar-check',
+            iconColor: 'bg-emerald-500',
+            badge: 'Completed',
+            badgeColor: 'bg-emerald-100 text-emerald-700',
+            description: 'Total number of completed bookings this month',
         },
         {
             label: 'Top Performing Area',
-            value: 'Ernakulam',
-            icon: 'fa-solid fa-location-dot',
-            iconColor: 'bg-green-400',
-            description: 'Area generating highest revenue this month'
+            valueKey: 'topPerformingArea',
+            icon: 'fa-solid fa-trophy',
+            iconColor: 'bg-yellow-500',
+            description: 'Area generating highest revenue this month',
         },
         {
             label: 'Underperforming Area',
-            value: 'Thrissur',
-            icon: 'fa-solid fa-location-crosshairs',
-            iconColor: 'bg-red-400',
+            valueKey: 'underperformingArea',
+            icon: 'fa-solid fa-arrow-trend-down',
+            iconColor: 'bg-red-500',
             badge: 'Decline',
             badgeColor: 'bg-red-100 text-red-700',
-            description: 'Revenue dropped compared to last month',
-            isNegative: true
+            description: 'Area with decreased revenue compared to last month',
         },
         {
-            label: 'Revenue Drop',
-            value: '↓ 12%',
-            icon: 'fa-solid fa-arrow-down',
-            iconColor: 'bg-red-500',
-            badge: 'MoM',
-            badgeColor: 'bg-red-100 text-red-700',
-            description: 'Percentage decrease in underperforming area',
-            isNegative: true
+            label: 'Peak Booking Time',
+            valueKey: 'peakBookingHour',
+            icon: 'fa-solid fa-clock',
+            iconColor: 'bg-indigo-500',
+            description: 'Time of day with the highest number of bookings',
         }
     ];
 
+
     ngOnInit(): void {
-        // Optional: fetch real data
-        // this._analyticService.getAreaKpis().pipe(takeUntil(this._destroy$)).subscribe(res => this.areaKpis = res);
+        this._analyticService.getAreaKpis()
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(res => this.areaSummary = res.data ?? this.areaSummary);
     }
 
     ngOnDestroy(): void {
         this._destroy$.next();
         this._destroy$.complete();
+    }
+
+    getCardValue(card: IOverviewCard<IAreaSummary>): number | string {
+        return this.areaSummary[card.valueKey];
     }
 }

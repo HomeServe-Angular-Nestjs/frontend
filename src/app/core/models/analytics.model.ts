@@ -5,10 +5,11 @@ export interface IOverviewCard<T> {
     valueKey: keyof T;
     icon: string;
     iconColor: string;
-    badge: string;
-    badgeColor: string;
+    badge?: string;
+    badgeColor?: string;
     unit?: string;
     description: string;
+    isNegative?: boolean;
 }
 
 export interface IProviderPerformanceOverview {
@@ -121,7 +122,9 @@ export interface INewOrReturningClientData {
 
 // ----------- Area Analytics Models ------------
 
-export interface IAreaSummary { 
+export interface IAreaSummary {
+    totalBookings: number;
     topPerformingArea: string;
-    totalBookings:number;
+    underperformingArea: string;
+    peakBookingHour: string;
 }

@@ -3,7 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
@@ -72,7 +72,12 @@ export class AnalyticService {
     }
 
     // ----------------- Area Analytics APIs --------------
-    getServiceDemandHeatmapData():any {
+
+    getAreaKpis(): Observable<IResponse<IAreaSummary>> {
+        return this._http.get<IResponse<IAreaSummary>>(`${this._apiUrl}/area/summary`);
+    }
+
+    getServiceDemandHeatmapData(): any {
         // Replace this mock with an HTTP request to your backend
         return of([
             { day: 'Mon', hour: '06:00', count: 5 },
