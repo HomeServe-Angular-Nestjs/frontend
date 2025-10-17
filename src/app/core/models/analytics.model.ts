@@ -79,6 +79,7 @@ export interface IComparisonChartData {
 }
 
 // ----------- Revenue Analytics Models ------------
+
 export type RevenueChartView = 'monthly' | 'quarterly' | 'yearly';
 
 export interface IProviderRevenueOverview {
@@ -116,4 +117,11 @@ export interface INewOrReturningClientData {
     month: string;
     newClients: number;
     returningClients: number;
+}
+
+// ----------- Area Analytics Models ------------
+
+export interface IAreaSummary { 
+    topPerformingArea: string;
+    totalBookings:number;
 }

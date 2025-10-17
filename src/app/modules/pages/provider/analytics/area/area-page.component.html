@@ -1,1 +1,58 @@
-<img src="assets/images/download.png" alt="" class="h-screen w-full">
+<div class="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-lime-50">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- KPI Overview -->
+        <section>
+            <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Key Area Metrics</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                Overview of top-performing and underperforming areas
+            </p>
+
+            <app-area-analytics-summary></app-area-analytics-summary>
+        </section>
+
+        <!-- Service Demand -->
+        <section>
+            <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Service Demand by Area</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                Visualize which areas have the highest demand for your services
+            </p>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <app-area-service-demand-chart></app-area-service-demand-chart>
+                <app-area-by-revenue></app-area-by-revenue>
+            </div>
+        </section>
+
+        <!-- Top Areas Revenue -->
+        <section>
+            <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Top Areas by Revenue</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                Quickly identify which areas are driving the most revenue
+            </p>
+
+            <app-top-areas-revenue></app-top-areas-revenue>
+        </section>
+
+        <!-- Underperforming Areas -->
+        <section>
+            <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Underperforming Areas</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                Spot areas where revenue has declined compared to last month
+            </p>
+
+            <app-underperforming-areas></app-underperforming-areas>
+        </section>
+
+        <!-- Peak Service Times -->
+        <section>
+            <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Peak Service Times</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                Analyze the hours of highest service demand for staffing and planning
+            </p>
+
+            <app-peak-service-times></app-peak-service-times>
+        </section>
+
+    </main>
+</div>
