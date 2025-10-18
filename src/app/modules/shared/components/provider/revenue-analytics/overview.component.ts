@@ -16,7 +16,7 @@ import { AnalyticService } from "../../../../../core/services/analytics.service"
     >
       <div class="flex items-start justify-between mb-4">
         <div
-          class="bg-gradient-to-br p-3 rounded-xl shadow-md flex items-center justify-center"
+          class="bg-gradient-to-br py-2 px-3 rounded-xl shadow-md flex items-center justify-center"
           [ngClass]="card.iconColor"
         >
           <i class="{{ card.icon }} text-white text-lg"></i>
