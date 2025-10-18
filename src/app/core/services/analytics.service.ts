@@ -3,7 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary, IServiceDemandData } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary, IServiceDemandData, ITopAreaRevenueResponse } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
@@ -92,16 +92,7 @@ export class AnalyticService {
         ]);
     }
 
-    getServiceDemandByLocation(): any {
-        return of([
-            { location: 'Thiruvananthapuram', demand: 120, revenue: 5000 },
-            { location: 'Kochi', demand: 95, revenue: 4000 },
-            { location: 'Kozhikode', demand: 80, revenue: 3500 },
-            { location: 'Alappuzha', demand: 60, revenue: 2500 },
-            { location: 'Thrissur', demand: 70, revenue: 3000 },
-            { location: 'Kannur', demand: 50, revenue: 2000 },
-            { location: 'Kollam', demand: 40, revenue: 1800 },
-            { location: 'Palakkad', demand: 55, revenue: 2200 }
-        ]);
+    getServiceDemandByLocation(): Observable<IResponse<ITopAreaRevenueResponse[]>> {
+        return this._http.get<IResponse<ITopAreaRevenueResponse[]>>(`${this._apiUrl}/area/top_service_by_revenue`);
     }
 }

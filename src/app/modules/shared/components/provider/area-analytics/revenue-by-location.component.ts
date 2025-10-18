@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
@@ -7,6 +7,7 @@ import { AnalyticService } from '../../../../../core/services/analytics.service'
 
 @Component({
     selector: 'app-area-by-revenue',
+    standalone: true,
     imports: [CommonModule, NgxEchartsModule],
     providers: [AnalyticService],
     template: `
@@ -28,87 +29,98 @@ import { AnalyticService } from '../../../../../core/services/analytics.service'
     </section>
   `
 })
-export class RevenueByLocationComponent implements OnInit {
+export class RevenueByLocationComponent implements OnInit, OnDestroy {
     private readonly _analyticService = inject(AnalyticService);
     private _destroy$ = new Subject<void>();
-
     chartOption!: EChartsOption;
 
     ngOnInit(): void {
         this._analyticService.getServiceDemandByLocation()
             .pipe(takeUntil(this._destroy$))
-            .subscribe((data: any) => {
-                this.chartOption = this.getChartOption(data);
+            .subscribe((res) => {
+                if (res?.data?.length) {
+                    this.chartOption = this.getChartOption(res.data);
+                }
             });
     }
 
-    getChartOption(data: any): EChartsOption {
-        // Sort locations alphabetically or by revenue
-        const locations = data.map((d: any) => d.location);
+    getChartOption(data: any[]): EChartsOption {
+        const sorted = [...data];
 
-        // Determine bubble sizes
-        const maxRevenue = Math.max(...data.map((d: any) => d.revenue ?? d.demand));
-        const minSize = 20;
-        const maxSize = 80;
-
-        const seriesData = data.map((d: any) => {
-            const size = minSize + ((d.revenue ?? d.demand) / maxRevenue) * (maxSize - minSize);
-            return {
-                name: d.location,
-                value: [d.location, d.demand, d.revenue ?? d.demand],
-                symbolSize: size
-            };
-        });
+        const locations = sorted.map(d => d.locationName);
+        const revenues = sorted.map(d => d.totalRevenue);
+        const growthColors = sorted.map(d => d.changePct >= 0 ? '#16A34A' : '#DC2626');
+        const growthIcons = sorted.map(d => d.changePct >= 0 ? '↑' : '↓');
 
         return {
             tooltip: {
-                trigger: 'item',
-                formatter: (params: any) =>
-                    `<strong>${params.data.name}</strong><br/>Demand: ${params.data.value[1]}<br/>Revenue: ${params.data.value[2]}`,
-                backgroundColor: '#333',
-                textStyle: { color: '#fff' },
-                padding: [8, 12]
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                backgroundColor: '#222',
+                borderColor: '#444',
+                borderWidth: 1,
+                padding: [4, 8],
+                textStyle: { color: '#fff', fontSize: 11 },
+                formatter: (params: any) => {
+                    const idx = params[0].dataIndex;
+                    const d = sorted[idx];
+                    return `
+          <div style="line-height:1.4">
+            <strong>${d.locationName.split(',')[3] ?? d.locationName}</strong><br/>
+            ₹${d.totalRevenue.toLocaleString()}<br/>
+            <span style="color:${growthColors[idx]}">${growthIcons[idx]} ${Math.abs(d.changePct)}%</span>
+          </div>
+        `;
+                }
             },
+            grid: { left: 130, right: 20, top: 30, bottom: 50 },
             xAxis: {
-                type: 'category',
-                data: locations,
-                name: 'Location',
-                axisLabel: { rotate: 30, fontWeight: 500, color: '#374151' },
-                axisLine: { lineStyle: { color: '#ccc' } },
-                nameLocation: 'middle',
-                nameGap: 30
+                type: 'value',
+                name: 'Revenue (₹)',
+                axisLabel: { color: '#555', fontWeight: 500, fontSize: 11 },
+                splitLine: { lineStyle: { type: 'dashed', color: '#E5E7EB' } },
+                nameTextStyle: { fontSize: 11, color: '#666' }
             },
             yAxis: {
-                type: 'value',
-                name: 'Demand',
-                axisLine: { lineStyle: { color: '#ccc' } },
-                axisLabel: { color: '#374151', fontWeight: 500 },
-                splitLine: { lineStyle: { type: 'dashed', color: '#E5E7EB' } }
+                type: 'category',
+                data: locations,
+                inverse: true,
+                axisLabel: {
+                    color: '#444',
+                    fontWeight: 500,
+                    fontSize: 11,
+                    formatter: (name: string) => name.split(',')[3] ?? name
+                },
+                axisLine: { show: false },
+                axisTick: { show: false }
             },
             series: [
                 {
-                    type: 'scatter',
-                    data: seriesData,
+                    type: 'bar',
+                    data: revenues,
+                    barWidth: 30,
                     label: {
                         show: true,
-                        formatter: '{b}',
-                        position: 'top',
+                        position: 'right',
+                        formatter: (params: any) => {
+                            const idx = params.dataIndex;
+                            return `₹${params.value.toLocaleString()} ${growthIcons[idx]}`;
+                        },
                         color: '#111',
-                        fontWeight: 600
+                        fontWeight: 500,
+                        fontSize: 11
                     },
                     itemStyle: {
-                        color: '#16A34A',
-                        shadowBlur: 15,
-                        shadowColor: 'rgba(0,0,0,0.3)',
-                        borderColor: '#fff',
-                        borderWidth: 1
-                    }
+                        color: (params: any) => growthColors[params.dataIndex],
+                        borderRadius: [0, 12, 12, 0],
+                        shadowBlur: 6,
+                        shadowColor: 'rgba(0,0,0,0.15)'
+                    },
+                    barCategoryGap: '60%'
                 }
-            ],
-            grid: { left: 50, right: 20, top: 60, bottom: 60 }
+            ]
         };
     }
-
 
     ngOnDestroy(): void {
         this._destroy$.next();

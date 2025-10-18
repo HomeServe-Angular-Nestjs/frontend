@@ -134,3 +134,10 @@ export interface IServiceDemandData {
     hour: string;
     count: number;
 }
+
+export interface ITopAreaRevenueResponse {
+    locationName: string;
+    totalRevenue: number;
+    previousRevenue: number;
+    changePct: number;
+}
