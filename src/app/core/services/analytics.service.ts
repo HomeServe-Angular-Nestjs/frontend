@@ -3,7 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary, IServiceDemandData } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
@@ -77,18 +77,8 @@ export class AnalyticService {
         return this._http.get<IResponse<IAreaSummary>>(`${this._apiUrl}/area/summary`);
     }
 
-    getServiceDemandHeatmapData(): any {
-        // Replace this mock with an HTTP request to your backend
-        return of([
-            { day: 'Mon', hour: '06:00', count: 5 },
-            { day: 'Mon', hour: '07:00', count: 12 },
-            { day: 'Tue', hour: '10:00', count: 18 },
-            { day: 'Fri', hour: '10:00', count: 44 },
-            { day: 'Sat', hour: '11:00', count: 61 },
-            { day: 'Sun', hour: '12:00', count: 73 },
-            // ...more data
-        ]);
-        return this._http.get<IResponse<INewOrReturningClientData[]>>(`${this._apiUrl}/revenue/new_returning_clients`);
+    getServiceDemandHeatmapData(): Observable<IResponse<IServiceDemandData[]>> {
+        return this._http.get<IResponse<IServiceDemandData[]>>(`${this._apiUrl}/area/service_demand`);
     }
 
     getRevenueByLocationData(): any {

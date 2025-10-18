@@ -40,9 +40,9 @@ export class ServiceDemandHeatmapComponent implements OnInit {
 
     ngOnInit() {
         this._analyticService.getServiceDemandHeatmapData()
-            .pipe(takeUntil(this._destroy$)) 
+            .pipe(takeUntil(this._destroy$))
             .subscribe({
-                next: (data:any) => this.setupChart(data),
+                next: (res) => this.setupChart(res.data ?? []),
                 error: () => console.error('Failed to load heatmap data.')
             });
     }
@@ -63,7 +63,7 @@ export class ServiceDemandHeatmapComponent implements OnInit {
                 formatter: ({ value }: any) =>
                     `<b>${this.days[value[0]]}, ${this.hours[value[1]]}</b><br/>Bookings: ${value[2]}`
             },
-            grid: { top: 40, left: 70, bottom: 60 },
+            grid: { top: 0, left: 70, right: 30, bottom: 90 },
             xAxis: {
                 type: 'category',
                 data: this.days,
@@ -84,9 +84,11 @@ export class ServiceDemandHeatmapComponent implements OnInit {
                 calculable: true,
                 orient: 'horizontal',
                 left: 'center',
-                bottom: 10,
-                inRange: { color: ['#E8F5E9', '#1B5E20'] },
-                textStyle: { color: '#374151', fontWeight: 600 }
+                bottom: 20,
+                text: ['Max', 'Min'],
+                textGap: 12,
+                textStyle: { color: '#374151', fontWeight: 600 },
+                inRange: { color: ['#E8F5E9', '#1B5E20'] }
             },
             series: [{
                 name: 'Service Demand',
