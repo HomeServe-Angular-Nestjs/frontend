@@ -3,7 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary, IServiceDemandData, ILocationRevenue, ITopAreaRevenue } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary, IServiceDemandData, ILocationRevenue, ITopAreaRevenue, IUnderperformingArea } from "../models/analytics.model";
 
 @Injectable()
 export class AnalyticService {
@@ -87,5 +87,9 @@ export class AnalyticService {
 
     getServiceDemandByLocation(): Observable<IResponse<ILocationRevenue[]>> {
         return this._http.get<IResponse<ILocationRevenue[]>>(`${this._apiUrl}/area/location_by_revenue`);
+    }
+
+    getUnderperformingAreas(): Observable<IResponse<IUnderperformingArea[]>> {
+        return this._http.get<IResponse<IUnderperformingArea[]>>(`${this._apiUrl}/area/underperforming`);
     }
 }

@@ -63,8 +63,8 @@ export class TopAreasRevenueComponent implements OnInit, OnDestroy {
                   Change: <span style="color:${growthColors[idx]}">${growthIcons[idx]} ${Math.abs(data[idx].changePct)}%</span>`;
                 },
                 backgroundColor: '#333',
-                textStyle: { color: '#fff' },
-                padding: [8, 12]
+                textStyle: { color: '#fff', fontSize: 12 },
+                padding: [4, 8]
             },
             grid: { left: 120, right: 20, top: 50, bottom: 50 },
             xAxis: {

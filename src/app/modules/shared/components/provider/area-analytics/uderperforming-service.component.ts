@@ -1,26 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
-
-interface UnderperformingArea {
-    locationName: string;
-    lastMonthRevenue: number;
-    currentMonthRevenue: number;
-    changePct: number;
-}
+import { AnalyticService } from '../../../../../core/services/analytics.service';
+import { Subject, takeUntil } from 'rxjs';
+import { IUnderperformingArea } from '../../../../../core/models/analytics.model';
 
 @Component({
     selector: 'app-underperforming-areas',
     standalone: true,
     imports: [CommonModule, NgxEchartsModule],
+    providers: [AnalyticService],
     template: `
     <section class="bg-white rounded-2xl shadow-lg p-6 w-full">
       <header class="flex items-center justify-between mb-6">
         <div>
           <h2 class="text-xl font-semibold text-gray-800">Underperforming Areas</h2>
           <p class="text-sm text-gray-500 mt-1">
-            Highlights areas with declining revenue to take early action.
+                Spot areas where revenue has declined compared to last month
           </p>
         </div>
       </header>
@@ -33,24 +30,24 @@ interface UnderperformingArea {
     </section>
   `
 })
-export class UnderperformingAreasComponent implements OnInit {
+export class UnderperformingAreasComponent implements OnInit, OnDestroy {
+    private readonly _analyticService = inject(AnalyticService);
+    private _destroy$ = new Subject<void>();
+
     chartOption!: EChartsOption;
 
-    private dummyData: UnderperformingArea[] = [
-        { locationName: 'Thrissur', lastMonthRevenue: 800000, currentMonthRevenue: 704000, changePct: -12 },
-        { locationName: 'Kozhikode', lastMonthRevenue: 900000, currentMonthRevenue: 810000, changePct: -10 },
-        { locationName: 'Palakkad', lastMonthRevenue: 600000, currentMonthRevenue: 570000, changePct: -5 },
-        { locationName: 'Ernakulam', lastMonthRevenue: 1200000, currentMonthRevenue: 1260000, changePct: 5 },
-        { locationName: 'Alappuzha', lastMonthRevenue: 550000, currentMonthRevenue: 561000, changePct: 2 }
-    ];
-
     ngOnInit(): void {
-        // Sort descending by negative % change
-        this.dummyData.sort((a, b) => a.changePct - b.changePct);
-        this.chartOption = this.getChartOption(this.dummyData);
+        this._analyticService.getUnderperformingAreas()
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(res => this.chartOption = this._getChartOption(res.data ?? []));
     }
 
-    getChartOption(data: UnderperformingArea[]): EChartsOption {
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
+    }
+
+    private _getChartOption(data: IUnderperformingArea[]): EChartsOption {
         const locations = data.map(d => d.locationName);
         const changes = data.map(d => d.changePct);
         const colors = data.map(d => d.changePct >= 0 ? '#16A34A' : '#DC2626'); // green/red
@@ -68,15 +65,18 @@ export class UnderperformingAreasComponent implements OnInit {
                   Change: <span style="color:${colors[idx]}">${d.changePct >= 0 ? '↑' : '↓'} ${Math.abs(d.changePct)}%</span>`;
                 },
                 backgroundColor: '#333',
-                textStyle: { color: '#fff' },
-                padding: [8, 12]
+                textStyle: { color: '#fff', fontSize: 12 },
+                padding: [4, 8]
             },
             grid: { left: 120, right: 20, top: 50, bottom: 50 },
             xAxis: {
                 type: 'value',
                 name: '% Change',
                 axisLine: { lineStyle: { color: '#ccc' } },
-                axisLabel: { color: '#374151', fontWeight: 500 },
+                axisLabel: {
+                    color: '#374151',
+                    fontWeight: 500,
+                },
                 splitLine: { lineStyle: { type: 'dashed', color: '#E5E7EB' } }
             },
             yAxis: {
@@ -84,12 +84,19 @@ export class UnderperformingAreasComponent implements OnInit {
                 data: locations,
                 inverse: true,
                 axisLine: { lineStyle: { color: '#ccc' } },
-                axisLabel: { color: '#374151', fontWeight: 500 }
+                axisLabel: {
+                    color: '#374151',
+                    fontWeight: 500,
+                    formatter: (value: string) => {
+                        return value.split(',')[3] ?? value;
+                    },
+                }
             },
             series: [
                 {
                     type: 'bar',
                     data: changes,
+                    barWidth: 30,
                     label: {
                         show: true,
                         position: 'right',
