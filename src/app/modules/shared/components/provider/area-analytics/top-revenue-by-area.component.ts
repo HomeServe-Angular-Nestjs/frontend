@@ -1,17 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
-
-interface LocationRevenue {
-    locationName: string;
-    totalRevenue: number;
-    changePct: number; // % change vs previous month
-}
+import { AnalyticService } from '../../../../../core/services/analytics.service';
+import { Subject, takeUntil } from 'rxjs';
+import { ITopAreaRevenue } from '../../../../../core/models/analytics.model';
 
 @Component({
     selector: 'app-top-areas-revenue',
     imports: [CommonModule, NgxEchartsModule],
+    providers: [AnalyticService],
     template: `
     <section class="bg-white rounded-2xl shadow-lg p-6 w-full">
       <header class="flex items-center justify-between mb-6">
@@ -31,26 +29,24 @@ interface LocationRevenue {
     </section>
   `
 })
-export class TopAreasRevenueComponent implements OnInit {
+export class TopAreasRevenueComponent implements OnInit, OnDestroy {
+    private readonly _analyticService = inject(AnalyticService);
+    private _destroy$ = new Subject<void>();
+
     chartOption!: EChartsOption;
 
-    private dummyData: LocationRevenue[] = [
-        { locationName: 'Ernakulam', totalRevenue: 1200000, changePct: 18 },
-        { locationName: 'Kochi', totalRevenue: 950000, changePct: 5 },
-        { locationName: 'Thiruvananthapuram', totalRevenue: 870000, changePct: -3 },
-        { locationName: 'Kozhikode', totalRevenue: 650000, changePct: -12 },
-        { locationName: 'Alappuzha', totalRevenue: 540000, changePct: 7 },
-        { locationName: 'Kannur', totalRevenue: 430000, changePct: 2 },
-        { locationName: 'Palakkad', totalRevenue: 390000, changePct: -5 }
-    ];
-
     ngOnInit(): void {
-        // Sort descending by totalRevenue
-        this.dummyData.sort((a, b) => b.totalRevenue - a.totalRevenue);
-        this.chartOption = this.getChartOption(this.dummyData);
+        this._analyticService.getTopAreasRevenue()
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(res => this.chartOption = this.getChartOption(res.data ?? []));
     }
 
-    getChartOption(data: LocationRevenue[]): EChartsOption {
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
+    }
+
+    getChartOption(data: ITopAreaRevenue[]): EChartsOption {
         const locations = data.map(d => d.locationName);
         const revenues = data.map(d => d.totalRevenue);
         const growthIcons = data.map(d => d.changePct >= 0 ? '↑' : '↓');
@@ -76,19 +72,28 @@ export class TopAreasRevenueComponent implements OnInit {
                 name: 'Revenue (₹)',
                 axisLine: { lineStyle: { color: '#ccc' } },
                 axisLabel: { color: '#374151', fontWeight: 500 },
-                splitLine: { lineStyle: { type: 'dashed', color: '#E5E7EB' } }
+                splitLine: { lineStyle: { type: 'dashed', color: '#E5E7EB' } },
+
+
             },
             yAxis: {
                 type: 'category',
                 data: locations,
                 inverse: true,
                 axisLine: { lineStyle: { color: '#ccc' } },
-                axisLabel: { color: '#374151', fontWeight: 500 }
+                axisLabel: {
+                    color: '#374151',
+                    fontWeight: 500,
+                    formatter: (text: string) => {
+                        return text.split(',')[3] ?? text
+                    }
+                },
             },
             series: [
                 {
                     type: 'bar',
                     data: revenues,
+                    barWidth: 30,
                     label: {
                         show: true,
                         position: 'right',
