@@ -1,13 +1,16 @@
-<div class=" p-6 bg-white rounded-2xl shadow-md space-y-4">
-    <h2 class="text-xl font-semibold text-gray-800">Leave a Review</h2>
+<div class="bg-white p-6 rounded-2xl shadow-lg w-96 max-w-md space-y-4 relative">
+    <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800">Leave a Review</h2>
+        <button (click)="closeModalEvent.emit()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    </div>
 
     <!-- Star Rating -->
     <div class="flex items-center space-x-1">
         <ng-container *ngFor="let star of stars; let i = index">
             <button type="button" class="text-2xl" [ngClass]="{
-                'text-yellow-400': i < selectedRating,
-                'text-gray-400': i >= selectedRating
-              }" (click)="setRating(i + 1)">
+            'text-yellow-400': i < selectedRating,
+            'text-gray-400': i >= selectedRating
+          }" (click)="setRating(i + 1)">
                 ★
             </button>
         </ng-container>
@@ -24,6 +27,5 @@
         <button type="submit" class="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 transition">
             Submit Review
         </button>
-
     </form>
 </div>

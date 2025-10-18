@@ -1,0 +1,162 @@
+// ----------- Performance Analytics Models ------------
+
+export interface IOverviewCard<T> {
+    label: string;
+    valueKey: keyof T;
+    icon: string;
+    iconColor: string;
+    badge?: string;
+    badgeColor?: string;
+    unit?: string;
+    description: string;
+    isNegative?: boolean;
+}
+
+export interface IProviderPerformanceOverview {
+    avgResponseTime: number;
+    onTimePercent: number;
+    avgRating: number;
+    completionRate: number;
+}
+
+export interface IBookingPerformanceData {
+    month: string;
+    completed: number;
+    cancelled: number;
+    total: number;
+}
+
+export interface IReviewChartData {
+    distributions: {
+        rating: number;
+        count: number;
+    }[];
+    reviews: {
+        name: string;
+        desc: string;
+        rating: number;
+    }[];
+}
+
+export interface IResponseTimeChartData {
+    name: string;
+    count: number;
+}
+
+export interface IOnTimeArrivalChartData {
+    month: string;
+    percentage: number;
+}
+
+export interface IDisputeData {
+    disputeType: string;
+    data: number[];
+}
+
+export interface IDisputeAnalyticsChartData {
+    month: string;
+    other: number;
+    harassment: number;
+    spam: number;
+    inappropriate: number;
+}
+
+export interface IComparisonOverviewData {
+    growthRate: number;
+    monthlyTrend: {
+        previousMonth: number;
+        currentMonth: number;
+        previousRevenue: number;
+        currentRevenue: number;
+        growthPercentage: number;
+    };
+    providerRank: number;
+}
+
+export interface IComparisonChartData {
+    month: string;
+    performance: number;
+    platformAvg: number;
+}
+
+// ----------- Revenue Analytics Models ------------
+
+export type RevenueChartView = 'monthly' | 'quarterly' | 'yearly';
+
+export interface IProviderRevenueOverview {
+    totalRevenue: number;
+    revenueGrowth: number;
+    completedTransactions: number;
+    avgTransactionValue: number;
+}
+
+export interface IRevenueTrendData {
+    providerRevenue: number[];
+    platformAvg: number[];
+    labels: string[];
+}
+
+export interface IRevenueMonthlyGrowthRateData {
+    month: string;
+    totalRevenue: number;
+    growthRate: number;
+}
+
+export interface IRevenueCompositionData {
+    totalRevenue: number;
+    category: string;
+}
+
+export interface ITopServicesByRevenue {
+    service: string;
+    revenue: number;
+    totalBookings: number;
+    avgRevenue: number;
+}
+
+export interface INewOrReturningClientData {
+    month: string;
+    newClients: number;
+    returningClients: number;
+}
+
+// ----------- Area Analytics Models ------------
+
+export interface IAreaSummary {
+    totalBookings: number;
+    topPerformingArea: string;
+    underperformingArea: string;
+    peakBookingHour: string;
+}
+
+export interface IServiceDemandData {
+    day: 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
+    hour: string;
+    count: number;
+}
+
+export interface ILocationRevenue {
+    locationName: string;
+    totalRevenue: number;
+    previousRevenue: number;
+    changePct: number;
+}
+
+export interface ITopAreaRevenue {
+    locationName: string;
+    totalRevenue: number;
+    changePct: number;
+}
+
+export interface IUnderperformingArea {
+    locationName: string;
+    lastMonthRevenue: number;
+    currentMonthRevenue: number;
+    changePct: number;
+}
+
+export interface IPeakServiceTime {
+    hour: number;
+    weekdayBookings: number;
+    weekendBookings: number;
+}

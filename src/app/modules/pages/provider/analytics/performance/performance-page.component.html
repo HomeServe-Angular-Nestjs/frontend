@@ -1,1 +1,56 @@
-<img src="assets/images/download.png" alt="" class="h-screen w-full">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+
+        <!-- KPI Summary -->
+        <section>
+            <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Key Performance Metrics</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                A summary of your key service performance indicators and quality metrics
+            </p>
+
+            <app-performance-summary></app-performance-summary>
+        </section>
+
+        <!-- Ratings & Bookings -->
+        <section>
+            <div class="mb-4">
+                <h2 class="text-2xl font-semibold text-emerald-700">Ratings & Bookings</h2>
+                <p class="text-sm text-slate-500 mt-1">Analyze customer satisfaction levels and booking activity over
+                    time</p>
+            </div>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <app-performance-ratings></app-performance-ratings>
+                <app-performance-bookings></app-performance-bookings>
+            </div>
+        </section>
+
+        <!-- Reliability Metrics -->
+        <section>
+            <div class="mb-4">
+                <h2 class="text-2xl font-semibold text-emerald-700">Reliability Metrics</h2>
+                <p class="text-sm text-slate-500 mt-1">Evaluate service quality, response time, and punctuality</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <app-performance-response-time></app-performance-response-time>
+                <app-performance-on-time-arrival></app-performance-on-time-arrival>
+            </div>
+            <div class="mt-6">
+                <app-performance-disputes></app-performance-disputes>
+            </div>
+        </section>
+
+        <!-- Performance Comparison -->
+        <section>
+            <div class="mb-4">
+                <h2 class="text-2xl font-semibold text-emerald-700">Performance Comparison</h2>
+                <p class="text-sm text-slate-500 mt-1">Compare your performance against platform benchmarks and
+                    competitors</p>
+            </div>
+            <div class="space-y-6">
+                <app-performance-comparison-overview></app-performance-comparison-overview>
+                <app-performance-comparison></app-performance-comparison>
+            </div>
+        </section>
+
+    </main>
+</div>

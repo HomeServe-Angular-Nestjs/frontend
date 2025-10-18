@@ -35,12 +35,12 @@ export class ProviderSidebarComponent {
           route: 'bookings',
           active: false
         },
-        {
-          name: 'Schedules',
-          icon: 'fas fa-calendar-check',
-          route: 'schedules',
-          active: false
-        },
+        // {
+        //   name: 'Schedules',
+        //   icon: 'fas fa-calendar-check',
+        //   route: 'schedules',
+        //   active: false
+        // },
       ]
     },
     {

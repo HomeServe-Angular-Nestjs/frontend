@@ -1,1 +1,43 @@
-<img src="assets/images/download.png" alt="" class="h-screen w-full">
+<div class="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-lime-50">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- KPI Overview -->
+        <section>
+            <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Key Area Metrics</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                Overview of top-performing and underperforming areas
+            </p>
+
+            <app-area-analytics-summary></app-area-analytics-summary>
+        </section>
+
+        <!-- Service Demand -->
+        <section>
+            <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Service Demand by Area</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                Visualize which areas have the highest demand for your services
+            </p>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <app-area-service-demand-chart></app-area-service-demand-chart>
+                <app-top-areas-revenue></app-top-areas-revenue>
+            </div>
+        </section>
+
+        <!-- Revenue by Location -->
+        <section>
+            <app-area-by-revenue></app-area-by-revenue>
+        </section>
+
+        <!-- Underperforming Areas -->
+        <section>
+            <app-underperforming-areas></app-underperforming-areas>
+        </section>
+
+        <!-- Peak Service Times -->
+        <section>
+            <app-peak-service-times></app-peak-service-times>
+        </section>
+
+    </main>
+</div>

@@ -8,6 +8,7 @@ import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { ILocation } from "../models/user.model";
 import { ISelectedSlot } from "../models/slot-rule.model";
+import { ISubmitReview } from "../models/reviews.model";
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
@@ -65,6 +66,10 @@ export class BookingService {
     fetchBookingDetails(bookingId: string): Observable<IBookingDetailCustomer> {
         const params = new HttpParams().set('bookingId', bookingId);
         return this._http.get<IBookingDetailCustomer>(`${this._customerApi}/booking/view_details`, { params })
+    }
+
+    addReview(bookingId: string, reviewData: ISubmitReview): Observable<IResponse> {
+        return this._http.patch<IResponse>(`${this._customerApi}/booking/add_review`, { bookingId, ...reviewData })
     }
 
     cancelBooking(bookingId: string, reason: string,): Observable<IResponse> {

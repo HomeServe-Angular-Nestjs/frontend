@@ -136,7 +136,7 @@ export const providerRoutes: Routes = [
                 path: 'performance',
                 canActivate: [AuthGuard],
                 loadComponent: () => import('../../pages/provider/analytics/performance/performance-page.component')
-                    .then(c => c.ProviderPerformanceComponent)
+                    .then(c => c.ProviderPerformanceLayoutComponent)
             },
             {
                 path: 'area-analytics',

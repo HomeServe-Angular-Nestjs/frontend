@@ -5,7 +5,7 @@ import { IChangePassword, ICustomer, ICustomerProfileData, IDisplayReviews } fro
 import { catchError, Observable, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { IReview, ISubmitReview } from "../models/reviews.model";
+import { ISubmitReview } from "../models/reviews.model";
 
 @Injectable({ providedIn: 'root' })
 export class CustomerService {

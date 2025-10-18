@@ -53,6 +53,14 @@ export interface IBookingDetailsBase {
     } | null;
 }
 
+export interface IReview {
+    desc: string;
+    rating: number;
+    writtenAt: Date | string;
+    // isActive: boolean;
+    // isReported: boolean;
+}
+
 // --------------------
 // Customer Related Interfaces
 // --------------------
@@ -88,6 +96,7 @@ export interface IBooking {
     }[];
     paymentStatus: PaymentStatus;
     transactionId: string | null;
+    review: IReview | null;
 }
 
 export interface IBookingResponse {
@@ -110,6 +119,7 @@ export interface IBookingResponse {
     totalAmount: number;
     createdAt: Date;
     transactionId: string | null;
+    review: IReview | null;
 }
 
 export interface IBookingWithPagination {
