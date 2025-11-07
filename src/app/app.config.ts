@@ -50,7 +50,8 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
-      })
+      }),
+      // withRouterConfig({ onSameUrlNavigation: 'reload' })
     ),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore({

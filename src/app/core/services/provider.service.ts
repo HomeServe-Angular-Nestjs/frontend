@@ -94,4 +94,8 @@ export class ProviderService {
     getAvgRating(providerId: string): Observable<IResponse<number>> {
         return this._http.get<IResponse<number>>(`${this._apiUrl}/avg_rating/${providerId}`);
     }
+
+    updatePassword(currentPassword: string, newPassword: string): Observable<IResponse> {
+        return this._http.patch<IResponse>(`${this._apiUrl}/update_password`, { currentPassword, newPassword });
+    }
 }
