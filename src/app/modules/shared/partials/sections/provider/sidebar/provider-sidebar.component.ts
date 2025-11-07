@@ -6,7 +6,6 @@ import { authActions } from '../../../../../../store/auth/auth.actions';
 
 @Component({
   selector: 'app-provider-sidebar',
-  standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './provider-sidebar.component.html',
 })
@@ -107,7 +106,7 @@ export class ProviderSidebarComponent {
         {
           name: 'Settings',
           icon: 'fas fa-cog',
-          route: '',
+          route: 'settings',
           active: false
         }
       ]

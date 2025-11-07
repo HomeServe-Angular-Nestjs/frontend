@@ -150,6 +150,12 @@ export const providerRoutes: Routes = [
                 loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
                     .then(c => c.ProviderRevenueAnalyticsComponent)
             },
+            {
+                path: 'settings',
+                canActivate: [AuthGuard],
+                loadComponent: () => import('../../pages/provider/settings/settings.component')
+                    .then(c => c.ProviderSettingsComponent)
+            }
         ],
     },
 
