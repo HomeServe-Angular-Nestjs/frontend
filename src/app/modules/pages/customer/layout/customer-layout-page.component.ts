@@ -4,7 +4,7 @@ import { RouterOutlet } from '@angular/router';
 import { CustomerHeaderComponent } from '../../../shared/partials/sections/customer/header/header.component';
 import { CustomerFooterComponent } from "../../../shared/partials/sections/customer/footer/customer-footer.component";
 import { distinctUntilChanged, filter, map, Subject, takeUntil } from 'rxjs';
-import { selectCheckStatus,  } from '../../../../store/auth/auth.selector';
+import { selectCheckStatus, } from '../../../../store/auth/auth.selector';
 import { Store } from '@ngrx/store';
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
 import { VideoCallSocketService } from '../../../../core/services/socket-service/video-socket.service';
@@ -12,6 +12,7 @@ import { NotificationSocketService } from '../../../../core/services/socket-serv
 import { selectCustomer } from '../../../../store/customer/customer.selector';
 import { NotificationTemplateId, NotificationType } from '../../../../core/enums/enums';
 import { ReservationSocketService } from '../../../../core/services/socket-service/reservation-socket.service';
+import { VideoCallService } from '../../../../core/services/video-call.service';
 
 @Component({
   selector: 'app-customer-landing-page',
@@ -21,13 +22,13 @@ import { ReservationSocketService } from '../../../../core/services/socket-servi
 export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
   private readonly _notificationService = inject(NotificationSocketService);
   private readonly _reservationService = inject(ReservationSocketService);
-  private readonly _videoSocket = inject(VideoCallSocketService);
+  private readonly _videoSocketService = inject(VideoCallSocketService);
+  private readonly _videoCallService = inject(VideoCallService); //? initiated the instance
   private readonly _chatSocket = inject(ChatSocketService);
+
   private readonly _store = inject(Store);
 
   private _destroy$ = new Subject<void>();
-
-  // showSubscriptionPage$ = this._store.select(selectShowSubscriptionPage);
 
   ngOnInit(): void {
     const authStatus$ = this._store.select(selectCheckStatus).pipe(
@@ -45,9 +46,9 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
       filter(status => status === 'authenticated')
     ).subscribe(() => {
       this._chatSocket.connect();
-      // this._videoSocket.connect();
       this._notificationService.connect();
       this._reservationService.connect();
+      this._videoSocketService.connect();
     });
 
     // Disconnect socket when unauthenticated
@@ -55,9 +56,9 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
       filter(status => status !== 'authenticated')
     ).subscribe(() => {
       this._chatSocket.disconnect();
-      // this._videoSocket.disconnect();
       this._notificationService.disconnect();
       this._reservationService.disconnect();
+      this._videoSocketService.disconnect();
     });
 
     customer$.pipe(
@@ -97,9 +98,5 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
     this._chatSocket.stopListeningMessages();
     this._notificationService.stopListeningNotifications();
     this._reservationService.stopListeningReservationUpdates();
-  }
-
-  proceedWithSub() {
-    // this._store.dispatch(authActions.updateShowSubscriptionPageValue({ value: false }));
   }
 }
