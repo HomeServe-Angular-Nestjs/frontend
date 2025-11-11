@@ -4,77 +4,77 @@ import { ToastNotificationService } from '../public/toastr.service';
 import { inject } from '@angular/core';
 
 export interface ISocketError {
-    type: string;
-    message: string;
-    error: any;
-    data?: any;
+  type: string;
+  message: string;
+  error: any;
+  data?: any;
 }
 
 export abstract class BaseSocketService {
-    protected readonly _toastr = inject(ToastNotificationService);
-    protected socket: Socket | null = null;
-    protected readonly _socketUrl = SOCKET_URL;
-    protected abstract namespace: string;
+  protected readonly _toastr = inject(ToastNotificationService);
+  protected socket: Socket | null = null;
+  protected readonly _socketUrl = SOCKET_URL;
+  protected abstract namespace: string;
 
-    connect(): void {
-        if (this.socket && this.socket.connected) {
-            return;
-        }
-
-        if (!this.socket) {
-            this.socket = io(`${this._socketUrl}/${this.namespace}`, {
-                withCredentials: true,
-                transports: ['websocket'],
-                forceNew: true,
-            });
-
-            this.socket.on('connect', () => {
-                console.log('Connected to server with ID:', this.socket!.id);
-                this.onConnect();
-            });
-
-            this.socket.on('disconnect', (reason: string) => {
-                console.log('Disconnected from server:', reason);
-                this.onDisconnect(reason);
-            });
-
-            // this.socket.onAny((event, ...args) => {
-            //     console.log("📩 Event received:", event, args);
-            // });
-        }
-
-        this.socket.connect();
-        this.socket?.on('error', (error) => {
-            console.error('Received socket error:', error);
-            if (error.type === 'validation') {
-                // Display in UI or handle accordingly
-            }
-        });
+  connect(): void {
+    if (this.socket && this.socket.connected) {
+      return;
     }
 
-    disconnect(): void {
-        if (this.socket) {
-            this.socket.disconnect();
-            this.socket = null;
-        }
+    if (!this.socket) {
+      this.socket = io(`${this._socketUrl}/${this.namespace}`, {
+        withCredentials: true,
+        transports: ['websocket'],
+        forceNew: true,
+      });
+
+      this.socket.on('connect', () => {
+        console.log('Connected to server with ID:', this.socket!.id);
+        this.onConnect();
+      });
+
+      this.socket.on('disconnect', (reason: string) => {
+        console.log('Disconnected from server:', reason);
+        this.onDisconnect(reason);
+      });
+
+      // this.socket.onAny((event, ...args) => {
+      //     console.log("📩 Event received:", event, args);
+      // });
     }
 
-    protected abstract onConnect(): void;
-    protected abstract onDisconnect(reason: string): void;
+    this.socket.connect();
+    this.socket?.on('error', (error) => {
+      console.error('Received socket error:', error);
+      if (error.type === 'validation') {
+        // Display in UI or handle accordingly
+      }
+    });
+  }
 
-    emit<T>(event: string, data?: T): void {
-        this.socket?.emit(event, data);
+  disconnect(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
     }
+  }
 
-    listen<T>(event: string, callback: (data: T) => void) {
-        this.socket?.on(event, callback);
-    }
+  protected abstract onConnect(): void;
+  protected abstract onDisconnect(reason: string): void;
 
-    removeListener(event: string) {
-        this.socket?.off(event);
-    }
+  emit<T>(event: string, data?: T): void {
+    this.socket?.emit(event, data);
+  }
 
-    isConnected(): boolean {
-        return !!this.socket?.connected;
-    }
+  listen<T>(event: string, callback: (data: T) => void) {
+    this.socket?.on(event, callback);
+  }
+
+  removeListener(event: string) {
+    this.socket?.off(event);
+  }
+
+  isConnected(): boolean {
+    return !!this.socket?.connected;
+  }
 }

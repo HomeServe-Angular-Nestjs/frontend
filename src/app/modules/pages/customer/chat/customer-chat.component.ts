@@ -9,33 +9,35 @@ import { Store } from "@ngrx/store";
 import { chatActions } from "../../../../store/chat/chat.action";
 import { CustomerHeaderComponent } from "../../../shared/partials/sections/customer/header/header.component";
 import { selectCheckStatus } from "../../../../store/auth/auth.selector";
+import { VideoCallSocketService } from "../../../../core/services/socket-service/video-socket.service";
 
 @Component({
-    selector: 'app-customer-chat',
-    templateUrl: './customer-chat.component.html',
-    imports: [CommonModule, ChatListComponent, ChatMessageComponent, CustomerHeaderComponent]
+  selector: 'app-customer-chat',
+  templateUrl: './customer-chat.component.html',
+  imports: [CommonModule, ChatListComponent, ChatMessageComponent, CustomerHeaderComponent]
 })
 export class CustomerChatComponent implements OnInit, OnDestroy {
-    private readonly _store = inject(Store);
-    private readonly _chatSocket = inject(ChatSocketService);
+  private readonly _store = inject(Store);
+  private readonly _videoSocketService = inject(VideoCallSocketService);
 
-    private _destroy$ = new Subject<void>();
+  private readonly _chatSocket = inject(ChatSocketService);
 
+  private _destroy$ = new Subject<void>();
 
-    ngOnInit(): void {
-        this._store.select(selectCheckStatus).pipe(
-            distinctUntilChanged(),
-            takeUntil(this._destroy$)
-        ).pipe(
-            filter(status => status === 'authenticated')
-        ).subscribe(() => {
-            this._chatSocket.connect();
-            this._store.dispatch(chatActions.fetchAllChat());
-        });
-    }
+  ngOnInit(): void {
+    this._store.select(selectCheckStatus).pipe(
+      takeUntil(this._destroy$)
+    ).subscribe((status) => {
+      if (status === 'authenticated') {
+        this._chatSocket.connect();
+        this._videoSocketService.connect();
+        this._store.dispatch(chatActions.fetchAllChat());
+      }
+    });
+  }
 
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
+  }
 }

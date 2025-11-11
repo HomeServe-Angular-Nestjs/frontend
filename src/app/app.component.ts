@@ -6,6 +6,7 @@ import { authActions } from './store/auth/auth.actions';
 import { UserType } from './modules/shared/models/user.model';
 import { DomPortalOutlet } from '@angular/cdk/portal';
 import { LoadingSpinnerComponent } from "./UI/spinner/spinner.component";
+import { VideoCallService } from './core/services/video-call.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,7 @@ import { LoadingSpinnerComponent } from "./UI/spinner/spinner.component";
 export class AppComponent implements OnInit, OnDestroy {
   private readonly _router = inject(Router);
   private readonly _store = inject(Store);
-
+  
   private readonly _destroy$ = new Subject<void>();
 
   ngOnInit(): void {

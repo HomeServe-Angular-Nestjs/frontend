@@ -3,32 +3,32 @@ const domainName = 'http://localhost:5000/api';
 export const production = false;
 
 export const API_ENV = {
-    signupAuth: `${domainName}/signup`,
-    loginAuth: `${domainName}/login`,
-    auth: `${domainName}/auth`,
-    admin: `${domainName}/admin`,
-    customer: `${domainName}`,
-    provider: `${domainName}/provider`,
-    payment: `${domainName}/payment`,
-    schedule: `${domainName}/schedule`,
-    chat: `${domainName}/chat`,
-    message: `${domainName}/messages`,
-    plans: `${domainName}/plans`,
-    subscription: `${domainName}/subscription`,
-    uploads: `${domainName}/uploads`,
-    rule: `${domainName}/rule`,
-    transactions: `${domainName}/transactions`,
-    wallet: `${domainName}/wallet`,
-    notification: `${domainName}/notification`,
-    reservation: `${domainName}/reservation`,
-    report: `${domainName}/report`,
-    analytics: `${domainName}/analytics`
+  signupAuth: `${domainName}/signup`,
+  loginAuth: `${domainName}/login`,
+  auth: `${domainName}/auth`,
+  admin: `${domainName}/admin`,
+  customer: `${domainName}`,
+  provider: `${domainName}/provider`,
+  payment: `${domainName}/payment`,
+  schedule: `${domainName}/schedule`,
+  chat: `${domainName}/chat`,
+  message: `${domainName}/messages`,
+  plans: `${domainName}/plans`,
+  subscription: `${domainName}/subscription`,
+  uploads: `${domainName}/uploads`,
+  rule: `${domainName}/rule`,
+  transactions: `${domainName}/transactions`,
+  wallet: `${domainName}/wallet`,
+  notification: `${domainName}/notification`,
+  reservation: `${domainName}/reservation`,
+  report: `${domainName}/report`,
+  analytics: `${domainName}/analytics`
 };
 
 export const API_KEY = {
-    mapbox: 'pk.eyJ1Ijoic2FqaWRtdWhhbW1lZCIsImEiOiJjbTl3b25hZDMxMHB0Mmlwc3ZlcnV3MmMwIn0.zMhfdAfDTgodZvIu0tbglw',
-    razorpay: 'rzp_test_OZVJGxiPWQgDaM',
-    openCageApi: '891b320be91d49d0861fc8b1592cc0b5',
+  mapbox: 'pk.eyJ1Ijoic2FqaWRtdWhhbW1lZCIsImEiOiJjbTl3b25hZDMxMHB0Mmlwc3ZlcnV3MmMwIn0.zMhfdAfDTgodZvIu0tbglw',
+  razorpay: 'rzp_test_OZVJGxiPWQgDaM',
+  openCageApi: '891b320be91d49d0861fc8b1592cc0b5',
 }
 
 export const OPEN_CAGE_URL = 'https://api.opencagedata.com/geocode/v1/json';
@@ -36,16 +36,40 @@ export const OPEN_CAGE_URL = 'https://api.opencagedata.com/geocode/v1/json';
 export const SOCKET_URL = 'http://localhost:5000';
 
 export const REGEXP_ENV = {
-    password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-    phone: /^[6-9]\d{9}$/,
-    decimals: /^\d+(\.\d{1,2})?$/,
-    integers: /^\d+$/,
-    time24Hour: /^([01]\d|2[0-3]):([0-5]\d)$/, // format HH:mm
-    dateYYYYMMDD: /^\d{4}-\d{2}-\d{2}$/, // Matches YYYY-MM-DD strictly
+  password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+  phone: /^[6-9]\d{9}$/,
+  decimals: /^\d+(\.\d{1,2})?$/,
+  integers: /^\d+$/,
+  time24Hour: /^([01]\d|2[0-3]):([0-5]\d)$/, // format HH:mm
+  dateYYYYMMDD: /^\d{4}-\d{2}-\d{2}$/, // Matches YYYY-MM-DD strictly
 }
 
+export const ICE_SERVERS = [
+  { urls: "stun:stun.relay.metered.ca:80" },
+  {
+    urls: "turn:global.relay.metered.ca:80",
+    username: "1b5c834b93a455e980999ef5",
+    credential: "BDHDGRa4FMJlPOlp",
+  },
+  {
+    urls: "turn:global.relay.metered.ca:80?transport=tcp",
+    username: "1b5c834b93a455e980999ef5",
+    credential: "BDHDGRa4FMJlPOlp",
+  },
+  {
+    urls: "turn:global.relay.metered.ca:443",
+    username: "1b5c834b93a455e980999ef5",
+    credential: "BDHDGRa4FMJlPOlp",
+  },
+  {
+    urls: "turns:global.relay.metered.ca:443?transport=tcp",
+    username: "1b5c834b93a455e980999ef5",
+    credential: "BDHDGRa4FMJlPOlp",
+  },
+];
+
 export const ICONS = {
-    razorpay: `<?xml version="1.0" encoding="utf-8"?>
+  razorpay: `<?xml version="1.0" encoding="utf-8"?>
                     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 122.88 26.53" style="enable-background:new 0 0 122.88 26.53" xml:space="preserve"><style type="text/css">
                         <![CDATA[
 	                        .st0{fill:#3395FF;}

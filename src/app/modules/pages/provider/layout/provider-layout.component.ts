@@ -9,6 +9,8 @@ import { ChatSocketService } from '../../../../core/services/socket-service/chat
 import { selectCheckStatus } from '../../../../store/auth/auth.selector';
 import { PaymentService } from '../../../../core/services/payment.service';
 import { RazorpayWrapperService } from '../../../../core/services/public/razorpay-wrapper.service';
+import { VideoCallSocketService } from '../../../../core/services/socket-service/video-socket.service';
+import { VideoCallService } from '../../../../core/services/video-call.service';
 
 @Component({
   selector: 'app-provider-layout',
@@ -19,7 +21,10 @@ import { RazorpayWrapperService } from '../../../../core/services/public/razorpa
 })
 export class ProviderLayoutComponent implements OnInit, OnDestroy {
   private readonly _store = inject(Store);
+  private readonly _videoSocketService = inject(VideoCallSocketService);
   private readonly _chatSocket = inject(ChatSocketService);
+  private readonly _videoCallService = inject(VideoCallService); //? initiated the instance
+
 
   private _destroy$ = new Subject<void>();
 
@@ -31,8 +36,10 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
       if (status === 'authenticated') {
         this._chatSocket.stopListeningMessages();
         this._chatSocket.connect();
+        this._videoSocketService.connect();
       } else {
         this._chatSocket.disconnect();
+        this._videoSocketService.disconnect();
       }
     });
   }
