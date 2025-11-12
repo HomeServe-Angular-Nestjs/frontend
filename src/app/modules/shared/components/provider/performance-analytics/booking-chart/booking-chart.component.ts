@@ -11,7 +11,7 @@ import { CallbackDataParams } from "echarts/types/dist/shared";
     imports: [NgxEchartsModule],
     providers: [AnalyticService],
     template: `
-      <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-100 hover:shadow-xl transition-shadow duration-300">
+      <div class="bg-white rounded-2xl shadow-md p-6 border border-slate-100">
         <div class="flex items-center justify-between mb-6">
           <div>
             <h2 class="text-2xl font-semibold text-slate-900">

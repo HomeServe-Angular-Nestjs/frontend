@@ -10,92 +10,96 @@ import { UploadType } from "../enums/enums";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
-    private _http = inject(HttpClient);
+  private _http = inject(HttpClient);
 
-    private providerDataSource = new BehaviorSubject<IProvider | null>(null);
-    private readonly _apiUrl = API_ENV.provider;
+  private providerDataSource = new BehaviorSubject<IProvider | null>(null);
+  private readonly _apiUrl = API_ENV.provider;
 
-    providerData$ = this.providerDataSource.asObservable();
+  providerData$ = this.providerDataSource.asObservable();
 
-    private _buildFilterParams(filter: IFilter): HttpParams {
-        let params = new HttpParams();
+  private _buildFilterParams(filter: IFilter): HttpParams {
+    let params = new HttpParams();
 
-        Object.entries(filter).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-                params = params.set(key, value);
-            }
-        });
+    Object.entries(filter).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params = params.set(key, value);
+      }
+    });
 
-        return params;
+    return params;
+  }
+
+  // Updates the BehaviorSubject with new provider data.
+  setProviderData(data: IProvider) {
+    this.providerDataSource.next(data);
+  }
+
+  getProviders(filter: IFilter = {}, locationSearch?: IHomeSearch): Observable<IResponse<IProviderCardView[]>> {
+    let params = this._buildFilterParams(filter);
+
+    if (locationSearch) {
+      params = params.set('lat', locationSearch.lat.toString())
+        .set('lng', locationSearch.lng.toString())
+        .set('title', locationSearch.title);
     }
 
-    // Updates the BehaviorSubject with new provider data.
-    setProviderData(data: IProvider) {
-        this.providerDataSource.next(data);
-    }
+    return this._http.get<IResponse<IProviderCardView[]>>(`${this._apiUrl}/fetch_providers`, { params });
+  }
 
-    getProviders(filter: IFilter = {}, locationSearch?: IHomeSearch): Observable<IResponse<IProviderCardView[]>> {
-        let params = this._buildFilterParams(filter);
+  getOneProvider(id: string | null = null): Observable<IProvider> {
+    return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?id=${id}`).pipe(shareReplay(1));
+  }
 
-        if (locationSearch) {
-            params = params.set('lat', locationSearch.lat.toString())
-                .set('lng', locationSearch.lng.toString())
-                .set('title', locationSearch.title);
-        }
+  // Updates a provider with full or file-based data (e.g., multipart form).
+  bulkUpdate(formData: FormData | Partial<IProvider>): Observable<IProvider> {
+    return this._http.patch<IProvider>(`${this._apiUrl}/update_provider`, formData);
+  }
 
-        return this._http.get<IResponse<IProviderCardView[]>>(`${this._apiUrl}/fetch_providers`, { params });
-    }
+  // Updates specific fields of a provider (partial update).
+  partialUpdate(data: Partial<IProvider>): Observable<IProvider> {
+    return this._http.patch<IProvider>(`${this._apiUrl}/partial_update`, data);
+  }
 
-    getOneProvider(id: string | null = null): Observable<IProvider> {
-        return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?id=${id}`).pipe(shareReplay(1));
-    }
+  updateDefaultSlot(slot: SlotType): Observable<SlotType[]> {
+    return this._http.patch<SlotType[]>(`${this._apiUrl}/default_slots`, slot);
+  }
 
-    // Updates a provider with full or file-based data (e.g., multipart form).
-    bulkUpdate(formData: FormData | Partial<IProvider>): Observable<IProvider> {
-        return this._http.patch<IProvider>(`${this._apiUrl}/update_provider`, formData);
-    }
+  updateBio(updateData: IProviderUpdateBio): Observable<IResponse<IProvider>> {
+    return this._http.put<IResponse<IProvider>>(`${this._apiUrl}/bio`, updateData);
+  }
 
-    // Updates specific fields of a provider (partial update).
-    partialUpdate(data: Partial<IProvider>): Observable<IProvider> {
-        return this._http.patch<IProvider>(`${this._apiUrl}/partial_update`, data);
-    }
+  uploadCertificate(formData: FormData): Observable<IResponse<IProvider>> {
+    return this._http.put<IResponse<IProvider>>(`${this._apiUrl}/cert_upload`, formData);
+  }
 
-    updateDefaultSlot(slot: SlotType): Observable<SlotType[]> {
-        return this._http.patch<SlotType[]>(`${this._apiUrl}/default_slots`, slot);
-    }
+  deleteDefaultSlot() {
+    return this._http.delete(`${this._apiUrl}/default_slots`);
+  }
 
-    updateBio(updateData: IProviderUpdateBio): Observable<IResponse<IProvider>> {
-        return this._http.put<IResponse<IProvider>>(`${this._apiUrl}/bio`, updateData);
-    }
+  getReviews(providerId: string, count: number = 0): Observable<IResponse<IDisplayReviews>> {
+    const params = new HttpParams()
+      .set('providerId', providerId)
+      .set('count', count);
+    return this._http.get<IResponse<IDisplayReviews>>(`${this._apiUrl}/reviews`, { params });
+  }
 
-    uploadCertificate(formData: FormData): Observable<IResponse<IProvider>> {
-        return this._http.put<IResponse<IProvider>>(`${this._apiUrl}/cert_upload`, formData);
-    }
+  uploadImage(imageData: FormData): Observable<IResponse> {
+    return this._http.patch<IResponse>(`${this._apiUrl}/gallery_upload`, imageData);
+  }
 
-    deleteDefaultSlot() {
-        return this._http.delete(`${this._apiUrl}/default_slots`);
-    }
+  getWorkImages(): Observable<IResponse<string[]>> {
+    return this._http.get<IResponse<string[]>>(`${this._apiUrl}/work_images`);
+  }
 
-    getReviews(providerId: string, count: number = 0): Observable<IResponse<IDisplayReviews>> {
-        const params = new HttpParams()
-            .set('providerId', providerId)
-            .set('count', count);
-        return this._http.get<IResponse<IDisplayReviews>>(`${this._apiUrl}/reviews`, { params });
-    }
+  getAvgRating(providerId: string): Observable<IResponse<number>> {
+    return this._http.get<IResponse<number>>(`${this._apiUrl}/avg_rating/${providerId}`);
+  }
 
-    uploadImage(imageData: FormData): Observable<IResponse> {
-        return this._http.patch<IResponse>(`${this._apiUrl}/gallery_upload`, imageData);
-    }
+  updatePassword(currentPassword: string, newPassword: string): Observable<IResponse> {
+    return this._http.patch<IResponse>(`${this._apiUrl}/update_password`, { currentPassword, newPassword });
+  }
 
-    getWorkImages(): Observable<IResponse<string[]>> {
-        return this._http.get<IResponse<string[]>>(`${this._apiUrl}/work_images`);
-    }
-
-    getAvgRating(providerId: string): Observable<IResponse<number>> {
-        return this._http.get<IResponse<number>>(`${this._apiUrl}/avg_rating/${providerId}`);
-    }
-
-    updatePassword(currentPassword: string, newPassword: string): Observable<IResponse> {
-        return this._http.patch<IResponse>(`${this._apiUrl}/update_password`, { currentPassword, newPassword });
-    }
+  getDashboardOverview(): Observable<IResponse> {
+    return this._http.get<IResponse>(`${this._apiUrl}/dashboard/overview`);
+  }
 }
