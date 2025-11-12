@@ -1,0 +1,93 @@
+<div
+  class="max-w-full sm:max-w-sm bg-white rounded-xl shadow-md border border-gray-100
+         p-4 sm:p-5 min-h-[220px] flex flex-col justify-between transition-all duration-300 ease-in-out hover:shadow-lg">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+    <h3 class="text-gray-900 text-base sm:text-lg font-semibold tracking-tight">
+      {{ data.heading }}
+    </h3>
+    <button class="flex items-center text-green-600 font-medium text-xs sm:text-sm hover:text-green-700 transition"
+      type="button" (click)="onViewDetails()">
+      {{ data.detailsText || 'View Details' }}
+      <i class="fa-solid fa-chevron-right ml-1 text-[10px] sm:text-xs"></i>
+    </button>
+  </div>
+
+  <!-- Main Layout Switch -->
+  <ng-container [ngSwitch]="data.boxes.length">
+
+    <!-- Case: 3 Boxes (1 full width + 2 half width) -->
+    <ng-container *ngSwitchCase="3">
+      <!-- Top main box -->
+      <div class="flex justify-between items-center rounded-lg p-4 mb-3 min-h-[90px] sm:min-h-[100px]
+               bg-green-50 border border-green-100">
+        <div>
+          <p class="text-green-700 text-xs sm:text-sm font-medium tracking-wide">
+            {{ data.boxes[0].title }}
+          </p>
+          <p class="text-gray-900 text-lg sm:text-xl font-semibold mt-1">
+            {{ formatValue(data.boxes[0].value) }}
+          </p>
+        </div>
+        <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-100 text-green-700">
+          <i class="fa-solid text-lg sm:text-xl" [ngClass]="data.boxes[0].icon"></i>
+        </div>
+      </div>
+
+      <!-- Bottom two boxes -->
+      <div class="grid grid-cols-2 gap-3">
+        <div *ngFor="let box of data.boxes.slice(1); let i = index"
+          class="rounded-lg p-4 min-h-[70px] flex flex-col justify-between border" [ngClass]="[
+            i === 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100'
+          ]">
+          <p class="text-gray-700 text-xs sm:text-sm font-medium">{{ box.title }}</p>
+          <p class="text-gray-900 text-base sm:text-lg font-semibold mt-1">
+            {{ formatValue(box.value) }}
+          </p>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Case: 2 Boxes (Full width each) -->
+    <ng-container *ngSwitchCase="2">
+      <div class="flex flex-col gap-3">
+        <div *ngFor="let box of data.boxes; let i = index"
+          class="rounded-lg p-4 min-h-[90px] flex justify-between items-center border" [ngClass]="[
+            i === 0 ? 'bg-sky-50 border-sky-100' : 'bg-pink-50 border-pink-100'
+          ]">
+          <div>
+            <p class="text-gray-700 text-xs sm:text-sm font-medium">{{ box.title }}</p>
+            <p class="text-gray-900 text-base sm:text-lg font-semibold mt-1">
+              {{ formatValue(box.value) }}
+            </p>
+          </div>
+          <div class="w-9 h-9 flex items-center justify-center rounded-lg bg-white/70">
+            <i class="fa-solid text-gray-700 text-lg sm:text-xl" [ngClass]="box.icon"></i>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Default (1 or >3 Boxes) -->
+    <ng-container *ngSwitchDefault>
+      <div class="grid gap-3" [ngClass]="{
+          'grid-cols-1': data.boxes.length === 1,
+          'grid-cols-2': data.boxes.length > 1
+        }">
+        <div *ngFor="let box of data.boxes; let i = index"
+          class="rounded-lg p-4 min-h-[90px] flex flex-col justify-between border" [ngClass]="[
+            i % 3 === 0
+              ? 'bg-green-50 border-green-100'
+              : i % 3 === 1
+              ? 'bg-teal-50 border-teal-100'
+              : 'bg-rose-50 border-rose-100'
+          ]">
+          <p class="text-gray-700 text-xs sm:text-sm font-medium">{{ box.title }}</p>
+          <p class="text-gray-900 text-base sm:text-lg font-semibold mt-1">
+            {{ formatValue(box.value) }}
+          </p>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
