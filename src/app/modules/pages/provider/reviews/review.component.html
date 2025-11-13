@@ -1,0 +1,100 @@
+<div class="bg-gray-50 py-8">
+  <div class="max-w-5xl mx-auto px-4 space-y-5">
+
+    <!-- Search + Filters -->
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+      <!-- Filters -->
+      <div class="flex flex-wrap items-center gap-3">
+
+        <!-- Rating Filter -->
+        <select [ngModel]="filter().rating" (ngModelChange)="updateRating($event)"
+          class="rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm px-3 py-1.5">
+          <option value="all">All Ratings</option>
+          <option *ngFor="let r of [5,4,3,2,1]" [value]="r">{{r}} ★</option>
+        </select>
+
+        <!-- Time Filter -->
+        <select [ngModel]="filter().time" (ngModelChange)="updateTime($event)"
+          class="rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm px-3 py-1.5">
+          <option value="all">All Time</option>
+          <option value="last_6_months">Last 6 Months</option>
+          <option value="last_year">Last Year</option>
+        </select>
+
+        <!-- Sort Filter -->
+        <select [ngModel]="filter().sort" (ngModelChange)="updateSort($event)"
+          class="rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm px-3 py-1.5">
+          <option value="desc">Newest First</option>
+          <option value="asc">Oldest First</option>
+        </select>
+      </div>
+
+      <!-- Search -->
+      <div class="relative w-full sm:w-72">
+        <input type="text" placeholder="Search by email" [ngModel]="filter().search" (ngModelChange)="onSearch($event)"
+          class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+      </div>
+    </div>
+
+    <!-- Review Cards -->
+    <div class="space-y-4">
+      <div *ngFor="let review of reviews()"
+        class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition duration-200">
+
+        <div class="flex items-start gap-4">
+          <img [src]="review.avatar" alt="User Avatar"
+            class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border border-gray-200 shadow-sm" />
+
+          <div class="flex-1">
+
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="text-base font-semibold text-gray-900">{{ review.username || 'Anonymous User' }}</h3>
+                <p class="text-sm text-gray-500">{{ review.email }}</p>
+              </div>
+              <p class="text-xs sm:text-sm text-gray-400 mt-1 sm:mt-0">
+                {{ review.writtenAt | date: 'mediumDate' }}
+              </p>
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-center mt-1.5">
+              <div class="flex text-yellow-400 text-base">
+                <ng-container *ngFor="let star of [1,2,3,4,5]">
+                  <i class="fas" [ngClass]="{
+                      'fa-star': review.rating >= star,
+                      'fa-star-half-alt': review.rating >= star - 0.5 && review.rating < star,
+                      'fa-star-o': review.rating < star - 0.5
+                    }"></i>
+                </ng-container>
+              </div>
+              <span class="ml-2 text-gray-700 font-semibold text-sm">{{ review.rating.toFixed(1) }}</span>
+            </div>
+
+            <p class="text-gray-700 text-sm mt-2 leading-relaxed">
+              “{{ review.desc }}”
+            </p>
+
+            <div *ngIf="review.serviceTitles?.length" class="mt-2 text-xs sm:text-sm text-gray-600">
+              <span class="font-medium text-gray-700 mr-1">Booked Services:</span>
+              <span *ngFor="let title of review.serviceTitles; let i = index">
+                {{ title }}<span *ngIf="i < review.serviceTitles.length - 1">, </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!reviews().length" class="text-center py-10 text-gray-500 italic text-sm">
+        No reviews available.
+      </div>
+    </div>
+
+    <app-provider-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)">
+    </app-provider-pagination>
+
+  </div>
+</div>

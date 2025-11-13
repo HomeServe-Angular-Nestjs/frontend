@@ -94,7 +94,7 @@ export class ProviderSidebarComponent {
         {
           name: 'Reviews',
           icon: 'fas fa-star',
-          route: '',
+          route: 'reviews',
           active: false
         },
         {
