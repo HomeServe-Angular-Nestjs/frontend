@@ -2,10 +2,8 @@ import { Routes } from "@angular/router";
 import { AuthGuard } from "../../../core/guards/auth.guard";
 import { ProviderLayoutComponent } from "../../pages/provider/layout/provider-layout.component";
 import { ProfilesLayoutComponent } from "../../pages/provider/profiles/profiles-layout.component";
-import { ProviderProfileOverviewLayoutComponent } from "../../shared/components/provider/profile-overview/layout/provider-profile-overview-layout.component";
 import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
-// import { SubscriptionGuard } from "../../../core/guards/subscription.guard";
 
 export const providerRoutes: Routes = [
   {
@@ -151,6 +149,12 @@ export const providerRoutes: Routes = [
         canActivate: [AuthGuard],
         loadComponent: () => import('../../pages/provider/reviews/review.component')
           .then(c => c.ProviderReviewComponent)
+      },
+      {
+        path: 'wallet',
+        canActivate: [AuthGuard],
+        loadComponent: () => import('../../pages/provider/wallet/wallet.component')
+          .then(c => c.ProviderWalletComponent)
       },
       {
         path: 'settings',

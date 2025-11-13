@@ -98,9 +98,9 @@ export class ProviderSidebarComponent {
           active: false
         },
         {
-          name: 'Earnings',
+          name: 'Wallet',
           icon: 'fas fa-wallet',
-          route: '',
+          route: 'wallet',
           active: false
         },
         {
