@@ -1,17 +1,22 @@
-<div class="flex h-screen font-sans">
-    <!-- Sidebar -->
-    <app-provider-sidebar class="w-64 border-r bg-white shrink-0"></app-provider-sidebar>
+<div class="flex h-screen font-sans bg-white">
 
-    <!-- Main Content -->
-    <section class="flex flex-col flex-1 bg-gray-50 overflow-hidden">
-        <!-- Header -->
-        <div class="sticky top-3 mx-3 z-20 bg-white border-b">
-            <app-provider-header></app-provider-header>
-        </div>
+  <!-- Sidebar -->
+  <app-provider-sidebar (collapsedChange)="onSidebarToggle($event)">
+  </app-provider-sidebar>
 
-        <!-- Scrollable Content -->
-        <div class="flex-1 overflow-auto p-4 no-scrollbar">
-            <router-outlet></router-outlet>
-        </div>
-    </section>
+  <!-- Main Content -->
+  <section class="flex flex-col flex-1 overflow-hidden transition-all duration-300" [ngClass]="{
+      'ml-64': sidebarState === 'expanded',
+      'ml-20': sidebarState === 'collapsed',
+    }">
+
+    <div class="sticky top-0 bg-white z-20 border-b">
+      <app-provider-header></app-provider-header>
+    </div>
+
+    <div class="flex-1 overflow-auto p-4">
+      <router-outlet></router-outlet>
+    </div>
+
+  </section>
 </div>

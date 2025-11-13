@@ -25,8 +25,9 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
   private readonly _chatSocket = inject(ChatSocketService);
   private readonly _videoCallService = inject(VideoCallService); //? initiated the instance
 
-
   private _destroy$ = new Subject<void>();
+
+  sidebarState: 'expanded' | 'collapsed' | 'hidden' = 'expanded';
 
   ngOnInit(): void {
     this._store.select(selectCheckStatus).pipe(
@@ -42,6 +43,10 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
         this._videoSocketService.disconnect();
       }
     });
+  }
+
+  onSidebarToggle(state: 'expanded' | 'collapsed' | 'hidden') {
+    this.sidebarState = state;
   }
 
   ngOnDestroy(): void {
