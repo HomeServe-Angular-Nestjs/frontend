@@ -147,6 +147,12 @@ export const providerRoutes: Routes = [
           .then(c => c.ProviderRevenueAnalyticsComponent)
       },
       {
+        path: 'reviews',
+        canActivate: [AuthGuard],
+        loadComponent: () => import('../../pages/provider/reviews/review.component')
+          .then(c => c.ProviderReviewComponent)
+      },
+      {
         path: 'settings',
         canActivate: [AuthGuard],
         loadComponent: () => import('../../pages/provider/settings/settings.component')

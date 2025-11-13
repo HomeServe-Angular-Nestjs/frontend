@@ -4,7 +4,7 @@ import { SharedDataService } from '../../../../core/services/public/shared-data.
 import { ProviderOverviewCardsComponent } from '../../../shared/partials/sections/provider/overview-cards/overview-cards.component';
 import { IProviderDashboardOverview, OverviewCardData } from '../../../../core/models/dashboard.model';
 import { ProviderService } from '../../../../core/services/provider.service';
-import { Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -46,14 +46,16 @@ export class ProviderHomepageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._sharedService.setProviderHeader('Dashboard');
 
-    this._providerService.getDashboardOverview().subscribe({
-      next: (res) => {
-        this.overviewCards = this._buildOverviewCards(res.data);
-      },
-      error: (err) => {
-        console.error('Error fetching dashboard overview:', err);
-      },
-    });
+    this._providerService.getDashboardOverview()
+      .pipe(takeUntil(this._destroy$))
+      .subscribe({
+        next: (res) => {
+          this.overviewCards = this._buildOverviewCards(res.data);
+        },
+        error: (err) => {
+          console.error('Error fetching dashboard overview:', err);
+        },
+      });
   }
 
   private _buildOverviewCards(data: IProviderDashboardOverview): OverviewCardData[] {
