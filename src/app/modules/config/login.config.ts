@@ -22,7 +22,7 @@ export const LOGIN_CONFIGS: {
 } = {
     customer: {
         type: 'customer',
-        title: 'Welcome to Muhammed sajid',
+        title: 'Welcome to Homeserve',
         subtitle: 'Your one-stop solution for all home services',
         backgroundImage: 'assets/images/bg-auth.jpg',
         logoColor: '#4f46e5',
