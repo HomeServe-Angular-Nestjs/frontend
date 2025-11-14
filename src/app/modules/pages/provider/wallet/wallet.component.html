@@ -1,0 +1,123 @@
+<div class="min-h-screen bg-gray-50 p-4 md:p-6">
+
+  <h3 class="text-lg font-semibold text-gray-800 mb-4 md:mb-6">Overview</h3>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-12">
+<!-- todo -->
+    <div class="bg-green-50 p-5 rounded-xl shadow-sm border border-green-100">
+      <p class="text-gray-600 text-sm">Available Balance</p>
+      <h3 class="text-2xl font-bold text-green-700 mt-1">₹8,270.00</h3>
+      <p class="text-green-700 text-xs mt-1">Ready to withdraw</p>
+    </div>
+
+    <div class="bg-blue-50 p-5 rounded-xl shadow-sm border border-blue-100">
+      <p class="text-gray-600 text-sm">Pending Payments</p>
+      <h3 class="text-2xl font-bold text-blue-700 mt-1">₹2,180.00</h3>
+      <p class="text-blue-700 text-xs mt-1">5 transactions pending</p>
+    </div>
+
+    <div class="bg-purple-50 p-5 rounded-xl shadow-sm border border-purple-100">
+      <p class="text-gray-600 text-sm">Total Earnings</p>
+      <h3 class="text-2xl font-bold text-purple-700 mt-1">₹12,450.00</h3>
+      <p class="text-purple-700 text-xs mt-1">This month</p>
+    </div>
+
+  </div>
+
+
+  <!-- Transaction History Section -->
+  <div class="bg-white shadow-md rounded-xl p-4 md:p-6">
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
+      <h3 class="text-lg font-semibold text-gray-800">Transaction History</h3>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <select [ngModel]="filter().date" (ngModelChange)="onDateChange($event)"
+          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500">
+          <option value="all">All Time</option>
+          <option value="last_six_months">Last 6 Months</option>
+          <option value="last_year">Last Year</option>
+        </select>
+
+        <select [ngModel]="filter().sort" (ngModelChange)="onSort($event)"
+          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="high">High Amount</option>
+          <option value="low">Low Amount</option>
+        </select>
+
+        <select [ngModel]="filter().type" (ngModelChange)="onTypeChange($event)"
+          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500">
+          <option value="all">All Types</option>
+          <option value="booking_release">Booking</option>
+          <option value="subscription">Subscription</option>
+        </select>
+
+        <select [ngModel]="filter().method" (ngModelChange)="onMethodChange($event)"
+          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500">
+          <option value="all">All Methods</option>
+          <option value="credit">Credit</option>
+          <option value="debit">Debit</option>
+        </select>
+      </div>
+    </div>
+
+
+    <!-- Table -->
+    <div class="overflow-x-auto rounded-md border border-gray-200">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
+            <th class="px-4 py-3 text-left whitespace-nowrap">Transaction ID</th>
+            <th class="px-4 py-3 text-left">Email</th>
+            <th class="px-4 py-3 text-left whitespace-nowrap">Payment ID</th>
+            <th class="px-4 py-3 text-left">Amount</th>
+            <th class="px-4 py-3 text-left">Date</th>
+            <th class="px-4 py-3 text-left">Type</th>
+            <th class="px-4 py-3 text-left">Source</th>
+            <th class="px-4 py-3 text-left">Method</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-200">
+          <ng-container *ngIf="transactions().length > 0; else noData">
+            <tr *ngFor="let tnx of transactions()" class="hover:bg-gray-50 transition">
+              <td class="px-4 py-3 text-green-600 font-medium">
+                #{{ tnx.transactionId | slice:-10 | uppercase }}
+              </td>
+
+              <td class="px-4 py-3">{{ tnx.email || '_' }}</td>
+              <td class="px-4 py-3">{{ tnx.paymentId || '_' }}</td>
+
+              <td class="px-4 py-3 font-medium">
+                ₹{{ tnx.amount.toLocaleString('en-IN') }}
+              </td>
+
+              <td class="px-4 py-3">{{ tnx.createdAt | date:'mediumDate' }}</td>
+
+              <td class="px-4 py-3 capitalize">{{ tnx.transactionType }}</td>
+              <td class="px-4 py-3 capitalize">{{ tnx.source }}</td>
+              <td class="px-4 py-3 capitalize">{{ tnx.method }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+
+      <ng-template #noData>
+        <tr>
+          <td colspan="8" class="text-center py-10 text-gray-500 text-sm">
+            No transactions found for the selected filters.
+          </td>
+        </tr>
+      </ng-template>
+    </div>
+
+    <div class="mt-10">
+      <app-provider-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)">
+      </app-provider-pagination>
+    </div>
+
+  </div>
+
+</div>

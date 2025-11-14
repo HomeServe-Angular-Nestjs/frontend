@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { combineLatest, Subject, switchMap } from 'rxjs';
+import { combineLatest, Subject, switchMap, takeUntil } from 'rxjs';
 import { BookingService } from '../../../../core/services/booking.service';
 import { CommonModule } from '@angular/common';
 import { ProviderPaginationComponent } from '../../../shared/partials/sections/provider/pagination/provider-pagination.component';
@@ -7,6 +7,7 @@ import { IReviewDetails, IReviewFilter } from '../../../../core/models/reviews.m
 import { FormsModule } from '@angular/forms';
 import { DebounceService } from '../../../../core/services/public/debounce.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
+import { SharedDataService } from '../../../../core/services/public/shared-data.service';
 
 @Component({
   selector: 'app-provider-review',
@@ -15,6 +16,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop'
   templateUrl: './review.component.html',
 })
 export class ProviderReviewComponent implements OnInit, OnDestroy {
+  private readonly _sharedService = inject(SharedDataService);
   private readonly _bookingService = inject(BookingService);
   private readonly _debounceService = inject(DebounceService);
 
@@ -47,7 +49,10 @@ export class ProviderReviewComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this._debounceService.onSearch(500)
+    this._sharedService.setProviderHeader('Reviews');
+
+    this._debounceService.onSearch(700)
+      .pipe(takeUntil(this._destroy$))
       .subscribe(value => {
         this.filter.update(f => ({ ...f, search: value }));
         this.page.set(1);

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -9,8 +9,63 @@ import { authActions } from '../../../../../../store/auth/auth.actions';
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './provider-sidebar.component.html',
 })
-export class ProviderSidebarComponent {
+export class ProviderSidebarComponent implements OnInit {
   constructor(private store: Store) { }
+
+  @Output() collapsedChange = new EventEmitter<'expanded' | 'collapsed' | 'hidden'>();
+
+  sidebarMode: 'expanded' | 'collapsed' | 'hidden' = 'expanded';
+  isMobileOpen = false;
+  innerWidth = window.innerWidth;
+
+  ngOnInit() {
+    this.updateSidebarMode();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.innerWidth = window.innerWidth;
+    this.updateSidebarMode();
+  }
+
+  updateSidebarMode() {
+    // if (this.innerWidth < 768) {
+    //   // MOBILE → Hidden drawer
+    //   this.sidebarMode = 'hidden';
+    //   this.isMobileOpen = false;
+    //   this.collapsedChange.emit('hidden');
+    //   return;
+    // }
+
+    if (this.innerWidth < 1280) {
+      // TABLET → Collapsed (icon only)
+      this.sidebarMode = 'collapsed';
+      this.isMobileOpen = true;
+      this.collapsedChange.emit('collapsed');
+      return;
+    }
+
+    // DESKTOP → Expanded
+    this.sidebarMode = 'expanded';
+    this.isMobileOpen = true;
+    this.collapsedChange.emit('expanded');
+  }
+
+  openMobile() {
+    if (this.sidebarMode === 'hidden') {
+      this.isMobileOpen = true;
+    }
+  }
+
+  closeMobile() {
+    if (this.sidebarMode === 'hidden') {
+      this.isMobileOpen = false;
+    }
+  }
+
+  logout() {
+    this.store.dispatch(authActions.logout({ fromInterceptor: false }));
+  }
 
   menuItems = [
     {
@@ -98,9 +153,9 @@ export class ProviderSidebarComponent {
           active: false
         },
         {
-          name: 'Earnings',
+          name: 'Wallet',
           icon: 'fas fa-wallet',
-          route: '',
+          route: 'wallet',
           active: false
         },
         {
@@ -112,8 +167,4 @@ export class ProviderSidebarComponent {
       ]
     }
   ];
-
-  logout() {
-    this.store.dispatch(authActions.logout({ fromInterceptor: false }));
-  }
 }

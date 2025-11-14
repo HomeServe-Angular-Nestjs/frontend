@@ -78,7 +78,7 @@
               “{{ review.desc }}”
             </p>
 
-            <div *ngIf="review.serviceTitles?.length" class="mt-2 text-xs sm:text-sm text-gray-600">
+            <div *ngIf="review.serviceTitles.length" class="mt-2 text-xs sm:text-sm text-gray-600">
               <span class="font-medium text-gray-700 mr-1">Booked Services:</span>
               <span *ngFor="let title of review.serviceTitles; let i = index">
                 {{ title }}<span *ngIf="i < review.serviceTitles.length - 1">, </span>
