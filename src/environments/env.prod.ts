@@ -1,6 +1,6 @@
 const domainName = 'https://homeserve-mauve.vercel.app/login?return=%2Fhomepage/api';
 
-export const production = false;
+export const production = true;
 
 export const API_ENV = {
   signupAuth: `${domainName}/signup`,
