@@ -1,4 +1,4 @@
-const domainName = 'http://localhost:5000/api';
+const domainName = 'https://homeserve-mauve.vercel.app/login?return=%2Fhomepage/api';
 
 export const production = false;
 
@@ -33,7 +33,7 @@ export const API_KEY = {
 
 export const OPEN_CAGE_URL = 'https://api.opencagedata.com/geocode/v1/json';
 
-export const SOCKET_URL = 'http://localhost:5000';
+export const SOCKET_URL = 'https://homeserve-mauve.vercel.app/login?return=%2Fhomepage';
 
 export const REGEXP_ENV = {
   password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
