@@ -1,99 +1,101 @@
 <!-- Profile Overview Section -->
 <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-    <div class="flex flex-col md:flex-row gap-6">
-        <!-- Profile Image -->
-        <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
-            <!-- Avatar image if exists -->
-            <img *ngIf="providerData?.avatar; else fallbackAvatar" [src]="providerData?.avatar" alt="User profile"
-                class="rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all" />
+  <div class="flex flex-col md:flex-row gap-6">
+    <!-- Profile Image -->
+    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
 
-            <!-- Fallback avatar with colored background -->
-            <ng-template #fallbackAvatar>
-                <div class="h-full flex items-center justify-center rounded-full text-white text-6xl font-medium border-2 border-transparent group-hover:border-blue-300 transition-all"
-                    [style.background-color]="fallbackColor(providerData?.username)">
-                    {{ fallbackChar }}
-                </div>
-            </ng-template>
+      <!-- Avatar image if exists -->
+      <img *ngIf="providerData?.avatar; else fallbackAvatar" [src]="providerData?.avatar" alt="User profile"
+        class="w-full h-full object-cover rounded-full" />
+
+      <!-- Fallback avatar -->
+      <ng-template #fallbackAvatar>
+        <div class="w-full h-full flex items-center justify-center rounded-full text-white text-6xl font-medium"
+          [style.background-color]="fallbackColor(providerData?.username)">
+          {{ fallbackChar }}
         </div>
-        <!-- Profile Info -->
-        <div class="flex-1">
-            <div class="flex items-center gap-4 mb-4">
-                <h1 class="text-2xl font-bold text-gray-800">{{providerData?.fullname || providerData?.username}}
-                </h1>
-                <span *ngIf="providerData?.isCertified"
-                    class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Verified</span>
-            </div>
-            <div class="flex items-center gap-2 mb-2">
-                <span class="text-yellow-400">⭐</span>
-                <!-- <span class="font-semibold">{{providerData?.avgRating?.toFixed()}}</span> -->
-                <!-- <span class="text-gray-500">({{providerData?.reviews?.length}} reviews)</span> -->
-            </div>
-            <div class="flex flex-wrap gap-2 mb-4">
-                <ng-container *ngIf="providerData?.profession">
-                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {{providerData?.profession}}
-                    </span>
-                </ng-container>
+      </ng-template>
 
-                <ng-container *ngIf="providerData?.experience; else noExperience">
-                    <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {{ providerData?.experience }} + Years Experience
-                    </span>
-                </ng-container>
-
-                <ng-template #noExperience>
-                    <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        No Experience
-                    </span>
-                </ng-template>
-
-                <!-- <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Top
-                    Rated</span> -->
-            </div>
-            <!-- Track Records -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 py-4 border-t border-b">
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-blue-600">500+</div>
-                    <div class="text-sm text-gray-600">Jobs Completed</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-green-600">98%</div>
-                    <div class="text-sm text-gray-600">Success Rate</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-purple-600">4.8</div>
-                    <div class="text-sm text-gray-600">Avg. Rating</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-orange-600">{{providerData?.experience || 0}}</div>
-                    <div class="text-sm text-gray-600">Years Experience</div>
-                </div>
-            </div>
-            <div class="flex justify-between">
-                <div class="flex gap-4">
-                    <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                        Book Now
-                    </button>
-                    <button (click)="chat()"
-                        class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        Message
-                    </button>
-                    <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-                        (click)="addToSaved(providerData?.id)">
-                        <span [class.text-red-500]="(providerData?.id | isSaved | async)">❤</span> Favorite
-                    </button>
-                </div>
-                <button type="button" (click)="reportProvider(providerData?.id)"
-                    class="flex items-center gap-1 text-xs text-red-700 hover:text-red-800 rounded transition">
-                    <i class="fas fa-info-circle"></i>
-                    <span>Report</span>
-                </button>
-            </div>
-        </div>
     </div>
+
+    <!-- Profile Info -->
+    <div class="flex-1">
+      <div class="flex items-center gap-4 mb-4">
+        <h1 class="text-2xl font-bold text-gray-800">{{providerData?.fullname || providerData?.username}}
+        </h1>
+        <span *ngIf="providerData?.isCertified"
+          class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Verified</span>
+      </div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-yellow-400">⭐</span>
+        <span class="text-gray-500">(21 reviews)</span><!--todo-->
+      </div>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <ng-container *ngIf="providerData?.profession">
+          <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+            {{providerData?.profession}}
+          </span>
+        </ng-container>
+
+        <ng-container *ngIf="providerData?.experience; else noExperience">
+          <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+            {{ providerData?.experience }} + Years Experience
+          </span>
+        </ng-container>
+
+        <ng-template #noExperience>
+          <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+            No Experience
+          </span>
+        </ng-template>
+
+        <!-- <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Top
+                    Rated</span> -->
+      </div>
+      <!-- Track Records -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 py-4 border-t border-b">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-600">500+</div>
+          <div class="text-sm text-gray-600">Jobs Completed</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-600">98%</div>
+          <div class="text-sm text-gray-600">Success Rate</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-purple-600">4.8</div>
+          <div class="text-sm text-gray-600">Avg. Rating</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-orange-600">{{providerData?.experience || 0}}</div>
+          <div class="text-sm text-gray-600">Years Experience</div>
+        </div>
+      </div>
+      <div class="flex justify-between">
+        <div class="flex gap-4">
+          <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            Book Now
+          </button>
+          <button (click)="chat()"
+            class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+            Message
+          </button>
+          <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+            (click)="addToSaved(providerData?.id)">
+            <span [class.text-red-500]="(providerData?.id | isSaved | async)">❤</span> Favorite
+          </button>
+        </div>
+        <button type="button" (click)="reportProvider(providerData?.id)"
+          class="flex items-center gap-1 text-xs text-red-700 hover:text-red-800 rounded transition">
+          <i class="fas fa-info-circle"></i>
+          <span>Report</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <ng-container *ngIf="openReportModal">
-    <app-report-modal (closeEvent)="openReportModal=!openReportModal"
-        (submitEvent)="submitReport($event)"></app-report-modal>
+  <app-report-modal (closeEvent)="openReportModal=!openReportModal"
+    (submitEvent)="submitReport($event)"></app-report-modal>
 </ng-container>

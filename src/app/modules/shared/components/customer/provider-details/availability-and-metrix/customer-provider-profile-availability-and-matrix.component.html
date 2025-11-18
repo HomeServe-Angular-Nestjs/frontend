@@ -46,7 +46,7 @@
         <div class="space-y-4">
             <div class="flex items-center gap-3">
                 <span class="text-gray-500">📞</span>
-                <ng-container *ngIf="providerData && providerData?.phone; else unavailablePhone">
+                <ng-container *ngIf="providerData && providerData.phone; else unavailablePhone">
                     <span class="font-medium">{{ providerData.phone }}</span>
                 </ng-container>
                 <ng-template #unavailablePhone>
@@ -65,7 +65,7 @@
                     <path fill-rule="evenodd"
                         d="M5.05 2.05a7 7 0 119.9 9.9L10 17.9l-4.95-5.95a7 7 0 010-9.9zM10 11a3 3 0 100-6 3 3 0 000 6z"
                         clip-rule="evenodd" />
-                </svg> <ng-container *ngIf="providerData && providerData?.address; else unavailableLocation">
+                </svg> <ng-container *ngIf="providerData && providerData.address; else unavailableLocation">
                     <span class="font-medium">{{ providerData.address }}</span>
                 </ng-container>
                 <ng-template #unavailableLocation>
@@ -79,7 +79,7 @@
         </div>
     </div>
 
-    <!-- Performance Metrics -->
+    <!--todo Performance Metrics -->
     <div class="bg-white rounded-lg shadow-lg p-6">
         <h2 class="text-xl font-semibold mb-4">Performance</h2>
         <div class="space-y-4">

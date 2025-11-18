@@ -1,149 +1,148 @@
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="providers.length > 0"> 
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="providers.length > 0">
 
-    <!-- Provider Card -->
-    <div *ngFor="let provider of providers"
-        class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 ">
-        <div class="p-6 flex flex-col justify-between max-h-[370px] h-full">
-            <div>
-                <!-- Provider Header -->
-                <div class="flex items-start gap-4 mb-5">
-                    <!-- Avatar image if exists -->
-                    <img *ngIf="provider.avatar; else fallbackAvatar" [src]="provider.avatar" alt="User profile"
-                        loading="lazy"
-                        class="h-9 w-9 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all" />
+  <!-- Provider Card -->
+  <div *ngFor="let provider of providers"
+    class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 ">
+    <div class="p-6 flex flex-col justify-between max-h-[370px] h-full">
+      <div>
+        <!-- Provider Header -->
+        <div class="flex items-start gap-4 mb-5">
+          <!-- Avatar image if exists -->
+          <img *ngIf="provider.avatar; else fallbackAvatar" [src]="provider.avatar" alt="User profile" loading="lazy"
+            class="h-14 w-14 rounded-full object-cover border-2 border-transparent group-hover:border-blue-300 transition-all" />
 
-                    <!-- Fallback avatar with colored background -->
-                    <ng-template #fallbackAvatar>
-                        <div class="h-9 w-9 flex items-center justify-center rounded-full text-white font-medium border-2 border-transparent group-hover:border-blue-300 transition-all"
-                            [style.background-color]="fallbackColor(provider.username)">
-                            {{ fallbackChar }}
-                        </div>
-                    </ng-template>
+          <ng-template #fallbackAvatar>
+            <div
+              class="h-14 w-14 flex items-center justify-center rounded-full text-white font-medium border-2 border-transparent group-hover:border-blue-300 transition-all"
+              [style.background-color]="fallbackColor(provider.username)">
+              {{ fallbackChar }}
+            </div>
+          </ng-template>
 
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h3 class="font-semibold text-lg text-gray-900">{{ provider.fullname || provider.username}}
-                            </h3>
-                            <span *ngIf="provider.isCertified"
-                                class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs rounded-full flex items-center gap-1">
-                                <svg class="h-3 w-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                Certified
-                            </span>
-                        </div>
-
-                        <!-- Rating -->
-                        <div class="flex items-center gap-2 mt-1">
-                            <div class="flex">
-                                <div class="flex">
-                                    <ng-container *ngFor="let star of [0, 1, 2, 3, 4]">
-                                        <ng-container [ngSwitch]="getStarType(star, provider.avgRating)">
-
-                                            <!-- Full Star -->
-                                            <i *ngSwitchCase="'full'" class="fas fa-star text-yellow-400"></i>
-
-                                            <!-- Half Star -->
-                                            <i *ngSwitchCase="'half'" class="fas fa-star-half-alt text-yellow-400"></i>
-
-                                            <!-- Empty Star -->
-                                            <i *ngSwitchDefault class="far fa-star text-gray-300"></i>
-
-                                        </ng-container>
-                                    </ng-container>
-                                </div>
-                            </div>
-
-                            <span class="text-sm text-gray-600">({{provider.totalReviews || 0}} reviews)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Provider Details -->
-                <div class="space-y-3 mb-5">
-                    <div class="flex items-center gap-3 text-gray-600">
-                        <svg class="h-5 w-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span>Starts from 300</span>
-                    </div>
-
-                    <div class="flex items-center gap-3 text-gray-600">
-                        <svg class="h-5 w-5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
-                                clip-rule="evenodd" />
-                            <path
-                                d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
-                        </svg>
-                        <span [ngClass]="provider.experience ? 'text-gray-800' : 'text-gray-400 italic'">
-                            {{ provider.experience ? provider.experience + '+ Years Experience' : 'Unavailable' }}
-                        </span>
-
-                    </div>
-
-                    <div class="flex items-center gap-3 text-gray-600">
-                        <svg class="h-5 w-5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
-                                clip-rule="evenodd" />
-                            <path
-                                d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
-                        </svg>
-                        <span [ngClass]="provider.profession ? 'text-gray-800' : 'text-gray-400 italic'">
-                            {{ provider.profession || 'Unavailable' }}
-                        </span>
-                    </div>
-
-                    <div class="flex items-start gap-3 text-gray-600">
-                        <svg class="h-5 w-5 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span [ngClass]="provider.address ? 'text-gray-800' : 'text-gray-400 italic'">
-                            {{ provider.address || 'Unavailable' }}
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Availability Tags -->
-                <div class="flex flex-wrap gap-2 mb-5">
-                    <span *ngIf="" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                        Available Today
-                    </span>
-                    <span *ngIf="" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                        Special Offer
-                    </span>
-                    <span *ngIf="" class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
-                        Fast Response
-                    </span>
-                </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-semibold text-lg text-gray-900">{{ provider.fullname || provider.username}}
+              </h3>
+              <span *ngIf="provider.isCertified"
+                class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs rounded-full flex items-center gap-1">
+                <svg class="h-3 w-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd" />
+                </svg>
+                Certified
+              </span>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-3">
-                <button
-                    class="flex-1 bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
-                    (click)="viewProvider(provider.id)">
-                    View Profile
-                </button>
-                <button
-                    class="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-red-500"
-                    [class.text-red-500]="(provider.id | isSaved | async)" (click)="addToSaved(provider.id)">
-                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path *ngIf="provider.isActive" fill-rule="evenodd"
-                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </button>
+            <!-- Rating -->
+            <div class="flex items-center gap-2 mt-1">
+              <div class="flex">
+                <div class="flex">
+                  <ng-container *ngFor="let star of [0, 1, 2, 3, 4]">
+                    <ng-container [ngSwitch]="getStarType(star, provider.avgRating)">
+
+                      <!-- Full Star -->
+                      <i *ngSwitchCase="'full'" class="fas fa-star text-yellow-400"></i>
+
+                      <!-- Half Star -->
+                      <i *ngSwitchCase="'half'" class="fas fa-star-half-alt text-yellow-400"></i>
+
+                      <!-- Empty Star -->
+                      <i *ngSwitchDefault class="far fa-star text-gray-300"></i>
+
+                    </ng-container>
+                  </ng-container>
+                </div>
+              </div>
+
+              <span class="text-sm text-gray-600">({{provider.totalReviews || 0}} reviews)</span>
             </div>
+          </div>
         </div>
+
+        <!-- Provider Details -->
+        <div class="space-y-3 mb-5">
+          <div class="flex items-center gap-3 text-gray-600">
+            <svg class="h-5 w-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
+                clip-rule="evenodd" />
+            </svg>
+            <span>Starts from 300</span>
+          </div>
+
+          <div class="flex items-center gap-3 text-gray-600">
+            <svg class="h-5 w-5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
+                clip-rule="evenodd" />
+              <path
+                d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
+            </svg>
+            <span [ngClass]="provider.experience ? 'text-gray-800' : 'text-gray-400 italic'">
+              {{ provider.experience ? provider.experience + '+ Years Experience' : 'Unavailable' }}
+            </span>
+
+          </div>
+
+          <div class="flex items-center gap-3 text-gray-600">
+            <svg class="h-5 w-5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
+                clip-rule="evenodd" />
+              <path
+                d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
+            </svg>
+            <span [ngClass]="provider.profession ? 'text-gray-800' : 'text-gray-400 italic'">
+              {{ provider.profession || 'Unavailable' }}
+            </span>
+          </div>
+
+          <div class="flex items-start gap-3 text-gray-600">
+            <svg class="h-5 w-5 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                clip-rule="evenodd" />
+            </svg>
+            <span [ngClass]="provider.address ? 'text-gray-800' : 'text-gray-400 italic'">
+              {{ provider.address || 'Unavailable' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Availability Tags -->
+        <div class="flex flex-wrap gap-2 mb-5">
+          <span *ngIf="" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+            Available Today
+          </span>
+          <span *ngIf="" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+            Special Offer
+          </span>
+          <span *ngIf="" class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+            Fast Response
+          </span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <button
+          class="flex-1 bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
+          (click)="viewProvider(provider.id)">
+          View Profile
+        </button>
+        <button
+          class="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-red-500"
+          [class.text-red-500]="(provider.id | isSaved | async)" (click)="addToSaved(provider.id)">
+          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+            <path *ngIf="provider.isActive" fill-rule="evenodd"
+              d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+              clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
     </div>
+  </div>
 </div>
