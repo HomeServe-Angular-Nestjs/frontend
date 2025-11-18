@@ -1,6 +1,6 @@
 const domainName = 'https://api.homeservenow.online/api';
 
-export const production = true;
+export const PRODUCTION = true;
 
 export const API_ENV = {
   signupAuth: `${domainName}/signup`,

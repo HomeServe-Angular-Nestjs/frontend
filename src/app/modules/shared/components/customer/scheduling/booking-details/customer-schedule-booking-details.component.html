@@ -1,88 +1,91 @@
 <div class=" rounded-lg shadow-md p-6 bg-white ">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Booking Details</h1>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Booking Details</h1>
 
-    <!-- Mobile Verification -->
-    <div class="mb-8">
-        <label class="block text-gray-800 text-sm font-semibold mb-2">Mobile Number</label>
-        <div class="flex items-end space-x-4">
-            <div class="flex-1">
-                <div class="flex">
-                    <input type="tel" placeholder="Enter your mobile number" [(ngModel)]="phoneNumber"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-            </div>
+  <!-- Mobile Verification -->
+  <div class="mb-8">
+    <label class="block text-gray-800 text-sm font-semibold mb-2">Mobile Number</label>
+    <div class="flex items-end space-x-4">
+      <div class="flex-1">
+        <div class="flex">
+          <input type="tel" placeholder="Enter your mobile number" [(ngModel)]="phoneNumber"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        <div class="mt-4 space-x-4 hidden" id="verificationCodeSection">
-            <div class="flex-1">
-                <label class="block text-gray-600 mb-1">Verification Code</label>
-                <input type="text" placeholder="Enter 6-digit code"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md">
-            </div>
-            <button
-                class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md mt-6 whitespace-nowrap">
-                Verify
-            </button>
-        </div>
+      </div>
+    </div>
+    <div class="mt-4 space-x-4 hidden" id="verificationCodeSection">
+      <div class="flex-1">
+        <label class="block text-gray-600 mb-1">Verification Code</label>
+        <input type="text" placeholder="Enter 6-digit code" class="w-full px-4 py-2 border border-gray-300 rounded-md">
+      </div>
+      <button
+        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md mt-6 whitespace-nowrap">
+        Verify
+      </button>
+    </div>
+  </div>
+
+  <!-- Service Location with Map -->
+  <div class="mb-8">
+    <div class="relative">
+      <label class="block text-gray-800 text-sm font-semibold mb-2">Your Location</label>
+
+      <button class="absolute bottom-0 right-4 text-xs font-medium text-blue-600 hover:text-blue-700 transition w-fit"
+        (click)="toggleMap()">
+        <i class="fas fa-map-marker-alt text-xs"></i>
+        <span> {{ mapVisible ? 'Hide Map' : 'Change Location' }}</span>
+      </button>
     </div>
 
-    <!-- Service Location with Map -->
-    <div class="mb-8">
-        <div class="relative">
-            <label class="block text-gray-800 text-sm font-semibold mb-2">Your Location</label>
-
-            <button
-                class="absolute bottom-0 right-4 text-xs font-medium text-blue-600 hover:text-blue-700 transition w-fit"
-                (click)="toggleMap()">
-                <i class="fas fa-map-marker-alt text-xs"></i>
-                <span> {{ mapVisible ? 'Hide Map' : 'Change Location' }}</span>
-            </button>
-        </div>
-
-        <div class="bg-white mt-4 p-4 rounded-lg border border-gray-200 shadow-sm flex items-start relative">
-            <i class="fas fa-map-pin text-blue-500 mr-3 mt-1"></i>
-            <p class="text-gray-800 text-sm">{{ selectedAddress || 'No location selected' }}</p>
-        </div>
-
-        <!-- Map Container -->
-        <div *ngIf="mapVisible" class="mt-4 border rounded-lg overflow-hidden">
-            <app-mapbox-map [center]="center" [search]="true" (locationChanged)="onMapLocationChanged($event)">
-            </app-mapbox-map>
-        </div>
+    <div class="bg-white mt-4 p-4 rounded-lg border border-gray-200 shadow-sm flex items-start relative">
+      <i class="fas fa-map-pin text-blue-500 mr-3 mt-1"></i>
+      <p class="text-gray-800 text-sm">{{ selectedAddress || 'No location selected' }}</p>
     </div>
 
-    <!-- Date and Time Picker -->
-    <div class="mb-2">
-        <label for="date" class="block text-gray-800 text-sm font-semibold mb-3">
-            Select Date & Time
-        </label>
-        <input type="date" id="date" [(ngModel)]="selectedDate" [min]="minDate" (ngModelChange)="getAvailableSlots()"
-            class="w-full px-4 py-2 rounded-md border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    <div *ngIf="loadingLocation" class="mt-2 text-sm text-gray-500">
+      Fetching your location…
+    </div>
 
-        <div class="mt-4">
-            <div *ngIf="availableSlots.length; else noSlots" class="grid grid-cols-2 gap-2">
-                <ng-container *ngIf="selectedDate">
-                    <ng-container *ngFor="let slot of availableSlots">
-                        <div class="relative">
-                            <button (click)="selectSlot(slot)" [disabled]="!slot.status" [ngClass]="{
+    <!-- Map Container -->
+    <div *ngIf="mapVisible" class="mt-4 border rounded-lg overflow-hidden">
+      <app-mapbox-map [center]="center" [search]="true" (locationChanged)="onMapLocationChanged($event)">
+      </app-mapbox-map>
+    </div>
+  </div>
+
+  <!-- Date and Time Picker -->
+  <div class="mb-2">
+    <label for="date" class="block text-gray-800 text-sm font-semibold mb-3">
+      Select Date & Time
+    </label>
+    <input type="date" id="date" [(ngModel)]="selectedDate" [min]="minDate" (ngModelChange)="getAvailableSlots()"
+      class="w-full px-4 py-2 rounded-md border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+    <div class="mt-4">
+      <div *ngIf="availableSlots.length; else noSlots" class="grid grid-cols-2 gap-2">
+        <ng-container *ngIf="selectedDate">
+          <ng-container *ngFor="let slot of availableSlots">
+            <div class="relative">
+              <button (click)="selectSlot(slot)" [disabled]="!slot.status" [ngClass]="{
                             'enabled:bg-blue-50 enabled:text-blue-900 enabled:hover:bg-blue-100 enabled:focus:ring-2 enabled:focus:ring-blue-500' : selectedSlot?.from === slot.from
-                        }" class="w-full px-3 py-2 rounded-lg font-medium shadow transition 
+                        }"
+                class="w-full px-3 py-2 rounded-lg font-medium shadow transition
                             text-sm sm:text-base border flex flex-col items-center disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-300 disabled:cursor-not-allowed">
 
-                                <span>{{ slot.from }} – {{ slot.to }}</span>
+                <span>{{ slot.from }} – {{ slot.to }}</span>
 
-                                <span *ngIf="!slot.status" class="text-xs text-red-500 font-semibold mt-1">
-                                    Reserved
-                                </span>
-                            </button>
-                        </div>
-                    </ng-container>
-                </ng-container>
-
+                <span *ngIf="!slot.status" class="text-xs text-red-500 font-semibold mt-1">
+                  Reserved
+                </span>
+              </button>
             </div>
+          </ng-container>
+        </ng-container>
 
-            <ng-template #noSlots>
-                <div class="text-gray-500 mt-4 text-center">No slots available for this date. Please try another.</div>
-            </ng-template>
-        </div>
+      </div>
+
+      <ng-template #noSlots>
+        <div class="text-gray-500 mt-4 text-center">No slots available for this date. Please try another.</div>
+      </ng-template>
     </div>
+  </div>
 </div>

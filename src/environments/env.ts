@@ -1,6 +1,6 @@
 const domainName = 'http://localhost:5000/api';
 
-export const production = false;
+export const PRODUCTION = false;
 
 export const API_ENV = {
   signupAuth: `${domainName}/signup`,
