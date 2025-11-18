@@ -1,6 +1,11 @@
-<div class="relative">
-    <ng-container *ngIf="search">
-        <div #geocoderContainer class=" z-50 custom-geocoder w-full"></div>
-    </ng-container>
-    <div #mapContainer id="map" style="width: 100%; height: 400px;"></div>
+<div class="relative w-full">
+
+  <!-- Search Bar Container -->
+  <div *ngIf="search" class="absolute top-3 left-1/2 -translate-x-1/2 w-[90%] z-50 custom-geocoder overflow-visible">
+    <div #geocoderContainer class="rounded-lg shadow-lg overflow-hidden bg-white w-full"></div>
+  </div>
+
+  <!-- Map Container -->
+  <div #mapContainer id="map" class="w-full h-[400px] rounded-xl shadow-md border"></div>
+
 </div>

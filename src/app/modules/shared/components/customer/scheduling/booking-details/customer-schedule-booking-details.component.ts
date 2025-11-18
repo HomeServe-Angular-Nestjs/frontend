@@ -32,6 +32,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   private readonly _store = inject(Store);
 
   mapVisible = false;
+  loadingLocation = false;
   center!: [number, number];
   selectedAddress: string | null = null;
   selectedDate: string = '';
@@ -94,7 +95,21 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   }
 
   toggleMap() {
-    this.mapVisible = !this.mapVisible;
+    this.loadingLocation = true;
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        this.center = [coords.longitude, coords.latitude];
+
+        this.loadingLocation = false;
+        this.mapVisible = true;
+      },
+      (err) => {
+        console.error(err);
+        this.loadingLocation = false;
+        this._toastr.error('Unable to access the location.');
+      }
+    );
   }
 
   getAvailableSlots() {
