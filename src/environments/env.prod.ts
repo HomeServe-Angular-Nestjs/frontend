@@ -1,4 +1,4 @@
-const domainName = 'http://16.16.27.130:5000/api';
+const domainName = 'https://jamarion-uncondolatory-olimpia.ngrok-free.dev/api';
 
 export const production = true;
 
@@ -33,7 +33,7 @@ export const API_KEY = {
 
 export const OPEN_CAGE_URL = 'https://api.opencagedata.com/geocode/v1/json';
 
-export const SOCKET_URL = 'http://16.16.27.130:5000';
+export const SOCKET_URL = 'https://jamarion-uncondolatory-olimpia.ngrok-free.dev';
 
 export const REGEXP_ENV = {
   password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
