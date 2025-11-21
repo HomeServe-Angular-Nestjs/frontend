@@ -17,11 +17,12 @@ import { ITransaction } from "../../../../../../core/models/transaction.model";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { CustomerLeaveAReviewComponent } from "../leave-a-review/leave-a-review.component";
 import { ISubmitReview } from "../../../../../../core/models/reviews.model";
+import { SubmitCancellationComponent } from "../../../../partials/shared/submit-cancellation/submit-cancellation.component";
 
 @Component({
   selector: 'app-customer-booking-lists',
   templateUrl: './booking-lists.component.html',
-  imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent, ButtonComponent, CustomerLeaveAReviewComponent],
+  imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent, ButtonComponent, CustomerLeaveAReviewComponent, SubmitCancellationComponent],
   providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerBookingListsComponent implements OnInit, OnDestroy {
@@ -36,7 +37,6 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   bookingData$ = this._bookingsData$.asObservable();
   isReviewModalOpen = false;
   cancellationReasonModal = false;
-  cancelReason = '';
   selectedBookingIdForReview = '';
   bookingSelectedForCancellation = '';
   prevReview: IReview | null = null;
@@ -152,27 +152,23 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     return isWithinCancellableWindow && !isAlreadyCancelled;
   }
 
-  submitCancellation() {
-    if (!this.bookingSelectedForCancellation || !this.cancelReason.trim()) {
+
+  handleCancellation(reason: string) {
+    if (!this.bookingSelectedForCancellation || !reason.trim()) {
       this._toastr.warning('Cancellation reason is required.');
       return;
     }
 
-    this._bookingService.cancelBooking(this.bookingSelectedForCancellation, this.cancelReason)
+    this._bookingService.cancelBooking(this.bookingSelectedForCancellation, reason)
       .pipe(takeUntil(this._destroy$))
       .subscribe({
         next: (res) => {
           this._updateCancelledBookingData(this.bookingSelectedForCancellation);
           this.bookingSelectedForCancellation = '';
           this.cancellationReasonModal = false;
-          this.cancelReason = '';
           this._toastr.success(res.message);
         },
-        error: (err) => {
-          console.error('Cancellation failed:', err);
-          this._toastr.error(err);
-        }
-      })
+      });
   }
 
   openReviewModal(bookingStatus: BookingStatus, review: IReview | null, bookingId: string) {
