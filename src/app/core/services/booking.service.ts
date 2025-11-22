@@ -72,7 +72,7 @@ export class BookingService {
     return this._http.patch<IResponse>(`${this._customerApi}/booking/add_review`, { bookingId, ...reviewData })
   }
 
-  cancelBooking(bookingId: string, reason: string,): Observable<IResponse> {
+  markBookingCancelledByCustomer(bookingId: string, reason: string,): Observable<IResponse> {
     return this._http.patch<IResponse>(`${this._customerApi}/booking/cancel`, { bookingId, reason });
   }
 
@@ -114,8 +114,12 @@ export class BookingService {
     return this._http.get<IResponse<IReviewWithPagination>>(`${this._providerApi}/bookings/review_data`, { params });
   }
 
-  changeBookingStatus(bookingId: string, newStatus: BookingStatus): Observable<IResponse<IBookingDetailProvider>> {
-    return this._http.patch<IResponse<IBookingDetailProvider>>(`${this._providerApi}/bookings/b_status`, { bookingId, newStatus });
+  markBookingCancelledByProvider(bookingId: string, reason?: string): Observable<IResponse<IBookingDetailProvider>> {
+    return this._http.patch<IResponse<IBookingDetailProvider>>(`${this._providerApi}/bookings/cancel/${bookingId}`, { reason });
+  }
+
+  updateBookingStatus(bookingId: string, newStatus: BookingStatus): Observable<IResponse> {
+    return this._http.patch<IResponse>(`${this._providerApi}/bookings/status/${bookingId}`, { newStatus });
   }
 
   downloadInvoice(bookingId: string): Observable<Blob> {
