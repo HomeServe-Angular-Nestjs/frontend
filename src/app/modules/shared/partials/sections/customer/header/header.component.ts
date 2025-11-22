@@ -30,6 +30,9 @@ export class CustomerHeaderComponent implements OnInit {
   private readonly _destroy$ = new Subject<void>();
 
   @Input() isFixed: boolean = true;
+  showMobileSearch = false;
+  defaultImg = 'https://via.placeholder.com/48';
+
 
   // User observables
   userStatus$!: Observable<StatusType>;

@@ -9,7 +9,7 @@ import { IBookingResponse, IPagination, IReview } from "../../../../../../core/m
 import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
-import { BookingStatus, PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from "../../../../../../core/enums/enums";
+import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../../../../../../core/enums/enums";
 import { PaymentService } from "../../../../../../core/services/payment.service";
 import { RazorpayWrapperService } from "../../../../../../core/services/public/razorpay-wrapper.service";
 import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../../../core/models/payment.model";
@@ -159,7 +159,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this._bookingService.cancelBooking(this.bookingSelectedForCancellation, reason)
+    this._bookingService.markBookingCancelledByCustomer(this.bookingSelectedForCancellation, reason)
       .pipe(takeUntil(this._destroy$))
       .subscribe({
         next: (res) => {
@@ -245,5 +245,13 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   closeModal() {
     this.bookingSelectedForCancellation = '';
     this.cancellationReasonModal = false;
+  }
+
+  shouldShowCompletePayment(paymentStatus: PaymentStatus, cancelStatus: CancelStatus | null) {
+    return (
+      (paymentStatus === PaymentStatus.UNPAID ||
+        paymentStatus === PaymentStatus.FAILED) &&
+      cancelStatus === null
+    );
   }
 }

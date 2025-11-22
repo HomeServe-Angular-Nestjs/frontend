@@ -2,18 +2,20 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { Observable, Subject, filter, finalize, map, of, switchMap, takeUntil } from "rxjs";
+import { BehaviorSubject, Observable, Subject, filter, finalize, map, of, pipe, switchMap, takeUntil } from "rxjs";
 
 import { IBookingDetailProvider } from "../../../../../../core/models/booking.model";
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
-import { BookingStatus, PaymentStatus } from "../../../../../../core/enums/enums";
+import { BookingStatus, CancelStatus, PaymentStatus } from "../../../../../../core/enums/enums";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { ReportModalComponent } from "../../../../partials/shared/report-modal/report-modal.component";
 import { IReportSubmit, ReportService } from "../../../../../../core/services/report.service";
 import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 import { SubmitCancellationComponent } from "../../../../partials/shared/submit-cancellation/submit-cancellation.component";
+import { MatDialog } from "@angular/material/dialog";
+import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
 
 @Component({
   selector: 'app-provider-view-booking-details',
@@ -27,9 +29,11 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   private readonly _sharedData = inject(SharedDataService);
   private readonly _reportService = inject(ReportService);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _dialog = inject(MatDialog);
 
   private _destroy$ = new Subject<void>();
-  bookingData$!: Observable<IBookingDetailProvider>;
+  private bookingDataSource = new BehaviorSubject<IBookingDetailProvider | null>(null);
+  bookingData$ = this.bookingDataSource.asObservable();
 
   paymentSelectOptions: { value: PaymentStatus; label: string; }[] = [
     { value: PaymentStatus.PAID, label: 'Paid' },
@@ -43,21 +47,29 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
     { value: BookingStatus.IN_PROGRESS, label: 'In Progress' },
     { value: BookingStatus.CONFIRMED, label: 'Confirmed' },
     { value: BookingStatus.COMPLETED, label: 'Completed' },
-    { value: BookingStatus.CANCELLED, label: 'Cancelled' },
   ];
+
+  private statusMessageMap: Record<BookingStatus, string> = {
+    [BookingStatus.PENDING]: 'mark pending',
+    [BookingStatus.IN_PROGRESS]: 'mark in progress',
+    [BookingStatus.CONFIRMED]: 'confirm',
+    [BookingStatus.COMPLETED]: 'complete',
+    [BookingStatus.CANCELLED]: 'cancel',
+  };
 
   showReportModal = signal(false);
   showCancelBookingModal = signal(false);
+  get cancelled(): BookingStatus { return BookingStatus.CANCELLED };
 
   ngOnInit(): void {
     this._sharedData.setProviderHeader('Bookings');
 
-    this.bookingData$ = this._route.paramMap.pipe(
+    this._route.paramMap.pipe(
       takeUntil(this._destroy$),
       map(param => param.get('id')),
       filter((id): id is string => !!id),
       switchMap(id => this._bookingService.getBookingDetails(id))
-    );
+    ).subscribe(bookingData => this.bookingDataSource.next(bookingData));
   }
 
   ngOnDestroy(): void {
@@ -65,24 +77,43 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
     this._destroy$.complete();
   }
 
-  changeBookingStatus(bookingId: string, newStatus: BookingStatus): void {
-    if (newStatus === BookingStatus.CANCELLED) {
-      this.toggleCancelBookingModal();
-      return;
-    }
-
-    this._bookingService.changeBookingStatus(bookingId, newStatus).subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.bookingData$ = of(response.data);
-          this._toastr.success(response.message);
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        this._toastr.error(err);
-      }
+  private _openConfirmationDialog(message: string, title: string) {
+    return this._dialog.open(ConfirmDialogComponent, {
+      data: { title, message },
     });
+  }
+
+
+
+  changeBookingStatus(bookingId: string, cancelStatus: CancelStatus | null, newStatus: BookingStatus, bookingStatus: BookingStatus): void {
+    if (newStatus === bookingStatus) return;
+
+    const action = this.statusMessageMap[newStatus];
+
+    this._openConfirmationDialog(
+      `Are you sure you want to ${action} this order?`,
+      'Confirm Action'
+    )
+      .afterClosed()
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        this._bookingService.updateBookingStatus(bookingId, newStatus)
+          .pipe(takeUntil(this._destroy$))
+          .subscribe({
+            next: (response) => {
+              if (response.success) {
+                const bookingData = this.bookingDataSource.getValue() as IBookingDetailProvider;
+                bookingData.bookingStatus = newStatus;
+                this.bookingDataSource.next(bookingData);
+                this._toastr.success(response.message);
+              } else {
+                this._toastr.error('Failed to update status.');
+              }
+            }
+          });
+      });
   }
 
   formateData(date: string): string {
@@ -123,18 +154,26 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
     }
   }
 
-  isStatusDisabled(optionStatus: BookingStatus, currentStatus: BookingStatus): boolean {
+  isStatusDisabled(optionStatus: BookingStatus, bookingStatus: BookingStatus, cancelStatus: CancelStatus | null): boolean {
+    if (cancelStatus) {
+      return optionStatus !== BookingStatus.CANCELLED;
+    }
+
     const allowedTransitions: Record<BookingStatus, BookingStatus[]> = {
       [BookingStatus.PENDING]: [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
-      [BookingStatus.IN_PROGRESS]: [BookingStatus.COMPLETED, BookingStatus.CANCELLED, BookingStatus.CONFIRMED],
+      [BookingStatus.IN_PROGRESS]: [
+        BookingStatus.COMPLETED,
+        BookingStatus.CANCELLED,
+        BookingStatus.CONFIRMED
+      ],
       [BookingStatus.CONFIRMED]: [BookingStatus.COMPLETED, BookingStatus.CANCELLED],
       [BookingStatus.COMPLETED]: [],
       [BookingStatus.CANCELLED]: [],
     };
 
-    if (optionStatus === currentStatus) return false;
+    if (optionStatus === bookingStatus) return false;
 
-    const allowed = allowedTransitions[currentStatus] ?? [];
+    const allowed = allowedTransitions[bookingStatus] ?? [];
 
     return !allowed.includes(optionStatus);
   }
@@ -168,17 +207,42 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
     this.showCancelBookingModal.update(v => v = !v);
   }
 
-  handleCancellation(bookingId: string, reason: string) {
-    this._bookingService.cancelBooking(bookingId, reason)
-      .pipe(
-        takeUntil(this._destroy$),
-        finalize(() => this.toggleCancelBookingModal())
-      )
-      .subscribe({
-        next: () => {
+  onCancelButtonClick(bookingId: string, cancelStatus: CancelStatus | null): void {
+    if (cancelStatus === null) {
+      this.toggleCancelBookingModal();
+      return;
+    }
 
-        }
-      })
+    this.handleCancellation(bookingId);
+  }
+
+  handleCancellation(bookingId: string, reason?: string): void {
+    console.log(bookingId, reason ?? 'nope')
+    this._openConfirmationDialog(
+      `Are you sure you want to cancel this order?`,
+      'Confirm Action'
+    )
+      .afterClosed()
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        this._bookingService.markBookingCancelledByProvider(bookingId, reason)
+          .pipe(
+            takeUntil(this._destroy$),
+            finalize(() => this.showCancelBookingModal.set(false))
+          )
+          .subscribe({
+            next: (response) => {
+              if (response.success && response.data) {
+                this.bookingDataSource.next(response.data);
+                this._toastr.success(response.message);
+              } else {
+                this._toastr.error('Failed to cancel service.');
+              }
+            }
+          });
+      });
   }
 
   downloadInvoice(bookingId: string) {

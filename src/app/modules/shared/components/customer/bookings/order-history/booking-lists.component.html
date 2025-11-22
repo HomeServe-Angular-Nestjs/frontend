@@ -61,8 +61,8 @@
               <!-- Action Buttons -->
               <div class="space-y-2">
 
-                <app-button *ngIf="list.paymentStatus === 'unpaid' || list.paymentStatus === 'failed'"
-                  (clicked)="completePayment(list)" icon="fa-credit-card  mr-2" text="Complete Payment"
+                <app-button *ngIf="shouldShowCompletePayment(list.paymentStatus, list.cancelStatus)"
+                  (clicked)=" completePayment(list)" icon="fa-credit-card  mr-2" text="Complete Payment"
                   buttonClass="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
                 </app-button>
 
