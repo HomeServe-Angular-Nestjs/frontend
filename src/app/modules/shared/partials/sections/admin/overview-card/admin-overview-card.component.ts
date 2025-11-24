@@ -17,7 +17,7 @@ export interface IAdminOverViewCard {
 export class OverviewCardComponent {
     @Input({ required: true }) title!: string;
     @Input({ required: true }) value!: string | number;
-    @Input() icon?: string; // e.g., 'fas fa-calendar'
-    @Input() iconBg?: string = 'bg-blue-100 text-blue-700'; // Tailwind classes
+    @Input() icon?: string; 
+    @Input() iconBg?: string = 'bg-blue-100 text-blue-700'; 
     @Input() subtext?: string;
 }
