@@ -5,7 +5,7 @@ export type SortOption =
     | 'price-desc'
     | 'duration-asc'
     | 'duration-desc';
-    
+
 export interface IPriceRange {
     min?: number;
     max?: number;
@@ -21,6 +21,7 @@ export type ServiceDurationKey = "Quick Service" | "Half Day" | "Full Day" | "Mu
 export interface IFilter {
     search?: string;
     status?: ToggleType;
+    date?: Date | string;
     isCertified?: boolean;
     sort?: SortOption;
     category?: string;

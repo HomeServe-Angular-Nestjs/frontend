@@ -28,10 +28,6 @@ export class FiltersComponent implements OnInit, OnDestroy {
   selectedStatus: ToggleType = 'all';
   selectedRole: 'customer' | 'provider' = 'customer';
 
-  /**
-   * Lifecycle hook that is called after data-bound properties are initialized.
-   * Subscribes to internal filters stream and search debounce stream to emit filter changes.
-   */
   ngOnInit(): void {
     this._filters$
       .pipe(takeUntil(this._destroy$))
@@ -46,48 +42,34 @@ export class FiltersComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Triggers the debounce search mechanism when the search input changes.
-   */
   onSearchTriggered() {
     this._debounceService.delay(this.searchTerm);
   }
 
-  /**
-   * Updates the selected role and emits a roleChanged event to notify parent components.
-   * @param role 'customer' | 'provider'
-   */
   setRole(role: 'customer' | 'provider'): void {
     this.selectedRole = role;
     this.roleChanged.emit(role);
   }
 
-  /**
-   * Updates the selected status (true, false, or 'all') and emits the new filter state.
-   * @param status ToggleType - true for active, false for blocked, 'all' for no filter
-   */
   changeStatus(status: ToggleType): void {
     this.selectedStatus = status;
     this._emitFilters();
   }
 
+  changeDate(): void {
+    this._emitFilters();
+  }
 
-  /**
-   * Emits the current filter values by pushing them into the filters BehaviorSubject.
-   */
   private _emitFilters(): void {
     const filter: IFilter = {
       search: this.searchTerm,
-      status: this.selectedStatus
+      status: this.selectedStatus,
+      date: this.selectedDate
     };
 
     this._filters$.next(filter);
   }
 
-  /**
-   * Lifecycle hook called when the component is destroyed.
-   * Cleans up subscriptions to prevent memory leaks.
-   */
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
