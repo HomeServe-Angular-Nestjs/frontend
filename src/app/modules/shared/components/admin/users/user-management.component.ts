@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { filter, map, Observable, switchMap, tap } from 'rxjs';
+import { filter, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { IUpdateUserStatus, IUserData, UType } from '../../../../../core/models/user.model';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
 import { createAdminTableUI } from '../../../../../core/utils/generate-tables.utils';
@@ -19,10 +19,12 @@ import { SharedDataService } from '../../../../../core/services/public/shared-da
   templateUrl: './user-management.component.html',
   imports: [CommonModule, TableComponent, FiltersComponent, AdminPaginationComponent],
 })
-export class UserManagementComponent implements OnInit {
-  private _userManagementService = inject(AdminService);
-  private _toastr = inject(ToastNotificationService);
+export class UserManagementComponent implements OnInit, OnDestroy {
+  private readonly _userManagementService = inject(AdminService);
+  private readonly _toastr = inject(ToastNotificationService);
   private readonly _sharedData = inject(SharedDataService);
+
+  private readonly destroy$ = new Subject<void>();
 
   tableData$!: Observable<TableData<UserTableRow>>;
   pagination!: IPagination;
@@ -91,8 +93,14 @@ export class UserManagementComponent implements OnInit {
     this.lastFilterUsed = filter;
 
     this._userManagementService.role$.pipe(
+      takeUntil(this.destroy$),
       switchMap(role => this._userManagementService.getUsers(role, filter, page)),
       tap(userData => this.pagination = userData.pagination)
     ).subscribe();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
