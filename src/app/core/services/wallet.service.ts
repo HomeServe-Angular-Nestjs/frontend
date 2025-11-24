@@ -10,14 +10,15 @@ import { ITransactionFilter, ITransactionUserTableData } from "../models/transac
 export class WalletService {
   private readonly _http = inject(HttpClient);
   private readonly _walletUrl = API_ENV.wallet;
-  private readonly _providerUrl = API_ENV.provider;
 
   getWallet(): Observable<IResponse<IWallet>> {
     return this._http.get<IResponse<IWallet>>(`${this._walletUrl}`);
   }
 
-  getTransaction(page: number = 1, filters: ITransactionFilter = {}): Observable<IResponse<ITransactionUserTableData>> {
-    let params = new HttpParams().set('page', page);
+  getTransaction(options: { page: number, limit: number }, filters: ITransactionFilter = {}): Observable<IResponse<ITransactionUserTableData>> {
+    let params = new HttpParams()
+      .set('page', options.page ?? 1)
+      .set('limit', options.limit ?? 5);
 
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
@@ -25,6 +26,6 @@ export class WalletService {
       }
     });
 
-    return this._http.get<IResponse<ITransactionUserTableData>>(`${this._providerUrl}/transaction/list`, { params });
+    return this._http.get<IResponse<ITransactionUserTableData>>(`${this._walletUrl}/transaction/list`, { params });
   }
 }

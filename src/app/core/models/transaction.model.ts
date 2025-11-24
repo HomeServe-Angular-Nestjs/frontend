@@ -35,7 +35,7 @@ export interface ITransactionTableData {
   amount: number;
   method: string;
   source: PaymentSource,
-  transactionType: string;
+  transactionType: PaymentDirection;
   createdAt: Date;
 }
 
