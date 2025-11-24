@@ -31,14 +31,17 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
     method: 'all'
   });
 
-  page = signal(1);
+  options = signal({
+    page: 1,
+    limit: 10
+  });
 
   dataSignal = toSignal(
     combineLatest([
-      toObservable(this.page),
+      toObservable(this.options),
       toObservable(this.filter)
     ]).pipe(
-      switchMap(([page, filter]) => this._walletService.getTransaction(page, filter))
+      switchMap(([options, filter]) => this._walletService.getTransaction(options, filter))
     ),
     { initialValue: null }
   );
@@ -56,7 +59,7 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(value => {
         this.filter.update(f => ({ ...f, search: value }));
-        this.page.set(1);
+        this.options.update(o => ({ ...o, page: 1 }));
       });
   }
 
@@ -65,27 +68,29 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
   }
 
   onDateChange(value: 'all' | 'last_six_months' | 'last_year') {
-    this.page.set(1);
+    this.options.update(o => ({ ...o, page: 1 }));
     this.filter.update(f => ({ ...f, date: value }));
   }
 
   onSort(value: 'newest' | 'oldest' | 'high' | 'low') {
-    this.page.set(1);
+    this.options.update(o => ({ ...o, page: 1 }));
     this.filter.update(f => ({ ...f, sort: value }));
   }
 
   onTypeChange(value: TransactionType | 'all') {
-    this.page.set(1);
+    this.options.update(o => ({ ...o, page: 1 }));
+
     this.filter.update(f => ({ ...f, type: value }));
   }
 
   onMethodChange(value: PaymentDirection | 'all') {
-    this.page.set(1);
+    this.options.update(o => ({ ...o, page: 1 }));
+
     this.filter.update(f => ({ ...f, method: value }));
   }
 
   onPageChange(newPage: number) {
-    this.page.set(newPage);
+    this.options.update(o => ({ ...o, page: newPage }));
   }
 
   ngOnDestroy(): void {

@@ -1,51 +1,76 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
 import { IAdminOverViewCard, OverviewCardComponent } from "../../../partials/sections/admin/overview-card/admin-overview-card.component";
-import { TransactionService } from "../../../../../core/services/public/transaction.service";
-import {  Subject, takeUntil } from "rxjs";
-import { ITransactionStats, ITransactionTableData } from "../../../../../core/models/transaction.model";
+import { TransactionService } from "../../../../../core/services/transaction.service";
+import { combineLatest, map, Subject, switchMap, takeUntil } from "rxjs";
+import { ITransactionFilter, ITransactionStats, ITransactionTableData } from "../../../../../core/models/transaction.model";
 import { CommonModule } from "@angular/common";
 import { IPagination } from "../../../../../core/models/booking.model";
 import { AdminPaginationComponent } from "../../../partials/sections/admin/pagination/pagination.component";
 import { WalletService } from "../../../../../core/services/wallet.service";
+import { DebounceService } from "../../../../../core/services/public/debounce.service";
+import { FormsModule } from "@angular/forms";
 
 @Component({
     selector: 'app-admin-transactions',
     templateUrl: './admin-transactions.component.html',
-    imports: [CommonModule, OverviewCardComponent, AdminPaginationComponent],
-    providers: [WalletService]
+    imports: [CommonModule, FormsModule, OverviewCardComponent, AdminPaginationComponent],
+    providers: [WalletService, DebounceService]
 })
-export class AdminTransactionsComponent implements OnInit {
+export class AdminTransactionsComponent implements OnInit, OnDestroy {
     private readonly _transactionService = inject(TransactionService);
     private readonly _sharedService = inject(SharedDataService);
     private readonly _walletService = inject(WalletService);
+    private readonly _debounceService = inject(DebounceService);
 
-    private destroy$ = new Subject<void>();
+    private _destroy$ = new Subject<void>();
 
     stats: IAdminOverViewCard[] = [];
     transactions: ITransactionTableData[] = [];
     walletBalance: number = 0;
+    options: { page?: number, limit?: number } = { page: 1, limit: 10 };
     pagination: IPagination = {
         limit: 1,
         page: 1,
         total: 0
     }
+    filters: ITransactionFilter = {
+        search: '',
+        sort: 'newest',
+        type: 'all',
+        date: 'all',
+        method: 'all'
+    };
 
     ngOnInit(): void {
         this._sharedService.setAdminHeader('Revenues & Transactions');
-        this._loadOverviewData();
-        this._loadTableData();
-        this._fetchWalletAmount();
+
+        this._debounceService.onSearch()
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(value => {
+                this.filters.search = value;
+                this.options = { page: 1, limit: 10 };
+                this._loadTableData(this.options, this.filters);
+            });
+
+        this._loadTableData(this.options, this.filters);
+
+        combineLatest([
+            this._loadOverviewData(),
+            this._fetchWalletAmount()
+        ]).pipe(takeUntil(this._destroy$))
+            .subscribe({
+                next: ([stats, balance]) => {
+                    if (stats && balance) {
+                        this.stats = this._buildOverviewCards(stats, balance);
+                    }
+                }
+            });
     }
 
-    ngDestroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
-
-    private _loadTableData(page = 1) {
-        this._transactionService.getTransactionTableData(page)
-            .pipe(takeUntil(this.destroy$))
+    private _loadTableData(options?: { page?: number, limit?: number }, filters: ITransactionFilter = {}) {
+        this._transactionService.getTransactionTableData(options, filters)
+            .pipe(takeUntil(this._destroy$))
             .subscribe({
                 next: (res) => {
                     if (res.success && res.data) {
@@ -57,27 +82,29 @@ export class AdminTransactionsComponent implements OnInit {
     }
 
     private _loadOverviewData() {
-        this._transactionService.getTransactionStats()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (res) => {
-                    if (res && res.data) {
-                        this.stats = this._buildOverviewCards(res.data);
-                    }
-                }
-            });
+        return this._transactionService.getTransactionStats()
+            .pipe(
+                takeUntil(this._destroy$),
+                map((res) => res.data)
+            );
     }
 
     private _fetchWalletAmount() {
-        this._walletService.getWallet()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (res) => this.walletBalance = res?.data?.balance ?? 0
-            });
+        return this._walletService.getWallet()
+            .pipe(
+                takeUntil(this._destroy$),
+                map(res => res?.data?.balance ?? 0)
+            );
     }
 
-    private _buildOverviewCards(data: ITransactionStats): IAdminOverViewCard[] {
+    private _buildOverviewCards(data: ITransactionStats, balance: number): IAdminOverViewCard[] {
         return [
+            {
+                icon: 'fas fa-receipt',
+                iconBg: 'bg-blue-100 text-blue-700',
+                title: 'Available Balance',
+                value: this.formatINR(balance),
+            },
             {
                 icon: 'fas fa-receipt',
                 iconBg: 'bg-blue-100 text-blue-700',
@@ -88,7 +115,7 @@ export class AdminTransactionsComponent implements OnInit {
                 icon: 'fas fa-rupee-sign',
                 iconBg: 'bg-green-100 text-green-700',
                 title: 'Total Revenue',
-                value: this.formatINR(data.totalRevenue/100),
+                value: this.formatINR(data.totalRevenue / 100),
             },
             {
                 icon: 'fas fa-percentage',
@@ -114,6 +141,22 @@ export class AdminTransactionsComponent implements OnInit {
     }
 
     pageChange(page: number) {
-        this._loadTableData(page);
+        this.options.page = page;
+        this._loadTableData(this.options, this.filters);
+    }
+
+    updateFilter(key: keyof ITransactionFilter, value: any) {
+        this.filters[key] = value;
+        this.options = { page: 1, limit: 10 };
+        this._loadTableData(this.options, this.filters);
+    }
+
+    onSearch(text: string) {
+        this._debounceService.delay(text);
+    }
+
+    ngOnDestroy() {
+        this._destroy$.next();
+        this._destroy$.complete();
     }
 }
