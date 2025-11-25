@@ -1,12 +1,10 @@
-import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { BehaviorSubject, catchError, Observable, shareReplay, throwError } from "rxjs";
-import { IDisplayReviews, IHomeSearch, IProvider, IProviderCardView, IProviderUpdateBio } from "../models/user.model";
+import { BehaviorSubject, Observable, shareReplay } from "rxjs";
+import { IDisplayReviews, IFilterFetchProviders, IProvider, IProviderCardWithPagination, IProviderUpdateBio } from "../models/user.model";
 import { API_ENV } from "../../../environments/env";
 import { SlotType } from "../models/schedules.model";
-import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { UploadType } from "../enums/enums";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
@@ -17,7 +15,7 @@ export class ProviderService {
 
   providerData$ = this.providerDataSource.asObservable();
 
-  private _buildFilterParams(filter: IFilter): HttpParams {
+  private _buildFilterParams(filter: object): HttpParams {
     let params = new HttpParams();
 
     Object.entries(filter).forEach(([key, value]) => {
@@ -29,33 +27,26 @@ export class ProviderService {
     return params;
   }
 
-  // Updates the BehaviorSubject with new provider data.
   setProviderData(data: IProvider) {
     this.providerDataSource.next(data);
   }
 
-  getProviders(filter: IFilter = {}, locationSearch?: IHomeSearch): Observable<IResponse<IProviderCardView[]>> {
+  getProviders(filter: IFilterFetchProviders): Observable<IResponse<IProviderCardWithPagination>> {
     let params = this._buildFilterParams(filter);
 
-    if (locationSearch) {
-      params = params.set('lat', locationSearch.lat.toString())
-        .set('lng', locationSearch.lng.toString())
-        .set('title', locationSearch.title);
-    }
+    console.log(params.toString())
 
-    return this._http.get<IResponse<IProviderCardView[]>>(`${this._apiUrl}/fetch_providers`, { params });
+    return this._http.get<IResponse<IProviderCardWithPagination>>(`${this._apiUrl}/fetch_providers`, { params });
   }
 
   getOneProvider(id: string | null = null): Observable<IProvider> {
     return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?id=${id}`).pipe(shareReplay(1));
   }
 
-  // Updates a provider with full or file-based data (e.g., multipart form).
   bulkUpdate(formData: FormData | Partial<IProvider>): Observable<IProvider> {
     return this._http.patch<IProvider>(`${this._apiUrl}/update_provider`, formData);
   }
 
-  // Updates specific fields of a provider (partial update).
   partialUpdate(data: Partial<IProvider>): Observable<IProvider> {
     return this._http.patch<IProvider>(`${this._apiUrl}/partial_update`, data);
   }

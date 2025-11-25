@@ -201,9 +201,16 @@ export interface ISearchedLocation {
 }
 
 export interface IHomeSearch {
-    title: string;
-    lat: number,
-    lng: number;
+    title?: string | null;
+    lat?: number | null,
+    lng?: number | null;
+}
+
+export interface IFilterFetchProviders extends IHomeSearch {
+    search?: string;
+    isCertified?: boolean;
+    status?: string;
+    page?: number;
 }
 
 export interface IStats {
@@ -236,4 +243,9 @@ export interface IProviderCardView {
     address: string;
     isActive: boolean;
     avatar: string;
+}
+
+export interface IProviderCardWithPagination {
+    providerCards: IProviderCardView[];
+    pagination: IPagination;
 }

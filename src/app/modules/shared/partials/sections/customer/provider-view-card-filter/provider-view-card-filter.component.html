@@ -1,90 +1,38 @@
-<div class="bg-white rounded-xl shadow-sm p-6 mb-8 sticky top-4 z-10 border border-gray-100">
-    <div class="flex flex-col md:flex-row gap-6">
-        <!-- Search -->
-        <div class="flex-1 min-w-[250px]">
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <input type="text" placeholder="Search providers..." [(ngModel)]="searchQuery"
-                    class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg bg-gray-50 outline-none"
-                    (ngModelChange)="onSearchTriggered()">
-            </div>
-        </div>
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
 
-        <!-- Filters -->
-        <div class="flex flex-wrap gap-3">
-            <!-- Certified Providers Toggle -->
-            <div
-                class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors">
-                <input type="checkbox" id="certified" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer"
-                    [(ngModel)]="certifiedOnly" (ngModelChange)="toggleCertifiedOnly()">
-                <label for="certified" class="text-sm font-medium text-gray-700 cursor-pointer">Certified
-                    Only</label>
-            </div>
+    <!-- Search Left -->
+    <div class="flex-1 min-w-[260px]">
+        <input type="text" placeholder="Search providers..." [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchTriggered()"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
 
-            <!-- Rating Filter -->
+    <!-- Filters Right -->
+    <div class="flex items-center gap-6">
+
+        <!-- Toggle -->
+        <label for="certified"
+            class="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
+            <span>Certified Only</span>
+
             <div class="relative">
-                <select
-                    class="appearance-none pl-3 pr-8 py-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                    [(ngModel)]="ratingFilter" (change)="filterProviders()">
-                    <option [value]="0">All Ratings</option>
-                    <option [value]="4">4+ Stars</option>
-                    <option [value]="3">3+ Stars</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                            clip-rule="evenodd" />
-                    </svg>
+                <input type="checkbox" id="certified" [(ngModel)]="certifiedOnly"
+                    (ngModelChange)="toggleCertifiedOnly()" class="sr-only peer" />
+
+                <div class="w-10 h-5 bg-gray-300 rounded-full transition peer-checked:bg-indigo-600"></div>
+                <div
+                    class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition peer-checked:translate-x-5">
                 </div>
             </div>
+        </label>
 
-            <!-- Price Filter -->
-            <!-- <div class="relative">
-                        <select
-                            class="appearance-none pl-3 pr-8 py-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                            [(ngModel)]="priceFilter" (change)="filterProviders()">
-                            <option [value]="'all'">All Prices</option>
-                            <option [value]="'0-50'">$0 - $50</option>
-                            <option [value]="'50-100'">$50 - $100</option>
-                            <option [value]="'100+'">$100+</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </div> -->
+        <!-- Sort -->
+        <select [(ngModel)]="sortOption" (ngModelChange)="sortProviders()"
+            class="border border-gray-300 rounded-lg px-3 py-2 text-sm cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="all">All</option>
+            <option value="best-rated">Best Rated</option>
+            <option value="nearest">Nearest</option>
+        </select>
 
-            <!-- Sort Options -->
-            <div class="relative">
-                <select
-                    class="appearance-none pl-3 pr-8 py-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                    [(ngModel)]="sortOption" (change)="sortProviders()">
-                    <option [value]="'rating'">Best Rated</option>
-                    <!-- <option [value]="'price'">Lowest Price</option> -->
-                    <option [value]="'distance'">Nearest</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
