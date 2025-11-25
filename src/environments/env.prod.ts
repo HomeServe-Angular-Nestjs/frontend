@@ -1,39 +1,39 @@
-const domainName = 'https://jamarion-uncondolatory-olimpia.ngrok-free.dev/api';
+const API_URL = process.env['API_URL'];
 
 export const PRODUCTION = true;
 
 export const API_ENV = {
-  signupAuth: `${domainName}/signup`,
-  loginAuth: `${domainName}/login`,
-  auth: `${domainName}/auth`,
-  admin: `${domainName}/admin`,
-  customer: `${domainName}`,
-  provider: `${domainName}/provider`,
-  payment: `${domainName}/payment`,
-  schedule: `${domainName}/schedule`,
-  chat: `${domainName}/chat`,
-  message: `${domainName}/messages`,
-  plans: `${domainName}/plans`,
-  subscription: `${domainName}/subscription`,
-  uploads: `${domainName}/uploads`,
-  rule: `${domainName}/rule`,
-  transactions: `${domainName}/transactions`,
-  wallet: `${domainName}/wallet`,
-  notification: `${domainName}/notification`,
-  reservation: `${domainName}/reservation`,
-  report: `${domainName}/report`,
-  analytics: `${domainName}/analytics`
+  signupAuth: `${API_URL}/signup`,
+  loginAuth: `${API_URL}/login`,
+  auth: `${API_URL}/auth`,
+  admin: `${API_URL}/admin`,
+  customer: `${API_URL}`,
+  provider: `${API_URL}/provider`,
+  payment: `${API_URL}/payment`,
+  schedule: `${API_URL}/schedule`,
+  chat: `${API_URL}/chat`,
+  message: `${API_URL}/messages`,
+  plans: `${API_URL}/plans`,
+  subscription: `${API_URL}/subscription`,
+  uploads: `${API_URL}/uploads`,
+  rule: `${API_URL}/rule`,
+  transactions: `${API_URL}/transactions`,
+  wallet: `${API_URL}/wallet`,
+  notification: `${API_URL}/notification`,
+  reservation: `${API_URL}/reservation`,
+  report: `${API_URL}/report`,
+  analytics: `${API_URL}/analytics`
 };
 
 export const API_KEY = {
-  mapbox: 'pk.eyJ1Ijoic2FqaWRtdWhhbW1lZCIsImEiOiJjbTl3b25hZDMxMHB0Mmlwc3ZlcnV3MmMwIn0.zMhfdAfDTgodZvIu0tbglw',
-  razorpay: 'rzp_test_OZVJGxiPWQgDaM',
-  openCageApi: '891b320be91d49d0861fc8b1592cc0b5',
+  mapbox: process.env['MAPBOX_API_KEY'],
+  razorpay: process.env['RAZORPAY_API_KEY'],
+  openCageApi: process.env['OPEN_CAGE_API_KEY'],
 }
 
-export const OPEN_CAGE_URL = 'https://api.opencagedata.com/geocode/v1/json';
+export const OPEN_CAGE_URL = process.env['OPEN_CAGE_URL'];
 
-export const SOCKET_URL = 'https://jamarion-uncondolatory-olimpia.ngrok-free.dev';
+export const SOCKET_URL = process.env['SOCKET_URL'];
 
 export const REGEXP_ENV = {
   password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
