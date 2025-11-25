@@ -5,16 +5,17 @@ import { FormsModule } from '@angular/forms';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { decode as base64Decode } from 'js-base64';
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
-import { IHomeSearch, IProviderCardView } from '../../../../core/models/user.model';
+import { IFilterFetchProviders, IHomeSearch, IProviderCardView } from '../../../../core/models/user.model';
 import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 import { ProviderViewCardFilterComponent } from "../../../shared/partials/sections/customer/provider-view-card-filter/provider-view-card-filter.component";
-import { IFilter } from '../../../../core/models/filter.model';
 import { ProviderService } from '../../../../core/services/provider.service';
 import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
+import { IPagination } from '../../../../core/models/booking.model';
+import { CustomerPaginationComponent } from '../../../shared/partials/sections/customer/pagination/pagination.component';
 
 @Component({
   selector: 'app-customer-view-providers',
-  imports: [CommonModule, CustomerBreadcrumbsComponent, FormsModule, CustomerProviderViewCardComponent, ProviderViewCardFilterComponent],
+  imports: [CommonModule, CustomerBreadcrumbsComponent, FormsModule, CustomerProviderViewCardComponent, ProviderViewCardFilterComponent, CustomerPaginationComponent],
   templateUrl: './customer-view-providers.component.html',
 })
 export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
@@ -26,6 +27,28 @@ export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
 
   providers$!: Observable<IProviderCardView[]>;
 
+  homeSearch: IHomeSearch = {
+    title: null,
+    lat: null,
+    lng: null,
+  };
+
+  filters: IFilterFetchProviders = {
+    isCertified: false,
+    search: '',
+    status: 'all',
+    page: 1,
+    lng: this.homeSearch.lng,
+    lat: this.homeSearch.lat,
+    title: this.homeSearch.title,
+  };
+
+  pagination: IPagination = {
+    total: 0,
+    page: 1,
+    limit: 0,
+  };
+
   @ViewChild(ProviderViewCardFilterComponent)
   filterComponent!: ProviderViewCardFilterComponent
 
@@ -35,37 +58,57 @@ export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
       let parsedParam: IHomeSearch | undefined;
 
       try {
-        if (ls) {
-          parsedParam = JSON.parse(base64Decode(ls));
-        }
+        if (ls) parsedParam = JSON.parse(base64Decode(ls));
       } catch (err) {
         this._toastr.error('Oops something went wrong.');
-        console.error('Invalid ls param:', err);
+        console.error('Invalid location search param:', err);
       }
 
-      this._fetchProviders({}, parsedParam);
+      this.homeSearch = parsedParam || this.homeSearch;
+
+      this.filters = {
+        ...this.filters,
+        lat: this.homeSearch.lat,
+        lng: this.homeSearch.lng,
+        title: this.homeSearch.title,
+      };
+
+      this._fetchProviders(this.filters);
     });
+  }
+
+  private _fetchProviders(filter: IFilterFetchProviders = {}) {
+    this.providers$ = this._providerService.getProviders(filter).pipe(
+      takeUntil(this._destroy$),
+      map(res => {
+        this.pagination = res.data?.pagination ?? this.pagination;
+        return res.data?.providerCards ?? []
+      })
+    );
+  }
+
+  applyFilters(newFilter: Partial<typeof this.filters>) {
+    this.filters = { ...this.filters, ...newFilter, page: 1 };
+    this.pagination.page = 1;
+    this._fetchProviders(this.filters);
+  }
+
+  resetFilters() {
+    this.filters = { search: '', isCertified: false, status: 'all', page: 1, };
+    this.pagination.page = 1;
+    this.filterComponent?.reset();
+    this._fetchProviders(this.filters);
+  }
+
+  changePage(page: number) {
+    this.filters.page = page;
+    this.pagination.page = page;
+    console.log(this.filters);
+    this._fetchProviders(this.filters);
   }
 
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
-  }
-
-  private _fetchProviders(filter?: IFilter, locationSearch?: IHomeSearch) {
-    this.providers$ = this._providerService.getProviders(filter, locationSearch).pipe(
-      takeUntil(this._destroy$),
-      map(res => res.data ?? [])
-    );
-  }
-
-  applyFilters(filter: IFilter) {
-    this._fetchProviders(filter);
-  }
-
-  resetFilters() {
-    if (this.filterComponent) {
-      this.filterComponent.reset();
-    }
   }
 }

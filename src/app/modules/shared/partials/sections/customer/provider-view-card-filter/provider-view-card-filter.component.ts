@@ -1,11 +1,4 @@
-import {
-    Component,
-    EventEmitter,
-    inject,
-    OnDestroy,
-    OnInit,
-    Output,
-} from '@angular/core';
+import { Component, EventEmitter, inject, OnDestroy, OnInit, Output, } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { IFilter } from '../../../../../../core/models/filter.model';
@@ -19,21 +12,20 @@ import { DebounceService } from '../../../../../../core/services/public/debounce
 })
 export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
     private _debounceService = inject(DebounceService);
-    private _filters$ = new BehaviorSubject<IFilter>({});
+    private _filters$ = new BehaviorSubject({});
     private _destroy$ = new Subject<void>();
 
-    @Output() filterEvents = new EventEmitter<IFilter>();
+    @Output() filterEvents = new EventEmitter<{ search?: string; isCertified?: boolean; status?: string }>();
 
     searchQuery: string = '';
     certifiedOnly: boolean = false;
-    ratingFilter: number = 0;
-    sortOption: string = 'rating';
+    sortOption: string = 'all';
 
     ngOnInit(): void {
         this._filters$
             .pipe(takeUntil(this._destroy$))
             .subscribe((filter) => {
-                this.filterEvents.emit(filter); 
+                this.filterEvents.emit(filter);
             });
 
         this._debounceService.onSearch(700)
@@ -47,26 +39,26 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
         this._debounceService.delay(this.searchQuery);
     }
 
-    filterProviders() { }
-
     toggleCertifiedOnly() {
-        this._debounceService.delay(this.certifiedOnly);
+        this._emitFilter();
     }
 
-    sortProviders() { }
+    sortProviders() {
+        this._emitFilter();
+    }
 
     reset() {
         this.certifiedOnly = false;
         this.searchQuery = '';
-        // this.ratingFilter = 0;
-        // this.sortOption = 'rating';
+        this.sortOption = 'all';
         this._emitFilter();
     }
 
     private _emitFilter() {
-        const filter: IFilter = {
-            search: this.searchQuery,
+        const filter = {
+            search: this.searchQuery.trim(),
             isCertified: this.certifiedOnly,
+            status: this.sortOption,
         };
 
         this._filters$.next(filter);
