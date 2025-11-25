@@ -11,30 +11,30 @@ export class PaymentService {
     private _http = inject(HttpClient);
     private _apiUrl = API_ENV.payment;
 
-    private _paymentInProgress = signal(false);
-    readonly isPaymentInProgress = this._paymentInProgress.asReadonly();
+    // private _paymentInProgress = signal(false);
+    // readonly isPaymentInProgress = this._paymentInProgress.asReadonly();
 
     constructor() {
-        window.addEventListener('storage', (event) => {
-            if (event.key === PAYMENT_LOCK_KEY) {
-                this._paymentInProgress.set(event.newValue === 'true')
-            }
-        });
+        // window.addEventListener('storage', (event) => {
+        //     if (event.key === PAYMENT_LOCK_KEY) {
+        //         this._paymentInProgress.set(event.newValue === 'true')
+        //     }
+        // });
     }
 
     private _getFromStorage(): boolean {
         return localStorage.getItem(PAYMENT_LOCK_KEY) === 'true';
     }
 
-    lockPayment(): void {
-        localStorage.setItem(PAYMENT_LOCK_KEY, 'true');
-        this._paymentInProgress.set(true);
-    }
+    // lockPayment(): void {
+    //     localStorage.setItem(PAYMENT_LOCK_KEY, 'true');
+    //     this._paymentInProgress.set(true);
+    // }
 
-    unlockPayment(): void {
-        localStorage.setItem(PAYMENT_LOCK_KEY, 'false');
-        this._paymentInProgress.set(false);
-    }
+    // unlockPayment(): void {
+    //     localStorage.setItem(PAYMENT_LOCK_KEY, 'false');
+    //     this._paymentInProgress.set(false);
+    // }
 
     createRazorpayOrder(amount: number): Observable<RazorpayOrder> {
         return this._http.post<RazorpayOrder>(`${this._apiUrl}/create_order`, { amount });

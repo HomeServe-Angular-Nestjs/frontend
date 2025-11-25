@@ -17,6 +17,9 @@ export class BookingService {
   private _addressSource = new BehaviorSubject<IAddress & Omit<ILocation, 'type'> | null>(null);
   address$ = this._addressSource.asObservable();
 
+  private _phoneNumberSource = new BehaviorSubject<string | null>(null);
+  phoneNumber$ = this._phoneNumberSource.asObservable();
+
   private _slotSource = new BehaviorSubject<ISelectedSlot | null>(null);
   slot$ = this._slotSource.asObservable();
 
@@ -33,6 +36,14 @@ export class BookingService {
 
   getSelectedSlot(): ISelectedSlot | null {
     return this._slotSource.getValue();
+  }
+
+  setSelectedPhoneNumber(phoneNumber: string) {
+    this._phoneNumberSource.next(phoneNumber);
+  }
+
+  getSelectedPhoneNumber(): string | null {
+    return this._phoneNumberSource.getValue();
   }
 
   // ------------------------------------------------------------------------------------------------------------------------------

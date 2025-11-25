@@ -51,6 +51,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
     this._store.select(selectPhoneNumber).subscribe(phoneNumber => {
       if (phoneNumber) {
         this.phoneNumber = phoneNumber;
+        this._bookingService.setSelectedPhoneNumber(phoneNumber);
       }
     });
 
@@ -138,6 +139,12 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
       ...slot,
       date: this.selectedDate
     });
+  }
+
+  onPhoneNumberChange(phone: string) {
+    if (phone.trim().length !== 10) return;
+    this.phoneNumber = phone;
+    this._bookingService.setSelectedPhoneNumber(this.phoneNumber);
   }
 
   async onMapLocationChanged(newCenter: [number, number]) {
