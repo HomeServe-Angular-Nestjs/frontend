@@ -81,7 +81,6 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
       });
   }
 
-  // React to changes in Input (if parent updates services after init)
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedServiceData'] && !changes['selectedServiceData'].firstChange) {
       const priceData = this._prepareDataForPriceBreakup(this.selectedServiceData);
@@ -160,9 +159,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
       tap(() => {
         this._toastr.success('Booking confirmed and payment successful!');
         this._router.navigate(['profile', 'bookings']);
-      }),
-      finalize(() => this._paymentService.unlockPayment())
-    );
+      }));
   }
 
   private _saveBooking(transactionData?: ITransaction): Observable<any> {
@@ -175,13 +172,16 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
 
     const { status, ...slotData } = this.selectedSlot;
 
+    console.log(this._bookingService.getSelectedPhoneNumber())
+
     const bookingData: IBookingData = {
       providerId: this.providerId!,
       total: Number(this.priceBreakup.total.toFixed(2)),
       location: this.location,
       slotData,
       serviceIds,
-      transactionId: transactionData?.id ?? null
+      transactionId: transactionData?.id ?? null,
+      phoneNumber: this._bookingService.getSelectedPhoneNumber() ?? null,
     };
 
     return this._bookingService.postBookingData(bookingData).pipe(
@@ -193,13 +193,6 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
   }
 
   initiatePayment() {
-    if (this._paymentService.isPaymentInProgress()) {
-      this._toastr.warning('You already have an ongoing payment!');
-      return;
-    }
-
-    this._paymentService.lockPayment();
-
     this.isProcessing = true;
 
     if (!this._isAllDataAvailable()) {
@@ -210,8 +203,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
 
     const slotData = this._bookingService.getSelectedSlot();
     if (!slotData) {
-      this._toastr.error('Oops something went wrong.');
-      console.error('Slot data is missing.');
+      this._toastr.error('Please select a slot.');
       this.isProcessing = false;
       return;
     }
@@ -250,32 +242,28 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
                 .pipe(takeUntil(this._destroy$))
                 .subscribe({
                   next: () => {
-                    this._paymentService.unlockPayment()
                     observer.next();
                     observer.complete()
                   },
                   error: (err) => {
-                    this._paymentService.unlockPayment()
                     observer.error(err)
                   },
                 });
             },
             () => {
-              this._paymentService.unlockPayment();
               observer.complete();
             }
           );
         })
       )
     ).subscribe({
-      next: () => {
-        this._paymentService.unlockPayment();
-      },
       error: (err) => {
         console.error(err);
         this._toastr.error(err.message || err);
         this.isProcessing = false;
-        this._paymentService.unlockPayment();
+      },
+      complete: () => {
+        this.isProcessing = false;
       }
     });
   }

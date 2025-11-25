@@ -129,12 +129,12 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
                     this._verifyPaymentAndConfirmSubscription(paymentResponse, order, subscriptionId)
                         .subscribe({
                             next: () => {
-                                this._paymentService.unlockPayment()
+                                // this._paymentService.unlockPayment()
                                 observer.next('success');
                                 observer.complete();
                             },
                             error: (err) => {
-                                this._paymentService.unlockPayment()
+                                // this._paymentService.unlockPayment()
                                 observer.error(err)
                             }
                         });
@@ -148,7 +148,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
                             })
                         )
                         .subscribe(() => {
-                            this._paymentService.unlockPayment()
+                            // this._paymentService.unlockPayment()
                             observer.next('dismissed');
                             observer.complete();
                         })
@@ -248,10 +248,10 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     }
 
     proceedSub(plan: IPlan): void {
-        if (this._paymentService.isPaymentInProgress()) {
-            this._toastr.error('Another payment is already in progress. Please wait.');
-            return;
-        }
+        // if (this._paymentService.isPaymentInProgress()) {
+        //     this._toastr.error('Another payment is already in progress. Please wait.');
+        //     return;
+        // }
 
         if (plan.duration === PlanDuration.LIFETIME) {
             this._handleFreePlan();
@@ -266,7 +266,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
         const flow$ = this._initializePayment(plan);
 
-        this._paymentService.lockPayment();
+        // this._paymentService.lockPayment();
 
         flow$.pipe(takeUntil(this._destroy$)).subscribe({
             next: (status) => {
@@ -275,9 +275,9 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
                 } else if (status === "dismissed") {
                     this._toastr.info('Payment dismissed.');
                 }
-                this._paymentService.unlockPayment()
+                // this._paymentService.unlockPayment()
             },
-            error: () => this._paymentService.unlockPayment(),
+            // error: () => this._paymentService.unlockPayment(),
         });
     }
 

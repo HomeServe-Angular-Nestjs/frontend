@@ -73,6 +73,7 @@ export interface IBookingData {
   slotData: IAvailableSlot;
   serviceIds: SelectedServiceIdsType[];
   transactionId: string | null;
+  phoneNumber: string | null;
 }
 
 export interface IBooking {
