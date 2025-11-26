@@ -1,4 +1,4 @@
-const domainName = 'https://linking-blog-supervisors-acrylic.trycloudflare.com/api';
+const domainName = ' https://prompt-punch-telling-strange.trycloudflare.com/api';
 
 export const PRODUCTION = true;
 
@@ -33,7 +33,7 @@ export const API_KEY = {
 
 export const OPEN_CAGE_URL = 'https://api.opencagedata.com/geocode/v1/json';
 
-export const SOCKET_URL = 'https://linking-blog-supervisors-acrylic.trycloudflare.com';
+export const SOCKET_URL = ' https://prompt-punch-telling-strange.trycloudflare.com';
 
 export const REGEXP_ENV = {
   password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
