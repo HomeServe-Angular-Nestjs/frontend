@@ -1,4 +1,4 @@
-const domainName = 'https://api.homeserve.msajid.space';
+const domainName = 'https://api.homeserve.msajid.space/api';
 
 export const PRODUCTION = true;
 
