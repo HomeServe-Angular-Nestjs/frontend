@@ -142,7 +142,7 @@ export interface IRemoveData {
 
 export interface IProviderUpdateBio {
     providerBio?: string;
-    expertises?: IExpertise[];
+    expertise?: IExpertise[];
     additionalSkills?: string[];
     languages?: ILanguage[];
 }
