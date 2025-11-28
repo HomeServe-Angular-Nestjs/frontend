@@ -147,6 +147,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     const isAlreadyCancelled =
       booking.bookingStatus === 'cancelled' ||
       booking.paymentStatus === 'refunded' ||
+      booking.bookingStatus === 'completed' ||
       booking.cancelStatus;
 
     return isWithinCancellableWindow && !isAlreadyCancelled;
