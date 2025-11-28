@@ -6,7 +6,6 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './customer-hero-section.component.html',
-  styleUrl: './customer-hero-section.component.scss',
 })
 export class CustomerHeroSectionComponent {
   currentSlide = 0;
@@ -14,7 +13,7 @@ export class CustomerHeroSectionComponent {
 
   images = [
     {
-      url: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115',
+      url: 'asset/images/hero_image1.jpg',
       alt: 'Home construction'
     },
     {

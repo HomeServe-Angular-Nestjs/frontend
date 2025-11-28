@@ -147,6 +147,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     const isAlreadyCancelled =
       booking.bookingStatus === 'cancelled' ||
       booking.paymentStatus === 'refunded' ||
+      booking.bookingStatus === 'completed' ||
       booking.cancelStatus;
 
     return isWithinCancellableWindow && !isAlreadyCancelled;
@@ -186,7 +187,6 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   }
 
   submitReview(reviewData: ISubmitReview) {
-    alert(this.selectedBookingIdForReview)
     this._bookingService.addReview(this.selectedBookingIdForReview, reviewData)
       .pipe(
         takeUntil(this._destroy$),

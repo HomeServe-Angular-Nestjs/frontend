@@ -27,7 +27,7 @@ export class ProviderProfileAboutComponent implements OnInit {
     isLanguageModalOpen = false;
 
     providerBio: string = '';
-    expertises: IExpertise[] = [];
+    expertise: IExpertise[] = [];
     additionalSkills: Set<string> = new Set();
     docs: IDocs[] = [];
     languages: ILanguage[] = [];
@@ -64,7 +64,7 @@ export class ProviderProfileAboutComponent implements OnInit {
     ngOnInit(): void {
         this._store.select(selectProvider).subscribe(provider => {
             this.providerBio = provider?.bio ?? '';
-            this.expertises = [...(provider?.expertise ?? [])];
+            this.expertise = [...(provider?.expertise ?? [])];
             this.additionalSkills = new Set(provider?.additionalSkills ?? []);
             this.docs = [...(provider?.docs ?? [])];
             this.languages = [...(provider?.languages ?? [])];
@@ -76,7 +76,7 @@ export class ProviderProfileAboutComponent implements OnInit {
             this._store.dispatch(providerActions.updateBio({
                 updateData: {
                     providerBio: this.providerBio.trim(),
-                    expertises: this.expertises,
+                    expertise: this.expertise,
                     additionalSkills: [...this.additionalSkills],
                     languages: this.languages
                 }
@@ -105,7 +105,7 @@ export class ProviderProfileAboutComponent implements OnInit {
                 specialization: specialization.trim()
             };
 
-            const exists = this.expertises.some(e =>
+            const exists = this.expertise.some(e =>
                 e.label.toLowerCase() === newExpertise.label.toLowerCase() &&
                 e.specialization.toLowerCase() === newExpertise.specialization.toLowerCase()
             );
@@ -115,11 +115,11 @@ export class ProviderProfileAboutComponent implements OnInit {
                 return;
             }
 
-            this.expertises = [...this.expertises, newExpertise];
+            this.expertise = [...this.expertise, newExpertise];
 
             this._store.dispatch(providerActions.updateBio({
                 updateData: {
-                    expertises: this.expertises,
+                    expertise: this.expertise,
                     providerBio: this.providerBio.trim(),
                     additionalSkills: [...this.additionalSkills],
                     languages: this.languages
@@ -145,10 +145,10 @@ export class ProviderProfileAboutComponent implements OnInit {
     }
 
     deleteSpecialization(index: number) {
-        this.expertises.splice(index, 1);
+        this.expertise.splice(index, 1);
         this._store.dispatch(providerActions.updateBio({
             updateData: {
-                expertises: this.expertises,
+                expertise: this.expertise,
                 providerBio: this.providerBio.trim(),
                 additionalSkills: [...this.additionalSkills],
                 languages: this.languages
@@ -163,7 +163,7 @@ export class ProviderProfileAboutComponent implements OnInit {
             this._store.dispatch(providerActions.updateBio({
                 updateData: {
                     additionalSkills: Array.from(this.additionalSkills).filter(skill => typeof skill === 'string'),
-                    expertises: this.expertises,
+                    expertise: this.expertise,
                     providerBio: this.providerBio.trim(),
                     languages: this.languages
                 }
@@ -177,7 +177,7 @@ export class ProviderProfileAboutComponent implements OnInit {
         this._store.dispatch(providerActions.updateBio({
             updateData: {
                 additionalSkills: [...this.additionalSkills],
-                expertises: this.expertises,
+                expertise: this.expertise,
                 providerBio: this.providerBio.trim(),
                 languages: this.languages
             }
@@ -296,7 +296,7 @@ export class ProviderProfileAboutComponent implements OnInit {
             this._store.dispatch(providerActions.updateBio({
                 updateData: {
                     languages: this.languages,
-                    expertises: this.expertises,
+                    expertise: this.expertise,
                     additionalSkills: [...this.additionalSkills],
                     providerBio: this.providerBio.trim()
                 }
@@ -325,7 +325,7 @@ export class ProviderProfileAboutComponent implements OnInit {
         this._store.dispatch(providerActions.updateBio({
             updateData: {
                 languages: this.languages,
-                expertises: this.expertises,
+                expertise: this.expertise,
                 additionalSkills: [...this.additionalSkills],
                 providerBio: this.providerBio.trim()
             }

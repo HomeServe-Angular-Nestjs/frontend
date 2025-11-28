@@ -1,165 +1,166 @@
 <section class="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-gray-50 to-gray-100">
-    <div class="container mx-auto px-4 py-8">
-        <div class="flex flex-col md:flex-row gap-6">
-            <!-- Left Side - Service Categories -->
-            <div class="w-full md:w-1/2">
-                <h1 class="text-2xl font-bold text-gray-900 mb-6">
-                    What Service Do You Need Today?
-                </h1>
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row gap-6">
+      <!-- Left Side - Service Categories -->
+      <div class="w-full md:w-1/2">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">
+          What Service Do You Need Today?
+        </h1>
 
-                <!-- Service Grid -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div *ngFor="let service of services"
-                        class="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1">
-                        <div
-                            class="bg-indigo-50 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-indigo-100 transition-colors">
-                            <i [class]="'fas ' + service.icon + ' text-xl text-indigo-600'"></i>
-                        </div>
-                        <h3 class="text-lg font-semibold mb-1 text-gray-800">{{ service.title }}</h3>
-                        <p class="text-gray-600 text-sm">{{ service.description }}</p>
-                    </div>
-                </div>
-
-                <!-- Service Finder Card -->
-                <div class="mt-6">
-                    <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-                        <h2 class="text-md font-bold text-gray-800 mb-3">Find the Right Professional</h2>
-
-                        <div class="flex flex-col md:flex-row gap-4">
-                            <div class="flex-1">
-                                <label for="service" class="block text-gray-700 text-sm font-medium mb-2">Service
-                                    Type</label>
-                                <div class="relative w-full max-w-md mx-auto">
-                                    <i
-                                        class="fas fa-tools absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
-
-                                    <input id="service" [(ngModel)]="serviceSearch"
-                                        (ngModelChange)="filterTitle($event)" placeholder="Search services..."
-                                        class="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm" />
-
-                                    <div *ngIf="isServiceSearchDropdownOpen && serviceSearch"
-                                        class="absolute w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
-                                        <ng-container
-                                            *ngIf="(serviceTitles$ | async) as serviceTitles; else noTitlesFound">
-                                            <ng-container *ngIf="serviceTitles.length; else noTitlesFound">
-                                                <button *ngFor="let service of serviceTitles"
-                                                    (click)="serviceSearch = service; isServiceSearchDropdownOpen = false; selectedService = service"
-                                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors border-b last:border-b-0">
-                                                    {{ service }}
-                                                </button>
-                                            </ng-container>
-                                        </ng-container>
-
-                                        <ng-template #noTitlesFound>
-                                            <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                                                <i class="fas fa-exclamation-circle mr-1"></i>No services found.
-                                            </div>
-                                        </ng-template>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="flex-1">
-                                <label for="location"
-                                    class="flex justify-between items-center text-gray-700 text-sm font-medium mb-2">
-                                    <span>Your Location</span>
-
-                                    <span class="text-xs text-blue-500 flex items-center gap-1 cursor-pointer"
-                                        (click)="!loadingCurrentLocation && detectCurrentLocation()">
-
-                                        <ng-container *ngIf="!loadingCurrentLocation; else loadingTpl">
-                                            <i class="fas fa-location-crosshairs"></i>
-                                            Current Location
-                                        </ng-container>
-
-                                        <ng-template #loadingTpl>
-                                            <svg class="animate-spin h-3.5 w-3.5 text-blue-500"
-                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                                    stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                                            </svg>
-                                            Detecting...
-                                        </ng-template>
-                                    </span>
-                                </label>
-                                <div class="relative">
-                                    <i
-                                        class="fas fa-map-marker-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
-                                    <input id="service" [(ngModel)]="locationSearch"
-                                        (ngModelChange)="findLocation($event)" placeholder="Enter your location"
-                                        class="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm" />
-                                    <div *ngIf="isLocationSearchDropdownOpen && locationSearch"
-                                        class="absolute w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
-                                        <ng-container *ngIf="(locationData$ | async) as locationData; else searching">
-                                            <ng-container *ngIf="locationData.length; else searching">
-                                                <button *ngFor="let location of locationData"
-                                                    (click)="locationSearch = location.address; isLocationSearchDropdownOpen = false; selectedLocation = location"
-                                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors border-b last:border-b-0">
-                                                    {{ location.address }}
-                                                </button>
-                                            </ng-container>
-                                        </ng-container>
-
-                                        <ng-template #searching>
-                                            <ng-container *ngIf="isLocationSearchLoading; else noResults">
-                                                <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                                                    <i class="fas fa-spinner fa-spin text-gray-400 text-sm"></i>
-                                                    <span class="ml-2">Searching...</span>
-                                                </div>
-                                            </ng-container>
-                                        </ng-template>
-                                        <ng-template #noResults>
-                                            <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                                                <i class="fas fa-exclamation-circle mr-1"></i>No Locations found.
-                                            </div>
-                                        </ng-template>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button (click)="findProviders()"
-                            class="mt-4 w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-colors duration-300 shadow-md hover:shadow-lg text-sm">
-                            Find Services Now
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Side - Image Carousel -->
-            <div class="w-full md:w-1/2">
-                <div class="relative h-full min-h-[400px] rounded-xl overflow-hidden shadow-xl">
-                    <div class="absolute inset-0">
-                        <div class="relative h-full" #carousel>
-                            <img *ngFor="let image of images; let i = index" [src]="image.src" [alt]="image.alt"
-                                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-                                [class.opacity-0]="currentSlide !== i" [class.opacity-100]="currentSlide === i" />
-                        </div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
-                            <div class="absolute bottom-8 left-8 right-8 text-white">
-                                <h2 class="text-4xl font-bold mb-4">
-                                    Quality Home Services
-                                </h2>
-                                <p class="text-lg opacity-90">Trusted professionals for all your home needs</p>
-                                <button
-                                    class="mt-6 px-6 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-colors">
-                                    Learn More
-                                </button>
-                            </div>
-                        </div>
-                        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3">
-                            <button *ngFor="let image of images; let i = index"
-                                class="w-3 h-3 rounded-full bg-white transition-opacity duration-300"
-                                [class.opacity-100]="currentSlide === i" [class.opacity-50]="currentSlide !== i"
-                                (click)="goToSlide(i)" [attr.aria-label]="'Go to slide ' + (i + 1)">
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Service Grid -->
+        <div class="grid grid-cols-2 gap-3">
+          <ng-container *ngFor="let service of services">
+            <a [routerLink]="['/','view_providers']" [queryParams]="{category: service.route}"
+              class="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1">
+              <div
+                class="bg-indigo-50 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-indigo-100 transition-colors">
+                <i [class]="'fas ' + service.icon + ' text-xl text-indigo-600'"></i>
+              </div>
+              <h3 class="text-lg font-semibold mb-1 text-gray-800">{{ service.title }}</h3>
+              <p class="text-gray-600 text-sm">{{ service.description }}</p>
+            </a>
+          </ng-container>
         </div>
+
+        <!-- Service Finder Card -->
+        <div class="mt-6">
+          <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+            <h2 class="text-md font-bold text-gray-800 mb-3">Find the Right Professional</h2>
+
+            <div class="flex flex-col md:flex-row gap-4">
+              <div class="flex-1">
+                <label for="service" class="block text-gray-700 text-sm font-medium mb-2">Service
+                  Type</label>
+                <div class="relative w-full max-w-md mx-auto">
+                  <i
+                    class="fas fa-tools absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+
+                  <input id="service" [(ngModel)]="serviceSearch" (ngModelChange)="filterTitle($event)"
+                    placeholder="Search services..."
+                    class="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm" />
+
+                  <div *ngIf="isServiceSearchDropdownOpen && serviceSearch"
+                    class="absolute w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                    <ng-container *ngIf="(serviceTitles$ | async) as serviceTitles; else noTitlesFound">
+                      <ng-container *ngIf="serviceTitles.length; else noTitlesFound">
+                        <button *ngFor="let service of serviceTitles"
+                          (click)="serviceSearch = service; isServiceSearchDropdownOpen = false; selectedService = service"
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors border-b last:border-b-0">
+                          {{ service }}
+                        </button>
+                      </ng-container>
+                    </ng-container>
+
+                    <ng-template #noTitlesFound>
+                      <div class="px-4 py-3 text-sm text-gray-500 text-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>No services found.
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="flex-1">
+                <label for="location" class="flex justify-between items-center text-gray-700 text-sm font-medium mb-2">
+                  <span>Your Location</span>
+
+                  <span class="text-xs text-blue-500 flex items-center gap-1 cursor-pointer"
+                    (click)="!loadingCurrentLocation && detectCurrentLocation()">
+
+                    <ng-container *ngIf="!loadingCurrentLocation; else loadingTpl">
+                      <i class="fas fa-location-crosshairs"></i>
+                      Current Location
+                    </ng-container>
+
+                    <ng-template #loadingTpl>
+                      <svg class="animate-spin h-3.5 w-3.5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                      </svg>
+                      Detecting...
+                    </ng-template>
+                  </span>
+                </label>
+                <div class="relative">
+                  <i
+                    class="fas fa-map-marker-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                  <input id="service" [(ngModel)]="locationSearch" (ngModelChange)="findLocation($event)"
+                    placeholder="Enter your location"
+                    class="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm" />
+                  <div *ngIf="isLocationSearchDropdownOpen && locationSearch"
+                    class="absolute w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                    <ng-container *ngIf="(locationData$ | async) as locationData; else searching">
+                      <ng-container *ngIf="locationData.length; else searching">
+                        <button *ngFor="let location of locationData"
+                          (click)="locationSearch = location.address; isLocationSearchDropdownOpen = false; selectedLocation = location"
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors border-b last:border-b-0">
+                          {{ location.address }}
+                        </button>
+                      </ng-container>
+                    </ng-container>
+
+                    <ng-template #searching>
+                      <ng-container *ngIf="isLocationSearchLoading; else noResults">
+                        <div class="px-4 py-3 text-sm text-gray-500 text-center">
+                          <i class="fas fa-spinner fa-spin text-gray-400 text-sm"></i>
+                          <span class="ml-2">Searching...</span>
+                        </div>
+                      </ng-container>
+                    </ng-template>
+                    <ng-template #noResults>
+                      <div class="px-4 py-3 text-sm text-gray-500 text-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>No Locations found.
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button (click)="findProviders()"
+              class="mt-4 w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-colors duration-300 shadow-md hover:shadow-lg text-sm">
+              Find Services Now
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side - Image Carousel -->
+      <div class="w-full md:w-1/2">
+        <div class="relative h-full min-h-[400px] rounded-xl overflow-hidden shadow-xl">
+          <div class="absolute inset-0">
+            <div class="relative h-full" #carousel>
+              <ng-container *ngFor="let image of images; let i = index">
+                <img [src]="image.src" [alt]="image.alt"
+                  class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+                  [class.opacity-0]="currentSlide !== i" [class.opacity-100]="currentSlide === i" />
+              </ng-container>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+              <div class="absolute bottom-8 left-8 right-8 text-white">
+                <h2 class="text-4xl font-bold mb-4">
+                  Quality Home Services
+                </h2>
+                <p class="text-lg opacity-90">Trusted professionals for all your home needs</p>
+                <button
+                  class="mt-6 px-6 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                  Learn More
+                </button>
+              </div>
+            </div>
+            <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3">
+              <button *ngFor="let image of images; let i = index"
+                class="w-3 h-3 rounded-full bg-white transition-opacity duration-300"
+                [class.opacity-100]="currentSlide === i" [class.opacity-50]="currentSlide !== i" (click)="goToSlide(i)"
+                [attr.aria-label]="'Go to slide ' + (i + 1)">
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </section>
