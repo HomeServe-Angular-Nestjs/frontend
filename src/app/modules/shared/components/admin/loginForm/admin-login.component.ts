@@ -26,7 +26,7 @@ export class AdminLoginComponent {
   showPassword = false;
   form: FormGroup = this._fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]],
+    password: ['', [Validators.required, Validators.pattern(this._regexp.password)]],
   });
 
   formSubmit() {
@@ -35,7 +35,7 @@ export class AdminLoginComponent {
       password: this.form.get('password')
     };
 
-    if (this.form.valid) {  
+    if (this.form.valid) {
       const user: IUser = {
         email: controls.email?.value,
         password: controls.password?.value,
