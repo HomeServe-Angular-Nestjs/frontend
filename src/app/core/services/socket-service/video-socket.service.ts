@@ -109,7 +109,7 @@ export class VideoCallSocketService extends BaseSocketService {
     });
 
     this.listen(this.VIDEO_CALL_UNAVAILABLE, (event: { message: string }) => {
-      alert(event.message);
+      // alert(event.message);
     });
 
     this.listen(this.VIDEO_CALL_RINGING, (event: any) => {

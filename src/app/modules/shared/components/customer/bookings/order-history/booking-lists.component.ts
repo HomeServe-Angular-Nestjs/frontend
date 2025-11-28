@@ -187,7 +187,6 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   }
 
   submitReview(reviewData: ISubmitReview) {
-    alert(this.selectedBookingIdForReview)
     this._bookingService.addReview(this.selectedBookingIdForReview, reviewData)
       .pipe(
         takeUntil(this._destroy$),
