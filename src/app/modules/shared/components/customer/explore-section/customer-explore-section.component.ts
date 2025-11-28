@@ -66,9 +66,9 @@ export class CustomerExploreSectionComponent {
 
 
   images = [
-    { src: 'service1.jpg', alt: 'Home Service 1' },
-    { src: 'service2.jpg', alt: 'Home Service 2' },
-    { src: 'service3.jpg', alt: 'Home Service 3' }
+    { src: 'assets/images/hero_image1.jpg', alt: 'Home Service 1' },
+    { src: 'assets/images/hero_image2.jpg', alt: 'Home Service 2' },
+    { src: 'assets/images/hero_image3.jpg', alt: 'Home Service 3' },
   ];
 
   ngOnInit() {
