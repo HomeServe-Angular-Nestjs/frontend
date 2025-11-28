@@ -9,15 +9,17 @@
 
         <!-- Service Grid -->
         <div class="grid grid-cols-2 gap-3">
-          <div *ngFor="let service of services"
-            class="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1">
-            <div
-              class="bg-indigo-50 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-indigo-100 transition-colors">
-              <i [class]="'fas ' + service.icon + ' text-xl text-indigo-600'"></i>
-            </div>
-            <h3 class="text-lg font-semibold mb-1 text-gray-800">{{ service.title }}</h3>
-            <p class="text-gray-600 text-sm">{{ service.description }}</p>
-          </div>
+          <ng-container *ngFor="let service of services">
+            <a [routerLink]="['/','view_providers']" [queryParams]="{category: service.route}"
+              class="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1">
+              <div
+                class="bg-indigo-50 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-indigo-100 transition-colors">
+                <i [class]="'fas ' + service.icon + ' text-xl text-indigo-600'"></i>
+              </div>
+              <h3 class="text-lg font-semibold mb-1 text-gray-800">{{ service.title }}</h3>
+              <p class="text-gray-600 text-sm">{{ service.description }}</p>
+            </a>
+          </ng-container>
         </div>
 
         <!-- Service Finder Card -->

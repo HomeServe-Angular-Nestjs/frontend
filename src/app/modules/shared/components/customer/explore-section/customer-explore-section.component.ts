@@ -1,6 +1,6 @@
 import { Component, inject, } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { encode as base64Encode } from 'js-base64';
@@ -13,7 +13,7 @@ import { ISearchedLocation } from '../../../../../core/models/user.model';
 @Component({
   selector: 'app-customer-explore-section',
   templateUrl: './customer-explore-section.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   providers: [LocationService, DebounceService],
 })
 export class CustomerExploreSectionComponent {
@@ -45,20 +45,24 @@ export class CustomerExploreSectionComponent {
     {
       icon: 'fa-broom',
       title: 'Cleaning Services',
-      description: 'Professional home cleaning'
+      description: 'Professional home cleaning',
+      route: 'cleaning'
     },
     {
       icon: 'fa-wrench',
       title: 'Plumbing',
-      description: 'Expert plumbing solutions'
+      description: 'Expert plumbing solutions',
+      route: 'plumbing'
     },
     {
       icon: 'fa-bolt',
       title: 'Electrical',
-      description: 'Electrical maintenance'
+      route: 'electrical',
+      description: 'Electrical maintenance',
     },
     {
       icon: 'fa-paint-roller',
+      route: 'painting',
       title: 'Painting',
       description: 'Interior & exterior painting'
     }
