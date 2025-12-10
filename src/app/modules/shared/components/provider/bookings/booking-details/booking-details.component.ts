@@ -245,7 +245,12 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
       });
   }
 
-  downloadInvoice(bookingId: string) {
+  downloadInvoice(bookingId: string, bookingStatus: BookingStatus) {
+    if (bookingStatus !== BookingStatus.COMPLETED) {
+      this._toastr.error('Booking must be completed to download invoice.');
+      return;
+    }
+
     this._bookingService.downloadInvoice(bookingId)
       .pipe(takeUntil(this._destroy$))
       .subscribe({

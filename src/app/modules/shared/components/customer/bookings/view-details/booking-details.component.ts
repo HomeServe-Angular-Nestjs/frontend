@@ -6,6 +6,8 @@ import { BookingService } from "../../../../../../core/services/booking.service"
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { IBookingDetailCustomer } from "../../../../../../core/models/booking.model";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
+import { BookingStatus } from "../../../../../../core/enums/enums";
+import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 
 @Component({
     selector: 'app-customer-view-booking-details',
@@ -15,6 +17,7 @@ import { ButtonComponent } from "../../../../../../UI/button/button.component";
 export class CustomerViewBookingDetailsComponent implements OnInit {
     private readonly _bookingService = inject(BookingService);
     private readonly _route = inject(ActivatedRoute);
+    private readonly _toastr = inject(ToastNotificationService);
 
     private _destroy$ = new Subject<void>();
     bookingDetails$!: Observable<IBookingDetailCustomer>;
@@ -32,7 +35,11 @@ export class CustomerViewBookingDetailsComponent implements OnInit {
         return formatFullDateWithTimeHelper(date);
     }
 
-    downloadInvoice(bookingId: string) {
+    downloadInvoice(bookingId: string, bookingStatus: BookingStatus) {
+        if (bookingStatus !== BookingStatus.COMPLETED) {
+            this._toastr.error('You can only download invoice for completed bookings.');
+            return;
+        }
         this._bookingService.downloadInvoice(bookingId)
             .pipe(takeUntil(this._destroy$))
             .subscribe({

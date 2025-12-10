@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -31,8 +31,8 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _store = inject(Store);
 
-  mapVisible = false;
-  loadingLocation = false;
+  mapVisible = signal<boolean>(false);
+  loadingLocation = signal<boolean>(false);
   center!: [number, number];
   selectedAddress: string | null = null;
   selectedDate: string = '';
@@ -96,18 +96,32 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   }
 
   toggleMap() {
-    this.loadingLocation = true;
+    if (this.loadingLocation()) {
+      return;
+    }
+
+    if (this.mapVisible()) {
+      this.mapVisible.set(false);
+      return;
+    }
+
+    if (this.center) {
+      this.mapVisible.set(true);
+      return;
+    }
+
+    this.loadingLocation.set(true);
 
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         this.center = [coords.longitude, coords.latitude];
 
-        this.loadingLocation = false;
-        this.mapVisible = true;
+        this.loadingLocation.set(false);
+        this.mapVisible.set(true);
       },
       (err) => {
         console.error(err);
-        this.loadingLocation = false;
+        this.loadingLocation.set(false);
         this._toastr.error('Unable to access the location.');
       }
     );
@@ -143,6 +157,12 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
 
   onPhoneNumberChange(phone: string) {
     if (phone.trim().length !== 10) return;
+
+    if (isNaN(Number(phone))) {
+      this._toastr.error('Please enter a valid phone number.');
+      return;
+    }
+
     this.phoneNumber = phone;
     this._bookingService.setSelectedPhoneNumber(this.phoneNumber);
   }

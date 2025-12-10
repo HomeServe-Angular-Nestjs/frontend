@@ -1,5 +1,5 @@
 import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, RouterConfigOptions, withInMemoryScrolling, withRouterConfig, withViewTransitions } from '@angular/router';
+import { provideRouter, RouterConfigOptions, withDebugTracing, withInMemoryScrolling, withRouterConfig, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
@@ -46,12 +46,13 @@ export const appConfig: ApplicationConfig = {
     ),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes,
-      withViewTransitions(), // optional
+      withViewTransitions(),
       withInMemoryScrolling({
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
       }),
-      // withRouterConfig({ onSameUrlNavigation: 'reload' })
+      // withDebugTracing(),
+      withRouterConfig({ onSameUrlNavigation: 'reload' })
     ),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore({
