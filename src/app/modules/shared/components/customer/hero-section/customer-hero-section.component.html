@@ -1,48 +1,63 @@
 <section class="relative w-full h-[34rem] overflow-hidden">
-    <!-- Image Slides -->
-    <div class="absolute inset-0">
-        <div *ngFor="let image of images; let i = index" class="absolute inset-0 transition-opacity duration-1000"
-            [ngClass]="{ 'opacity-100': i === currentSlide, 'opacity-0': i !== currentSlide }">
-            <img [src]="image.url" [alt]="image.alt" class="w-full h-full object-cover object-center" />
-        </div>
-    </div>
+  <div class="absolute top-4 left-4 z-[9999]">
+    <a [routerLink]="['/homepage']" class="flex items-center group rounded-l">
+      <div class="flex items-center justify-center">
+        <svg width="28" height="22" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg"
+          class="transition-transform group-hover:rotate-12">
+          <path
+            d="M13.7549 5.98438C13.8486 5.89062 13.9893 5.84375 14.1299 5.84375C14.2236 5.84375 14.3643 5.89062 14.458 5.98438L23.1299 13.0625V20.75C23.1299 21.1719 22.7549 21.5 22.3799 21.5H17.083C16.708 21.5 16.333 21.1719 16.333 20.75V16.25C16.333 15.875 16.0049 15.5 15.583 15.5H12.583C12.208 15.5 11.833 15.875 11.833 16.25V20.75C11.833 21.1719 11.5049 21.5 11.1299 21.5H5.87988C5.45801 21.5 5.12988 21.1719 5.12988 20.75V13.1094L13.7549 5.98438ZM27.3955 10.8125C27.5361 10.9062 27.6299 11.0938 27.6299 11.2344C27.6299 11.375 27.583 11.5156 27.4893 11.6094L26.2705 13.0625C26.1768 13.2031 26.0361 13.25 25.8486 13.25C25.708 13.25 25.5674 13.2031 25.4736 13.1094L14.458 4.0625C14.3643 3.96875 14.2236 3.92188 14.1299 3.92188C13.9893 3.92188 13.8486 3.96875 13.7549 4.0625L2.73926 13.1094C2.64551 13.2031 2.50488 13.25 2.36426 13.25C2.17676 13.25 2.03613 13.2031 1.94238 13.0625L0.723633 11.6094C0.676758 11.5156 0.583008 11.375 0.583008 11.2344C0.583008 11.0938 0.676758 10.9062 0.817383 10.8125L12.6768 1.01562C13.0518 0.734375 13.5674 0.546875 14.1299 0.546875C14.6455 0.546875 15.1611 0.734375 15.5361 1.01562L19.7549 4.48438V1.10938C19.7549 0.78125 19.9893 0.546875 20.3174 0.546875H22.9424C23.2236 0.546875 23.5049 0.78125 23.5049 1.10938V7.57812L27.3955 10.8125Z"
+            class="fill-blue-600 group-hover:fill-blue-700 transition-colors" />
+        </svg>
+        <span
+          class="title-text text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent ml-2">HomeServe</span>
+      </div>
+    </a>
+  </div>
 
-    <!-- Gradient Overlay -->
-    <div class="absolute inset-0 bg-gradient-to-r from-blue-100/80 to-indigo-100/30 z-10"></div>
-
-    <!-- Floating Blurs -->
-    <div class="absolute inset-0 z-10 opacity-10 pointer-events-none">
-        <div class="absolute w-40 h-40 top-20 left-20 bg-blue-300 rounded-full blur-3xl animate-float"></div>
-        <div class="absolute w-60 h-60 bottom-8 right-8 bg-indigo-300 rounded-full blur-3xl animate-float delay-1000">
-        </div>
+  <!-- Slides -->
+  <div class="absolute inset-0">
+    <div *ngFor="let image of images; let i = index" class="absolute inset-0 transition-opacity duration-1000"
+      [ngClass]="{ 'opacity-100': i === currentSlide, 'opacity-0': i !== currentSlide }">
+      <img [src]="image.url" [alt]="image.alt" class="w-full h-full object-cover" />
     </div>
+  </div>
 
-    <!-- Foreground Content -->
-    <div class="relative z-20 h-full flex items-center px-8">
-        <div class="max-w-2xl">
-            <h1 class="text-4xl font-bold text-gray-800 leading-tight space-y-2">
-                <span class="block animate-fade-up delay-100">Your Trusted Partner for</span>
-                <span class="block text-blue-600 animate-fade-up delay-300">Home Services</span>
-            </h1>
-            <p class="mt-4 text-lg text-gray-700 animate-fade-up delay-500">
-                Connect with verified professionals for all your home service needs.
-            </p>
-            <button
-                class="mt-6 inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-all shadow-md animate-fade-up delay-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                Find Services Now
-            </button>
-        </div>
-    </div>
+  <!-- Gradient -->
+  <div class="absolute inset-0 bg-gradient-to-r from-blue-200/70 to-indigo-100/20 z-10"></div>
 
-    <!-- Dots -->
-    <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 flex gap-3">
-        <button *ngFor="let image of images; let i = index" class="w-3 h-3 rounded-full transition-all duration-300"
-            [ngClass]="{
-          'bg-white': i === currentSlide,
-          'bg-white/50 hover:bg-white': i !== currentSlide
-        }" (click)="selectSlide(i)" aria-label="Next slide"></button>
+  <!-- Foreground -->
+  <div class="relative z-20 h-full flex items-center px-8">
+    <div class="max-w-2xl">
+      <h1 class="text-5xl font-bold text-gray-900 space-y-2">
+        <span class="block">Your Trusted Partner for</span>
+        <span class="block text-blue-700">Home Services</span>
+      </h1>
+
+      <p class="mt-4 text-lg text-gray-700">
+        Connect with verified professionals for all your home service needs.
+      </p>
+
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row gap-4 mt-6">
+        <a routerLink="/signup" [queryParams]="{role: 'customer'}"
+          class="px-8 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition flex items-center gap-2">
+          Find Services
+        </a>
+
+        <a routerLink="/provider/signup"
+          class="px-8 py-3 bg-white text-blue-700 border border-blue-600 rounded-lg shadow hover:bg-blue-50 transition flex items-center gap-2">
+          Become a Provider
+        </a>
+      </div>
     </div>
+  </div>
+
+  <!-- Dots -->
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-3">
+    <button *ngFor="let image of images; let i = index" (click)="selectSlide(i)"
+      class="w-3 h-3 rounded-full transition-all" [ngClass]="{
+                    'bg-white': i === currentSlide,
+                    'bg-white/50': i !== currentSlide
+                }"></button>
+  </div>
 </section>

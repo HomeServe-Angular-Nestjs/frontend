@@ -11,7 +11,6 @@ import { ToastNotificationService } from '../../../../../core/services/public/to
 @Component({
   selector: 'app-admin-login',
   templateUrl: './admin-login.component.html',
-  styleUrl: './admin-login.component.scss',
   imports: [ReactiveFormsModule, CommonModule],
 
 })

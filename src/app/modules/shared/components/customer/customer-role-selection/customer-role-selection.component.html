@@ -1,0 +1,34 @@
+<section class="py-20 bg-white border-y">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <h2 class="text-3xl font-bold text-gray-900">How Can We Help You?</h2>
+    <p class="text-gray-600 mt-2 text-lg">Choose your preferred role to get started</p>
+
+    <div class="grid sm:grid-cols-2 gap-10 mt-12">
+
+      <!-- Customer Card -->
+      <div class="p-10 bg-gray-50 rounded-2xl shadow hover:shadow-xl transition border hover:-translate-y-1">
+        <h3 class="text-2xl font-semibold">I Need a Service</h3>
+        <p class="text-gray-500 mt-3">
+          Book trusted professionals for cleaning, plumbing, electrical work and more.
+        </p>
+        <a routerLink="/signup" [queryParams]="{role: 'customer'}"
+          class="mt-6 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+          Join as Customer
+        </a>
+      </div>
+
+      <!-- Provider Card -->
+      <div class="p-10 bg-gray-50 rounded-2xl shadow hover:shadow-xl transition border hover:-translate-y-1">
+        <h3 class="text-2xl font-semibold">I Provide a Service</h3>
+        <p class="text-gray-500 mt-3">
+          Grow your business by getting service requests from your city.
+        </p>
+        <a routerLink="/provider/signup"
+          class="mt-6 inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+          Join as Provider
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
