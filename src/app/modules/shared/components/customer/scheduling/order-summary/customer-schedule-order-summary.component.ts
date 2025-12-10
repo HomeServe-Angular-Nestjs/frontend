@@ -172,7 +172,12 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
 
     const { status, ...slotData } = this.selectedSlot;
 
-    console.log(this._bookingService.getSelectedPhoneNumber())
+    const phoneNumber = this._bookingService.getSelectedPhoneNumber();
+
+    if (!phoneNumber || phoneNumber.length !== 10 || isNaN(Number(phoneNumber))) {
+      this._toastr.error('Please enter a valid phone number.');
+      return throwError(() => new Error('Phone number is invalid.'));
+    }
 
     const bookingData: IBookingData = {
       providerId: this.providerId!,
@@ -181,7 +186,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
       slotData,
       serviceIds,
       transactionId: transactionData?.id ?? null,
-      phoneNumber: this._bookingService.getSelectedPhoneNumber() ?? null,
+      phoneNumber,
     };
 
     return this._bookingService.postBookingData(bookingData).pipe(

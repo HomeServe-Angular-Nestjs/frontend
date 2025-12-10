@@ -40,7 +40,7 @@ export class ProviderService {
   }
 
   getOneProvider(id: string | null = null): Observable<IProvider> {
-    return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?id=${id}`).pipe(shareReplay(1));
+    return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?providerId=${id}`).pipe(shareReplay(1));
   }
 
   bulkUpdate(formData: FormData | Partial<IProvider>): Observable<IProvider> {
