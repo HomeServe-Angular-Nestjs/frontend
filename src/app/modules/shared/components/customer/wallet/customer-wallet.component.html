@@ -2,15 +2,8 @@
   <!-- Wallet Balance -->
   <div class="bg-white shadow-md rounded-2xl p-6 max-w-md mx-auto text-center">
     <h2 class="text-lg font-medium text-gray-600">Wallet Balance</h2>
-
-    <ng-container *ngIf="wallet(); else walletNotFound">
-      <p class="text-4xl font-bold text-indigo-600 mt-3">₹ {{ wallet() / 100| number:'1.2-2' }}</p>
-      <p class="text-sm text-gray-400 mt-1">Available Balance</p>
-    </ng-container>
-
-    <ng-template #walletNotFound>
-      <span class="text-sm text-gray-500 italic">Sorry, unable to view balance</span>
-    </ng-template>
+    <p class="text-4xl font-bold text-indigo-600 mt-3">₹ {{ wallet() / 100| number:'1.2-2' }}</p>
+    <p class="text-sm text-gray-400 mt-1">Available Balance</p>
   </div>
 
   <!-- Recent Transactions -->
