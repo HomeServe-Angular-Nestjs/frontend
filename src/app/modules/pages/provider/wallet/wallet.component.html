@@ -3,7 +3,7 @@
   <h3 class="text-lg font-semibold text-gray-800 mb-4 md:mb-6">Overview</h3>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-12">
-<!-- todo -->
+    <!-- todo -->
     <div class="bg-green-50 p-5 rounded-xl shadow-sm border border-green-100">
       <p class="text-gray-600 text-sm">Available Balance</p>
       <h3 class="text-2xl font-bold text-green-700 mt-1">₹0.00</h3>
@@ -68,13 +68,12 @@
       <table class="min-w-full text-sm">
         <thead>
           <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
-            <th class="px-4 py-3 text-left whitespace-nowrap">Transaction ID</th>
-            <th class="px-4 py-3 text-left">Email</th>
-            <th class="px-4 py-3 text-left whitespace-nowrap">Payment ID</th>
+            <th class="px-4 py-3 text-left whitespace-nowrap">Date</th>
+            <th class="px-4 py-3 text-left">Transaction ID</th>
+            <th class="px-4 py-3 text-left whitespace-nowrap">Type</th>
             <th class="px-4 py-3 text-left">Amount</th>
-            <th class="px-4 py-3 text-left">Date</th>
-            <th class="px-4 py-3 text-left">Type</th>
-            <th class="px-4 py-3 text-left">Source</th>
+            <th class="px-4 py-3 text-left">Entity ID</th>
+            <th class="px-4 py-3 text-left">Description</th>
             <th class="px-4 py-3 text-left">Method</th>
           </tr>
         </thead>
@@ -82,22 +81,17 @@
         <tbody class="divide-y divide-gray-200">
           <ng-container *ngIf="transactions().length > 0; else noData">
             <tr *ngFor="let tnx of transactions()" class="hover:bg-gray-50 transition">
-              <td class="px-4 py-3 text-green-600 font-medium">
-                #{{ tnx.transactionId | slice:-10 | uppercase }}
+              <td class="px-4 py-3 font-medium">
+                {{ tnx.createdAt | date:'mediumDate' }}
               </td>
-
-              <td class="px-4 py-3">{{ tnx.email || '_' }}</td>
-              <td class="px-4 py-3">{{ tnx.paymentId || '_' }}</td>
-
+              <td class="px-4 py-3 text-xs text-green-700">#{{ tnx.paymentId | uppercase }}</td>
+              <td class="px-4 py-3">{{ tnx.method | titlecase}}</td>
               <td class="px-4 py-3 font-medium">
                 ₹{{ tnx.amount.toLocaleString('en-IN') }}
               </td>
-
-              <td class="px-4 py-3">{{ tnx.createdAt | date:'mediumDate' }}</td>
-
-              <td class="px-4 py-3 capitalize">{{ tnx.transactionType }}</td>
+              <td class="px-4 py-3 text-xs text-green-600">{{ tnx.bookingId ?? tnx.subscriptionId ?? '_' | uppercase}}</td>
+              <td class="px-4 py-3 capitalize">{{ displayType(tnx.transactionType) }}</td>
               <td class="px-4 py-3 capitalize">{{ tnx.source }}</td>
-              <td class="px-4 py-3 capitalize">{{ tnx.method }}</td>
             </tr>
           </ng-container>
         </tbody>

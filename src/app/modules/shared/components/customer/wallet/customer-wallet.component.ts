@@ -3,7 +3,7 @@ import { WalletService } from "../../../../../core/services/wallet.service";
 import { IWallet } from "../../../../../core/models/wallet.model";
 import { combineLatest, filter, map, Subject, switchMap, takeUntil } from "rxjs";
 import { CommonModule } from "@angular/common";
-import { ITransactionFilter, ITransactionTableData } from "../../../../../core/models/transaction.model";
+import { ITransactionFilter } from "../../../../../core/models/transaction.model";
 import { toObservable, toSignal } from "@angular/core/rxjs-interop";
 import { CustomerPaginationComponent } from "../../../partials/sections/customer/pagination/pagination.component";
 import { FormsModule } from "@angular/forms";

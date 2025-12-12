@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
 import { IAdminOverViewCard, OverviewCardComponent } from "../../../partials/sections/admin/overview-card/admin-overview-card.component";
 import { TransactionService } from "../../../../../core/services/transaction.service";
-import { combineLatest, map, Subject, switchMap, takeUntil } from "rxjs";
+import { combineLatest, map, Subject, takeUntil } from "rxjs";
 import { ITransactionFilter, ITransactionStats, ITransactionTableData } from "../../../../../core/models/transaction.model";
 import { CommonModule } from "@angular/common";
 import { IPagination } from "../../../../../core/models/booking.model";

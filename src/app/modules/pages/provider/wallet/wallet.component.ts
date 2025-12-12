@@ -41,7 +41,7 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
       toObservable(this.options),
       toObservable(this.filter)
     ]).pipe(
-      switchMap(([options, filter]) => this._walletService.getTransaction(options, filter))
+      switchMap(([options, filter]) => this._walletService.getTransactionListForProvider(options, filter))
     ),
     { initialValue: null }
   );
@@ -91,6 +91,21 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
 
   onPageChange(newPage: number) {
     this.options.update(o => ({ ...o, page: newPage }));
+  }
+
+  displayType(type: TransactionType) {
+    switch (type) {
+      case TransactionType.BOOKING_PAYMENT:
+        return 'Booking Payment';
+      case TransactionType.BOOKING_REFUND:
+        return 'Booking Refund';
+      case TransactionType.SUBSCRIPTION_PAYMENT:
+        return 'Subscription Payment';
+      case TransactionType.BOOKING_RELEASE:
+        return 'Booking Release';
+      default:
+        return '_';
+    }
   }
 
   ngOnDestroy(): void {
