@@ -99,7 +99,7 @@
           <div class="flex items-center flex-shrink-0">
             <button
               [disabled]="isStatusDisabled(status.value, bookingDetails.bookingStatus, bookingDetails.cancelStatus)"
-              (click)="changeBookingStatus(bookingDetails.bookingId, bookingDetails.cancelStatus, status.value, bookingDetails.bookingStatus)"
+              (click)="changeBookingStatus(bookingDetails.bookingId, status.value, bookingDetails.bookingStatus)"
               class="relative flex items-center justify-center w-10 h-10 rounded-full border-2 font-medium transition"
               [ngClass]="{
                                 'bg-green-600 border-green-600 text-white': bookingDetails.bookingStatus===status.value,
