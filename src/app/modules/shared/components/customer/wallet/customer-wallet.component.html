@@ -4,7 +4,7 @@
     <h2 class="text-lg font-medium text-gray-600">Wallet Balance</h2>
 
     <ng-container *ngIf="wallet(); else walletNotFound">
-      <p class="text-4xl font-bold text-indigo-600 mt-3">₹ {{ wallet()| number:'1.2-2' }}</p>
+      <p class="text-4xl font-bold text-indigo-600 mt-3">₹ {{ wallet() / 100| number:'1.2-2' }}</p>
       <p class="text-sm text-gray-400 mt-1">Available Balance</p>
     </ng-container>
 
@@ -38,9 +38,9 @@
         <select [ngModel]="filters().type" (ngModelChange)="updateFilter('type', $event)"
           class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200">
           <option value="all">All Types</option>
-          <option value="booking">Booking</option>
-          <option value="refund">Refund</option>
-          <option value="subscription">Subscription</option>
+          <option value="booking_payment">Booking Payment</option>
+          <option value="booking_refund">Booking Refund</option>
+          <option value="subscription_payment">Subscription Payment</option>
         </select>
 
         <select [ngModel]="filters().method" (ngModelChange)="updateFilter('method', $event)"
@@ -96,7 +96,7 @@
             </div>
 
             <div class="text-xs rounded px-2 mt-1 inline-block">
-              {{ t.transactionType }}
+              {{ displayType(t.transactionType) }}
             </div>
           </div>
         </div>

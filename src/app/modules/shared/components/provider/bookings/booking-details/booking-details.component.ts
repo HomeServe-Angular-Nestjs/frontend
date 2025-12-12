@@ -217,7 +217,6 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   }
 
   handleCancellation(bookingId: string, reason?: string): void {
-    console.log(bookingId, reason ?? 'nope')
     this._openConfirmationDialog(
       `Are you sure you want to cancel this order?`,
       'Confirm Action'

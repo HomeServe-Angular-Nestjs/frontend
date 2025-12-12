@@ -33,9 +33,9 @@ export interface ITransactionTableData {
   transactionId: string;
   paymentId: string | null;
   amount: number;
-  method: string;
+  method: PaymentDirection;
   source: PaymentSource,
-  transactionType: PaymentDirection;
+  transactionType: TransactionType;
   createdAt: Date;
 }
 

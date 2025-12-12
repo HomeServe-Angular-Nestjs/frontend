@@ -67,14 +67,13 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
       .subscribe(bookingData => this._bookingsData$.next(bookingData));
   }
 
-  private _updateCancelledBookingData(cancelledBookingId: string) {
+  private _updateCancelledBookingData(cancelledBookingId: string, updatedData: IBookingResponse) {
     const bookingData = this._bookingsData$.getValue();
-    const updatedBookingData = bookingData.map(bookings => ({
-      ...bookings,
-      bookingStatus: bookings.bookingId === cancelledBookingId
-        ? BookingStatus.CANCELLED
-        : bookings.bookingStatus
-    }));
+    const updatedBookingData = bookingData.map(booking =>
+      booking.bookingId === cancelledBookingId
+        ? { ...booking, ...updatedData }
+        : booking
+    );
     this._bookingsData$.next(updatedBookingData);
   }
 
@@ -97,7 +96,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     const orderData: IBookingOrder = {
       id: order.id,
       bookingId,
-      transactionType: TransactionType.BOOKING,
+      transactionType: TransactionType.BOOKING_PAYMENT,
       amount: order.amount,
       status: TransactionStatus.SUCCESS,
       direction: PaymentDirection.DEBIT,
@@ -153,18 +152,17 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     return isWithinCancellableWindow && !isAlreadyCancelled;
   }
 
-
   handleCancellation(reason: string) {
-    if (!this.bookingSelectedForCancellation || !reason.trim()) {
-      this._toastr.warning('Cancellation reason is required.');
-      return;
-    }
-
     this._bookingService.markBookingCancelledByCustomer(this.bookingSelectedForCancellation, reason)
       .pipe(takeUntil(this._destroy$))
       .subscribe({
         next: (res) => {
-          this._updateCancelledBookingData(this.bookingSelectedForCancellation);
+          if (!res || !res.data) {
+            this._toastr.error(res.message);
+            return;
+          }
+
+          this._updateCancelledBookingData(this.bookingSelectedForCancellation, res.data);
           this.bookingSelectedForCancellation = '';
           this.cancellationReasonModal = false;
           this._toastr.success(res.message);

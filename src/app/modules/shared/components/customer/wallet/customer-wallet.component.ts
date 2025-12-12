@@ -8,6 +8,7 @@ import { toObservable, toSignal } from "@angular/core/rxjs-interop";
 import { CustomerPaginationComponent } from "../../../partials/sections/customer/pagination/pagination.component";
 import { FormsModule } from "@angular/forms";
 import { DebounceService } from "../../../../../core/services/public/debounce.service";
+import { TransactionType } from "../../../../../core/enums/enums";
 
 @Component({
   selector: 'app-customer-wallet',
@@ -87,6 +88,19 @@ export class CustomerWalletComponent implements OnInit, OnDestroy {
   updateFilter(key: keyof ITransactionFilter, value: any) {
     this.filters.update((filters) => ({ ...filters, [key]: value }));
     this.options.update((options) => ({ ...options, page: 1 }));
+  }
+
+  displayType(type: TransactionType) {
+    switch (type) {
+      case TransactionType.BOOKING_PAYMENT:
+        return 'Booking Payment';
+      case TransactionType.BOOKING_REFUND:
+        return 'Booking Refund';
+      case TransactionType.SUBSCRIPTION_PAYMENT:
+        return 'Subscription Payment';
+      default:
+        return 'All';
+    }
   }
 
   ngOnDestroy(): void {

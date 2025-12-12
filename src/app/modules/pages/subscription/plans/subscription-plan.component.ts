@@ -95,7 +95,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
         const orderData: ISubscriptionOrder = {
             id: order.id,
             subscriptionId,
-            transactionType: TransactionType.SUBSCRIPTION,
+            transactionType: TransactionType.SUBSCRIPTION_PAYMENT,
             amount: order.amount,
             status: TransactionStatus.SUCCESS,
             direction: PaymentDirection.DEBIT,

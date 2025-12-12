@@ -133,7 +133,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
     const orderData: IBookingOrder = {
       id: order.id,
       bookingId,
-      transactionType: TransactionType.BOOKING,
+      transactionType: TransactionType.BOOKING_PAYMENT,
       amount: order.amount,
       status: TransactionStatus.SUCCESS,
       direction: PaymentDirection.DEBIT,
@@ -142,27 +142,14 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
     };
 
     return this._paymentService.verifyBookingPayment(response, orderData).pipe(
-      switchMap((verificationResponse) => {
-        const { verified, bookingId, transaction } = verificationResponse;
-
-        if (!transaction || !bookingId || !transaction.id || !verified) {
-          this._toastr.error('Payment verification failed or transaction missing.');
-          return throwError(() => new Error('Payment verification failed'));
-        }
-
-        return this._bookingService.updatePaymentStatus({
-          transactionId: transaction.id,
-          bookingId,
-          paymentStatus: PaymentStatus.PAID
-        });
-      }),
       tap(() => {
-        this._toastr.success('Booking confirmed and payment successful!');
         this._router.navigate(['profile', 'bookings']);
-      }));
+        this._toastr.success('Booking confirmed successfully.');
+      })
+    );
   }
 
-  private _saveBooking(transactionData?: ITransaction): Observable<any> {
+  private _saveBooking(): Observable<any> {
     const serviceIds: SelectedServiceIdsType[] = this.getServiceIds;
 
     if (!this.selectedSlot) {
@@ -185,14 +172,10 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
       location: this.location,
       slotData,
       serviceIds,
-      transactionId: transactionData?.id ?? null,
       phoneNumber,
     };
 
-    return this._bookingService.postBookingData(bookingData).pipe(
-      tap(() =>
-        this._store.dispatch(customerActions.changeReviewedStatus({ status: false }))
-      ),
+    return this._bookingService.preBookingData(bookingData).pipe(
       finalize(() => this.isProcessing = false)
     );
   }

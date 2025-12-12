@@ -72,7 +72,7 @@ export interface IBookingData {
   location: Omit<ILocation, 'type'>;
   slotData: IAvailableSlot;
   serviceIds: SelectedServiceIdsType[];
-  transactionId: string | null;
+  // transactionId: string | null;
   phoneNumber: string | null;
 }
 

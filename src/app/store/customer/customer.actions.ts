@@ -11,5 +11,4 @@ export const customerActions = {
     updateProfile: createAction('[Customer] update profile', props<{ profileData: ICustomerProfileData }>()),
     changePassword: createAction('[Customer] change password', props<{ passwordData: IChangePassword }>()),
     changeAvatar: createAction('[Customer] change avatar', props<{ formData: FormData }>()),
-    changeReviewedStatus: createAction('[Customer] change reviewed status', props<{ status: boolean }>()),
 }
