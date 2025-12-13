@@ -3,7 +3,7 @@ import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { ICustomerTransactionDataWithPagination, IProviderTransactionDataWithPagination, IWallet } from "../models/wallet.model";
+import { ICustomerTransactionDataWithPagination, IProviderTransactionDataWithPagination, IProviderTransactionOverview, IWallet } from "../models/wallet.model";
 import { ITransactionFilter } from "../models/transaction.model";
 
 @Injectable()
@@ -39,5 +39,9 @@ export class WalletService {
     });
 
     return this._http.get<IResponse<IProviderTransactionDataWithPagination>>(`${this._walletUrl}/provider/transaction/list`, { params });
+  }
+
+  getProviderTransactionOverview(): Observable<IResponse<IProviderTransactionOverview>> {
+    return this._http.get<IResponse<IProviderTransactionOverview>>(`${this._walletUrl}/provider/transaction/overview`);
   }
 }

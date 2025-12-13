@@ -3,12 +3,13 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular
 import { WalletService } from '../../../../core/services/wallet.service';
 import { ITransactionFilter } from '../../../../core/models/transaction.model';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { combineLatest, Subject, switchMap, takeUntil } from 'rxjs';
+import { combineLatest, map, Subject, switchMap, takeUntil } from 'rxjs';
 import { DebounceService } from '../../../../core/services/public/debounce.service';
 import { SharedDataService } from '../../../../core/services/public/shared-data.service';
 import { ProviderPaginationComponent } from "../../../shared/partials/sections/provider/pagination/provider-pagination.component";
 import { FormsModule } from "@angular/forms";
 import { PaymentDirection, TransactionType } from '../../../../core/enums/enums';
+import { IProviderTransactionOverview } from '../../../../core/models/wallet.model';
 
 @Component({
   selector: 'app-provider-wallet',
@@ -22,6 +23,13 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
   private readonly _sharedService = inject(SharedDataService);
 
   private _destroy$ = new Subject<void>();
+
+  stats = signal<IProviderTransactionOverview>({
+    balance: 0,
+    totalCredit: 0,
+    totalDebit: 0,
+    netGain: 0
+  });
 
   filter = signal<ITransactionFilter & { page: number, limit: number }>({
     search: '',
@@ -56,6 +64,13 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
       .subscribe(value => {
         this.filter.update(f => ({ ...f, search: value }));
       });
+
+    this._walletService.getProviderTransactionOverview()
+      .pipe(
+        takeUntil(this._destroy$),
+        map(res => res.data ?? { balance: 0, totalCredit: 0, totalDebit: 0, netGain: 0 })
+      )
+      .subscribe(stats => this.stats.set(stats));
   }
 
   onSearch(term: string) {

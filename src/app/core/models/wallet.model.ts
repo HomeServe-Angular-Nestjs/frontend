@@ -40,3 +40,10 @@ export interface IProviderTransactionDataWithPagination {
     transactions: IProviderTransactionData[];
     pagination: IPagination;
 }
+
+export interface IProviderTransactionOverview {
+    balance: number;
+    totalCredit: number;
+    totalDebit: number;
+    netGain: number;
+}
