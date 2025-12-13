@@ -1,3 +1,4 @@
+import { UserType } from "../../modules/shared/models/user.model";
 import { PaymentDirection, PaymentSource, TransactionType } from "../enums/enums";
 import { IPagination } from "./booking.model";
 
@@ -46,4 +47,23 @@ export interface IProviderTransactionOverview {
     totalCredit: number;
     totalDebit: number;
     netGain: number;
+}
+
+export interface ITransactionAdminList {
+    dateTime: string;
+    counterparty: {
+        email: string;
+        role: UserType;
+    };
+    type: TransactionType;
+    direction: PaymentDirection;
+    amount: number;
+    referenceId: string;
+    referenceType: string;
+    source: PaymentSource;
+}
+
+export interface IAdminTransactionDataWithPagination {
+    transactions: ITransactionAdminList[];
+    pagination: IPagination;
 }

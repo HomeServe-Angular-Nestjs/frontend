@@ -23,10 +23,13 @@ export interface ITransaction {
 }
 
 export interface ITransactionStats {
-  totalTransactions: number;
-  totalRevenue: number;
-  successRate: number;
-  avgTransactionValue: number;
+  balance: number;
+  grossPayments: number;
+  providerPayouts: number;
+  platformCommission: number;
+  gstCollected: number;
+  refundIssued: number;
+  netProfit: number;
 }
 
 export interface ITransactionTableData {

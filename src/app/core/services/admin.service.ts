@@ -150,4 +150,6 @@ export class AdminService {
     updateSettings(field: Partial<IAdminSettings>): Observable<IResponse<IAdminSettings>> {
         return this._http.patch<IResponse<IAdminSettings>>(`${this._adminUrl}/settings`, field);
     }
+
+    
 }

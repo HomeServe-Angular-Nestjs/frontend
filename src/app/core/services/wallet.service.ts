@@ -3,13 +3,14 @@ import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { ICustomerTransactionDataWithPagination, IProviderTransactionDataWithPagination, IProviderTransactionOverview, IWallet } from "../models/wallet.model";
-import { ITransactionFilter } from "../models/transaction.model";
+import { IAdminTransactionDataWithPagination, ICustomerTransactionDataWithPagination, IProviderTransactionDataWithPagination, IProviderTransactionOverview, IWallet } from "../models/wallet.model";
+import { ITransactionFilter, ITransactionStats } from "../models/transaction.model";
 
 @Injectable()
 export class WalletService {
   private readonly _http = inject(HttpClient);
   private readonly _walletUrl = API_ENV.wallet;
+  private readonly _adminUrl = API_ENV.admin;
 
   getWallet(): Observable<IResponse<IWallet>> {
     return this._http.get<IResponse<IWallet>>(`${this._walletUrl}`);
@@ -43,5 +44,21 @@ export class WalletService {
 
   getProviderTransactionOverview(): Observable<IResponse<IProviderTransactionOverview>> {
     return this._http.get<IResponse<IProviderTransactionOverview>>(`${this._walletUrl}/provider/transaction/overview`);
+  }
+
+  getTransactionListForAdmin(filters: ITransactionFilter = {}): Observable<IResponse<IAdminTransactionDataWithPagination>> {
+    let params = new HttpParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params = params.set(key, value);
+      }
+    });
+
+    return this._http.get<IResponse<IAdminTransactionDataWithPagination>>(`${this._adminUrl}/transactions/lists`, { params });
+  }
+
+  getTransactionStats(): Observable<IResponse<ITransactionStats>> {
+    return this._http.get<IResponse<ITransactionStats>>(`${this._adminUrl}/transactions/stats`);
   }
 }
