@@ -1,8 +1,8 @@
-<div class="min-h-screen bg-gray-50 p-4 md:p-6">
+<div class="h-full bg-gray-50 p-4 md:p-6">
 
   <h3 class="text-lg font-semibold text-gray-800 mb-4 md:mb-6">Overview</h3>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-12">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10 md:mb-12">
     <!-- todo -->
     <div class="bg-green-50 p-5 rounded-xl shadow-sm border border-green-100">
       <p class="text-gray-600 text-sm">Available Balance</p>
@@ -11,13 +11,19 @@
     </div>
 
     <div class="bg-blue-50 p-5 rounded-xl shadow-sm border border-blue-100">
-      <p class="text-gray-600 text-sm">Pending Payments</p>
+      <p class="text-gray-600 text-sm">Total Credit</p>
       <h3 class="text-2xl font-bold text-blue-700 mt-1">₹0.00</h3>
       <p class="text-blue-700 text-xs mt-1">5 transactions pending</p>
     </div>
 
     <div class="bg-purple-50 p-5 rounded-xl shadow-sm border border-purple-100">
-      <p class="text-gray-600 text-sm">Total Earnings</p>
+      <p class="text-gray-600 text-sm">Total Debit</p>
+      <h3 class="text-2xl font-bold text-purple-700 mt-1">₹12,450.00</h3>
+      <p class="text-purple-700 text-xs mt-1">This month</p>
+    </div>
+
+    <div class="bg-purple-50 p-5 rounded-xl shadow-sm border border-purple-100">
+      <p class="text-gray-600 text-sm">Net Gain</p>
       <h3 class="text-2xl font-bold text-purple-700 mt-1">₹12,450.00</h3>
       <p class="text-purple-700 text-xs mt-1">This month</p>
     </div>
@@ -31,15 +37,19 @@
       <h3 class="text-lg font-semibold text-gray-800">Transaction History</h3>
 
       <div class="flex flex-wrap items-center gap-3">
+        <input [ngModel]="filter().search" (ngModelChange)="onSearch($event)" type="text"
+          placeholder="Search transactions..."
+          class="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-green-500" />
+
         <select [ngModel]="filter().date" (ngModelChange)="onDateChange($event)"
-          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500">
+          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-1 focus:ring-green-500">
           <option value="all">All Time</option>
           <option value="last_six_months">Last 6 Months</option>
           <option value="last_year">Last Year</option>
         </select>
 
         <select [ngModel]="filter().sort" (ngModelChange)="onSort($event)"
-          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500">
+          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-1 focus:ring-green-500">
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
           <option value="high">High Amount</option>
@@ -47,14 +57,14 @@
         </select>
 
         <select [ngModel]="filter().type" (ngModelChange)="onTypeChange($event)"
-          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500">
+          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-1 focus:ring-green-500">
           <option value="all">All Types</option>
-          <option value="booking_release">Booking</option>
+          <option value="booking">Booking</option>
           <option value="subscription">Subscription</option>
         </select>
 
         <select [ngModel]="filter().method" (ngModelChange)="onMethodChange($event)"
-          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500">
+          class="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm focus:ring-1 focus:ring-green-500">
           <option value="all">All Methods</option>
           <option value="credit">Credit</option>
           <option value="debit">Debit</option>
@@ -89,7 +99,8 @@
               <td class="px-4 py-3 font-medium">
                 ₹{{ tnx.amount.toLocaleString('en-IN') }}
               </td>
-              <td class="px-4 py-3 text-xs text-green-600">{{ tnx.bookingId ?? tnx.subscriptionId ?? '_' | uppercase}}</td>
+              <td class="px-4 py-3 text-xs text-green-600">{{ tnx.bookingId ?? tnx.subscriptionId ?? '_' | uppercase}}
+              </td>
               <td class="px-4 py-3 capitalize">{{ displayType(tnx.transactionType) }}</td>
               <td class="px-4 py-3 capitalize">{{ tnx.source }}</td>
             </tr>
@@ -106,7 +117,7 @@
       </ng-template>
     </div>
 
-    <div class="mt-10">
+    <div class="">
       <app-provider-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)">
       </app-provider-pagination>
     </div>

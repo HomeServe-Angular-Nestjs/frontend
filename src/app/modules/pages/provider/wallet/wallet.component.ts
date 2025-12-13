@@ -23,25 +23,21 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  filter = signal<ITransactionFilter>({
+  filter = signal<ITransactionFilter & { page: number, limit: number }>({
     search: '',
     sort: 'newest',
     type: 'all',
     date: 'all',
-    method: 'all'
-  });
-
-  options = signal({
+    method: 'all',
     page: 1,
     limit: 10
   });
 
   dataSignal = toSignal(
     combineLatest([
-      toObservable(this.options),
       toObservable(this.filter)
     ]).pipe(
-      switchMap(([options, filter]) => this._walletService.getTransactionListForProvider(options, filter))
+      switchMap(([filter]) => this._walletService.getTransactionListForProvider(filter))
     ),
     { initialValue: null }
   );
@@ -59,7 +55,6 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(value => {
         this.filter.update(f => ({ ...f, search: value }));
-        this.options.update(o => ({ ...o, page: 1 }));
       });
   }
 
@@ -68,29 +63,23 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
   }
 
   onDateChange(value: 'all' | 'last_six_months' | 'last_year') {
-    this.options.update(o => ({ ...o, page: 1 }));
     this.filter.update(f => ({ ...f, date: value }));
   }
 
   onSort(value: 'newest' | 'oldest' | 'high' | 'low') {
-    this.options.update(o => ({ ...o, page: 1 }));
     this.filter.update(f => ({ ...f, sort: value }));
   }
 
-  onTypeChange(value: TransactionType | 'all') {
-    this.options.update(o => ({ ...o, page: 1 }));
-
+  onTypeChange(value: string) {
     this.filter.update(f => ({ ...f, type: value }));
   }
 
   onMethodChange(value: PaymentDirection | 'all') {
-    this.options.update(o => ({ ...o, page: 1 }));
-
     this.filter.update(f => ({ ...f, method: value }));
   }
 
   onPageChange(newPage: number) {
-    this.options.update(o => ({ ...o, page: newPage }));
+    this.filter.update(f => ({ ...f, page: newPage }));
   }
 
   displayType(type: TransactionType) {

@@ -29,10 +29,8 @@ export class WalletService {
     return this._http.get<IResponse<ICustomerTransactionDataWithPagination>>(`${this._walletUrl}/transaction/list`, { params });
   }
 
-  getTransactionListForProvider(options: { page: number, limit: number }, filters: ITransactionFilter = {}): Observable<IResponse<IProviderTransactionDataWithPagination>> {
-    let params = new HttpParams()
-      .set('page', options.page ?? 1)
-      .set('limit', options.limit ?? 5);
+  getTransactionListForProvider(filters: ITransactionFilter & { page?: number, limit?: number } = {}): Observable<IResponse<IProviderTransactionDataWithPagination>> {
+    let params = new HttpParams();
 
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
