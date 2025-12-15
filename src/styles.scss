@@ -218,6 +218,7 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 
 .no-number-spinner {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 @layer components {

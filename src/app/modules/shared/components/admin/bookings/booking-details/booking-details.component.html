@@ -1,0 +1,166 @@
+<ng-container *ngIf="bookingDetails">
+
+    <!-- HEADER SUMMARY -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-6 flex flex-col md:flex-row md:items-center gap-8">
+
+        <!-- LEFT -->
+        <div class="min-w-0">
+            <p class="text-xs text-gray-500 uppercase tracking-wide">Booking ID</p>
+            <p class="font-mono text-sm text-gray-700 break-all">
+                {{ bookingDetails.bookingId }}
+            </p>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flex gap-10 md:ml-auto items-center">
+            <div>
+                <p class="text-xs text-gray-500 uppercase">Status</p>
+                <span class="status-pill" [ngClass]="{
+                    'status-success': bookingDetails.bookingStatus === 'completed',
+                    'status-warning': bookingDetails.bookingStatus === 'pending',
+                    'status-danger': bookingDetails.bookingStatus === 'cancelled'
+                }">
+                    {{ bookingDetails.bookingStatus | titlecase }}
+                </span>
+            </div>
+
+            <div>
+                <p class="text-xs text-gray-500 uppercase">Total Amount</p>
+                <p class="text-xl font-semibold text-gray-900">
+                    ₹{{ bookingDetails.totalAmount }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="card">
+        <h2 class="card-title">Timeline</h2>
+        <div class="space-y-3 text-sm">
+            <div class="timeline-row">
+                <span class="label">Created</span>
+                <span class="value">{{ bookingDetails.createdAt | date:'medium' }}</span>
+            </div>
+            <div class="timeline-row">
+                <span class="label">Expected Arrival</span>
+                <span class="value">{{ bookingDetails.expectedArrival | date:'medium' }}</span>
+            </div>
+            <div class="timeline-row">
+                <span class="label">Actual Arrival</span>
+                <span class="value">
+                    {{ bookingDetails.actualArrival ? (bookingDetails.actualArrival | date:'medium') : 'N/A' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PEOPLE -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div class="card">
+            <h2 class="card-title">Customer</h2>
+            <p class="text-sm font-medium text-gray-800">{{ bookingDetails.customer.email }}</p>
+            <p class="text-sm text-gray-500">{{ bookingDetails.customer.phone }}</p>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Provider</h2>
+            <p class="text-sm font-medium text-gray-800">{{ bookingDetails.provider.email }}</p>
+            <p class="text-sm text-gray-500">{{ bookingDetails.provider.phone || 'N/A' }}</p>
+        </div>
+    </div>
+
+    <!-- LOCATION -->
+    <div class="card mt-6">
+        <h2 class="card-title">Service Location</h2>
+        <p class="text-sm text-gray-700">
+            {{ bookingDetails.location.address }}
+        </p>
+        <p class="text-xs text-gray-500 mt-2">
+            Lat: {{ bookingDetails.location.coordinates[0] }},
+            Lng: {{ bookingDetails.location.coordinates[1] }}
+        </p>
+    </div>
+
+    <!-- PAYMENT BREAKDOWN -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        <div class="kpi kpi-indigo">
+            <p class="label">Customer Paid</p>
+            <p class="kpi-value">₹{{ bookingDetails.breakdown.customerPaid }}</p>
+        </div>
+
+        <div class="kpi kpi-green">
+            <p class="label">Provider Amount</p>
+            <p class="kpi-value">₹{{ bookingDetails.breakdown.providerAmount }}</p>
+        </div>
+
+        <div class="kpi kpi-yellow">
+            <p class="label">Commission</p>
+            <p class="kpi-value">₹{{ bookingDetails.breakdown.commissionEarned }}</p>
+        </div>
+
+        <div class="kpi kpi-gray">
+            <p class="label">GST</p>
+            <p class="kpi-value">₹{{ bookingDetails.breakdown.gst }}</p>
+        </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="card mt-6">
+        <h2 class="card-title">Transaction History</h2>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm table-fixed">
+                <thead>
+                    <tr class="border-b text-gray-500">
+                        <th class="py-3 px-3 text-left">Date</th>
+                        <th class="px-3 text-left">User</th>
+                        <th class="px-3 text-left">Type</th>
+                        <th class="px-3 text-left">Direction</th>
+                        <th class="px-3 text-left">Amount</th>
+                        <th class="px-3 text-left">Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let tnx of bookingDetails.transactionHistory"
+                        class="border-b last:border-0 hover:bg-gray-50">
+
+                        <td class="py-3 px-3 text-left whitespace-nowrap">
+                            {{ tnx.date | date:'medium' }}
+                        </td>
+
+                        <td class="px-3 capitalize">
+                            {{ tnx.user }}
+                        </td>
+
+                        <td class="px-3">
+                            {{displayType(tnx.type) }}
+                        </td>
+
+                        <td class="px-3">
+                            <span class="font-medium"
+                                [ngClass]="tnx.direction === 'credit' ? 'text-green-600' : 'text-red-600'">
+                                {{ tnx.direction | uppercase }}
+                            </span>
+                        </td>
+
+                        <td class="px-3 font-semibold whitespace-nowrap">
+                            ₹{{ tnx.amount }}
+                        </td>
+
+                        <td class="px-3">
+                            <span class="status-pill" [ngClass]="{
+                'status-success': tnx.status === 'success',
+                'status-danger': tnx.status === 'failed'
+              }">
+                                {{ tnx.status }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</ng-container>

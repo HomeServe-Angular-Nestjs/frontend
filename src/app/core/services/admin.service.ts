@@ -5,7 +5,7 @@ import { IAdminDashboardUserStats, IApprovalOverviewData, IApprovalTableDetails,
 import { BehaviorSubject, Observable, tap } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { IAdminBookingFilter, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
+import { IAdminBookingDetails, IAdminBookingFilter, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
 import { IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
 import { IAdminDashboardSubscription } from "../models/subscription.model";
 import { IReportDownloadBookingData, IReportDownloadTransactionData, IReportDownloadUserData } from "../models/admin-report.model";
@@ -151,5 +151,7 @@ export class AdminService {
         return this._http.patch<IResponse<IAdminSettings>>(`${this._adminUrl}/settings`, field);
     }
 
-    
+    fetchBookingDetails(bookingId: string): Observable<IResponse<IAdminBookingDetails>> {
+        return this._http.get<IResponse<IAdminBookingDetails>>(`${this._adminUrl}/bookings/details/${bookingId}`);
+    }
 }

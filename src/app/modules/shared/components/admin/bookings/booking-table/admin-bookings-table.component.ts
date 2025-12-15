@@ -2,11 +2,12 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, Input, OnInit } from "@angular/core";
 import { IAdminBookingForTable, IPagination } from "../../../../../../core/models/booking.model";
 import { AdminPaginationComponent } from "../../../../partials/sections/admin/pagination/pagination.component";
+import { RouterLink } from "@angular/router";
 
 @Component({
     selector: 'app-admin-booking-table',
     templateUrl: './admin-bookings-table.component.html',
-    imports: [CommonModule]
+    imports: [CommonModule, RouterLink]
 })
 export class AdminBookingTableComponent implements OnInit {
 

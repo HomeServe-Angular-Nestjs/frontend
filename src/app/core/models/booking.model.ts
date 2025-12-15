@@ -1,5 +1,5 @@
 import { SelectedServiceIdsType } from "../../modules/pages/customer/booking-1-pick-service/customer-pick-a-service.component";
-import { BookingStatus, CancelStatus, PaymentSource, PaymentStatus } from "../enums/enums";
+import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../enums/enums";
 import { RazorpayOrder, RazorpayPaymentResponse } from "./payment.model";
 import { ISlotSource } from "./schedules.model";
 import { IAvailableSlot } from "./slot-rule.model";
@@ -249,4 +249,43 @@ export interface IAdminBookingFilter {
   search?: string;
   bookingStatus?: BookingStatus | '';
   paymentStatus?: PaymentStatus | '';
+}
+
+
+export interface IAdminBookingDetails {
+  bookingId: string;
+  totalAmount: number;
+  expectedArrival: Date;
+  actualArrival: Date | null;
+  bookingStatus: BookingStatus;
+  paymentStatus: PaymentStatus;
+  createdAt: string;
+  customer: {
+    phone: string;
+    role: string;
+    email: string;
+  };
+  provider: {
+    phone: string;
+    role: string;
+    email: string;
+  };
+  location: {
+    address: string;
+    coordinates: [number, number];
+  };
+  transactionHistory: {
+    date: string;
+    user: string;
+    type: TransactionType;
+    direction: PaymentDirection;
+    amount: number;
+    status: TransactionStatus;
+  }[]
+  breakdown: {
+    customerPaid: number;
+    providerAmount: number;
+    commissionEarned: number;
+    gst: number;
+  }
 }

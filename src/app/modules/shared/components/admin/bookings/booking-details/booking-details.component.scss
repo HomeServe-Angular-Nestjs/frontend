@@ -1,0 +1,61 @@
+.card {
+    @apply bg-white rounded-2xl shadow-sm p-6;
+}
+
+.card-title {
+    @apply text-lg font-semibold text-gray-800 mb-4;
+}
+
+.label {
+    @apply text-xs uppercase tracking-wide text-gray-500;
+}
+
+.value {
+    @apply text-sm font-medium text-gray-800;
+}
+
+.timeline-row {
+    @apply flex justify-between items-center;
+}
+
+/* Status pills */
+.status-pill {
+    @apply px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.status-success {
+    @apply bg-green-100 text-green-700;
+}
+
+.status-warning {
+    @apply bg-yellow-100 text-yellow-700;
+}
+
+.status-danger {
+    @apply bg-red-100 text-red-700;
+}
+
+/* KPI cards */
+.kpi {
+    @apply rounded-2xl p-4;
+}
+
+.kpi-value {
+    @apply text-lg font-semibold mt-1;
+}
+
+.kpi-indigo {
+    @apply bg-indigo-50 text-indigo-700;
+}
+
+.kpi-green {
+    @apply bg-green-50 text-green-700;
+}
+
+.kpi-yellow {
+    @apply bg-yellow-50 text-yellow-700;
+}
+
+.kpi-gray {
+    @apply bg-gray-50 text-gray-700;
+}
