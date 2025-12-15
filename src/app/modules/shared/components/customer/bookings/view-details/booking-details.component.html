@@ -78,7 +78,8 @@
 
     <!-- Actions -->
     <div class="flex flex-wrap gap-4 mt-6 border-t pt-6">
-        <app-button (clicked)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
+        <app-button *ngIf="bookingDetails.bookingStatus === 'completed'"
+            (clicked)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
             buttonClass="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
             text="Download Invoice"></app-button>
     </div>

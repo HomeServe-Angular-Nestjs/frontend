@@ -40,6 +40,7 @@ export class CustomerViewBookingDetailsComponent implements OnInit {
             this._toastr.error('You can only download invoice for completed bookings.');
             return;
         }
+        
         this._bookingService.downloadInvoice(bookingId)
             .pipe(takeUntil(this._destroy$))
             .subscribe({

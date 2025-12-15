@@ -142,7 +142,7 @@
       </div>
 
       <div class="flex gap-3 mt-4 md:mt-0">
-        <app-button *ngIf="bookingDetails?.transaction?.id"
+        <app-button *ngIf="bookingDetails?.transaction?.id && bookingDetails.bookingStatus === 'completed'"
           (clicked)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
           buttonClass="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 transition"
           text=" Download Invoice">
