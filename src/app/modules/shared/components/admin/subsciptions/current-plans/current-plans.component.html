@@ -1,11 +1,21 @@
-<section class="rounded-xl shadow-md bg-white p-6 space-y-6">
-    <h1 class="text-2xl font-medium text-gray-800 mb-3">
-        Subscription Plans
+<section class="rounded-xl shadow-md bg-white p-6 space-y-4">
+    <h1 class="text-xl font-medium text-gray-800 mb-3">
+        Plans
     </h1>
 
     <ng-container *ngIf="tableData$ | async as planTableData; else noData">
         <app-admin-table-template [table]="planTableData"
             (adminTableActionEvent)="adminTableActionTriggered($event)"></app-admin-table-template>
+    </ng-container>
+
+
+    <ng-container *ngIf="isViewPlanModalOpen">
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
+                <app-admin-plan-details (closeModalEvent)="closeModal()" [plan]="planToView"
+                    (savePlanEvent)="updatePlan($event)" [isEditMode]="isEditMode"></app-admin-plan-details>
+            </div>
+        </div>
     </ng-container>
 
     <ng-template #noData>

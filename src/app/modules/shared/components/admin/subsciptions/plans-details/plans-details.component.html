@@ -1,53 +1,147 @@
-<!-- Plan Modal -->
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
 
-    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl relative">
-        <h2 class="text-xl font-semibold mb-6">Plan Detail</h2>
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
 
-        <div class="space-y-4">
-            <div>
-                <label class="block font-medium mb-1">Plan Name</label>
-                <p class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                    {{ plan.name}}
-                </p>
-            </div>
+        <!-- Header -->
+        <div class="flex justify-between items-center px-6 py-4 border-b">
+            <h2 class="text-lg font-semibold">
+                {{ isEditMode ? 'Edit Plan' : 'Plan Details' }}
+            </h2>
 
-            <div>
-                <label class="block font-medium mb-1">Price</label>
-                <p class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                    {{ plan.price }}
-                </p>
-            </div>
-
-            <div>
-                <label class="block font-medium mb-1">Role</label>
-                <p class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                    {{ plan.role}}
-                </p>
-            </div>
-
-            <div>
-                <label class="block font-medium mb-1">Duration</label>
-                <p class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                    {{ plan.duration }}
-                </p>
-            </div>
-
-            <div>
-                <label class="block font-medium mb-2">Features</label>
-                <ul class="list-disc list-inside space-y-1">
-                    <li *ngFor="let feature of plan.features">
-                        {{ feature}}
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="mt-6 text-right">
-            <button type="button" (click)="closeModal()"
-                class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2 rounded-lg transition cursor-pointer">
-                Close
+            <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl">
+                ✕
             </button>
         </div>
+
+        <!-- Body -->
+        <div class="px-6 py-5 space-y-6 text-sm">
+
+            <!-- VIEW MODE -->
+            <ng-container *ngIf="!isEditMode">
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-gray-500">Plan Name</p>
+                        <p class="font-medium">{{ planForm.value.name }}</p>
+                    </div>
+
+                    <div>
+                        <p class="text-gray-500">Price</p>
+                        <p class="font-medium">₹{{ planForm.value.price }}</p>
+                    </div>
+
+                    <div class="space-y-1">
+                        <p class="text-gray-500">Status</p>
+                        <p class="font-medium ">
+                            <span class="text-white px-2 py-1 rounded-xl"
+                                [ngClass]="planForm.value.status ? 'bg-green-500' : 'bg-red-500'">
+                                {{ planForm.value.status ?
+                                'Active' : 'Inactive' }}
+                            </span>
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-gray-500">Role</p>
+                        <p class="font-medium capitalize">{{ planForm.value.role }}</p>
+                    </div>
+
+                    <div>
+                        <p class="text-gray-500">Duration</p>
+                        <p class="font-medium">{{ planForm.value.duration }}</p>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-gray-500 mb-2">Features</p>
+
+                    <ol class="list-decimal list-inside space-y-1 text-sm">
+                        <li *ngFor="let feature of planForm.value.features" class="text-gray-700">
+                            {{ feature }}
+                        </li>
+                    </ol>
+                </div>
+            </ng-container>
+
+            <!-- EDIT MODE -->
+            <form *ngIf="isEditMode" [formGroup]="planForm" class="space-y-6">
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-500 mb-1">Plan Name</label>
+                        <input formControlName="name"
+                            class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-500 mb-1">Price</label>
+                        <input type="number" formControlName="price"
+                            class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-500 mb-1">Role</label>
+                        <select formControlName="role"
+                            class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="customer">Customer</option>
+                            <option value="provider">Provider</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-500 mb-1">Duration</label>
+                        <select formControlName="duration"
+                            class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="lifetime">Lifetime</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div formArrayName="features">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-gray-500">Features</p>
+                        <button type="button" (click)="addFeature()" class="text-blue-600 text-xs hover:underline">
+                            + Add Feature
+                        </button>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div *ngFor="let ctrl of features.controls; let i = index" class="flex gap-2">
+                            <input [formControlName]="i"
+                                class="flex-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="button" (click)="removeFeature(i)" class="text-red-500 hover:text-red-700">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4 border-t flex justify-end gap-3">
+
+            <ng-container *ngIf="!isEditMode">
+                <button (click)="enableEdit()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                    Edit Plan
+                </button>
+            </ng-container>
+
+            <ng-container *ngIf="isEditMode">
+                <button (click)="cancelEdit()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100">
+                    Cancel
+                </button>
+
+                <button (click)="saveChanges()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                    Save Changes
+                </button>
+            </ng-container>
+
+        </div>
+
     </div>
 </div>

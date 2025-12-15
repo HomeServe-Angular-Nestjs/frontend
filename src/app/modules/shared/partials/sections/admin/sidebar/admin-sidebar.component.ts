@@ -7,7 +7,7 @@ import { ButtonComponent } from '../../../../../../UI/button/button.component';
 
 @Component({
   selector: 'app-admin-sidebar',
-  imports: [CommonModule, RouterLink, ButtonComponent], 
+  imports: [CommonModule, RouterLink, ButtonComponent],
   templateUrl: './admin-sidebar.component.html',
 })
 export class AdminSidebarComponent {
@@ -25,19 +25,22 @@ export class AdminSidebarComponent {
       icon: 'fa-users',
       subItems: [
         { name: 'Users', route: 'admin/users' },
-        { name: 'Ratings & Reviews', route: 'admin/ratings&reviews' },
+        // { name: 'Ratings & Reviews', route: 'admin/ratings&reviews' },
         // { name: 'Approvals', route: 'admin/approvals' }
       ]
-    },
-    {
-      name: 'Subscriptions & Plans',
-      icon: 'fa-calendar-alt',
-      route: 'admin/subscriptions'
     },
     {
       name: 'Bookings Management',
       icon: 'fa-book',
       route: 'admin/bookings'
+    },
+    {
+      name: 'Subscriptions & Plans',
+      icon: 'fa-calendar-alt',
+      subItems: [
+        { name: 'Subscriptions', route: 'admin/subscriptions' },
+        { name: 'Plans', route: 'admin/plans' }
+      ]
     },
     {
       name: 'Revenue & Transactions',

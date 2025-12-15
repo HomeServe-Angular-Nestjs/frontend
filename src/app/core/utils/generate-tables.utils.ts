@@ -84,6 +84,12 @@ export const createPlansTable = (columns: string[], plans: IPlan[]): ITable => {
                     styles: 'text-blue-600',
                     action: 'view',
                 },
+                {
+                    toolTip: 'Edit Plan',
+                    icon: 'fas fa-edit',
+                    styles: 'text-green-600',
+                    action: 'edit',
+                },
             ]
         }))
     };
