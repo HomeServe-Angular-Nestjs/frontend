@@ -1,10 +1,10 @@
 <section class="mb-10">
-    <h2 class="text-2xl font-bold text-gray-900 leading-tight tracking-tight mb-6">
-        Transaction Summary Overview
+    <h2 class="text-xl font-bold text-gray-900 mb-6">
+        Summary Overview
     </h2>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        <app-admin-overview-card *ngFor="let stat of stats" [icon]="stat.icon" [iconBg]="stat.iconBg"
+        <app-admin-overview-card *ngFor="let stat of stats()" [icon]="stat.icon" [iconBg]="stat.iconBg"
             [title]="stat.title" [value]="stat.value" [subtext]="stat.subtext">
         </app-admin-overview-card>
     </div>
@@ -15,67 +15,116 @@
 
     <div class="flex justify-end w-full mb-5">
         <div class="flex flex-wrap items-center gap-3">
-            <input [(ngModel)]="filters.search" (ngModelChange)="onSearch($event)" type="text"
-                placeholder="Search transactions..."
-                class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200" />
 
-            <select [(ngModel)]="filters.sort" (ngModelChange)="updateFilter('sort', $event)"
-                class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200">
+            <input [ngModel]="filters().search" (ngModelChange)="onSearch($event)" type="text"
+                placeholder="Search transactions..." class="border rounded-lg px-3 py-2 text-sm focus:ring-blue-200" />
+
+            <select [ngModel]="filters().sort" (ngModelChange)="onSort($event)"
+                class="border rounded-lg px-3 py-2 text-sm">
                 <option value="newest">Newest</option>
                 <option value="oldest">Oldest</option>
                 <option value="high">High</option>
                 <option value="low">Low</option>
             </select>
 
-            <select [(ngModel)]="filters.type" (ngModelChange)="updateFilter('type', $event)"
-                class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200">
+            <select [ngModel]="filters().type" (ngModelChange)="onTypeChange($event)"
+                class="border rounded-lg px-3 py-2 text-sm">
                 <option value="all">All Types</option>
                 <option value="booking">Booking</option>
-                <option value="refund">Refund</option>
                 <option value="subscription">Subscription</option>
+                <option value="refund">Refund</option>
             </select>
 
-            <select [(ngModel)]="filters.method" (ngModelChange)="updateFilter('method', $event)"
-                class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200">
+            <select [ngModel]="filters().method" (ngModelChange)="onMethodChange($event)"
+                class="border rounded-lg px-3 py-2 text-sm">
                 <option value="all">All Methods</option>
                 <option value="credit">Credit</option>
                 <option value="debit">Debit</option>
             </select>
 
-            <select [(ngModel)]="filters.date" (ngModelChange)="updateFilter('date', $event)"
-                class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200">
+            <select [ngModel]="filters().date" (ngModelChange)="onDateChange($event)"
+                class="border rounded-lg px-3 py-2 text-sm">
                 <option value="all">All Time</option>
                 <option value="last_six_months">Last Six Months</option>
                 <option value="last_year">Last Year</option>
             </select>
+
         </div>
     </div>
 
-    <div class="overflow-x-auto border rounded-lg">
+    <div class="border rounded-lg overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">TNX ID</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Amount</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Payment ID</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Source</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Transaction Type</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Date</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Method</th>
+                    <th class="px-4 py-2 text-left text-sm text-gray-500">Date & Time</th>
+                    <th class="px-4 py-2 text-left text-sm text-gray-500">Counterparty</th>
+                    <th class="px-4 py-2 text-left text-sm text-gray-500">Type</th>
+                    <th class="px-4 py-2 text-left text-sm text-gray-500">Method</th>
+                    <th class="px-4 py-2 text-left text-sm text-gray-500">Amount</th>
+                    <th class="px-4 py-2 text-left text-sm text-gray-500">Reference Type</th>
+                    <th class="px-4 py-2 text-left text-sm text-gray-500">Reference ID</th>
+                    <th class="px-4 py-2 text-left text-sm text-gray-500">Source</th>
                 </tr>
             </thead>
+
             <tbody class="divide-y divide-gray-200 bg-white">
-                <tr *ngFor="let tx of transactions">
-                    <td class="px-4 py-2 text-sm text-gray-900 uppercase">{{ tx.transactionId | slice:10}}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ formatINR(tx.amount / 100) }}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.paymentId ? tx.paymentId : 'N/A'}}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.source }}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.transactionType }}</td>
-                    <td class="px-4 py-2 text-sm text-gray-500">{{ tx.createdAt | date:'medium' }}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ tx.method | titlecase }}</td> <!--TODO output-->
+                <tr *ngFor="let tx of transactions()" class="hover:bg-gray-50 transition-colors">
+
+                    <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
+                        {{ tx.dateTime | date:'medium' }}
+                    </td>
+
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <ng-container *ngIf="tx.counterparty.role !== 'admin'; else admin">
+                            <div class="font-medium capitalize">
+                                {{ tx.counterparty.role }}
+                            </div>
+                            <div class="text-xs text-gray-500 truncate max-w-[180px]">
+                                {{ tx.counterparty.email }}
+                            </div>
+                        </ng-container>
+
+                        <ng-template #admin>
+                            <span class="text-gray-500 italic">Myself</span>
+                        </ng-template>
+                    </td>
+
+                    <td class="px-4 py-3 text-sm text-gray-800">
+                        {{ displayType(tx.type) }}
+                    </td>
+
+                    <td class="px-4 py-3 text-sm font-medium" [class.text-green-600]="tx.direction === 'credit'"
+                        [class.text-red-600]="tx.direction === 'debit'">
+                        {{ tx.direction === 'credit' ? 'Credited' : 'Debited' }}
+                    </td>
+
+                    <td class="px-4 py-3 text-sm font-semibold text-gray-900">
+                        {{ formatINR(tx.amount) }}
+                    </td>
+
+                    <td class="px-4 py-3 text-sm text-gray-600 capitalize">
+                        {{ tx.referenceType }}
+                    </td>
+
+                    <td class="px-4 py-3 text-xs text-blue-600 font-mono max-w-[180px] cursor-pointer select-none group"
+                        (click)="copyToClipboard(tx.referenceId)">
+                        <div class="flex items-center gap-1">
+                            #{{ tx.referenceId | slice:0:8 }}…
+
+                            <i
+                                class="fas fa-copy text-gray-400 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </td>
+
+                    <td class="px-4 py-3 text-sm text-gray-600 capitalize">
+                        {{ tx.source }}
+                    </td>
+
                 </tr>
             </tbody>
+
         </table>
     </div>
-    <app-admin-pagination [pagination]="pagination" (pageChange)="pageChange($event)"></app-admin-pagination>
+
+    <app-admin-pagination [pagination]="pagination()" (pageChange)="pageChange($event)"></app-admin-pagination>
 </section>

@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, Observable, shareReplay } from "rxjs";
-import { IBooking, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists, IUpdateBookingsPaymentStatus } from "../models/booking.model";
+import { IBooking, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists, IUpdateBookingsPaymentStatus } from "../models/booking.model";
 import { IAddress } from "../models/schedules.model";
 import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
@@ -55,7 +55,7 @@ export class BookingService {
     return this._http.post<IPriceBreakupData>(`${this._customerApi}/booking/price_breakup`, data);
   }
 
-  postBookingData(data: IBookingData): Observable<IResponse<IBooking>> {
+  preBookingData(data: IBookingData): Observable<IResponse<IBooking>> {
     return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, data);
   }
 
@@ -83,8 +83,8 @@ export class BookingService {
     return this._http.patch<IResponse>(`${this._customerApi}/booking/add_review`, { bookingId, ...reviewData })
   }
 
-  markBookingCancelledByCustomer(bookingId: string, reason: string,): Observable<IResponse> {
-    return this._http.patch<IResponse>(`${this._customerApi}/booking/cancel`, { bookingId, reason });
+  markBookingCancelledByCustomer(bookingId: string, reason: string,): Observable<IResponse<IBookingResponse>> {
+    return this._http.patch<IResponse<IBookingResponse>>(`${this._customerApi}/booking/cancel`, { bookingId, reason });
   }
 
   // ------------------------------------------------------------------------------------------------------------------------------
@@ -131,6 +131,10 @@ export class BookingService {
 
   updateBookingStatus(bookingId: string, newStatus: BookingStatus): Observable<IResponse> {
     return this._http.patch<IResponse>(`${this._providerApi}/bookings/status/${bookingId}`, { newStatus });
+  }
+
+  completeBooking(bookingId: string): Observable<IResponse<IBookingDetailProvider>> {
+    return this._http.post<IResponse<IBookingDetailProvider>>(`${this._providerApi}/bookings/complete`, { bookingId });
   }
 
   downloadInvoice(bookingId: string): Observable<Blob> {

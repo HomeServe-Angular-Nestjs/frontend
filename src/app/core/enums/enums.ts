@@ -75,12 +75,14 @@ export enum PaymentSource {
 }
 
 export enum TransactionType {
-    BOOKING = 'booking',
-    SUBSCRIPTION = 'subscription',
+    BOOKING_PAYMENT = 'booking_payment',
+    BOOKING_RELEASE = 'booking_release',
+    BOOKING_REFUND = 'booking_refund',
+    CANCELLATION_FEE = 'cancellation_fee',
     CUSTOMER_COMMISSION = 'customer_commission',
     PROVIDER_COMMISSION = 'provider_commission',
-    REFUND = 'refund',
-    BOOKING_RELEASE = 'booking_release',
+    GST = 'gst',
+    SUBSCRIPTION_PAYMENT = 'subscription_payment',
 }
 
 export enum SortEnum {

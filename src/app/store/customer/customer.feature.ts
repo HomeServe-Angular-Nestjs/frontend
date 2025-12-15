@@ -42,13 +42,5 @@ export const customerFeature = createFeature({
             error,
             loading: false
         })),
-
-        on(customerActions.changeReviewedStatus, (state, { status }) => ({
-            ...state,
-            customer: state.customer ? {
-                ...state.customer,
-                isReviewed: status
-            } : null
-        })),
     )
 })

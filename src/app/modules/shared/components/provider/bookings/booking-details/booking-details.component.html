@@ -99,7 +99,7 @@
           <div class="flex items-center flex-shrink-0">
             <button
               [disabled]="isStatusDisabled(status.value, bookingDetails.bookingStatus, bookingDetails.cancelStatus)"
-              (click)="changeBookingStatus(bookingDetails.bookingId, bookingDetails.cancelStatus, status.value, bookingDetails.bookingStatus)"
+              (click)="changeBookingStatus(bookingDetails.bookingId, status.value, bookingDetails.bookingStatus)"
               class="relative flex items-center justify-center w-10 h-10 rounded-full border-2 font-medium transition"
               [ngClass]="{
                                 'bg-green-600 border-green-600 text-white': bookingDetails.bookingStatus===status.value,
@@ -119,6 +119,8 @@
           <div *ngIf="i < bookingSelectOption.length - 1" class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
         </ng-container>
 
+
+        <!-- cancel status button -->
         <div class="flex items-center flex-shrink-0">
           <button [disabled]="isStatusDisabled(cancelled, bookingDetails.bookingStatus, bookingDetails.cancelStatus)"
             (click)="onCancelButtonClick(bookingDetails.bookingId, bookingDetails.cancelStatus)"
@@ -140,7 +142,8 @@
       </div>
 
       <div class="flex gap-3 mt-4 md:mt-0">
-        <app-button *ngIf="bookingDetails?.transaction?.id" (clicked)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
+        <app-button *ngIf="bookingDetails?.transaction?.id && bookingDetails.bookingStatus === 'completed'"
+          (clicked)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
           buttonClass="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 transition"
           text=" Download Invoice">
         </app-button>

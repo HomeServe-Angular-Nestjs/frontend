@@ -23,19 +23,22 @@ export interface ITransaction {
 }
 
 export interface ITransactionStats {
-  totalTransactions: number;
-  totalRevenue: number;
-  successRate: number;
-  avgTransactionValue: number;
+  balance: number;
+  grossPayments: number;
+  providerPayouts: number;
+  platformCommission: number;
+  gstCollected: number;
+  refundIssued: number;
+  netProfit: number;
 }
 
 export interface ITransactionTableData {
   transactionId: string;
   paymentId: string | null;
   amount: number;
-  method: string;
+  method: PaymentDirection;
   source: PaymentSource,
-  transactionType: PaymentDirection;
+  transactionType: TransactionType;
   createdAt: Date;
 }
 
@@ -55,7 +58,7 @@ export interface ITransactionHistory {
 export interface ITransactionFilter {
   search?: string;
   sort?: 'newest' | 'oldest' | 'high' | 'low';
-  type?: TransactionType | 'all';
+  type?: string;
   date?: 'all' | 'last_six_months' | 'last_year';
   method?: PaymentDirection | 'all';
 }

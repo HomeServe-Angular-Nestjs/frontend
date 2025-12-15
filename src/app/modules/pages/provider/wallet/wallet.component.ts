@@ -3,12 +3,13 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular
 import { WalletService } from '../../../../core/services/wallet.service';
 import { ITransactionFilter } from '../../../../core/models/transaction.model';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { combineLatest, Subject, switchMap, takeUntil } from 'rxjs';
+import { combineLatest, map, Subject, switchMap, takeUntil } from 'rxjs';
 import { DebounceService } from '../../../../core/services/public/debounce.service';
 import { SharedDataService } from '../../../../core/services/public/shared-data.service';
 import { ProviderPaginationComponent } from "../../../shared/partials/sections/provider/pagination/provider-pagination.component";
 import { FormsModule } from "@angular/forms";
 import { PaymentDirection, TransactionType } from '../../../../core/enums/enums';
+import { IProviderTransactionOverview } from '../../../../core/models/wallet.model';
 
 @Component({
   selector: 'app-provider-wallet',
@@ -23,25 +24,28 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  filter = signal<ITransactionFilter>({
+  stats = signal<IProviderTransactionOverview>({
+    balance: 0,
+    totalCredit: 0,
+    totalDebit: 0,
+    netGain: 0
+  });
+
+  filter = signal<ITransactionFilter & { page: number, limit: number }>({
     search: '',
     sort: 'newest',
     type: 'all',
     date: 'all',
-    method: 'all'
-  });
-
-  options = signal({
+    method: 'all',
     page: 1,
     limit: 10
   });
 
   dataSignal = toSignal(
     combineLatest([
-      toObservable(this.options),
       toObservable(this.filter)
     ]).pipe(
-      switchMap(([options, filter]) => this._walletService.getTransaction(options, filter))
+      switchMap(([filter]) => this._walletService.getTransactionListForProvider(filter))
     ),
     { initialValue: null }
   );
@@ -59,8 +63,14 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(value => {
         this.filter.update(f => ({ ...f, search: value }));
-        this.options.update(o => ({ ...o, page: 1 }));
       });
+
+    this._walletService.getProviderTransactionOverview()
+      .pipe(
+        takeUntil(this._destroy$),
+        map(res => res.data ?? { balance: 0, totalCredit: 0, totalDebit: 0, netGain: 0 })
+      )
+      .subscribe(stats => this.stats.set(stats));
   }
 
   onSearch(term: string) {
@@ -68,29 +78,38 @@ export class ProviderWalletComponent implements OnInit, OnDestroy {
   }
 
   onDateChange(value: 'all' | 'last_six_months' | 'last_year') {
-    this.options.update(o => ({ ...o, page: 1 }));
     this.filter.update(f => ({ ...f, date: value }));
   }
 
   onSort(value: 'newest' | 'oldest' | 'high' | 'low') {
-    this.options.update(o => ({ ...o, page: 1 }));
     this.filter.update(f => ({ ...f, sort: value }));
   }
 
-  onTypeChange(value: TransactionType | 'all') {
-    this.options.update(o => ({ ...o, page: 1 }));
-
+  onTypeChange(value: string) {
     this.filter.update(f => ({ ...f, type: value }));
   }
 
   onMethodChange(value: PaymentDirection | 'all') {
-    this.options.update(o => ({ ...o, page: 1 }));
-
     this.filter.update(f => ({ ...f, method: value }));
   }
 
   onPageChange(newPage: number) {
-    this.options.update(o => ({ ...o, page: newPage }));
+    this.filter.update(f => ({ ...f, page: newPage }));
+  }
+
+  displayType(type: TransactionType) {
+    switch (type) {
+      case TransactionType.BOOKING_PAYMENT:
+        return 'Booking Payment';
+      case TransactionType.BOOKING_REFUND:
+        return 'Booking Refund';
+      case TransactionType.SUBSCRIPTION_PAYMENT:
+        return 'Subscription Payment';
+      case TransactionType.BOOKING_RELEASE:
+        return 'Booking Release';
+      default:
+        return '_';
+    }
   }
 
   ngOnDestroy(): void {

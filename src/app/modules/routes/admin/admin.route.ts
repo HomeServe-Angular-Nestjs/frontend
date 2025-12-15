@@ -49,6 +49,11 @@ export const adminRoute: Routes = [
                             .then(c => c.AdminBookingLayoutComponent)
                     },
                     {
+                        path: 'booking_details/:bookingId',
+                        loadComponent: () => import('../../shared/components/admin/bookings/booking-details/booking-details.component')
+                            .then(c => c.AdminBookingDetailsComponent)
+                    },
+                    {
                         path: 'ratings&reviews',
                         loadComponent: () => import('../../shared/components/admin/ratings-and-reviews/layout/reviews-and-rating.component')
                             .then(c => c.AdminReviewsAndRatingsLayout)

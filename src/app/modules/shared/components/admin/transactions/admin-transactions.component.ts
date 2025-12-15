@@ -1,161 +1,209 @@
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { Component, computed, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
 import { IAdminOverViewCard, OverviewCardComponent } from "../../../partials/sections/admin/overview-card/admin-overview-card.component";
-import { TransactionService } from "../../../../../core/services/transaction.service";
 import { combineLatest, map, Subject, switchMap, takeUntil } from "rxjs";
-import { ITransactionFilter, ITransactionStats, ITransactionTableData } from "../../../../../core/models/transaction.model";
+import { ITransactionFilter, ITransactionStats } from "../../../../../core/models/transaction.model";
 import { CommonModule } from "@angular/common";
-import { IPagination } from "../../../../../core/models/booking.model";
 import { AdminPaginationComponent } from "../../../partials/sections/admin/pagination/pagination.component";
 import { WalletService } from "../../../../../core/services/wallet.service";
 import { DebounceService } from "../../../../../core/services/public/debounce.service";
 import { FormsModule } from "@angular/forms";
+import { toObservable, toSignal } from "@angular/core/rxjs-interop";
+import { PaymentDirection, TransactionType } from "../../../../../core/enums/enums";
+import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
 
 @Component({
   selector: 'app-admin-transactions',
   templateUrl: './admin-transactions.component.html',
-  imports: [CommonModule, FormsModule, OverviewCardComponent, AdminPaginationComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    OverviewCardComponent,
+    AdminPaginationComponent
+  ],
   providers: [WalletService, DebounceService]
 })
 export class AdminTransactionsComponent implements OnInit, OnDestroy {
-  private readonly _transactionService = inject(TransactionService);
-  private readonly _sharedService = inject(SharedDataService);
   private readonly _walletService = inject(WalletService);
+  private readonly _sharedService = inject(SharedDataService);
   private readonly _debounceService = inject(DebounceService);
+  private readonly _toastr = inject(ToastNotificationService);
 
-  private _destroy$ = new Subject<void>();
+  private readonly _destroy$ = new Subject<void>();
 
-  stats: IAdminOverViewCard[] = [];
-  transactions: ITransactionTableData[] = [];
-  walletBalance: number = 0;
-  options: { page?: number, limit?: number } = { page: 1, limit: 10 };
-  pagination: IPagination = {
-    limit: 1,
-    page: 1,
-    total: 0
-  }
-  filters: ITransactionFilter = {
+  filters = signal<ITransactionFilter & { page: number; limit: number }>({
     search: '',
     sort: 'newest',
     type: 'all',
     date: 'all',
-    method: 'all'
-  };
+    method: 'all',
+    page: 1,
+    limit: 10,
+  });
+
+  adminTable = toSignal(
+    combineLatest([
+      toObservable(this.filters),
+    ]).pipe(
+      switchMap(([filters]) =>
+        this._walletService.getTransactionListForAdmin(filters)
+      )
+    ),
+    { initialValue: null }
+  );
+
+  transactions = computed(() =>
+    this.adminTable()?.data?.transactions ?? []
+  );
+
+  pagination = computed(() =>
+    this.adminTable()?.data?.pagination ?? {
+      page: 1,
+      limit: 10,
+      total: 0,
+    }
+  );
+
+  adminOverview = toSignal(
+    this._walletService.getTransactionStats().pipe(
+      map(res => res?.data ?? {
+        balance: 0,
+        grossPayments: 0,
+        providerPayouts: 0,
+        platformCommission: 0,
+        gstCollected: 0,
+        refundIssued: 0,
+        netProfit: 0,
+      })
+    ),
+    { initialValue: null }
+  );
+
+  stats = computed<IAdminOverViewCard[]>(() => {
+    const stats = this.adminOverview();
+
+    if (!stats) return [];
+
+    return this._buildOverviewCards(stats);
+  });
 
   ngOnInit(): void {
     this._sharedService.setAdminHeader('Revenues & Transactions');
 
-    this._debounceService.onSearch()
+    this._debounceService.onSearch(700)
       .pipe(takeUntil(this._destroy$))
       .subscribe(value => {
-        this.filters.search = value;
-        this.options = { page: 1, limit: 10 };
-        this._loadTableData(this.options, this.filters);
-      });
-
-    this._loadTableData(this.options, this.filters);
-
-    combineLatest([
-      this._loadOverviewData(),
-      this._fetchWalletAmount()
-    ]).pipe(takeUntil(this._destroy$))
-      .subscribe({
-        next: ([stats, balance]) => {
-          if (stats && balance) {
-            this.stats = this._buildOverviewCards(stats, balance);
-          }
-        }
+        this.filters.update(f => ({ ...f, search: value }));
       });
   }
 
-  private _loadTableData(options?: { page?: number, limit?: number }, filters: ITransactionFilter = {}) {
-    this._transactionService.getTransactionTableData(options, filters)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe({
-        next: (res) => {
-          if (res.success && res.data) {
-            this.transactions = res.data.tableData;
-            this.pagination = res.data.pagination;
-          }
-        }
-      });
-  }
-
-  private _loadOverviewData() {
-    return this._transactionService.getTransactionStats()
-      .pipe(
-        takeUntil(this._destroy$),
-        map((res) => res.data)
-      );
-  }
-
-  private _fetchWalletAmount() {
-    return this._walletService.getWallet()
-      .pipe(
-        takeUntil(this._destroy$),
-        map(res => res?.data?.balance ?? 0)
-      );
-  }
-
-  private _buildOverviewCards(data: ITransactionStats, balance: number): IAdminOverViewCard[] {
+  private _buildOverviewCards(data: ITransactionStats): IAdminOverViewCard[] {
     return [
       {
-        icon: 'fas fa-receipt',
-        iconBg: 'bg-blue-100 text-blue-700',
+        icon: 'fa-solid fa-wallet',
+        iconBg: 'bg-blue-50 text-blue-600',
         title: 'Available Balance',
-        value: this.formatINR(balance ?? 0),
+        value: this.formatINR(data.balance),
       },
       {
-        icon: 'fas fa-receipt',
-        iconBg: 'bg-blue-100 text-blue-700',
-        title: 'Total Transactions',
-        value: data.totalTransactions ?? 0,
+        icon: 'fa-solid fa-credit-card',
+        iconBg: 'bg-slate-50 text-slate-600',
+        title: 'Gross Payments',
+        value: this.formatINR(data.grossPayments),
       },
       {
-        icon: 'fas fa-rupee-sign',
-        iconBg: 'bg-green-100 text-green-700',
-        title: 'Total Revenue',
-        value: this.formatINR((data.totalRevenue ?? 0) / 100),
+        icon: 'fa-solid fa-arrow-up-right-dots',
+        iconBg: 'bg-emerald-50 text-emerald-600',
+        title: 'Provider Payouts',
+        value: this.formatINR(data.providerPayouts),
       },
       {
-        icon: 'fas fa-percentage',
-        iconBg: 'bg-red-100 text-red-600',
-        title: 'Success Rate',
-        value: `${(data?.successRate ?? 0).toFixed(1)}%`,
+        icon: 'fa-solid fa-chart-line',
+        iconBg: 'bg-indigo-50 text-indigo-600',
+        title: 'Platform Commission',
+        value: this.formatINR(data.platformCommission),
       },
       {
-        icon: 'fas fa-balance-scale',
-        iconBg: 'bg-purple-100 text-purple-700',
-        title: 'Average Transaction Value',
-        value: (data.avgTransactionValue ?? 0 / 100).toFixed(2),
+        icon: 'fa-solid fa-receipt',
+        iconBg: 'bg-purple-50 text-purple-600',
+        title: 'GST Collected',
+        value: this.formatINR(data.gstCollected),
+      },
+      {
+        icon: 'fa-solid fa-arrow-rotate-left',
+        iconBg: 'bg-rose-50 text-rose-600',
+        title: 'Refund Issued',
+        value: this.formatINR(data.refundIssued), 
+      },
+      {
+        icon: 'fa-solid fa-sack-dollar',
+        iconBg: 'bg-green-50 text-green-700',
+        title: 'Net Profit',
+        value: this.formatINR(data.netProfit),
       },
     ];
-  }
-
-  formatINR(amount: number): string {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 2
-    }).format(amount);
-  }
-
-  pageChange(page: number) {
-    this.options.page = page;
-    this._loadTableData(this.options, this.filters);
-  }
-
-  updateFilter(key: keyof ITransactionFilter, value: any) {
-    this.filters[key] = value;
-    this.options = { page: 1, limit: 10 };
-    this._loadTableData(this.options, this.filters);
   }
 
   onSearch(text: string) {
     this._debounceService.delay(text);
   }
 
-  ngOnDestroy() {
+  onDateChange(value: 'all' | 'last_six_months' | 'last_year') {
+    this.filters.update(f => ({ ...f, date: value }));
+  }
+
+  onSort(value: 'newest' | 'oldest' | 'high' | 'low') {
+    this.filters.update(f => ({ ...f, sort: value }));
+  }
+
+  onTypeChange(value: string) {
+    this.filters.update(f => ({ ...f, type: value }));
+  }
+
+  onMethodChange(value: PaymentDirection | 'all') {
+    this.filters.update(f => ({ ...f, method: value }));
+  }
+
+  pageChange(page: number) {
+    this.filters.update(f => ({ ...f, page }));
+  }
+
+  copyToClipboard(value: string) {
+    navigator.clipboard.writeText(value).then(() => {
+      this._toastr.success('Copied to clipboard');
+    });
+  }
+
+  formatINR(amount: number): string {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 2,
+    }).format(amount);
+  }
+
+  displayType(type: TransactionType) {
+    switch (type) {
+      case TransactionType.BOOKING_PAYMENT:
+        return 'Booking Payment';
+      case TransactionType.BOOKING_REFUND:
+        return 'Booking Refund';
+      case TransactionType.SUBSCRIPTION_PAYMENT:
+        return 'Subscription Payment';
+      case TransactionType.BOOKING_RELEASE:
+        return 'Booking Release';
+      case TransactionType.CANCELLATION_FEE:
+        return 'Cancellation Fee';
+      case TransactionType.GST:
+        return 'GST';
+      case TransactionType.PROVIDER_COMMISSION:
+        return 'Provider Commission';
+      default:
+        return '-';
+    }
+  }
+
+  ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
   }

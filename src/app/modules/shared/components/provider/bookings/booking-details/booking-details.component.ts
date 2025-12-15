@@ -72,20 +72,31 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
     ).subscribe(bookingData => this.bookingDataSource.next(bookingData));
   }
 
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
-  }
-
   private _openConfirmationDialog(message: string, title: string) {
     return this._dialog.open(ConfirmDialogComponent, {
       data: { title, message },
     });
   }
 
+  private _handleBookingCompletion(bookingId: string): void {
+    this._bookingService.completeBooking(bookingId)
+      .pipe(
+        takeUntil(this._destroy$),
+        map(res => res.data)
+      )
+      .subscribe({
+        next: (data) => {
+          if (!data) throw new Error('Failed to update booking status');
+          this.bookingDataSource.next(data);
+          this._toastr.success('Booking status updated successfully');
+        },
+        error: (error) => {
+          this._toastr.error(error.message);
+        }
+      })
+  }
 
-
-  changeBookingStatus(bookingId: string, cancelStatus: CancelStatus | null, newStatus: BookingStatus, bookingStatus: BookingStatus): void {
+  changeBookingStatus(bookingId: string, newStatus: BookingStatus, bookingStatus: BookingStatus): void {
     if (newStatus === bookingStatus) return;
 
     const action = this.statusMessageMap[newStatus];
@@ -98,6 +109,11 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(confirmed => {
         if (!confirmed) return;
+
+        if (newStatus === BookingStatus.COMPLETED) {
+          this._handleBookingCompletion(bookingId);
+          return;
+        }
 
         this._bookingService.updateBookingStatus(bookingId, newStatus)
           .pipe(takeUntil(this._destroy$))
@@ -217,7 +233,6 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   }
 
   handleCancellation(bookingId: string, reason?: string): void {
-    console.log(bookingId, reason ?? 'nope')
     this._openConfirmationDialog(
       `Are you sure you want to cancel this order?`,
       'Confirm Action'
@@ -263,5 +278,10 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
           URL.revokeObjectURL(url);
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 }
