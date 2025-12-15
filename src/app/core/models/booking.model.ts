@@ -245,10 +245,10 @@ export interface IBookingStats {
 
 export interface IAdminBookingFilter {
   page?: number;
-  searchBy?: string;
+  limit?: number;
   search?: string;
-  bookingStatus?: BookingStatus | '';
-  paymentStatus?: PaymentStatus | '';
+  bookingStatus?: BookingStatus | 'all';
+  paymentStatus?: PaymentStatus | 'all';
 }
 
 

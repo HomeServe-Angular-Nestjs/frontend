@@ -1,4 +1,4 @@
-<div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200 bg-white">
+<div class="overflow-x-auto rounded-t-xl shadow-sm border-gray-200 bg-white">
     <table class="min-w-full text-sm text-left text-gray-800">
         <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-600">
             <tr>
@@ -16,7 +16,7 @@
         <tbody *ngIf="bookings && bookings.length > 0; else noBookings">
             <tr *ngFor="let booking of bookings; let i = index" class="border-b hover:bg-blue-50/30 transition-shadow">
                 <td class="px-5 py-3 font-mono text-xs text-gray-500 tracking-wide">
-                    {{ booking.bookingId | uppercase | slice: 0:10 }}
+                    {{ booking.bookingId | uppercase }}
                 </td>
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">

@@ -9,11 +9,6 @@ import { RouterLink } from "@angular/router";
     templateUrl: './admin-bookings-table.component.html',
     imports: [CommonModule, RouterLink]
 })
-export class AdminBookingTableComponent implements OnInit {
-
+export class AdminBookingTableComponent {
     @Input({ required: true }) bookings: IAdminBookingForTable[] = [];
-
-    ngOnInit(): void {
-
-    }
 }

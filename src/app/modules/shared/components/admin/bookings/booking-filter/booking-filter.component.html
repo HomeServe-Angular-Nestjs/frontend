@@ -1,18 +1,11 @@
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end mb-7 gap-3">
     <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
-        <select [(ngModel)]="filter.searchBy" (change)="applyFilter()"
-            class="px-3 py-2 border rounded-md text-sm bg-white focus:ring focus:ring-blue-100 focus:outline-none">
-            <option value="id">Booking Id</option>
-            <option value="customer">Customer</option>
-            <option value="provider">Provider</option>
-        </select>
-
-        <input type="text" placeholder="Search by:" [(ngModel)]="filter.search" (ngModelChange)="applyFilter()"
+        <input type="text" placeholder="search..." [(ngModel)]="filter.search" (ngModelChange)="onSearchChange($event)"
             class="px-3 py-2 border rounded-md text-sm focus:ring focus:ring-blue-100 focus:outline-none" />
 
-        <select [(ngModel)]="filter.bookingStatus" (change)="applyFilter()" class=" px-3 py-2 border rounded-md text-sm bg-white focus:ring
+        <select [(ngModel)]="filter.bookingStatus" (ngModelChange)="onBookingStatusChange($event)" class=" px-3 py-2 border rounded-md text-sm bg-white focus:ring
             focus:ring-blue-100 focus:outline-none">
-            <option value="" class="">Booking Status</option>
+            <option value="all" class="">Booking Status</option>
             <option value="completed">Completed</option>
             <option value="confirmed">Confirmed</option>
             <option value="in_progress">In progress</option>
@@ -20,9 +13,9 @@
             <option value="cancelled">Cancelled</option>
         </select>
 
-        <select [(ngModel)]="filter.paymentStatus" (change)="applyFilter()" class=" px-3 py-2 border rounded-md text-sm bg-white focus:ring
+        <select [(ngModel)]="filter.paymentStatus" (ngModelChange)="applyFilter()" class=" px-3 py-2 border rounded-md text-sm bg-white focus:ring
             focus:ring-blue-100 focus:outline-none">
-            <option value="">Payment Status</option>
+            <option value="all">Payment Status</option>
             <option value="paid">Paid</option>
             <option value="unpaid">Unpaid</option>
             <option value="refunded">Refunded</option>

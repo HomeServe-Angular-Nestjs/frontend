@@ -1,5 +1,5 @@
 <section class="mb-10">
-    <h2 class="text-2xl font-bold text-gray-900 leading-tight tracking-tight mb-6">
+    <h2 class="text-lg md:text-xl font-bold text-gray-900 leading-tight tracking-tight mb-6">
         Booking Summary Overview
     </h2>
 
@@ -32,7 +32,7 @@
 
 <!-- Pagination Controls -->
 <ng-container *ngIf="pagination?.page">
-    <div class="px-5 py-4 bg-gray-50 border-t border-gray-200 mt-6 rounded-b-lg">
+    <div class="bg-gray-50 border-gray-200 rounded-b-lg mb-6">
         <app-admin-pagination [pagination]="pagination" (pageChange)="changePage($event)"></app-admin-pagination>
     </div>
 </ng-container>
