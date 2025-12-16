@@ -1,1 +1,129 @@
-<p>subscriptions-list works!</p>
+<section class="rounded-xl shadow-md bg-white p-6 pb-0 space-y-4">
+    <div class="flex justify-between items-center pb-3">
+        <h1 class="text-xl font-medium text-gray-800 mb-3">
+            Subscription List
+        </h1>
+
+        <app-admin-subscription-filters (filterEvent)="applyFilters($event)"></app-admin-subscription-filters>
+    </div>
+
+    <table class="w-full border-collapse rounded-lg overflow-hidden">
+        <!-- Header -->
+        <thead class="bg-gray-100 text-sm text-gray-700">
+            <tr>
+                <th class="px-4 py-3 text-left">Subscription</th>
+                <th class="px-4 py-3 text-left">User</th>
+                <th class="px-4 py-3 text-left">Plan</th>
+                <th class="px-4 py-3 text-left">Amount</th>
+                <th class="px-4 py-3 text-left">Status</th>
+                <th class="px-4 py-3 text-left">Payment</th>
+                <th class="px-4 py-3 text-left">Expires</th>
+                <!-- <th class="px-4 py-3 text-left">Renewal</th> -->
+                <th class="px-4 py-3 text-left">Actions</th>
+            </tr>
+        </thead>
+
+        <!-- Body -->
+        <tbody class="text-sm text-gray-800">
+            <ng-container *ngIf="subscriptions().length; else noData">
+                <tr *ngFor="let sub of subscriptions()" class="border-b hover:bg-gray-50 transition">
+
+                    <!-- Subscription ID -->
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">
+                        {{ sub.subscriptionId }}
+                    </td>
+
+                    <!-- User -->
+                    <td class="px-4 py-3 text-xs">
+                        <div class="font-medium">{{ sub.user.email }}</div>
+                        <div class="text-xs text-gray-500 capitalize">
+                            {{ sub.user.role }}
+                        </div>
+                    </td>
+
+                    <!-- Plan -->
+                    <td class="px-4 py-3 capitalize text-xs">
+                        {{ sub.plan.name }} · {{ sub.plan.duration }}
+                    </td>
+
+                    <!-- Amount -->
+                    <td class="px-4 py-3 font-medium">
+                        ₹{{ sub.amount }}
+                    </td>
+
+                    <!-- Status -->
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                        'bg-green-100 text-green-700': sub.status === 'active',
+                        'bg-red-100 text-red-700': sub.status === 'inactive'
+                    }">
+                            {{ sub.status | titlecase }}
+                        </span>
+                    </td>
+
+                    <!-- Payment -->
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                        'bg-green-100 text-green-700': sub.paymentStatus === 'paid',
+                        'bg-yellow-100 text-yellow-700': sub.paymentStatus === 'unpaid'
+                    }">
+                            {{ sub.paymentStatus | titlecase }}
+                        </span>
+                    </td>
+
+                    <!-- Expires -->
+                    <td class="px-4 py-3 text-xs">
+                        {{ sub.validity.end | date:'medium' }}
+                    </td>
+
+                    <!-- Renewal -->
+                    <!-- <td class="px-4 py-3 capitalize text-gray-600">
+                            {{ sub.renewalType }}
+                        </td> -->
+
+                    <td class="px-4 py-3 text-gray-600">
+                        <div class="flex items-center gap-4">
+
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" [checked]="sub.isActive"
+                                    (change)="updateSubscriptionStatus($event, sub)" />
+                                <div class="w-7 h-4 bg-gray-300 rounded-full peer peer-checked:bg-blue-700 after:content-[''] 
+                                        after:absolute after:top-0 after:left-0 after:bg-white after:rounded-full after:h-4 
+                                        after:w-4 after:transition-all peer-checked:after:translate-x-4">
+                                </div>
+                            </label>
+
+                            <!-- View -->
+                            <!-- <button class="text-blue-500 hover:text-blue-600 transition" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button> -->
+
+                            <!-- Edit -->
+                            <!-- <button class="text-green-500 hover:text-green-600 transition" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button> -->
+                        </div>
+                    </td>
+                </tr>
+            </ng-container>
+            <ng-template #noData>
+                <tr>
+                    <td colspan="8" class="px-4 py-10 text-center">
+                        <div
+                            class="flex flex-col items-center justify-center min-h-[280px] text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300 p-8">
+
+                            <svg class="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor"
+                                stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9.75 9.75h4.5m-4.5 4.5h4.5M4.5 6.75h15M6.75 6.75v10.5A2.25 2.25 0 009 19.5h6a2.25 2.25 0 002.25-2.25V6.75" />
+                            </svg>
+
+                            <p class="text-xl font-semibold">No subscriptions found</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </tbody>
+    </table>
+    <app-admin-pagination [pagination]="pagination()" (pageChange)="changePage($event)"></app-admin-pagination>
+</section>

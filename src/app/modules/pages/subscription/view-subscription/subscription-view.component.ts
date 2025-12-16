@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { ISubscription } from "../../../../core/models/subscription.model";
 import { Store } from "@ngrx/store";
-import { map, Observable, Subject, takeUntil } from "rxjs";
+import { map, Observable, of, Subject, takeUntil } from "rxjs";
 import { selectAuthUserType } from "../../../../store/auth/auth.selector";
 import { CapitalizeFirstPipe } from "../../../../core/pipes/capitalize-first.pipe";
 import { Router, RouterLink } from "@angular/router";
@@ -24,25 +24,27 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
 
     subscription$!: Observable<ISubscription | null>;
     userType = 'customer';
+
     ngOnInit(): void {
-
         this._sharedService.setProviderHeader('Subscription');
-
-        this.subscription$ = this._subscriptionService.fetchSubscription().pipe(
-            map(res => res.data || null)
-        );
-
         this._store.select(selectAuthUserType)
             .pipe(takeUntil(this._destroy$))
             .subscribe(type => this.userType = type === 'provider'
                 ? 'provider'
                 : 'customer'
             );
+
+        this.subscription$ = this._getSubscription();
     }
 
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
+    private _getSubscription(): Observable<ISubscription | null> {
+        if (this._subscriptionService.getSubscription) {
+            return of(this._subscriptionService.getSubscription);
+        }
+
+        return this._subscriptionService.fetchSubscription().pipe(
+            map(res => res.data || null)
+        );
     }
 
     navigateToPlans() {
@@ -50,5 +52,10 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
             ? 'plans'
             : 'provider/plans'
         this._router.navigate([url]);
+    }
+
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
     }
 }

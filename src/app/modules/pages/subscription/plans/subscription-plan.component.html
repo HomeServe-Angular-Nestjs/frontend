@@ -1,4 +1,4 @@
-<section class="bg-gray-50 py-16 px-4 fixed inset-0 z-50 overflow-auto">
+<section class="max-w-screen bg-gray-50 pt-10 pb-4 px-4 fixed inset-0 z-50 overflow-auto">
     <div class="max-w-6xl mx-auto text-center">
         <h2 class="text-4xl font-extrabold text-gray-800">Simple, Transparent Pricing</h2>
         <p class="text-gray-500 mt-3 text-lg">Choose the plan that aligns with your needs</p>
@@ -6,7 +6,7 @@
         <div class="mt-12 flex flex-col lg:flex-row gap-10 items-stretch justify-center">
             <ng-container *ngIf="plans$ | async as plans">
                 <ng-container *ngFor="let plan of plans">
-                    <div class="w-full max-w-sm p-8 rounded-3xl border shadow-sm flex flex-col justify-between transition duration-300 transform hover:scale-[1.1]"
+                    <div class="w-full max-w-sm p-8 rounded-3xl border shadow-sm flex flex-col justify-between transition duration-300 transform hover:scale-[1.04]"
                         [ngClass]="{
                             'bg-white text-gray-800': plan.name.toLowerCase() === 'free',
                             'bg-green-50 text-green-900': userType === 'provider' && plan.name.toLowerCase() !== 'free',
@@ -36,8 +36,7 @@
                             </ul>
                         </div>
 
-                        <button (click)="proceedSub(plan)"
-                            [disabled]="isCurrentPlan(plan)"
+                        <button (click)="proceedSub(plan)" [disabled]="isCurrentPlan(plan)"
                             class="mt-auto w-full py-3 rounded-xl font-semibold border transition duration-200 ease-in-out"
                             [ngClass]="{
                                 'bg-gray-800 text-white border-transparent hover:bg-gray-700': isCurrentPlan(plan),
@@ -47,8 +46,7 @@
                                 }">
                             <span *ngIf="isCurrentPlan(plan)">Current Plan</span>
                             <ng-container *ngIf="!isCurrentPlan(plan)">
-                                <!-- {{ _paymentService.isPaymentInProgress() ? 'processing...' : -->
-                                <!-- getPlanButtonText(plan) | titlecase }} -->
+                                {{ getPlanButtonText(plan) | titlecase }}
                             </ng-container>
                         </button>
                     </div>
@@ -57,24 +55,15 @@
         </div>
 
 
-        <div *ngIf="isYearly()" class="mt-10 mx-auto max-w-xl text-center text-red-500 text-sm">
+        <div *ngIf="isYearly()" class="mt-12 mx-auto max-w-xl text-center text-red-500 text-sm">
             You are a yearly subscriber and can't change to monthly or free <br> until the time expires or you cancel
             the subscription.
         </div>
 
-        <div class=" text-center space-y-4 flex flex-col left-0 right-0">
-
+        <div class="mt-6 text-center space-y-4 flex flex-col left-0 right-0">
             <p class="text-sm text-gray-500">
                 All plans include booking management and {{ userType }} support.
             </p>
-
-            <a href="#" class="text-sm font-medium transition" [ngClass]="{
-                'text-green-600 hover:text-green-700': userType === 'provider',
-                'text-blue-600 hover:text-blue-700': userType === 'customer'
-                }">
-                Compare all features
-            </a>
-
             <ng-container *ngIf="currentPlanId">
                 <button (click)="goBack()" class="text-sm text-gray-500 hover:text-gray-700 transition">
                     ← Back

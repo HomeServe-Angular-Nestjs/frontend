@@ -1,7 +1,10 @@
 import { PlanRoleType } from "./plan.model";
 import { PaymentStatus, PlanDuration } from "../enums/enums";
+import { IPagination } from "./booking.model";
 
 export type RenewalType = 'auto' | 'manual';
+export type SubscriptionStatusType = 'active' | 'expired' | 'inactive';
+
 
 export interface ISubscription {
     id: string;
@@ -27,15 +30,7 @@ export interface ISubscription {
 
 export interface ICreateSubscription {
     planId: string;
-    transactionId: string | null;
-    name: string;
     duration: PlanDuration;
-    role: PlanRoleType;
-    features: string[];
-    paymentStatus?: PaymentStatus;
-    startTime: string;
-    endDate: string | null;
-    price: number;
 }
 
 export interface ISubscriptionState {
@@ -55,4 +50,39 @@ export interface IUpdateSubscriptionPaymentStatus {
     transactionId: string;
     paymentStatus: PaymentStatus;
     subscriptionId: string;
+}
+
+export interface IAdminSubscriptionList {
+    subscriptionId: string;
+    user: {
+        email: string;
+        role: 'provider' | 'customer';
+    };
+    plan: {
+        name: string;
+        duration: PlanDuration;
+    };
+    amount: number;
+    status: SubscriptionStatusType;
+    isActive: boolean;
+    paymentStatus: PaymentStatus;
+    validity: {
+        start: string;
+        end: string;
+    };
+    renewalType?: RenewalType;
+}
+
+export interface IAdminFilteredSubscriptionListWithPagination {
+    subscriptions: IAdminSubscriptionList[];
+    pagination: IPagination;
+}
+
+export interface ISubscriptionFilters {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: SubscriptionStatusType | 'all';
+    payment?: PaymentStatus | 'all';
+    duration?: PlanDuration | 'all';
 }

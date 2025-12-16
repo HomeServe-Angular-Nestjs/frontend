@@ -4,6 +4,7 @@ import { ProviderLayoutComponent } from "../../pages/provider/layout/provider-la
 import { ProfilesLayoutComponent } from "../../pages/provider/profiles/profiles-layout.component";
 import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
+import { SubscriptionGuard } from "../../../core/guards/subscription-guard.guard";
 
 export const providerRoutes: Routes = [
   {
@@ -15,21 +16,19 @@ export const providerRoutes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('../../pages/provider/provider-homepage/provider-homepage.component')
           .then(c => c.ProviderHomepageComponent),
-        canActivate: [ProfileAuthGuard, AuthGuard],
+        canActivate: [ProfileAuthGuard, AuthGuard, SubscriptionGuard],
       },
       {
         path: 'subscriptions',
         loadComponent: () => import('../../pages/subscription/view-subscription/subscription-view.component')
           .then(c => c.ProviderViewSubscriptionPage),
         canActivate: [AuthGuard],
-
       },
       {
         path: 'plans',
         loadComponent: () => import('../../pages/subscription/plans/subscription-plan.component')
           .then(c => c.ProviderSubscriptionPlansPage),
         canActivate: [AuthGuard],
-
       },
       {
         path: 'manage_services',
@@ -128,7 +127,7 @@ export const providerRoutes: Routes = [
       },
       {
         path: 'performance',
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, SubscriptionGuard],
         loadComponent: () => import('../../pages/provider/analytics/performance/performance-page.component')
           .then(c => c.ProviderPerformanceLayoutComponent)
       },

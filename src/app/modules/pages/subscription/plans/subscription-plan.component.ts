@@ -14,7 +14,6 @@ import { SubscriptionService } from "../../../../core/services/subscription.serv
 import { ISubscriptionOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../core/models/payment.model";
 import { ICreateSubscription, ISubscription } from "../../../../core/models/subscription.model";
 import { PaymentDirection, PaymentSource, PaymentStatus, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
-import { getStartTimeAndEndTime } from "../../../../core/utils/date.util";
 import { SharedDataService } from "../../../../core/services/public/shared-data.service";
 
 @Component({
@@ -31,7 +30,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _razorpayWrapper = inject(RazorpayWrapperService);
     private readonly _subscriptionService = inject(SubscriptionService);
-    readonly _paymentService = inject(PaymentService);
+    private readonly _paymentService = inject(PaymentService);
 
     private _destroy$ = new Subject<void>();
 
@@ -129,12 +128,10 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
                     this._verifyPaymentAndConfirmSubscription(paymentResponse, order, subscriptionId)
                         .subscribe({
                             next: () => {
-                                // this._paymentService.unlockPayment()
                                 observer.next('success');
                                 observer.complete();
                             },
                             error: (err) => {
-                                // this._paymentService.unlockPayment()
                                 observer.error(err)
                             }
                         });
@@ -148,7 +145,6 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
                             })
                         )
                         .subscribe(() => {
-                            // this._paymentService.unlockPayment()
                             observer.next('dismissed');
                             observer.complete();
                         })
@@ -168,28 +164,20 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     private _initializePayment(plan: IPlan) {
         const subscriptionData: ICreateSubscription = {
             planId: plan.id,
-            transactionId: null,
-            name: plan.name,
             duration: plan.duration,
-            role: plan.role,
-            features: plan.features,
-            price: plan.price,
-            paymentStatus: PaymentStatus.UNPAID,
-            ...getStartTimeAndEndTime(plan.duration),
         };
 
         return this._subscriptionService.createSubscription(subscriptionData).pipe(
             takeUntil(this._destroy$),
             switchMap((subscriptionResponse) => {
                 const sub = subscriptionResponse?.data;
-                if (!sub?.id) throw new Error('Failed to confirm subscription.');
+                if (!sub?.id) throw new Error('Failed to purchase subscription.');
 
                 return this._paymentService.createRazorpayOrder(Number(plan.price)).pipe(
                     switchMap(order => this._openRazorPayCheckout(order, sub.id))
                 );
             }),
             catchError(err => {
-                this._toastr.error('Something went wrong during upgrade.');
                 return throwError(() => err);
             })
         );
@@ -198,21 +186,14 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     private _initializeUpgrade(amount: number, plan: IPlan) {
         const subscriptionData: ICreateSubscription = {
             planId: plan.id,
-            transactionId: null,
-            name: plan.name,
             duration: plan.duration,
-            role: plan.role,
-            features: plan.features,
-            price: amount,
-            paymentStatus: PaymentStatus.UNPAID,
-            ...getStartTimeAndEndTime(plan.duration),
         };
 
         return this._subscriptionService.upgradeSubscription(subscriptionData).pipe(
             takeUntil(this._destroy$),
             switchMap(res => {
                 let sub = res.data;
-                if (!sub || !sub.id) throw new Error('Failed to create subscription.');
+                if (!sub || !sub.id) throw new Error('Failed to upgrade subscription.');
 
                 return this._paymentService.createRazorpayOrder(amount).pipe(
                     switchMap(order => this._openRazorPayCheckout(order, sub.id))
@@ -248,11 +229,6 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     }
 
     proceedSub(plan: IPlan): void {
-        // if (this._paymentService.isPaymentInProgress()) {
-        //     this._toastr.error('Another payment is already in progress. Please wait.');
-        //     return;
-        // }
-
         if (plan.duration === PlanDuration.LIFETIME) {
             this._handleFreePlan();
             return;
@@ -260,13 +236,11 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
         const isUpgrade = this.currentPlanDuration === PlanDuration.MONTHLY;
         if (isUpgrade) {
-            this._toastr.warning('You are already in subscription. wait for it to expire.')
+            this._toastr.warning('You are already in subscription.');
             return;
         };
 
         const flow$ = this._initializePayment(plan);
-
-        // this._paymentService.lockPayment();
 
         flow$.pipe(takeUntil(this._destroy$)).subscribe({
             next: (status) => {
@@ -275,9 +249,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
                 } else if (status === "dismissed") {
                     this._toastr.info('Payment dismissed.');
                 }
-                // this._paymentService.unlockPayment()
             },
-            // error: () => this._paymentService.unlockPayment(),
         });
     }
 
