@@ -52,7 +52,7 @@
         </div>
     </div>
 
-    <div class="border rounded-lg overflow-x-auto">
+    <div class="border border-b-0 rounded-lg overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -68,59 +68,78 @@
             </thead>
 
             <tbody class="divide-y divide-gray-200 bg-white">
-                <tr *ngFor="let tx of transactions()" class="hover:bg-gray-50 transition-colors">
+                <ng-container *ngIf="transactions.length; else noData">
+                    <tr *ngFor="let tx of transactions()" class="hover:bg-gray-50 transition-colors">
 
-                    <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                        {{ tx.dateTime | date:'medium' }}
-                    </td>
+                        <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
+                            {{ tx.dateTime | date:'medium' }}
+                        </td>
 
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <ng-container *ngIf="tx.counterparty.role !== 'admin'; else admin">
-                            <div class="font-medium capitalize">
-                                {{ tx.counterparty.role }}
+                        <td class="px-4 py-3 text-sm text-gray-900">
+                            <ng-container *ngIf="tx.counterparty.role !== 'admin'; else admin">
+                                <div class="font-medium capitalize">
+                                    {{ tx.counterparty.role }}
+                                </div>
+                                <div class="text-xs text-gray-500 truncate max-w-[180px]">
+                                    {{ tx.counterparty.email }}
+                                </div>
+                            </ng-container>
+
+                            <ng-template #admin>
+                                <span class="text-gray-500 italic">Myself</span>
+                            </ng-template>
+                        </td>
+
+                        <td class="px-4 py-3 text-sm text-gray-800">
+                            {{ displayType(tx.type) }}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm font-medium" [class.text-green-600]="tx.direction === 'credit'"
+                            [class.text-red-600]="tx.direction === 'debit'">
+                            {{ tx.direction === 'credit' ? 'Credited' : 'Debited' }}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm font-semibold text-gray-900">
+                            {{ formatINR(tx.amount) }}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm text-gray-600 capitalize">
+                            {{ tx.referenceType }}
+                        </td>
+
+                        <td class="px-4 py-3 text-xs text-blue-600 font-mono max-w-[180px] cursor-pointer select-none group"
+                            (click)="copyToClipboard(tx.referenceId)">
+                            <div class="flex items-center gap-1">
+                                #{{ tx.referenceId | slice:0:8 }}…
+
+                                <i
+                                    class="fas fa-copy text-gray-400 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
                             </div>
-                            <div class="text-xs text-gray-500 truncate max-w-[180px]">
-                                {{ tx.counterparty.email }}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm text-gray-600 capitalize">
+                            {{ tx.source }}
+                        </td>
+
+                    </tr>
+                </ng-container>
+                <ng-template #noData>
+                    <tr>
+                        <td colspan="8" class="px-4 py-10 text-center">
+                            <div
+                                class="flex flex-col items-center justify-center min-h-[280px] text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300 p-8">
+
+                                <svg class="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor"
+                                    stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9.75 9.75h4.5m-4.5 4.5h4.5M4.5 6.75h15M6.75 6.75v10.5A2.25 2.25 0 009 19.5h6a2.25 2.25 0 002.25-2.25V6.75" />
+                                </svg>
+
+                                <p class="text-xl font-semibold">No transactions found</p>
                             </div>
-                        </ng-container>
-
-                        <ng-template #admin>
-                            <span class="text-gray-500 italic">Myself</span>
-                        </ng-template>
-                    </td>
-
-                    <td class="px-4 py-3 text-sm text-gray-800">
-                        {{ displayType(tx.type) }}
-                    </td>
-
-                    <td class="px-4 py-3 text-sm font-medium" [class.text-green-600]="tx.direction === 'credit'"
-                        [class.text-red-600]="tx.direction === 'debit'">
-                        {{ tx.direction === 'credit' ? 'Credited' : 'Debited' }}
-                    </td>
-
-                    <td class="px-4 py-3 text-sm font-semibold text-gray-900">
-                        {{ formatINR(tx.amount) }}
-                    </td>
-
-                    <td class="px-4 py-3 text-sm text-gray-600 capitalize">
-                        {{ tx.referenceType }}
-                    </td>
-
-                    <td class="px-4 py-3 text-xs text-blue-600 font-mono max-w-[180px] cursor-pointer select-none group"
-                        (click)="copyToClipboard(tx.referenceId)">
-                        <div class="flex items-center gap-1">
-                            #{{ tx.referenceId | slice:0:8 }}…
-
-                            <i
-                                class="fas fa-copy text-gray-400 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                        </div>
-                    </td>
-
-                    <td class="px-4 py-3 text-sm text-gray-600 capitalize">
-                        {{ tx.source }}
-                    </td>
-
-                </tr>
+                        </td>
+                    </tr>
+                </ng-template>
             </tbody>
 
         </table>
