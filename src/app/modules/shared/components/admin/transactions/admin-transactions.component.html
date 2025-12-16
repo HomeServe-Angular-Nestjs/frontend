@@ -68,7 +68,7 @@
             </thead>
 
             <tbody class="divide-y divide-gray-200 bg-white">
-                <ng-container *ngIf="transactions.length; else noData">
+                <ng-container *ngIf="transactions().length; else noData">
                     <tr *ngFor="let tx of transactions()" class="hover:bg-gray-50 transition-colors">
 
                         <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
