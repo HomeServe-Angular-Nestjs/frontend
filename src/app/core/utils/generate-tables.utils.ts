@@ -1,4 +1,5 @@
 import { IPlan } from "../models/plan.model";
+import { IAdminSubscriptionList } from "../models/subscription.model";
 import { ITable, TableData, UserTableRow } from "../models/table.model";
 import { IUserData } from "../models/user.model";
 
@@ -60,6 +61,52 @@ export const createProviderBookingTables = (columns: string[], data: Record<stri
 };
 
 
+export const createSubscriptionTable = (columns: string[], subscriptions: IAdminSubscriptionList[]): ITable => {
+    console.log('util: ', subscriptions)
+    return {
+        columns,
+        rows: subscriptions.map(sub => ({
+            subscriptionId: sub.subscriptionId,
+            user: {
+                email: sub.user.email,
+                role: sub.user.role,
+            },
+            plan: {
+                name: sub.plan.name,
+                duration: sub.plan.duration,
+            },
+            amount: sub.amount,
+            status: sub.status,
+            paymentStatus: sub.paymentStatus,
+            validity: {
+                start: sub.validity.start,
+                end: sub.validity.end,
+            },
+            renewalType: sub.renewalType,
+            actions: [
+                // {
+                //     toolTip: sub.isActive ? 'Deactivate Plan' : 'Activate Plan',
+                //     icon: sub.isActive ? 'fas fa-circle-check' : 'fas fa-circle-xmark',
+                //     styles: sub.isActive ? 'text-green-500' : 'text-red-400',
+                //     action: 'toggle',
+                // },
+                // {
+                //     toolTip: 'View Plan',
+                //     icon: 'fas fa-eye',
+                //     styles: 'text-blue-600',
+                //     action: 'view',
+                // },
+                // {
+                //     toolTip: 'Edit Plan',
+                //     icon: 'fas fa-edit',
+                //     styles: 'text-green-600',
+                //     action: 'edit',
+                // },
+            ]
+        }))
+    };
+};
+
 export const createPlansTable = (columns: string[], plans: IPlan[]): ITable => {
     return {
         columns,
@@ -83,6 +130,12 @@ export const createPlansTable = (columns: string[], plans: IPlan[]): ITable => {
                     icon: 'fas fa-eye',
                     styles: 'text-blue-600',
                     action: 'view',
+                },
+                {
+                    toolTip: 'Edit Plan',
+                    icon: 'fas fa-edit',
+                    styles: 'text-green-600',
+                    action: 'edit',
                 },
             ]
         }))

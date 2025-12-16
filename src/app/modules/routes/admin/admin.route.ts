@@ -26,12 +26,10 @@ export const adminRoute: Routes = [
                     {
                         path: 'dashboard',
                         loadComponent: () => import('../../shared/components/admin/dashboard/layout/admin-dashboard.component').then(c => c.AdminDashboardComponent),
-                        // canActivate: [AuthGuard]
                     },
                     {
                         path: 'users',
                         loadComponent: () => import('../../shared/components/admin/users/user-management.component').then(c => c.UserManagementComponent),
-                        // canActivate: [AuthGuard]
                     },
                     {
                         path: 'approvals',
@@ -39,9 +37,14 @@ export const adminRoute: Routes = [
                             .then(c => c.AdminApprovalLayoutComponent)
                     },
                     {
+                        path: 'plans',
+                        loadComponent: () => import('../../shared/components/admin/subsciptions/current-plans/current-plans.component')
+                            .then(c => c.CurrentPlansComponent)
+                    },
+                    {
                         path: 'subscriptions',
-                        loadComponent: () => import('../../shared/components/admin/subsciptions/layout/admin-subscription-layout.component')
-                            .then(c => c.AdminSubscriptionLayoutComponent)
+                        loadComponent: () => import('../../shared/components/admin/subsciptions/subscriptions-list/subscriptions-list.component')
+                            .then(c => c.AdminSubscriptionsListComponent)
                     },
                     {
                         path: 'bookings',
@@ -52,11 +55,6 @@ export const adminRoute: Routes = [
                         path: 'booking_details/:bookingId',
                         loadComponent: () => import('../../shared/components/admin/bookings/booking-details/booking-details.component')
                             .then(c => c.AdminBookingDetailsComponent)
-                    },
-                    {
-                        path: 'ratings&reviews',
-                        loadComponent: () => import('../../shared/components/admin/ratings-and-reviews/layout/reviews-and-rating.component')
-                            .then(c => c.AdminReviewsAndRatingsLayout)
                     },
                     {
                         path: 'reports',

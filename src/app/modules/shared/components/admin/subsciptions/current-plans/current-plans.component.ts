@@ -9,32 +9,48 @@ import { createPlansTable } from "../../../../../../core/utils/generate-tables.u
 import { AdminTableComponent } from "../../../../partials/sections/admin/tables/admin-table/table.component";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
+import { AdminPlanDetailsComponent } from "../plans-details/plans-details.component";
+import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 
 @Component({
     selector: 'app-admin-view-plans',
-    templateUrl: 'admin-view-plans.component.html',
-    imports: [CommonModule, AdminTableComponent]
+    templateUrl: 'current-plans.component.html',
+    imports: [CommonModule, AdminTableComponent, AdminPlanDetailsComponent]
 })
-export class AdminViewPlansComponent implements OnInit, OnDestroy {
+export class CurrentPlansComponent implements OnInit, OnDestroy {
     private readonly _planService = inject(PlanService);
     private readonly _toastr = inject(ToastNotificationService);
+    private readonly _sharedService = inject(SharedDataService);
     private _dialog = inject(MatDialog);
-
-    @Output() createPlanEvent = new EventEmitter<string>();
-    @Output() viewPlanEvent = new EventEmitter();
-
     private _destroy$ = new Subject<void>();
 
     tableData$ = this._planService.tableData$;
     columns: string[] = ['id', 'plan name', 'pricing', 'role', 'billing cycle', 'created date', 'status'];
+    isViewPlanModalOpen = false;
+    planToView!: IPlan;
+    isEditMode = false;
 
     ngOnInit(): void {
+        this._sharedService.setAdminHeader('Subscriptions & Plans');
         this._loadTableData();
     }
 
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
+    public updateOrInsertRow(plan: IPlan) {
+        const currentTable = this._planService.getTableData;
+        const newRow = this._mapPlanToRow(plan);
+        const index = currentTable.rows.findIndex(r => r['id'] === plan.id);
+
+        let updatedRows;
+        if (index > -1) {
+            updatedRows = currentTable.rows.map(r => r['id'] === plan.id ? newRow : r);
+        } else {
+            updatedRows = [newRow, ...currentTable.rows];
+        }
+
+        this._planService.setTableData = {
+            ...currentTable,
+            rows: updatedRows,
+        };
     }
 
     private _loadTableData() {
@@ -55,6 +71,7 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
             'billing cycle': plan.duration,
             'created date': plan.createdAt,
             status: plan.isActive,
+            createdAt: plan.createdAt,
             actions: [
                 {
                     toolTip: plan.isActive ? 'Deactivate Plan' : 'Activate Plan',
@@ -67,6 +84,12 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
                     icon: 'fas fa-eye',
                     styles: 'text-blue-600',
                     action: 'view',
+                },
+                {
+                    toolTip: 'Edit Plan',
+                    icon: 'fas fa-edit',
+                    styles: 'text-green-600',
+                    action: 'edit',
                 },
             ]
         };
@@ -103,33 +126,29 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
         });
     }
 
-    public updateOrInsertRow(plan: IPlan) {
-        const currentTable = this._planService.getTableData;
-        const newRow = this._mapPlanToRow(plan);
-        const index = currentTable.rows.findIndex(r => r['id'] === plan.id);
-
-        let updatedRows;
-        if (index > -1) {
-            updatedRows = currentTable.rows.map(r => r['id'] === plan.id ? newRow : r);
-        } else {
-            updatedRows = [newRow, ...currentTable.rows];
-        }
-
-        this._planService.setTableData = {
-            ...currentTable,
-            rows: updatedRows,
-        };
+    private _viewPlan(planId: string) {
+        this._planService.fetchOnePlan(planId)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe({
+                next: (res) => {
+                    if (res.success && res.data) {
+                        this.planToView = res.data;
+                        this.isViewPlanModalOpen = true;
+                    }
+                },
+            });
     }
 
     adminTableActionTriggered(event: { action: string; row: any }) {
         let action = event.action;
-        if (action === 'toggle') {
-            action = event.row.status ? 'inactivate' : 'activate';
-        }
 
         if (action === 'view') {
-            this.viewPlanEvent.emit(event.row.id);
+            this._viewPlan(event.row.id);
             return;
+        }
+
+        if (action === 'toggle') {
+            action = event.row.status ? 'deactivate' : 'activate';
         }
 
         this._openConfirmationDialog(`Are you sure you want to ${action} the plan?`, 'Confirm Action')
@@ -141,10 +160,45 @@ export class AdminViewPlansComponent implements OnInit, OnDestroy {
                     case 'toggle':
                         this._togglePlanStatus(event.row);
                         break;
-                    case 'view':
-                        this.viewPlanEvent.emit(event.row.id);
+                    case 'edit': {
+                        this.isEditMode = true;
+                        this._viewPlan(event.row.id);
+                        break;
+                    }
+                    default:
                         break;
                 }
             });
     }
+
+    updatePlan(newPlan: IPlan) {
+        this._planService.updatePlan(newPlan)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe({
+                next: (res) => {
+                    const currentTable = this._planService.getTableData;
+
+                    const updatedRows = currentTable.rows.map(row =>
+                        row['id'] === newPlan.id ? this._mapPlanToRow(newPlan) : row
+                    );
+
+                    this._planService.setTableData = {
+                        ...currentTable,
+                        rows: updatedRows
+                    };
+
+                    this._toastr.success(res.message);
+                },
+            });
+    }
+
+    closeModal() {
+        this.isViewPlanModalOpen = false;
+    }
+
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
+    }
+
 }

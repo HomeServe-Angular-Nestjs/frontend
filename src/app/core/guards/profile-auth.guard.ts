@@ -19,9 +19,7 @@ import { selectAuthUser } from "../../store/auth/auth.selector";
  * If the parameters are not present or invalid, access is granted by default.
  */
 
-export const ProfileAuthGuard: CanActivateFn = (
-    route: ActivatedRouteSnapshot,
-): Observable<boolean> => {
+export const ProfileAuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot,): Observable<boolean> => {
     const store = inject(Store);
 
     const isLoggedIn: string = route.queryParams['loggedIn'];

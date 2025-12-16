@@ -1,83 +1,114 @@
-<section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-[80vh]">
+<section class="py-14 px-4 bg-gray-50 min-h-[80vh]">
     <div class="max-w-4xl mx-auto">
 
-        <div class="mb-8">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800">Your Subscription</h1>
-            <p class="mt-2 text-gray-600 text-base sm:text-lg">
-                Stay informed about your current plan and manage your subscription efficiently.
-            </p>
-        </div>
+        <ng-container *ngIf="subscription$ | async as sub; else emptyState">
 
-        <!-- Subscription Card -->
-        <section *ngIf="subscription$ | async as subscription" class="bg-white rounded-xl shadow-md p-6 sm:p-8">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <!-- Plan Info (spans 2 columns) -->
-                <div class="sm:col-span-2">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-2">Current Plan</h2>
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
 
-                    <p class="text-2xl font-bold mb-1" [ngClass]="{
-                        'text-green-700': userType === 'provider',
-                        'text-blue-700': userType === 'customer'
-                        }">
-                        {{ subscription.name | capitalizeFirst}}
-                        <span class="ml-2 text-sm font-medium text-gray-500 capitalize">
-                            ({{ subscription.duration }})
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="{
+                'bg-green-100 text-green-700': sub.isActive,
+                'bg-red-100 text-red-700': !sub.isActive
+              }">
+                            {{ sub.isActive ? 'Active Plan' : 'Inactive Plan' }}
                         </span>
-                    </p>
 
-                    <p class="text-sm text-gray-600">
-                        Expiring on:
-                        <span class="font-medium text-gray-800">
-                            {{ subscription.endDate | date: 'mediumDate' }}
-                        </span>
-                    </p>
+                        <h2 class="mt-2 text-2xl font-bold text-gray-900">
+                            {{ sub.name | capitalizeFirst }}
+                            <span class="text-sm font-medium text-gray-500 capitalize">
+                                · {{ sub.duration }}
+                            </span>
+                        </h2>
+
+                        <p class="text-sm text-gray-600 mt-1">
+                            Expires on
+                            <span class="font-medium text-gray-800">
+                                {{ sub.endDate | date:'mediumDate' }}
+                            </span>
+                        </p>
+                    </div>c
+
+                    <!-- Primary CTA -->
+                    <button (click)="navigateToPlans()"
+                        class="self-start sm:self-center px-5 py-2.5 rounded-xl font-semibold text-white shadow-md transition"
+                        [ngClass]="{
+              'bg-blue-600 hover:bg-blue-700': userType === 'customer',
+              'bg-green-600 hover:bg-green-700': userType === 'provider'
+            }">
+                        {{ sub.isActive ? 'Change Plan' : 'Choose a Plan' }}
+                    </button>
+                </div>
+
+                <!-- Divider -->
+                <div class="my-6 border-t"></div>
+
+                <!-- Details -->
+                <div class="grid sm:grid-cols-2 gap-6">
+
+                    <!-- Renewal -->
+                    <div>
+                        <p class="text-sm font-semibold text-gray-700 mb-1">Renewal</p>
+                        <p class="text-sm text-gray-600 capitalize">
+                            {{ sub.renewalType === 'auto' ? 'Auto renewal enabled' : 'Manual renewal' }}
+                        </p>
+                    </div>
 
                     <!-- Features -->
-                    <div class="mt-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-1">
-                            Included Features
-                        </h3>
-                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-1"
-                            *ngIf="subscription.features?.length">
-                            <li *ngFor="let feature of subscription.features">{{ feature }}</li>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-700 mb-2">Included Features</p>
+                        <ul *ngIf="sub.features?.length" class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                            <li *ngFor="let feature of sub.features">
+                                {{ feature }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+        </ng-container>
+
+        <!-- Empty State -->
+        <ng-template #emptyState>
+            <div class="bg-white border border-dashed border-gray-300 rounded-xl px-8 py-10 max-w-3xl mx-auto">
+
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+
+                    <!-- Left: Message -->
+                    <div>
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-2">
+                            You’re currently on the Free tier
+                        </h2>
+
+                        <p class="text-sm text-gray-600 max-w-lg">
+                            Upgrade your subscription to receive more bookings, advanced analytics,
+                            and priority visibility on the platform.
+                        </p>
+
+                        <!-- Value bullets -->
+                        <ul class="mt-4 space-y-1 text-sm text-gray-700">
+                            <li>• Higher customer visibility</li>
+                            <li>• Access to premium features</li>
+                            <li>• Better revenue insights</li>
                         </ul>
                     </div>
 
-                    <!-- Renewal Type -->
-                    <div class="flex items-center text-xs text-gray-500 mt-4 gap-2">
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only" [checked]="subscription.renewalType === 'auto'" />
-                            <i class="fas text-base transition-all duration-200" [ngClass]="{ 
-                                'fa-toggle-on text-green-600': subscription.renewalType === 'auto',
-                                'fa-toggle-off text-gray-400': subscription.renewalType === 'manual'
-                                }"></i>
-                        </label>
-
-                        <span class="font-medium capitalize text-gray-700">
-                            {{ subscription.renewalType }}
-                        </span>
+                    <!-- Right: CTA -->
+                    <div class="flex-shrink-0">
+                        <button (click)="navigateToPlans()"
+                            class="px-6 py-3 rounded-xl font-semibold text-white shadow-md transition" [ngClass]="{
+            'bg-blue-600 hover:bg-blue-700': userType === 'customer',
+            'bg-green-600 hover:bg-green-700': userType === 'provider'
+          }">
+                            Upgrade Subscription
+                        </button>
                     </div>
 
-
-
-                    <!-- Inactive Status -->
-                    <p class="text-xs text-red-600 mt-1" *ngIf="!subscription.isActive">
-                        This plan is currently inactive.
-                    </p>
-                </div>
-
-                <!-- Actions -->
-                <div class="flex flex-col justify-start gap-3 sm:items-end">
-                    <button (click)="navigateToPlans()"
-                        class="text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition" [ngClass]="{
-                            'bg-blue-600 hover:bg-blue-700': userType === 'customer',
-                            'bg-green-600 hover:bg-green-700': userType === 'provider'
-                        }">
-                        Upgrade Plan
-                    </button>
                 </div>
             </div>
-        </section> 
+        </ng-template>
 
 
     </div>

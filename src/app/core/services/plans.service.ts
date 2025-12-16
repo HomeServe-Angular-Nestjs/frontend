@@ -35,4 +35,8 @@ export class PlanService {
     updatePlanStatus(updateData: IUpdatePlanStatus): Observable<IResponse<IPlan>> {
         return this._http.patch<IResponse<IPlan>>(`${this._planApi}/status`, updateData);
     }
+
+    updatePlan(plan: Partial<IPlan>): Observable<IResponse<IPlan>> {
+        return this._http.put<IResponse<IPlan>>(`${this._planApi}/update`, plan);
+    }
 }
