@@ -169,7 +169,7 @@ export class ProviderHomepageComponent implements OnInit, OnDestroy {
             title: 'Working Hours',
             icon: 'fa-clock',
             iconColorClass: 'text-green-600',
-            value: `${data.availability.time.from} - ${data.availability.time.to}`,
+            value: `${data.availability?.time?.from || 0} - ${data.availability?.time?.to || 0}`,
             valueColorClass: 'text-gray-800',
             bgColorClass: 'bg-green-50',
             borderColorClass: 'border-green-100',
