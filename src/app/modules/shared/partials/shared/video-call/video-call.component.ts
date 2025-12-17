@@ -51,7 +51,11 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     const tag = this.role === "caller" ? "CALLER" : "CALLEE";
     console.log(`${tag}: Initializing RTCPeerConnection`);
 
-    this._pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+    this._pc = new RTCPeerConnection({
+      iceServers: ICE_SERVERS,
+      iceTransportPolicy: "relay",
+    });
+
     (window as any)._pc = this._pc;
 
     this.remoteStream = new MediaStream();
@@ -86,13 +90,13 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     this._videoSocketService.onAccept(async (data) => {
-      if (this.role === "caller") {
-        try {
-          await this.ensureLocalStream(tag);
-          await this._startOffer(tag);
-        } catch (err) {
-          console.error(`${tag}: Failed to start offer after accept`, err);
-        }
+      if (this.role === "caller") return;
+
+      try {
+        await this.ensureLocalStream(tag);
+        await this._startOffer(tag);
+      } catch (err) {
+        console.error(`${tag}: Failed to start offer after accept`, err);
       }
     });
 
@@ -113,7 +117,6 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async ngAfterViewInit() {
     const tag = this.role === "caller" ? "CALLER" : "CALLEE";
-    console.log(`${tag}: Setting up local and remote video`);
 
     if (!this.localStream || !this.localStream.getTracks().length) {
       try {
@@ -129,7 +132,7 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.localVideoRef && this.localStream) {
       const lv = this.localVideoRef.nativeElement;
-      lv.muted = true;
+      lv.muted = false;
       lv.playsInline = true;
       lv.autoplay = true;
       if (lv.srcObject !== this.localStream) lv.srcObject = this.localStream;
@@ -147,9 +150,9 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
       await rv.play().catch(() => { });
     }
 
-    if (this.role === "caller" && this._pc.signalingState === "stable") {
-      await this._startOffer(tag).catch(() => { });
-    }
+    // if (this.role === "caller" && this._pc.signalingState === "stable") {
+    //   await this._startOffer(tag).catch(() => { });
+    // }
 
     this._startStatsPolling(tag);
   }

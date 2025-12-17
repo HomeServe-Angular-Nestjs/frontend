@@ -228,7 +228,6 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
     } else if (this.receiverType === 'customer') {
-      alert('Customer')
       this._bookingService.canProviderStartCall(this.receiverId)
         .pipe(takeUntil(this._destroy$))
         .subscribe(res => {
