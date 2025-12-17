@@ -22,7 +22,7 @@ export abstract class BaseSocketService {
     }
 
     if (!this.socket) {
-      this.socket = io(`${this._socketUrl}/${this.namespace}`, {
+      this.socket = io(this._socketUrl + this.namespace, {
         withCredentials: true,
         transports: ['websocket'],
         forceNew: true,

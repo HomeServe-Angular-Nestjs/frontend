@@ -14,7 +14,7 @@ import { NotificationTemplateId, NotificationType } from "../../enums/enums";
 export class NotificationSocketService extends BaseSocketService {
     private readonly _store = inject(Store);
 
-    protected override namespace: string = 'notification';
+    protected override namespace: string = '/notification';
 
     private readonly _notificationApi = API_ENV.notification;
     private readonly NEW_NOTIFICATION = 'notification:new';

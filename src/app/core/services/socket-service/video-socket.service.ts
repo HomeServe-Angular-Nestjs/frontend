@@ -9,7 +9,7 @@ export class VideoCallSocketService extends BaseSocketService {
   private injector = inject(Injector);
   private callService?: VideoCallService;
 
-  protected override namespace: string = 'video-call';
+  protected override namespace: string = '/video-call';
 
   private SIGNAL = 'video-call:signal';
   private VIDEO_CALL_ROLE = 'video-call:role';
