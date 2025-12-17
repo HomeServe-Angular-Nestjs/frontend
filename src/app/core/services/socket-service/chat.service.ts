@@ -16,7 +16,7 @@ export class ChatSocketService extends BaseSocketService {
     private readonly _chatApi = API_ENV.chat;
     private readonly _messageApi = API_ENV.message;
 
-    protected override namespace: string = 'chat';
+    protected override namespace: string = '/chat';
 
     constructor(private readonly _http: HttpClient) {
         super();

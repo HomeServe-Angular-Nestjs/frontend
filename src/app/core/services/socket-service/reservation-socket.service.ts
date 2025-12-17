@@ -12,7 +12,7 @@ export class ReservationSocketService extends BaseSocketService {
   private readonly _http = inject(HttpClient);
   private readonly _store = inject(Store);
 
-  protected override namespace = 'reservation';
+  protected override namespace = '/reservation';
 
   private readonly NEW_RESERVATION = 'reservation:new'
   private readonly CHECK_RESERVATION = 'reservation:check';
