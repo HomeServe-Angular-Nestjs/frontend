@@ -7,6 +7,7 @@ import {
   ElementRef,
   ViewChild,
   inject,
+  effect,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
@@ -37,7 +38,7 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   isMinimized = false;
   isAudioEnabled = true;
   isVideoEnabled = true;
-  role: VideoRoleType = "caller";
+  role!: VideoRoleType;
 
   // drag state
   private target = { x: 0, y: 0 };
@@ -47,10 +48,17 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   dragging = false;
   transform = "translate3d(0px, 0px, 0px)";
 
-  async ngOnInit() {
-    const tag = this.role === "caller" ? "CALLER" : "CALLEE";
-    console.log(`${tag}: Initializing RTCPeerConnection`);
+  constructor() {
+    effect(() => {
+      const r = this._videoSocketService.role();
+      if (r) {
+        this.role = r;
+        console.log("Video role set:", r);
+      }
+    });
+  }
 
+  async ngOnInit() {
     this._pc = new RTCPeerConnection({
       iceServers: ICE_SERVERS,
       iceTransportPolicy: "relay",
@@ -58,25 +66,29 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
 
     (window as any)._pc = this._pc;
 
-    this.remoteStream = new MediaStream();
+    this._pc.addTransceiver("video", { direction: "sendrecv" });
+    this._pc.addTransceiver("audio", { direction: "sendrecv" });
 
     this._pc.ontrack = (event) => {
-      const tracks =
-        (event.streams && event.streams[0]?.getTracks()) ||
-        (event.track ? [event.track] : []);
-      tracks.forEach((track) => {
-        const exists = this.remoteStream.getTracks().some((t) => t.id === track.id);
-        if (!exists) {
-          this.remoteStream.addTrack(track);
-        }
-      });
+      console.log("REMOTE TRACK:", event.track.kind);
 
-      if (this.remoteVideoRef?.nativeElement) {
-        try {
-          const rv = this.remoteVideoRef.nativeElement;
-          if (rv.srcObject !== this.remoteStream) rv.srcObject = this.remoteStream;
-          rv.play().catch(() => { });
-        } catch { }
+      // prevent duplicates
+      if (!this.remoteStream.getTracks().some(t => t.id === event.track.id)) {
+        this.remoteStream.addTrack(event.track);
+      }
+
+      const rv = this.remoteVideoRef?.nativeElement;
+      if (rv && rv.srcObject !== this.remoteStream) {
+        rv.srcObject = this.remoteStream;
+        rv.muted = false;
+        rv.playsInline = true;
+        rv.autoplay = true;
+
+        rv.onloadedmetadata = () => {
+          rv.play().catch(err => {
+            console.warn("Remote video play blocked:", err);
+          });
+        };
       }
     };
 
@@ -89,175 +101,96 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     };
 
-    this._videoSocketService.onAccept(async (data) => {
-      if (this.role === "caller") return;
+    this._videoSocketService.onAccept(async () => {
+      if (this.role !== "caller") return;
 
-      try {
-        await this.ensureLocalStream(tag);
-        await this._startOffer(tag);
-      } catch (err) {
-        console.error(`${tag}: Failed to start offer after accept`, err);
-      }
+      await this.ensureLocalStream();
+      this._maybeAddLocalTracks();
+      await this._startOffer();
     });
 
-    this._registerSignalHandlers(tag);
+    this._registerSignalHandlers();
     this._videoSocketService.initSignalListener();
 
-    try {
-      this.localStream = await navigator.mediaDevices
-        .getUserMedia({ audio: true, video: true })
-        .catch(() => null);
-      if (this.localStream) {
-        this._maybeAddLocalTracks();
-      }
-    } catch (e) {
-      console.warn(`${tag}: Failed to prefetch local stream`, e);
-    }
+    // this.localStream = await navigator.mediaDevices
+    //   .getUserMedia({ audio: true, video: true })
+    //   .catch(() => null);
+    // if (this.localStream) {
+    //   this._maybeAddLocalTracks();
+    // }
   }
 
   async ngAfterViewInit() {
-    const tag = this.role === "caller" ? "CALLER" : "CALLEE";
-
-    if (!this.localStream || !this.localStream.getTracks().length) {
-      try {
-        this.localStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true,
-        });
-      } catch (err) {
-        console.error(`${tag}: Failed to getUserMedia`, err);
-        return;
-      }
+    if (!this.localStream) {
+      this.localStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
     }
 
-    if (this.localVideoRef && this.localStream) {
-      const lv = this.localVideoRef.nativeElement;
-      lv.muted = false;
-      lv.playsInline = true;
-      lv.autoplay = true;
-      if (lv.srcObject !== this.localStream) lv.srcObject = this.localStream;
-      await lv.play().catch(() => { });
-    }
+    const lv = this.localVideoRef.nativeElement;
+    lv.muted = true;
+    lv.autoplay = true;
+    lv.playsInline = true;
+    lv.srcObject = this.localStream;
+    await lv.play().catch(() => { });
 
     this._maybeAddLocalTracks();
-
-    if (this.remoteVideoRef) {
-      const rv = this.remoteVideoRef.nativeElement;
-      rv.muted = true;
-      rv.playsInline = true;
-      rv.autoplay = true;
-      if (rv.srcObject !== this.remoteStream) rv.srcObject = this.remoteStream;
-      await rv.play().catch(() => { });
-    }
-
-    // if (this.role === "caller" && this._pc.signalingState === "stable") {
-    //   await this._startOffer(tag).catch(() => { });
-    // }
-
-    this._startStatsPolling(tag);
   }
 
   private _maybeAddLocalTracks() {
     if (this.tracksAdded || !this.localStream) return;
-    try {
-      this.localStream.getTracks().forEach((track) => {
-        this._pc.addTrack(track, this.localStream!);
-      });
-      this.tracksAdded = true;
-    } catch (e) {
-      console.warn("Failed to add local tracks:", e);
-    }
+
+    this.localStream.getTracks().forEach((track) => {
+      this._pc.addTrack(track, this.localStream!);
+    });
+    this.tracksAdded = true;
   }
 
-  private async ensureLocalStream(tag: string) {
-    if (this.localStream && this.localStream.getTracks().length) {
-      this._maybeAddLocalTracks();
-      return this.localStream;
-    }
+  private async ensureLocalStream() {
+    if (this.localStream) return this.localStream;
+
     this.localStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true,
     });
+
     this._maybeAddLocalTracks();
     return this.localStream;
   }
 
-  private _registerSignalHandlers(tag: string) {
+  private _registerSignalHandlers() {
     this._videoSocketService.onSignal("offer", async (data) => {
-      try {
-        await this.ensureLocalStream(tag);
-        await this._pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+      await this.ensureLocalStream();
+      await this._pc.setRemoteDescription(data.offer);
 
-        const answer = await this._pc.createAnswer();
-        await this._pc.setLocalDescription(answer);
-        this._videoSocketService.sendSignal({ type: "answer", answer });
-      } catch (err) {
-        console.error(`${tag}: Error handling offer`, err);
-      }
+      const answer = await this._pc.createAnswer();
+      await this._pc.setLocalDescription(answer);
+
+      this._videoSocketService.sendSignal({ type: "answer", answer });
     });
 
     this._videoSocketService.onSignal("answer", async (data) => {
-      try {
-        if (this._pc.signalingState === "have-local-offer") {
-          await this._pc.setRemoteDescription(
-            new RTCSessionDescription(data.answer)
-          );
-          while (this.pendingIce.length) {
-            const c = this.pendingIce.shift()!;
-            await this._pc.addIceCandidate(c);
-          }
-        }
-      } catch (err) {
-        console.error(`${tag}: Error setting remote description`, err);
+      await this._pc.setRemoteDescription(data.answer);
+
+      while (this.pendingIce.length) {
+        await this._pc.addIceCandidate(this.pendingIce.shift()!);
       }
     });
 
     this._videoSocketService.onSignal("ice-candidate", async (data) => {
-      try {
-        if (!this._pc.remoteDescription?.type) {
-          this.pendingIce.push(data.candidate);
-        } else {
-          await this._pc.addIceCandidate(data.candidate);
-        }
-      } catch (err) {
-        console.error(`${tag}: Error adding ICE candidate`, err);
+      if (!this._pc.remoteDescription) {
+        this.pendingIce.push(data.candidate);
+      } else {
+        await this._pc.addIceCandidate(data.candidate);
       }
     });
   }
 
-  private async _startOffer(tag: string) {
-    try {
-      await this.ensureLocalStream(tag);
-      const offer = await this._pc.createOffer();
-      await this._pc.setLocalDescription(offer);
-      this._videoSocketService.sendSignal({ type: "offer", offer });
-    } catch (e) {
-      console.error(`${tag}: Failed to create/send offer`, e);
-      throw e;
-    }
-  }
-
-  private _startStatsPolling(tag: string) {
-    let count = 0;
-    const interval = setInterval(async () => {
-      count++;
-      const stats = await this._pc.getStats();
-      stats.forEach((r) => {
-        if (r.type === "inbound-rtp" && (r.kind === "video" || r.mediaType === "video")) {
-          console.log(`${tag}: inbound-rtp`, {
-            bytesReceived: (r as any).bytesReceived,
-            framesDecoded: (r as any).framesDecoded,
-          });
-        }
-        if (r.type === "outbound-rtp" && (r.kind === "video" || r.mediaType === "video")) {
-          console.log(`${tag}: outbound-rtp`, {
-            bytesSent: (r as any).bytesSent,
-            framesEncoded: (r as any).framesEncoded,
-          });
-        }
-      });
-      if (count > 30) clearInterval(interval);
-    }, 2000);
+  private async _startOffer() {
+    const offer = await this._pc.createOffer();
+    await this._pc.setLocalDescription(offer);
+    this._videoSocketService.sendSignal({ type: "offer", offer });
   }
 
   toggleAudioEnabling() {

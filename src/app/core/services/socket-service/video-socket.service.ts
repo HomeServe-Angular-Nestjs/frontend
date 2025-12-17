@@ -35,11 +35,9 @@ export class VideoCallSocketService extends BaseSocketService {
 
   protected override onConnect(): void {
     console.log('[VideoCallSocket] Connected');
-    // ensure listener is active for incoming signals
     this.initSignalListener();
 
     this.onRinging((data: { callerId: string }) => {
-      console.log('Incoming ringing event:', data);
       if (data?.callerId) {
         this.callService ??= this.injector.get(VideoCallService);
         this.callService.showIncomingFloating(data.callerId);
@@ -51,28 +49,19 @@ export class VideoCallSocketService extends BaseSocketService {
     console.log('[VideoCallSocket] Disconnected');
   }
 
+  /* ===================== SIGNAL ===================== */
   sendSignal(data: any) {
-    if (!this.partnerId) {
-      console.warn('[VideoCallSocket] partnerId is not set — cannot send signal', data);
-      return;
-    }
-
-    const full = {
+    this.emit(this.SIGNAL, {
       targetUserId: this.partnerId,
       ...data,
-    };
-
-    console.log('📤 Sending signal:', full);
-    this.emit(this.SIGNAL, full);
+    });
   }
 
   onSignal(type: string, callback: (msg: any) => void) {
     this._listeners[type] = callback;
 
     const pending = this._pendingSignals.filter(e => e.type === type);
-    for (const event of pending) {
-      callback(event);
-    }
+    pending.forEach(e => callback(e));
 
     this._pendingSignals = this._pendingSignals.filter(e => e.type !== type);
   }
@@ -95,7 +84,6 @@ export class VideoCallSocketService extends BaseSocketService {
 
     this.listen(this.SIGNAL, (event: any) => {
       const type = event?.type;
-      console.log('[SIGNAL] received by client:', event);
 
       if (type && this._listeners[type]) {
         this._listeners[type](event);
@@ -108,32 +96,34 @@ export class VideoCallSocketService extends BaseSocketService {
       this.role.set(event.role);
     });
 
-    this.listen(this.VIDEO_CALL_UNAVAILABLE, (event: { message: string }) => {
-      // alert(event.message);
-    });
+    this.listen(this.VIDEO_CALL_UNAVAILABLE, () => { });
 
     this.listen(this.VIDEO_CALL_RINGING, (event: any) => {
-      console.log('📳 Incoming call (socket event):', event);
       if (this._ringingListener) this._ringingListener(event);
     });
 
     this.listen(this.VIDEO_CALL_ACCEPT, (data) => {
-      console.log('✅ Call accepted event:', data);
       if (this._acceptListener) this._acceptListener(data);
     });
   }
 
+  /* ===================== CALL FLOW ===================== */
   startCall(callee: string) {
     this.partnerId = callee;
+    this.role.set("caller");
     this.emit(this.VIDEO_CALL_INITIATE, { callee });
   }
 
   acceptCall(callerId: string) {
     this.partnerId = callerId;
+    this.role.set("callee");
     this.emit(this.VIDEO_CALL_ACCEPT, { callerId });
   }
 
   endCall(partnerId: string) {
     this.emit(this.VIDEO_CALL_LEAVE, { callee: partnerId });
+    this.partnerId = undefined as any;
+    this.role.set(null);
+    this._pendingSignals = [];
   }
 }
