@@ -11,6 +11,8 @@ import { selectAuthUserId } from "../../../../../../store/auth/auth.selector";
 import { chatActions } from "../../../../../../store/chat/chat.action";
 import { LoadingCircleAnimationComponent } from "../../loading-Animations/loading-circle/loading-circle.component";
 import { VideoCallService } from "../../../../../../core/services/video-call.service";
+import { BookingService } from "../../../../../../core/services/booking.service";
+import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 
 @Component({
   selector: 'app-chat-message-area',
@@ -21,6 +23,8 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly _chatSocketService = inject(ChatSocketService);
   private readonly _videoCallService = inject(VideoCallService);
   private readonly _cdRef = inject(ChangeDetectorRef);
+  private readonly _bookingService = inject(BookingService);
+  private _toastr = inject(ToastNotificationService);
 
   private readonly _ngZone = inject(NgZone);
   private readonly _store = inject(Store);
@@ -212,6 +216,27 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   startVideoCall() {
-    this._videoCallService.startCall(this.receiverId);
+    if (!this.receiverId) return;
+    if (this.receiverType === 'provider') {
+      this._bookingService.canCustomerStartCall(this.receiverId)
+        .pipe(takeUntil(this._destroy$))
+        .subscribe(res => {
+          if (res.success) {
+            this._videoCallService.startCall(this.receiverId);
+          } else {
+            this._toastr.error(res.message);
+          }
+        });
+    } else if (this.receiverType === 'customer') {
+      this._bookingService.canProviderStartCall(this.receiverId)
+        .pipe(takeUntil(this._destroy$))
+        .subscribe(res => {
+          if (res.success) {
+            this._videoCallService.startCall(this.receiverId);
+          } else {
+            this._toastr.error(res.message);
+          }
+        });
+    }
   }
 }

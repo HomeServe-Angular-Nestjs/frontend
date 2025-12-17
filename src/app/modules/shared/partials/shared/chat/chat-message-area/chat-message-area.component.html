@@ -1,84 +1,117 @@
-<ng-container *ngIf="(chat$ | async) as chat;else noChatSelected">
-    <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
+<ng-container *ngIf="(chat$ | async) as chat; else noChatSelected">
+    <div class="flex flex-col flex-1 min-h-0 overflow-hidden bg-white">
 
-        <!-- Header -->
-        <div class="px-8 py-5 border-b bg-white flex items-center justify-between shrink-0">
+        <!-- ================= CHAT HEADER ================= -->
+        <div class="px-4 py-2 border-b bg-white flex items-center justify-between shrink-0">
             <ng-container *ngIf="chat.receiver as receiver">
+
                 <!-- User Info -->
-                <div class="flex items-center gap-4">
-                    <img [src]="receiver.avatar" alt="User avatar"
-                        class="w-12 h-12 rounded-full object-cover border-2 border-blue-100 shadow" />
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-800">{{ receiver.name }}</h2>
-                        <p class="text-xs text-green-500">Online</p>
+                <div class="flex items-center gap-3 min-w-0">
+                    <img [src]="receiver.avatar" alt="User avatar" referrerpolicy="no-referrer"
+                        class="w-9 h-9 rounded-full object-cover border border-blue-100" />
+
+                    <div class="min-w-0">
+                        <h2 class="text-sm font-semibold text-gray-800 leading-tight truncate">
+                            {{ receiver.name }}
+                        </h2>
+                        <p class="text-[11px] text-green-500 leading-tight">
+                            Online
+                        </p>
                     </div>
                 </div>
-                <!-- Action Icons -->
-                <div class="flex items-center gap-6 text-gray-400">
-                    <button aria-label="Call" class="hover:text-blue-600 transition"><i
-                            class="fas fa-phone"></i></button>
-                    <button (click)="startVideoCall()" aria-label="Video Call" class="hover:text-blue-600 transition"><i
-                            class="fas fa-video"></i></button>
-                    <button aria-label="More options" class="hover:text-blue-600 transition"><i
-                            class="fas fa-ellipsis-v"></i></button>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-4 text-gray-400">
+                    <!-- <button aria-label="Call" class="hover:text-blue-600 transition">
+                        <i class="fas fa-phone text-sm"></i>
+                    </button> -->
+
+                    <button aria-label="Video Call" (click)="startVideoCall()" class="hover:text-blue-600 transition">
+                        <i class="fas fa-video text-sm"></i>
+                    </button>
+                    <!-- 
+                    <button aria-label="More options" class="hover:text-blue-600 transition">
+                        <i class="fas fa-ellipsis-v text-sm"></i>
+                    </button> -->
                 </div>
+
             </ng-container>
         </div>
 
+        <!-- ================= MESSAGES SCROLL AREA ================= -->
         <div #messageScrollBox class="flex-1 overflow-y-scroll px-6 py-4 space-y-4 bg-white min-h-0"
             (scroll)="onScroll()">
             <ng-container *ngIf="(messages$ | async) as messages; else loadingMessages">
+
+                <!-- ================= MESSAGE LIST ================= -->
                 <ng-container *ngIf="messages.length > 0; else noMessagesContent">
                     <ng-container *ngFor="let message of messages">
-                        <div #messageItem class="flex" [attr.data-message-id]="message.id" [ngClass]="{
-                            'justify-end': message.senderId === currentUserId,
-                            'justify-start': message.receiverId === currentUserId
-                            }">
 
-                            <div class="rounded-lg p-3 text-sm max-w-xs" [ngClass]="{
-                                'bg-blue-600 text-white': message.senderId === currentUserId,
-                                'bg-gray-100 text-gray-900': message.receiverId === currentUserId
-                                }">
-                                {{ message.content }}
-                                <div class="text-xs text-gray-400 mt-1 text-right">
+                        <div class="flex" [attr.data-message-id]="message.id" [ngClass]="{
+                'justify-end': message.senderId === currentUserId,
+                'justify-start': message.senderId !== currentUserId
+              }">
+                            <div class="rounded-lg p-3 text-sm max-w-[70%]" [ngClass]="{
+                  'bg-blue-600 text-white rounded-br-none':
+                    message.senderId === currentUserId,
+                  'bg-gray-100 text-gray-900 rounded-bl-none':
+                    message.senderId !== currentUserId
+                }">
+                                <p>{{ message.content }}</p>
+                                <div class="text-xs opacity-70 mt-1 text-right">
                                     {{ message.createdAt | date: 'shortTime' }}
                                 </div>
                             </div>
                         </div>
+
                     </ng-container>
                 </ng-container>
             </ng-container>
 
+            <!-- ================= LOADING MESSAGES ================= -->
             <ng-template #loadingMessages>
                 <div class="min-h-[450px] h-full flex justify-center items-center">
-                    <app-loading-circle-animation [color]="'green'"
-                        [text]="'Please wait while we fetch your conversation...'"></app-loading-circle-animation>
+                    <app-loading-circle-animation color="green"
+                        text="Please wait while we fetch your conversation..."></app-loading-circle-animation>
                 </div>
             </ng-template>
 
+            <!-- ================= NO MESSAGES ================= -->
             <ng-template #noMessagesContent>
                 <div class="min-h-[450px] flex flex-col items-center justify-center h-full bg-white text-gray-400">
                     <i class="fas fa-envelope-open-text text-5xl mb-4"></i>
                     <p class="text-lg font-medium">No messages yet</p>
-                    <p class="text-sm text-gray-500 mt-2">Start the conversation by sending a message!</p>
+                    <p class="text-sm text-gray-500 mt-2">
+                        Start the conversation by sending a message!
+                    </p>
                 </div>
             </ng-template>
         </div>
 
-        <!-- Input Bar -->
-        <div class="px-4 py-3 border-t bg-white flex items-center gap-3 shrink-0 ">
-            <button class="text-gray-500"><i class="fas fa-paperclip"></i></button>
+        <!-- ================= MESSAGE INPUT ================= -->
+        <div class="px-4 py-3 border-t bg-white flex items-center gap-3 shrink-0">
+            <button class="text-gray-500">
+                <i class="fas fa-paperclip"></i>
+            </button>
+
             <input type="text" placeholder="Type a message..." [(ngModel)]="textMessage" (keydown.enter)="sendMessage()"
                 class="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring" />
-            <button (click)="sendMessage()" class="text-blue-600 text-xl"><i class="fas fa-paper-plane"></i></button>
+
+            <button (click)="sendMessage()" class="text-blue-600 text-xl">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
+
     </div>
 </ng-container>
 
+<!-- ================= NO CHAT SELECTED ================= -->
 <ng-template #noChatSelected>
     <div class="flex flex-col items-center justify-center h-full bg-gray-50 text-gray-400">
         <i class="fas fa-comments text-6xl mb-4"></i>
         <p class="text-lg font-medium">No chat selected yet</p>
-        <p class="text-sm text-gray-500 mt-2">Pick a conversation from the list to start messaging.</p>
+        <p class="text-sm text-gray-500 mt-2">
+            Pick a conversation from the list to start messaging.
+        </p>
     </div>
 </ng-template>

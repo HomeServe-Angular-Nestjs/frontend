@@ -86,6 +86,10 @@ export class BookingService {
   markBookingCancelledByCustomer(bookingId: string, reason: string,): Observable<IResponse<IBookingResponse>> {
     return this._http.patch<IResponse<IBookingResponse>>(`${this._customerApi}/booking/cancel`, { bookingId, reason });
   }
+  canCustomerStartCall(providerId: string): Observable<IResponse> {
+    const params = new HttpParams().set('providerId', providerId);
+    return this._http.post<IResponse>(`${this._customerApi}/booking/call`, { params });
+  }
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // **************************************************[Provider Related APIs]*******************************************************
@@ -141,5 +145,10 @@ export class BookingService {
     return this._http.post<Blob>(`${this._providerApi}/bookings/download_invoice`, { bookingId }, {
       responseType: 'blob' as 'json'
     });
+  }
+
+  canProviderStartCall(customerId: string): Observable<IResponse> {
+    const params = new HttpParams().set('customerId', customerId);
+    return this._http.post<IResponse>(`${this._providerApi}/bookings/call`, { params });
   }
 }
