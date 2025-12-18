@@ -1,0 +1,167 @@
+<section class="bg-white border rounded-lg p-5 space-y-4">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between">
+        <div class="space-y-1">
+            <h2 class="text-xl font-bold text-gray-900 tracking-tight">
+                Date overrides
+            </h2>
+            <p class="text-sm text-gray-500">
+                Change availability for specific dates.
+            </p>
+        </div>
+
+        <button onclick="document.getElementById('date-override-modal').classList.remove('hidden')" class="px-4 py-2 rounded-full bg-green-600 text-white text-sm
+                   hover:bg-green-700 transition">
+            + Add Override
+        </button>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        <!-- Custom Hours Override -->
+        <div class="group relative rounded-xl border border-gray-200 bg-gray-50/50 p-4
+           hover:bg-white hover:border-green-200 hover:shadow-sm transition-all duration-200">
+
+
+            <div class="space-y-1">
+                <p class="text-sm font-medium text-gray-900">
+                    December 15, 2025
+                </p>
+                <p class="text-sm text-gray-700">
+                    11:00 AM – 4:00 PM
+                </p>
+            </div>
+
+            <p class="mt-2 text-xs text-gray-400 group-hover:text-gray-500">
+                Custom availability for this date.
+            </p>
+
+            <div class="flex items-center justify-between mt-4">
+
+                <label class="flex items-center gap-2 text-xs text-gray-600">
+                    <input type="checkbox" checked class="rounded border-gray-300">
+                    Active
+                </label>
+
+                <div class="flex items-center gap-2">
+
+                    <button class="p-1.5 rounded-md text-gray-500 hover:text-gray-800 hover:bg-gray-100
+                 focus:outline-none focus:ring-2 focus:ring-gray-300" title="Edit" aria-label="Edit override">
+                        <i class="fas fa-pen text-xs"></i>
+                    </button>
+
+                    <button class="p-1.5 rounded-md text-gray-500 hover:text-red-600 hover:bg-red-50
+                 focus:outline-none focus:ring-2 focus:ring-red-300" title="Remove" aria-label="Remove override">
+                        <i class="fas fa-trash text-xs"></i>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Unavailable Override -->
+        <div class="group relative rounded-xl border border-gray-200 bg-gray-50/50 p-4
+           hover:bg-white hover:border-red-200 hover:shadow-sm transition-all duration-200">
+            <div class="space-y-1">
+                <p class="text-sm font-medium text-gray-900">
+                    December 18, 2025
+                </p>
+                <p class="text-sm text-gray-500">
+                    Unavailable
+                </p>
+            </div>
+
+            <p class="mt-2 text-xs text-gray-400 group-hover:text-gray-500">
+                No bookings allowed on this date.
+            </p>
+
+            <div class="flex items-center justify-between mt-4">
+
+                <label class="flex items-center gap-2 text-xs text-gray-600">
+                    <input type="checkbox" checked class="rounded border-gray-300">
+                    Active
+                </label>
+
+                <div class="flex items-center gap-2">
+
+                    <button class="p-1.5 rounded-md text-gray-500 hover:text-gray-800 hover:bg-gray-100
+                 focus:outline-none focus:ring-2 focus:ring-gray-300" title="Edit" aria-label="Edit override">
+                        <i class="fas fa-pen text-xs"></i>
+                    </button>
+
+                    <button class="p-1.5 rounded-md text-gray-500 hover:text-red-600 hover:bg-red-50
+                 focus:outline-none focus:ring-2 focus:ring-red-300" title="Remove" aria-label="Remove override">
+                        <i class="fas fa-trash text-xs"></i>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</section>
+
+<!-- Date Override Modal -->
+<div id="date-override-modal" class="fixed inset-0 z-50 flex items-center hidden justify-center bg-black/50"
+    role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    <div class="bg-white rounded-lg w-full max-w-md p-5 space-y-4">
+
+        <h3 id="modal-title" class="text-base font-semibold text-gray-900">
+            Add date override
+        </h3>
+
+        <!-- Availability Type (FIRST) -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Availability
+            </label>
+            <select id="availabilityType" onchange="toggleTimeFields()" class="w-full border rounded px-3 py-2 text-sm">
+                <option value="" selected disabled>Select type</option>
+                <option value="custom">Custom hours</option>
+                <option value="unavailable">Unavailable</option>
+            </select>
+        </div>
+
+        <!-- Date (shown for both types) -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Date
+            </label>
+            <input type="date" class="w-full border rounded px-3 py-2 text-sm">
+        </div>
+
+        <!-- Time Range (ONLY for Custom) -->
+        <div id="timeFields" class="hidden space-y-3">
+
+            <div class="flex gap-3">
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">From</label>
+                    <input type="time" class="w-full border rounded px-3 py-2 text-sm">
+                </div>
+
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">To</label>
+                    <input type="time" class="w-full border rounded px-3 py-2 text-sm">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-3 pt-2">
+            <button onclick="document.getElementById('date-override-modal').classList.add('hidden')"
+                class="text-sm text-gray-600 hover:underline">
+                Cancel
+            </button>
+            <button class="text-sm font-medium text-white bg-green-600 px-4 py-2 rounded hover:bg-green-500">
+                Save
+            </button>
+        </div>
+
+    </div>
+</div>

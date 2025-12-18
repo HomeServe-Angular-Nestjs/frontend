@@ -69,7 +69,7 @@ export class ProviderSidebarComponent implements OnInit {
 
   menuItems = [
     {
-      title: 'primary navigation',
+      title: 'Operations',
       subItems: [
         {
           name: 'Dashboard',
@@ -79,8 +79,14 @@ export class ProviderSidebarComponent implements OnInit {
         },
         {
           name: 'Manage Services',
-          icon: 'fas fa-calendar-check',
+          icon: 'fas fa-layer-group',
           route: 'manage_services',
+          active: false
+        },
+        {
+          name: 'Availability',
+          icon: 'fas fa-calendar-days',
+          route: 'availability',
           active: false
         },
         {
@@ -88,17 +94,11 @@ export class ProviderSidebarComponent implements OnInit {
           icon: 'fas fa-calendar-check',
           route: 'bookings',
           active: false
-        },
-        // {
-        //   name: 'Schedules',
-        //   icon: 'fas fa-calendar-check',
-        //   route: 'schedules',
-        //   active: false
-        // },
+        }
       ]
     },
     {
-      title: 'analytics',
+      title: 'Analytics',
       subItems: [
         {
           name: 'Performance',
@@ -121,14 +121,8 @@ export class ProviderSidebarComponent implements OnInit {
       ]
     },
     {
-      title: 'account management',
+      title: 'Communication',
       subItems: [
-        {
-          name: 'Profile',
-          icon: 'fas fa-user-circle',
-          route: 'profiles',
-          active: false
-        },
         {
           name: 'Messages',
           icon: 'fas fa-envelope',
@@ -144,8 +138,14 @@ export class ProviderSidebarComponent implements OnInit {
       ]
     },
     {
-      title: 'Business Tools',
+      title: 'Account & Finance',
       subItems: [
+        {
+          name: 'Profile',
+          icon: 'fas fa-user-circle',
+          route: 'profiles',
+          active: false
+        },
         {
           name: 'Reviews',
           icon: 'fas fa-star',
@@ -167,4 +167,5 @@ export class ProviderSidebarComponent implements OnInit {
       ]
     }
   ];
+
 }
