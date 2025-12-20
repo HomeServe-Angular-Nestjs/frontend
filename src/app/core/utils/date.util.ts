@@ -34,3 +34,11 @@ export function minutesToTime(minutes: number): string {
     const m = minutes % 60;
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
+
+export function formatTimeRanges(ranges: { startTime: string; endTime: string }[]): string {
+    if (!ranges || ranges.length === 0) return '';
+
+    return ranges
+        .map(r => `${r.startTime} – ${r.endTime}`)
+        .join(', ');
+}

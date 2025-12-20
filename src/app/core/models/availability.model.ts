@@ -8,6 +8,7 @@ export interface IDateOverride {
         startTime: string;
         endTime: string
     }[];
+    reason?: string;
     isAvailable: boolean;
     createdAt: string;
     updatedAt: string;
@@ -41,4 +42,13 @@ export interface IAvailabilityListView {
         from: string;
         to: string;
     }[];
+}
+
+export interface IDateOverrideViewList {
+    date: string;
+    timeRanges: {
+        startTime: string, endTime: string
+    }[],
+    reason?: string,
+    isAvailable: boolean,
 }
