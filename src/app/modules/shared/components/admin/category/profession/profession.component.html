@@ -1,0 +1,145 @@
+<section class="relative">
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800">Professions</h2>
+                <p class="text-sm text-gray-500">
+                    High-level categories used to group services
+                </p>
+            </div>
+
+            <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md">
+                + Add Profession
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="flex items-center gap-4 mb-4">
+            <input type="text" placeholder="Search professions..." class="w-full sm:w-72 border rounded-md px-3 py-2 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <select class="border rounded-md px-3 py-2 text-sm">
+                <option>Status</option>
+                <option>Active</option>
+                <option>Inactive</option>
+            </select>
+        </div>
+
+        <!-- Profession List (Scrollable after 3 rows) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4
+               max-h-[420px] overflow-y-auto pr-1">
+
+            <!-- Profession Card -->
+            <div class="border rounded-lg p-4 flex items-center justify-between hover:bg-gray-50">
+                <div>
+                    <p class="font-medium text-gray-800">Plumber</p>
+                    <p class="text-xs text-gray-500">12 services</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                        Active
+                    </span>
+                    <button class="text-gray-400 hover:text-blue-600 text-xs">
+                        Edit
+                    </button>
+                </div>
+            </div>
+
+            <div class="border rounded-lg p-4 flex items-center justify-between hover:bg-gray-50">
+                <div>
+                    <p class="font-medium text-gray-800">Electrician</p>
+                    <p class="text-xs text-gray-500">9 services</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                        Active
+                    </span>
+                    <button class="text-gray-400 hover:text-blue-600 text-xs">
+                        Edit
+                    </button>
+                </div>
+            </div>
+
+            <div class="border rounded-lg p-4 flex items-center justify-between hover:bg-gray-50">
+                <div>
+                    <p class="font-medium text-gray-800">Painter</p>
+                    <p class="text-xs text-gray-500">5 services</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600">
+                        Inactive
+                    </span>
+                    <button class="text-gray-400 hover:text-blue-600 text-xs">
+                        Edit
+                    </button>
+                </div>
+            </div>
+
+            <!-- more cards -->
+        </div>
+    </div>
+
+
+    <ng-container *ngIf="false">
+        <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+            <!-- Modal -->
+            <div class="bg-white w-full max-w-md rounded-lg shadow-lg">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between px-6 py-4 border-b">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        Add Profession
+                    </h3>
+
+                    <button class="text-gray-400 hover:text-gray-600">
+                        ✕
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="px-6 py-4 space-y-4">
+
+                    <!-- Profession Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Profession Name
+                        </label>
+                        <input type="text" placeholder="e.g. Plumber" class="w-full border rounded-md px-3 py-2 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Status -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Status
+                        </label>
+                        <select class="w-full border rounded-md px-3 py-2 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>Active</option>
+                            <option>Inactive</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-end gap-3 px-6 py-4 border-t">
+                    <button class="px-4 py-2 text-sm rounded-md border text-gray-600 hover:bg-gray-50">
+                        Cancel
+                    </button>
+
+                    <button class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700">
+                        Save Profession
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </ng-container>
+</section>

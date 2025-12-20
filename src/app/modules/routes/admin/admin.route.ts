@@ -75,6 +75,11 @@ export const adminRoute: Routes = [
                         path: 'settings',
                         loadComponent: () => import('../../shared/components/admin/settings/settings.component')
                             .then(c => c.AdminSettingsComponent)
+                    },
+                    {
+                        path: 'categories',
+                        loadComponent: () => import('../../shared/components/admin/category/category-layout/category-layout.component')
+                            .then(c => c.AdminCategoryLayoutComponent),
                     }
                 ]
             },

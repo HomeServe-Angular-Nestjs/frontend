@@ -20,7 +20,7 @@
                 }">
 
                 <div class="flex items-center gap-2">
-                    <i class="fas {{ item.icon }} text-sm"></i>
+                    <i [class]="'fas ' + item.icon + ' text-xs'"></i>
                     <span class="group-hover:text-blue-700">{{ item.name }}</span>
                 </div>
 
@@ -28,14 +28,21 @@
                     [ngClass]="{ 'rotate-180': openedMenu === item.name }"></i>
             </div>
 
-            <div *ngIf="item.subItems && openedMenu === item.name" class="ml-6 mt-1 space-y-1">
-                <div *ngFor="let subItem of item.subItems" (click)="navigateTo(subItem.route)"
-                    class="px-3 py-2 rounded-md text-sm cursor-pointer transition-all duration-200" [ngClass]="{
-                        'bg-blue-50 text-blue-700 font-medium': isActive(subItem.route),
-                        'text-gray-600 hover:bg-gray-100': !isActive(subItem.route)
-                    }">
-                    {{ subItem.name }}
-                </div>
+            <div *ngIf="item.subItems && openedMenu === item.name" class="ml-6 mt-1 space-y-1 text-gray-700">
+                <ng-container *ngFor="let subItem of item.subItems">
+                    <div class="flex items-center gap-2">
+                        <div>
+                            <i [class]="'fas ' + subItem?.icon + ' text-xs'"></i>
+                        </div>
+                        <button type="button" (click)="navigateTo(subItem.route)"
+                            class="px-3 py-2 rounded-md text-sm cursor-pointer transition-all duration-200" [ngClass]="{
+                                'bg-blue-50 text-blue-700 font-medium': isActive(subItem.route),    
+                                'text-gray-600 hover:bg-gray-100': !isActive(subItem.route)
+                            }">
+                            {{ subItem.name }}
+                        </button>
+                    </div>
+                </ng-container>
             </div>
         </ng-container>
 
