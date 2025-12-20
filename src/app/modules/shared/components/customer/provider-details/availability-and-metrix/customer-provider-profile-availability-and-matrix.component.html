@@ -1,100 +1,70 @@
-<div class="space-y-6">
-    <!-- Availability Section -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold mb-4">Availability</h2>
-        <div class="space-y-2">
-            <div class="flex justify-between">
-                <span class="text-gray-600">Day</span>
-                <span class="font-medium">{{providerData?.availability?.day?.from}} -
-                    {{providerData?.availability?.day?.to}}</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-gray-600">Time</span>
-                <span class="font-medium">{{providerData?.availability?.time?.from}} -
-                    {{providerData?.availability?.time?.to}}</span>
-            </div>
-            <!-- <div class="flex justify-between">
-                <span class="text-gray-600">Sunday</span>
-                <span class="font-medium">Emergency Only</span>
-            </div> -->
-        </div>
-        <div class="mt-4">
-            <h3 class="font-medium mb-2">Service Area</h3>
-            <div class=" bg-white rounded-lg relative overflow-hidden">
-                <ng-container *ngIf="center; else noCenter">
-                    <!-- Map Component -->
-                    <div class="w-full rounded-lg">
-                        <app-mapbox-map [center]="center" [zoom]="zoom" [disableInteraction]="true"
-                            class="w-full h-full">
-                        </app-mapbox-map>
-                    </div>
-                </ng-container>
-
-                <!-- Fallback Template -->
-                <ng-template #noCenter>
-                    <div class="w-full h-48 flex items-center justify-center text-gray-500">
-                        No address provided
-                    </div>
-                </ng-template>
-            </div>
-        </div>
-    </div>
-
+<div class="space-y-4">
     <!-- Contact Section -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold mb-4">Contact</h2>
-        <div class="space-y-4">
-            <div class="flex items-center gap-3">
-                <span class="text-gray-500">📞</span>
-                <ng-container *ngIf="providerData && providerData.phone; else unavailablePhone">
-                    <span class="font-medium">{{ providerData.phone }}</span>
+    <div class="bg-white rounded-xl border p-5">
+        <h2 class="text-base font-semibold text-gray-800 mb-4">
+            Contact
+        </h2>
+
+        <div class="space-y-3">
+            <!-- Phone -->
+            <div class="flex items-center gap-3 text-sm">
+                <i class="fas fa-phone text-gray-400 w-4"></i>
+
+                <ng-container *ngIf="providerData?.phone; else unavailablePhone">
+                    <span class="font-medium text-gray-800">
+                        {{ providerData?.phone }}
+                    </span>
                 </ng-container>
+
                 <ng-template #unavailablePhone>
                     <span class="text-gray-400 italic">Unavailable</span>
                 </ng-template>
             </div>
 
-            <div class="flex items-center gap-3">
-                <span class="text-gray-500">📧</span>
-                <span class="font-medium">{{providerData?.email}}</span>
+            <!-- Email -->
+            <div class="flex items-center gap-3 text-sm">
+                <i class="fas fa-envelope text-gray-400 w-4"></i>
+                <span class="font-medium text-gray-800">
+                    {{ providerData?.email || 'Unavailable' }}
+                </span>
             </div>
 
-            <div class="flex items-start gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 text-blue-600" viewBox="0 0 20 20"
-                    fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M5.05 2.05a7 7 0 119.9 9.9L10 17.9l-4.95-5.95a7 7 0 010-9.9zM10 11a3 3 0 100-6 3 3 0 000 6z"
-                        clip-rule="evenodd" />
-                </svg> <ng-container *ngIf="providerData && providerData.address; else unavailableLocation">
-                    <span class="font-medium">{{ providerData.address }}</span>
+            <!-- Address -->
+            <div class="flex items-start gap-3 text-sm">
+                <i class="fas fa-map-marker-alt text-gray-400 w-4 mt-0.5"></i>
+
+                <ng-container *ngIf="providerData?.address; else unavailableLocation">
+                    <span class="font-medium text-gray-800 leading-snug">
+                        {{ providerData?.address }}
+                    </span>
                 </ng-container>
+
                 <ng-template #unavailableLocation>
                     <span class="text-gray-400 italic">Unavailable</span>
                 </ng-template>
             </div>
-
-            <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                Book Appointment
-            </button>
         </div>
     </div>
 
-    <!--todo Performance Metrics -->
-    <div class="bg-white rounded-lg shadow-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Performance</h2>
-        <div class="space-y-4">
-            <div class="flex justify-between items-center">
-                <span class="text-gray-600">Response Time</span>
-                <span class="font-medium text-green-600">Within 1 hour</span>
-            </div>
-            <div class="flex justify-between items-center">
-                <span class="text-gray-600">Completion Rate</span>
-                <span class="font-medium text-green-600">98%</span>
-            </div>
-            <div class="flex justify-between items-center">
-                <span class="text-gray-600">Repeat Clients</span>
-                <span class="font-medium text-green-600">85%</span>
-            </div>
-        </div>
+    <!-- Service Area -->
+    <div class="bg-white rounded-xl border p-5">
+        <h2 class="text-base font-semibold text-gray-800 mb-3">
+            Location
+        </h2>
+
+        <div class="rounded-lg overflow-hidden border bg-gray-50">
+            <ng-container *ngIf="center; else noCenter">
+                <!-- <div class="w-full"> -->
+                    <app-mapbox-map [center]="center" [zoom]="zoom" [disableInteraction]="true" class="w-full h-24">
+                    </app-mapbox-map>
+                <!-- </div> -->
+            </ng-container>
+
+            <ng-template #noCenter>
+                <div class="h-24 flex items-center justify-center text-sm text-gray-500">
+                    No address provided
+                </div>
+            </ng-template>
+        </div>  
     </div>
 </div>
