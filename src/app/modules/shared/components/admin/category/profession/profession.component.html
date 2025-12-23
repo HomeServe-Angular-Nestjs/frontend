@@ -2,143 +2,193 @@
     <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
 
         <!-- Header -->
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-6">
             <div>
-                <h2 class="text-lg font-semibold text-gray-800">Professions</h2>
-                <p class="text-sm text-gray-500">
-                    High-level categories used to group services
+                <h2 class="text-xl font-bold text-gray-800">Professions</h2>
+                <p class="text-sm text-gray-500 mt-1">
+                    Manage service categories and professions
                 </p>
             </div>
 
-            <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md">
-                + Add Profession
+            <button (click)="openModal()"
+                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Profession
             </button>
         </div>
 
-        <!-- Search -->
-        <div class="flex items-center gap-4 mb-4">
-            <input type="text" placeholder="Search professions..." class="w-full sm:w-72 border rounded-md px-3 py-2 text-sm
-                   focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <!-- Search & Filter -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <div class="relative w-full sm:w-72">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input [ngModel]="searchQuery()" (ngModelChange)="onSearch($event)" type="text"
+                    placeholder="Search professions..."
+                    class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+            </div>
 
-            <select class="border rounded-md px-3 py-2 text-sm">
-                <option>Status</option>
-                <option>Active</option>
-                <option>Inactive</option>
+            <select [ngModel]="statusFilter()" (ngModelChange)="onStatusChange($event)"
+                class="w-full sm:w-auto px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer">
+                <option value="all">All Status</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
             </select>
         </div>
 
-        <!-- Profession List (Scrollable after 3 rows) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4
-               max-h-[420px] overflow-y-auto pr-1">
+        <!-- Profession List -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
+            <ng-container *ngIf="professions().length; else noProfessions">
+                <div *ngFor="let profession of professions()"
+                    class="group bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-[130px]">
 
-            <!-- Profession Card -->
-            <div class="border rounded-lg p-4 flex items-center justify-between hover:bg-gray-50">
-                <div>
-                    <p class="font-medium text-gray-800">Plumber</p>
-                    <p class="text-xs text-gray-500">12 services</p>
+                    <!-- Top: Name & Remove -->
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-semibold text-gray-800 text-lg group-hover:text-blue-600 transition-colors line-clamp-2"
+                            title="{{ profession.name }}">
+                            {{ profession.name | titlecase }}
+                        </h3>
+
+                        <button (click)="removeProfession(profession)"
+                            class="text-gray-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full transition-all -mr-2 -mt-2 opacity-0 group-hover:opacity-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Bottom: Status & Edit -->
+                    <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
+                        <button (click)="toggleStatus(profession.id)"
+                            class="relative inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors"
+                            [ngClass]="profession.isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                            <span class="w-1.5 h-1.5 rounded-full"
+                                [ngClass]="profession.isActive ? 'bg-green-600' : 'bg-gray-500'"></span>
+                            {{ profession.isActive ? 'Active' : 'Inactive' }}
+                        </button>
+
+                        <button (click)="editProfession(profession)"
+                            class="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline flex items-center gap-1">
+                            Edit
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
+            </ng-container>
 
-                <div class="flex items-center gap-3">
-                    <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
-                        Active
-                    </span>
-                    <button class="text-gray-400 hover:text-blue-600 text-xs">
-                        Edit
+            <ng-template #noProfessions>
+                <div
+                    class="col-span-full py-16 text-center border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+                    <div
+                        class="w-16 h-16 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-gray-900 font-medium text-lg">No professions found</h3>
+                    <p class="text-gray-500 mt-2 text-sm max-w-sm mx-auto">
+                        Get started by adding a new profession or try adjusting your search filters.
+                    </p>
+                    <button (click)="openModal()"
+                        class="mt-6 text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline">
+                        + Add First Profession
                     </button>
                 </div>
-            </div>
-
-            <div class="border rounded-lg p-4 flex items-center justify-between hover:bg-gray-50">
-                <div>
-                    <p class="font-medium text-gray-800">Electrician</p>
-                    <p class="text-xs text-gray-500">9 services</p>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
-                        Active
-                    </span>
-                    <button class="text-gray-400 hover:text-blue-600 text-xs">
-                        Edit
-                    </button>
-                </div>
-            </div>
-
-            <div class="border rounded-lg p-4 flex items-center justify-between hover:bg-gray-50">
-                <div>
-                    <p class="font-medium text-gray-800">Painter</p>
-                    <p class="text-xs text-gray-500">5 services</p>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <span class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600">
-                        Inactive
-                    </span>
-                    <button class="text-gray-400 hover:text-blue-600 text-xs">
-                        Edit
-                    </button>
-                </div>
-            </div>
-
-            <!-- more cards -->
+            </ng-template>
         </div>
     </div>
 
-
-    <ng-container *ngIf="false">
-        <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-
-            <!-- Modal -->
-            <div class="bg-white w-full max-w-md rounded-lg shadow-lg">
+    <!-- Modal -->
+    <ng-container *ngIf="isModalOpen()">
+        <div
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all">
+            <div class="bg-white w-full max-w-md rounded-xl shadow-2xl transform transition-all scale-100">
 
                 <!-- Header -->
-                <div class="flex items-center justify-between px-6 py-4 border-b">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                        Add Profession
+                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-800">
+                        {{ editableProfession().id ? 'Edit' : 'Add New' }} Profession
                     </h3>
-
-                    <button class="text-gray-400 hover:text-gray-600">
-                        ✕
+                    <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
                 </div>
 
                 <!-- Body -->
-                <div class="px-6 py-4 space-y-4">
+                <div class="px-6 py-6 space-y-5">
 
-                    <!-- Profession Name -->
+                    <!-- Error Message -->
+                    <!-- <div *ngIf="validationError()"
+                        class="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-lg text-sm flex items-start gap-2 animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <span>{{ validationError() }}</span>
+                    </div> -->
+
+                    <!-- Name Input -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Profession Name
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                            Profession Name <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" placeholder="e.g. Plumber" class="w-full border rounded-md px-3 py-2 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input [(ngModel)]="editableProfession().name" type="text"
+                            placeholder="e.g. Electrician, Plumber"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                        <p class="text-xs text-gray-500 mt-1">Must be unique and at least 3 characters.</p>
                     </div>
 
-                    <!-- Status -->
+                    <!-- Status Toggle -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Status
                         </label>
-                        <select class="w-full border rounded-md px-3 py-2 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option>Active</option>
-                            <option>Inactive</option>
-                        </select>
+                        <label class="inline-flex items-center cursor-pointer group">
+                            <input type="checkbox" [(ngModel)]="editableProfession().isActive" class="sr-only peer">
+                            <div
+                                class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                            </div>
+                            <span
+                                class="ml-3 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+                                {{ editableProfession().isActive ? 'Active' : 'Inactive' }}
+                            </span>
+                        </label>
                     </div>
-
                 </div>
 
                 <!-- Footer -->
-                <div class="flex justify-end gap-3 px-6 py-4 border-t">
-                    <button class="px-4 py-2 text-sm rounded-md border text-gray-600 hover:bg-gray-50">
+                <div
+                    class="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 rounded-b-xl border-t border-gray-100">
+                    <button (click)="closeModal()"
+                        class="px-4 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-white hover:text-gray-900 border border-transparent hover:border-gray-200 transition-all">
                         Cancel
                     </button>
-
-                    <button class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700">
-                        Save Profession
+                    <button (click)="saveProfession()"
+                        class="px-6 py-2.5 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow transition-all focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        {{ editableProfession().id ? 'Update' : 'Create' }}
                     </button>
                 </div>
-
             </div>
         </div>
     </ng-container>

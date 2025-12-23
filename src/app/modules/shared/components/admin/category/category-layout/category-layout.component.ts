@@ -11,6 +11,8 @@ import { AdminCategoryServiceComponent } from "../service/service.component";
 export class AdminCategoryLayoutComponent implements OnInit {
   private readonly _sharedService = inject(SharedDataService);
 
+  
+
   ngOnInit(): void {
     this._sharedService.setAdminHeader('Category Management');
   }
