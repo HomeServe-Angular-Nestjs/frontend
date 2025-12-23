@@ -2,9 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { IProfession, IProfessionFilter } from '../../../../../../core/models/category.model';
 import { CategoryService } from '../../../../../../core/services/category.service';
-import { map, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { IPagination } from '../../../../../../core/models/booking.model';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -37,6 +36,13 @@ export class AdminCategoryProfessionComponent implements OnInit, OnDestroy {
   statusFilter = signal<string>('all');
 
   ngOnInit(): void {
+    // Subscribe to store updates
+    this._categoryService.professions$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(professions => {
+        this.professions.set(professions);
+      });
+
     this._loadProfessions();
 
     this._debounceService.onSearch(700)
@@ -163,14 +169,8 @@ export class AdminCategoryProfessionComponent implements OnInit, OnDestroy {
     };
 
     this._categoryService.getProfessions(filter)
-      .pipe(
-        takeUntil(this._destroy$),
-        map(res => res.data || [])
-      )
+      .pipe(takeUntil(this._destroy$))
       .subscribe({
-        next: (professions) => {
-          this.professions.set(professions);
-        },
         error: (err) => console.log(err)
       });
   }

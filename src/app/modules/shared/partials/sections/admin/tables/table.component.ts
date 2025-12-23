@@ -3,13 +3,12 @@ import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { TableAction, TableData, UserTableRow } from '../../../../../../core/models/table.model';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog-box/confirm-dialog.component';
-import { FilterDeletedUserPipe } from '../../../../../../core/pipes/filter-blocked-user.pipe';
 
 @Component({
   selector: 'app-table',
   standalone: true,
   templateUrl: './table.component.html',
-  imports: [CommonModule, FilterDeletedUserPipe],
+  imports: [CommonModule],
 })
 export class TableComponent implements OnChanges {
   private _dialog = inject(MatDialog);

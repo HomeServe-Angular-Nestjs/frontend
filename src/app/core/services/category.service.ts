@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable, tap } from "rxjs";
 import { IProfession, IProfessionFilter, IServiceCategory, IServiceCategoryFilter, IServiceCategoryWithPagination } from "../models/category.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 
@@ -10,6 +10,13 @@ import { IResponse } from "../../modules/shared/models/response.model";
 export class CategoryService {
     private _http = inject(HttpClient);
     private readonly _categoryUrl = API_ENV.category;
+
+    // Subjects
+    private _professionsSource = new BehaviorSubject<IProfession[]>([]);
+    professions$ = this._professionsSource.asObservable(); // usually for dropdowns or full lists
+
+    private _servicesSource = new BehaviorSubject<IServiceCategory[]>([]);
+    services$ = this._servicesSource.asObservable();
 
     // ----------------------------
     // Profession Methods
@@ -25,7 +32,11 @@ export class CategoryService {
                 params = params.set(key, value);
             }
         }
-        return this._http.get<IResponse<IProfession[]>>(`${this._categoryUrl}/profession`, { params });
+        return this._http.get<IResponse<IProfession[]>>(`${this._categoryUrl}/profession`, { params }).pipe(
+            tap(res => {
+                if (res.data) this._professionsSource.next(res.data);
+            })
+        );
     }
 
     createProfession(profession: Partial<IProfession>): Observable<IResponse<IProfession>> {
@@ -58,22 +69,26 @@ export class CategoryService {
                 params = params.set(key, value);
             }
         }
-        return this._http.get<IResponse<IServiceCategoryWithPagination>>(`${this._categoryUrl}/services`, { params });
+        return this._http.get<IResponse<IServiceCategoryWithPagination>>(`${this._categoryUrl}/service`, { params }).pipe(
+            tap(res => {
+                if (res.data) this._servicesSource.next(res.data.services);
+            })
+        );
     }
 
     createServiceCategory(service: Partial<IServiceCategory>): Observable<IResponse<IServiceCategory>> {
-        return this._http.post<IResponse<IServiceCategory>>(`${this._categoryUrl}/services`, service);
+        return this._http.post<IResponse<IServiceCategory>>(`${this._categoryUrl}/service`, service);
     }
 
     updateServiceCategory(id: string, service: Partial<IServiceCategory>): Observable<IResponse<IServiceCategory>> {
-        return this._http.put<IResponse<IServiceCategory>>(`${this._categoryUrl}/services/${id}`, service);
+        return this._http.put<IResponse<IServiceCategory>>(`${this._categoryUrl}/service/${id}`, service);
     }
 
-    updateServiceCategoryStatus(id: string, status: boolean): Observable<IResponse<boolean>> {
-        return this._http.patch<IResponse<boolean>>(`${this._categoryUrl}/services/${id}/status`, { status });
+    updateServiceCategoryStatus(id: string): Observable<IResponse<boolean>> {
+        return this._http.patch<IResponse<boolean>>(`${this._categoryUrl}/service/${id}/toggle-status`, {});
     }
 
     removeServiceCategory(id: string): Observable<IResponse<boolean>> {
-        return this._http.delete<IResponse<boolean>>(`${this._categoryUrl}/services/${id}`);
+        return this._http.delete<IResponse<boolean>>(`${this._categoryUrl}/service/${id}`);
     }
 }
