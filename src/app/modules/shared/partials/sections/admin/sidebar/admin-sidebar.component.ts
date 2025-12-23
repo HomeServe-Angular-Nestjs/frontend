@@ -22,44 +22,36 @@ export class AdminSidebarComponent {
     },
     {
       name: 'User Management',
-      icon: 'fa-users',
+      icon: 'fa-user-shield',
       subItems: [
-        { name: 'Users', route: 'admin/users' },
-        // { name: 'Ratings & Reviews', route: 'admin/ratings&reviews' },
-        // { name: 'Approvals', route: 'admin/approvals' }
+        { name: 'Users', route: 'admin/users', icon: 'fa-users' },
+        { name: 'Ratings & Reviews', route: 'admin/ratings&reviews', icon: 'fa-star' },
+        { name: 'Approvals', route: 'admin/approvals', icon: 'fa-circle-check' }
       ]
     },
     {
+      name: 'Category Management',
+      icon: 'fa-layer-group',
+      route: 'admin/categories'
+    },
+    {
       name: 'Bookings Management',
-      icon: 'fa-book',
+      icon: 'fa-calendar-check',
       route: 'admin/bookings'
     },
     {
       name: 'Subscriptions & Plans',
-      icon: 'fa-calendar-alt',
+      icon: 'fa-id-card',
       subItems: [
-        { name: 'Subscriptions', route: 'admin/subscriptions' },
-        { name: 'Plans', route: 'admin/plans' }
+        { name: 'Subscriptions', route: 'admin/subscriptions', icon: 'fa-sync-alt' },
+        { name: 'Plans', route: 'admin/plans', icon: 'fa-list-alt' }
       ]
     },
     {
       name: 'Revenue & Transactions',
-      icon: 'fa-money-bill-wave',
+      icon: 'fa-credit-card',
       route: 'admin/transactions'
     },
-    // {
-    //   name: 'Messaging & Notifications',
-    //   icon: 'fa-envelope',
-    //   subItems: [
-    //     { name: 'Messaging', route: 'admin/messaging' },
-    //     { name: 'Notifications', route: 'admin/notifications' }
-    //   ]
-    // },
-    // {
-    //   name: 'Manage Reports',
-    //   icon: 'fa-chart-bar',
-    //   route: 'admin/reports'
-    // },
     {
       name: 'Complaint Management',
       icon: 'fa-bullhorn',

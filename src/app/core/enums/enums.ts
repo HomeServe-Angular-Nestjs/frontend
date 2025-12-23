@@ -111,12 +111,12 @@ export enum PlanDuration {
 }
 
 export enum WeekEnum {
-    MON = 'Mon',
-    TUE = 'Tue',
-    WED = 'Wed',
-    THU = 'Thu',
-    FRI = 'Fri',
-    SAT = 'Sat',
+    MON = 'mon',
+    TUE = 'tue',
+    WED = 'wed',
+    THU = 'thu',
+    FRI = 'fri',
+    SAT = 'sat',
     SUN = 'Sun',
 }
 

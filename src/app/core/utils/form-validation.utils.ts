@@ -1,5 +1,6 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
+import { AbstractControl, FormArray, ValidationErrors, ValidatorFn } from "@angular/forms";
 import { REGEXP_ENV } from "../../../environments/env";
+import { timeToMinutes } from "./date.util";
 
 
 export const FORM_VALIDATION_ERROR_MESSAGES: { [key: string]: string } = {
@@ -17,7 +18,9 @@ export const FORM_VALIDATION_ERROR_MESSAGES: { [key: string]: string } = {
     negativeNumber: 'Negative number in $FIELD is not allowed.',
     invalidTimeRange: 'Invalid time range.',
     sameTimeRange: 'Start Time and End Time Can\'t be the same.',
-    invalidDateRange: 'Invalid date range.'
+    invalidDateRange: 'Invalid date range.',
+    slotOverlap: 'This slot overlaps another slot.',
+    minArrayLength: '$FIELD must have at least $REQUIRED_LENGTH items.'
 };
 
 export const toTitleCase = (field: string): string => {
@@ -58,10 +61,25 @@ function clearSpecificError(control: AbstractControl | null, errorKey: string): 
     control.setErrors(Object.keys(remainingErrors).length ? remainingErrors : null);
 }
 
-export function arrayNotEmptyValidator(): ValidatorFn {
+export function arrayNotEmptyValidator(min = 1): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-        const value = control.value;
-        return Array.isArray(value) && value.length > 0 ? null : { required: true }
+        const array = control as FormArray;
+        if (!array?.controls) return null;
+
+        return array.length >= min
+            ? null
+            : { minArrayLength: { required: min, actual: array.length } };
+    };
+}
+
+export function minArrayLength(min = 1): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        const array = control as FormArray;
+        if (!array?.controls) return null;
+
+        return array.length >= min
+            ? null
+            : { minArrayLength: { requiredLength: min, actualLength: array.length } };
     };
 }
 
@@ -127,38 +145,25 @@ export function commaSeparatedDateValidator(): ValidatorFn {
 
 export function timeRangeValidator(startKey: string, endKey: string): ValidatorFn {
     return (group: AbstractControl): ValidationErrors | null => {
-        const startControl = group.get(startKey);
-        const endControl = group.get(endKey);
-        const start = startControl?.value;
-        const end = endControl?.value;
+        const start = group.get(startKey)?.value;
+        const end = group.get(endKey)?.value;
 
         if (!start || !end) return null;
 
-        const [startH, startM] = start.split(':').map(Number);
-        const [endH, endM] = end.split(':').map(Number);
+        const startMin = timeToMinutes(start);
+        const endMin = timeToMinutes(end);
 
-        const startMinute = startH * 60 + startM;
-        const endMinute = endH * 60 + endM;
+        if (startMin === endMin) {
+            return { sameTime: true };
+        }
 
-        clearSpecificError(startControl, 'invalidTimeRange');
-        clearSpecificError(endControl, 'invalidTimeRange');
-        clearSpecificError(startControl, 'sameTimeRange');
-        clearSpecificError(endControl, 'sameTimeRange');
-
-        if (startMinute === endMinute) {
-            startControl?.setErrors({ ...(startControl.errors || {}), sameTimeRange: true });
-            endControl?.setErrors({ ...(endControl.errors || {}), sameTimeRange: true });
-            return { sameTimeRange: true };
-        } else if (startMinute > endMinute) {
-            startControl?.setErrors({ ...startControl.errors, invalidTimeRange: true });
-            endControl?.setErrors({ ...endControl.errors, invalidTimeRange: true });
-            return { invalidTimeRange: true };
+        if (startMin > endMin) {
+            return { invalidRange: true };
         }
 
         return null;
     };
 }
-
 
 export function dateRangeValidator(startKey: string, endKey: string): ValidatorFn {
     return (group: AbstractControl): ValidationErrors | null => {
@@ -181,10 +186,8 @@ export function dateRangeValidator(startKey: string, endKey: string): ValidatorF
 
             return { invalidDateRange: true }
         }
-
         return null;
     }
-
 }
 
 export function isPasswordMatches(firstPasswordKey: string, secondPasswordKey: string): ValidatorFn {
@@ -208,3 +211,5 @@ export function isPasswordMatches(firstPasswordKey: string, secondPasswordKey: s
         }
     };
 }
+
+

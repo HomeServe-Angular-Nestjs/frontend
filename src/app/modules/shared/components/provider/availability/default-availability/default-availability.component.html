@@ -1,0 +1,100 @@
+<section class="bg-white rounded-lg border p-4 space-y-4 text-sm">
+
+    <!-- HEADER -->
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
+        <div class="space-y-1">
+            <h2 class="text-xl font-bold text-gray-900 tracking-tight">
+                Work Hours
+            </h2>
+            <p class="text-sm text-gray-500">
+                Set when you’re available for bookings
+            </p>
+        </div>
+
+        <!-- MODE TOGGLE -->
+        <div class="inline-flex rounded-lg border border-green-200 bg-green-50 p-1 text-xs font-medium">
+            <button type="button" (click)="setMode('manage')" class="px-4 py-1.5 rounded-md transition-all" [ngClass]="mode === 'manage'
+          ? 'bg-white text-green-700 shadow-sm'
+          : 'text-green-700/70 hover:text-green-800'">
+                Manage
+            </button>
+
+            <button type="button" (click)="setMode('preview')" class="px-4 py-1.5 rounded-md transition-all" [ngClass]="mode === 'preview'
+          ? 'bg-white text-green-700 shadow-sm'
+          : 'text-green-700/70 hover:text-green-800'">
+                Preview
+            </button>
+        </div>
+    </div>
+
+    <!-- WEEKLY AVAILABILITY -->
+    <div class="bg-white rounded-xl border border-gray-200 divide-y">
+
+        <div *ngFor="let day of weeklyAvailability" class="px-4 py-3 bg-gray-50/50 hover:bg-white transition-all">
+
+            <!-- DAY HEADER -->
+            <div class="flex items-center">
+                <span class="w-24 font-medium text-gray-700">
+                    {{ day.label }}
+                </span>
+
+                <!-- NO AVAILABILITY -->
+                <span *ngIf="!day.active" class="text-gray-400 italic text-xs">
+                    No availability
+                </span>
+
+                <!-- ADD FIRST SLOT -->
+                <button *ngIf="!day.active && mode === 'manage'"
+                    class="ml-auto text-green-600 hover:text-green-700 text-xs font-medium" (click)="addFirstSlot(day)">
+                    + Add
+                </button>
+            </div>
+
+            <!-- TIME RANGES -->
+            <div *ngIf="day.active" class="pl-24 space-y-1">
+
+                <div *ngFor="let slot of day.timeRanges; let i = index"
+                    class="flex items-center gap-2 text-xs leading-none">
+
+                    <ng-container *ngIf="mode === 'manage'; else previewSlot">
+                        <input type="time" [(ngModel)]="slot.from" (ngModelChange)="markDirty()"
+                            class="border rounded px-2 py-0.5 h-7 text-xs">
+
+                        <span class="text-gray-400">–</span>
+
+                        <input type="time" [(ngModel)]="slot.to" (ngModelChange)="markDirty()"
+                            class="border rounded px-2 py-0.5 h-7 text-xs">
+
+                        <button class="text-gray-400 hover:text-red-500" title="Remove slot"
+                            (click)="removeSlot(day, i)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </ng-container>
+
+                    <ng-template #previewSlot>
+                        <span class="text-gray-700">
+                            {{ slot.from }} – {{ slot.to }}
+                        </span>
+                    </ng-template>
+                </div>
+
+                <button *ngIf="mode === 'manage'"
+                    class="text-green-600 hover:text-green-700 text-[11px] font-medium mt-1" (click)="addNextSlot(day)">
+                    + Add another slot
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="flex justify-end pt-3 border-t">
+        <button [disabled]="!isDirty" (click)="saveWorkHours()" class="px-5 py-2 text-sm font-semibold rounded-md
+             bg-green-600 text-white
+             hover:bg-green-500
+             disabled:bg-gray-300 disabled:cursor-not-allowed
+             focus:outline-none focus:ring-2 focus:ring-green-600">
+            Save changes
+        </button>
+    </div>
+
+</section>

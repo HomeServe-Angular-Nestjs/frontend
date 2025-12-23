@@ -1,0 +1,67 @@
+<div class="overflow-x-auto rounded-xl border border-gray-100 shadow-sm bg-white">
+    <table class="w-full text-sm text-left">
+        <thead class="bg-gray-50 text-xs uppercase font-semibold text-gray-500 tracking-wider border-b border-gray-100">
+            <tr>
+                <th *ngFor="let col of columns" class="px-6 py-4">{{ col.label }}</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let row of data" class="group hover:bg-blue-50/40 transition-colors duration-200">
+                <td *ngFor="let col of columns" class="px-6 py-4">
+
+                    <!-- Text Type (Default) -->
+                    <ng-container *ngIf="!col.type || col.type === 'text'">
+                        <span class="text-gray-900 font-medium">{{ getCellValue(row, col.key) }}</span>
+                    </ng-container>
+
+                    <!-- Status Type -->
+                    <ng-container *ngIf="col.type === 'status'">
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border"
+                            [ngClass]="getCellValue(row, col.key) ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'">
+                            <span class="w-1.5 h-1.5 rounded-full"
+                                [ngClass]="getCellValue(row, col.key) ? 'bg-green-500' : 'bg-red-500'"></span>
+                            {{ getCellValue(row, col.key) ? 'Active' : 'Inactive' }}
+                        </div>
+                    </ng-container>
+
+                    <!-- Tags Type -->
+                    <ng-container *ngIf="col.type === 'tags'">
+                        <div class="flex flex-wrap gap-1.5">
+                            <span *ngFor="let k of getCellValue(row, col.key) | slice:0:3"
+                                class="px-2 py-0.5 text-xs rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                                {{ k }}
+                            </span>
+                            <span *ngIf="getCellValue(row, col.key)?.length > 3"
+                                class="px-2 py-0.5 text-xs rounded-md bg-gray-50 text-gray-500 border border-gray-100"
+                                [title]="getCellValue(row, col.key).slice(3).join(', ')">
+                                +{{ getCellValue(row, col.key).length - 3 }}
+                            </span>
+                        </div>
+                    </ng-container>
+
+                    <!-- Template Type -->
+                    <ng-container *ngIf="col.type === 'template'">
+                        <ng-container
+                            *ngTemplateOutlet="templates[col.key] || defaultTemplate; context: { $implicit: row }"></ng-container>
+                    </ng-container>
+
+                </td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="!isLoading && data.length === 0">
+                <td [attr.colspan]="columns.length" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center justify-center text-gray-400">
+                        <!-- We can use fontawesome here if global, assume yes -->
+                        <i class="fa-solid fa-inbox text-3xl mb-2 text-gray-300"></i>
+                        <p class="text-sm">{{ noDataMessage }}</p>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<ng-template #defaultTemplate>
+    <span class="text-red-500 text-xs">Test</span>
+</ng-template>

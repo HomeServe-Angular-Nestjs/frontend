@@ -52,6 +52,12 @@ export const providerRoutes: Routes = [
         ]
       },
       {
+        path: 'availability',
+        loadComponent: () => import('../../pages/provider/availability/availability.component')
+          .then(c => c.ProviderAvailabilityComponent),
+        canActivate: [AuthGuard],
+      },
+      {
         path: 'schedules',
         loadComponent: () => import('../../shared/components/provider/schedules/view-schedules.component')
           .then(c => c.ProviderScheduleView),
@@ -143,7 +149,7 @@ export const providerRoutes: Routes = [
         loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
           .then(c => c.ProviderRevenueAnalyticsComponent)
       },
-      {
+      { 
         path: 'reviews',
         canActivate: [AuthGuard],
         loadComponent: () => import('../../pages/provider/reviews/review.component')
