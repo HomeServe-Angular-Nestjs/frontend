@@ -5,7 +5,7 @@ import { ServiceListViewComponent } from '../../../../partials/sections/provider
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { IOfferedService, IServiceFilter, IToggleServiceStatus, IUpdateSubservice } from '../../../../../../core/models/offeredService.model';
 import { FilterDeletedSubservicePipe } from '../../../../../../core/pipes/filter-deleted-sub-services.pipe';
-import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
+import { OfferedServicesService } from '../../../../../../core/services/service-management-test.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { ProviderServiceFilterComponent } from "../service-filter/service-filter.component";
 import { IFilter } from '../../../../../../core/models/filter.model';

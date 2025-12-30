@@ -6,7 +6,7 @@ import { BehaviorSubject, forkJoin, Subject, Subscription, takeUntil } from 'rxj
 import { IProvider } from '../../../../../../core/models/user.model';
 import { IOfferedService } from '../../../../../../core/models/offeredService.model';
 import { ProviderService } from '../../../../../../core/services/provider.service';
-import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
+import { OfferedServicesService } from '../../../../../../core/services/service-management-test.service';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { IFilter, IPriceRange, IServiceDurationRange, ServiceDurationKey, SortOption } from '../../../../../../core/models/filter.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';

@@ -22,7 +22,7 @@ export class CategoryService {
     // Profession Methods
     // ----------------------------
 
-    getProfessions(filter: IProfessionFilter = {}, page: number = 1, limit: number = 10): Observable<IResponse<IProfession[]>> {
+    getProfessions(filter: IProfessionFilter = {}, page: number = 1, limit: number = 100): Observable<IResponse<IProfession[]>> {
         let params = new HttpParams()
             .set('page', page)
             .set('limit', limit);
@@ -74,6 +74,10 @@ export class CategoryService {
                 if (res.data) this._servicesSource.next(res.data.services);
             })
         );
+    }
+
+    getServiceCategoriesByProfessionId(professionId: string): Observable<IResponse<IServiceCategory[]>> {
+        return this._http.get<IResponse<IServiceCategory[]>>(`${this._categoryUrl}/service/${professionId}`);
     }
 
     createServiceCategory(service: Partial<IServiceCategory>): Observable<IResponse<IServiceCategory>> {

@@ -26,7 +26,7 @@ export class CustomerSelectPaymentComponent {
             color: 'indigo'
         },
         {
-            id: PaymentSource.WALLET,
+            id: PaymentSource.INTERNAL,
             name: 'Wallet',
             logo: 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png',
             color: 'green'

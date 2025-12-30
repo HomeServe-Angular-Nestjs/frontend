@@ -55,7 +55,7 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
       shareReplay(1)
     );
 
-    this.schedules$ = fetchedSchedules$;
+    // this.schedules$ = fetchedSchedules$;
 
     this.loading$ = combineLatest([fetchedSchedules$, delayed$]).pipe(
       takeUntil(this._destroy$),

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, forkJoin, Subject, takeUntil } from 'rxjs';
 import { IOfferedService, ISubService } from '../../../../core/models/offeredService.model';
-import { OfferedServicesService } from '../../../../core/services/service-management.service';
+import { OfferedServicesService } from '../../../../core/services/service-management-test.service';
 import { SharedDataService } from '../../../../core/services/public/shared-data.service';
 import { CustomerPickServiceListComponent, SelectedServiceIdType } from "../../../shared/components/customer/pick-service/service-list/customer-pick-service-list.component";
 import { CustomerPickServiceCategoryListComponent } from "../../../shared/components/customer/pick-service/categories/customer-pick-service-category-list.component";

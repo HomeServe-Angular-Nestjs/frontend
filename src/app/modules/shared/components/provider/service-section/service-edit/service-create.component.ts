@@ -3,7 +3,7 @@ import { CommonModule, ViewportScroller } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
-import { OfferedServicesService } from '../../../../../../core/services/service-management.service';
+import { OfferedServicesService } from '../../../../../../core/services/service-management-test.service';
 import { getValidationMessage } from '../../../../../../core/utils/form-validation.utils';
 import { IOfferedService } from '../../../../../../core/models/offeredService.model';
 import { Store } from '@ngrx/store';
