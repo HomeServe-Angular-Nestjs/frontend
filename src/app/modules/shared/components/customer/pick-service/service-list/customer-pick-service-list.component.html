@@ -1,68 +1,69 @@
-<div class="bg-white rounded-xl shadow-sm p-5 h-full">
+<div class="bg-white h-full">
+    <div class="divide-y divide-gray-50">
+        <!-- Service Card -->
+        <ng-container *ngIf="selectedServices && selectedServices.services.length > 0; else elseBlock">
+            <div *ngFor="let service of selectedServices.services"
+                class="group flex flex-col md:flex-row items-center gap-6 p-6 transition-all duration-300 hover:bg-blue-50/30">
 
+                <!-- Image Container -->
+                <div class="relative w-full md:w-32 h-32 rounded-2xl overflow-hidden shadow-sm flex-shrink-0">
+                    <img [src]="service.image" [alt]="service.category.name"
+                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div class="absolute inset-0 bg-black/5"></div>
+                </div>
 
-    <div class="space-y-4">
-        <!-- Service Card 1 - enhanced visual appeal -->
-        <ng-container *ngIf="selectedServices && selectedServices.subService.length > 0; else elseBlock">
-            <div *ngFor="let service of selectedServices.subService" class="service-card bg-white border border-gray-200 rounded-xl overflow-hidden 
-         shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-300 
-         mb-4 p-4 md:p-5">
-
-                <div class="flex flex-col md:flex-row justify-between gap-4">
-
-                    <!-- Left Section -->
-                    <div class="flex-1">
-                        <div class="flex items-center mb-4">
-                            <img [src]="service.image" alt="{{service.title}}"
-                                class="w-16 h-16 rounded-lg mr-4 object-cover border border-gray-200" />
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-800">{{service.title}}</h3>
-                                <span
-                                    class="ml-0 mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    <!-- {{service.tag}} -->
-                                    Popular
-                                </span>
-                            </div>
-                        </div>
-
-                        <p class="text-gray-600 text-sm leading-relaxed">
-                            {{service.desc}}
-                        </p>
-
-                        <div class="mt-4 flex items-center text-sm text-gray-500">
-                            <div class="flex items-center mr-4">
-                                <i class="fas fa-clock mr-1"></i>
-                                <span>{{service.estimatedTime}}</span>
-                            </div>
-                        </div>
+                <!-- Content Container -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span
+                            class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider">
+                            {{service.profession.name}}
+                        </span>
                     </div>
+                    <h3
+                        class="text-lg font-bold text-gray-900 mb-2 truncate group-hover:text-blue-600 transition-colors">
+                        {{service.category.name}}
+                    </h3>
+                    <p class="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-4">
+                        {{service.description}}
+                    </p>
 
-                    <!-- Right Section -->
-                    <div class="flex flex-col items-end justify-between space-y-2 md:ml-6">
-                        <div class="text-xl font-bold text-blue-600">
-                            ₹{{ service.price }}
-                        </div>
-                        <button (click)="addService({id: selectedServices.id, selectedId: service.id})" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg 
-               transition flex items-center text-sm font-medium shadow-sm hover:shadow-md">
-                            <i class="fas fa-cart-plus mr-2"></i>
-                            Add
-                        </button>
+                    <div class="flex items-center gap-4 text-xs font-semibold text-gray-400">
+                        <span class="flex items-center gap-1.5">
+                            <i class="far fa-clock text-blue-400"></i>
+                            {{service.estimatedTimeInMinutes}} mins
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <i class="fas fa-tools text-green-400"></i>
+                            Expert Service
+                        </span>
                     </div>
                 </div>
+
+                <!-- Price and Action -->
+                <div class="flex flex-col items-center md:items-end gap-3 md:pl-6">
+                    <div class="flex flex-col items-end">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Starting at</span>
+                        <span class="text-2xl font-black text-gray-900">₹{{ service.price }}</span>
+                    </div>
+                    <button (click)="addService({id: selectedServices.id, selectedId: service.id})"
+                        class="w-full md:w-auto px-8 py-3 bg-gray-900 hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg shadow-gray-200 hover:shadow-blue-500/20 active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-plus text-xs"></i>
+                        Add Service
+                    </button>
+                </div>
             </div>
-
         </ng-container>
-        <ng-template #elseBlock>
-            <div
-                class="flex flex-col items-center justify-center py-12 text-center text-gray-500 bg-gray-50 rounded-xl shadow-inner">
-                <svg class="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M9 17v-2a4 4 0 00-4-4H5a2 2 0 00-2 2v3a2 2 0 002 2h4zm6 0v-2a4 4 0 014-4h.01a2 2 0 012 2v3a2 2 0 01-2 2h-4zm-6 0h6M12 9a3 3 0 110-6 3 3 0 010 6z" />
-                </svg>
-                <h2 class="text-lg font-semibold text-gray-700">No categories selected</h2>
-                <p class="mt-2 text-sm text-gray-500">Once you select a category, it will appear here for review.</p>
 
+        <ng-template #elseBlock>
+            <div class="flex flex-col items-center justify-center py-20 text-center">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                    <i class="fas fa-search text-2xl text-gray-200"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">No services found</h2>
+                <p class="mt-2 text-sm text-gray-500 max-w-xs mx-auto">
+                    Try selecting a different category or search for another service.
+                </p>
             </div>
         </ng-template>
     </div>

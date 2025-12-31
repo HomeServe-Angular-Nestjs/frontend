@@ -1,42 +1,39 @@
-<div class="space-y-3">
+<div class="space-y-4">
     <ng-container *ngIf="purchasedServiceList.length > 0; else elseBlock">
-        <div *ngFor="let service of purchasedServiceList">
-            <div *ngFor="let sub of service.subService"
-                class="flex justify-between items-center bg-gray-50 border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition">
+        <div *ngFor="let category of purchasedServiceList" class="space-y-3">
+            <div *ngFor="let service of category.services"
+                class="group flex items-center justify-between gap-4 bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-blue-100 transition-all duration-300">
 
-                <!-- Left Section -->
-                <div>
-                    <p class="font-medium text-gray-800 text-sm">{{ sub.title }}</p>
-                    <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                        <i class="far fa-clock"></i> {{ sub.estimatedTime }}
-                    </p>
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                    <!-- Compact Image -->
+                    <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0">
+                        <img [src]="service.image" [alt]="service.category.name" class="w-full h-full object-cover" />
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-gray-900 text-sm truncate">{{ service.category.name }}</p>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-[10px] font-medium text-gray-500 flex items-center gap-1">
+                                <i class="far fa-clock text-blue-400"></i> {{ service.estimatedTimeInMinutes }}m
+                            </span>
+                            <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                            <span class="text-[10px] font-bold text-blue-600">₹{{ service.price }}</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Right Section -->
-                <div class="flex items-center gap-3">
-                    <p class="text-blue-600 font-semibold text-sm">₹{{ sub.price }}</p>
-                    <button (click)="removeFromSelectedList({id:service.id, selectedId: sub.id})"
-                        class="text-gray-400 hover:text-red-600 transition">
-                        <i class="fas fa-times text-lg"></i>
+                <div class="flex items-center">
+                    <button (click)="removeFromSelectedList({id:category.id, selectedId: service.id})"
+                        class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all duration-300 active:scale-90">
+                        <i class="fas fa-trash-alt text-xs"></i>
                     </button>
                 </div>
             </div>
         </div>
     </ng-container>
 
-    <!-- Empty State -->
+    <!-- Empty State is handled by parent if needed, but keeping a fallback here -->
     <ng-template #elseBlock>
-        <div
-            class="flex flex-col items-center justify-center py-12 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
-            <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 17v-2a4 4 0 00-4-4H5a2 2 0 00-2 2v3a2 2 0 002 2h4zm6 0v-2a4 4 0 014-4h.01a2 2 0 012 2v3a2 2 0 01-2 2h-4zm-6 0h6M12 9a3 3 0 110-6 3 3 0 010 6z" />
-            </svg>
-            <h2 class="text-lg font-semibold text-gray-700">No Services Selected</h2>
-            <p class="mt-2 text-sm text-gray-500 max-w-sm px-4">
-                You haven&apos;t added any services yet. Pick from the list to get started.
-            </p>
-        </div>
+        <div class="hidden"></div>
     </ng-template>
 </div>

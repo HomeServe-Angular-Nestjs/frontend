@@ -1,94 +1,101 @@
-<!-- Introduction Section -->
-<div class="bg-white rounded-lg shadow-lg p-6">
-    <h2 class="text-xl font-semibold mb-4">Introduction</h2>
-    <ng-container *ngIf="(provider$ | async) as provider">
-        <p class="text-gray-600 mb-6" *ngIf="provider.bio; else noBio">
-            {{ provider.bio }}
-        </p>
-        <ng-template #noBio>
-            <p class="text-gray-400 italic mb-6">No bio provided.</p>
-        </ng-template>
-    </ng-container>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Introduction Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Introduction</h2>
+            <ng-container *ngIf="(provider$ | async) as provider">
+                <p class="text-gray-600 mb-6" *ngIf="provider.bio; else noBio">
+                    {{ provider.bio }}
+                </p>
+                <ng-template #noBio>
+                    <p class="text-gray-400 italic mb-6">No bio provided.</p>
+                </ng-template>
+            </ng-container>
 
-    <!-- Specialization and Expertise -->
-    <div class="mb-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-3">
-            Specialization and Expertise
-        </h3>
-        <ng-container *ngIf="(provider$ | async) as provider">
-            <div *ngIf="provider.expertise && provider.expertise.length > 0; else noExpertise"
-                class="grid gap-4 sm:grid-cols-2">
-                <div *ngFor="let expertise of provider.expertise"
-                    class="bg-green-50 border border-gray-200 px-4 py-3 rounded-lg shadow-sm">
-                    <div class="font-semibold text-gray-700 text-base">{{ expertise.specialization }}</div>
-                    <div class="text-sm text-gray-600 mt-1">{{ expertise.label }}</div>
-                </div>
-            </div>
-            <ng-template #noExpertise>
-                <p class="text-gray-400 italic">No expertise or specializations listed.</p>
-            </ng-template>
-        </ng-container>
-    </div>
-
-    <!-- Additional Skills -->
-    <div class="mb-6">
-        <h3 class="text-lg font-medium text-gray-800 mb-3">
-            Additional Skills
-        </h3>
-        <ng-container *ngIf="(provider$ | async) as provider">
-            <ul *ngIf="provider.additionalSkills && provider.additionalSkills.length > 0; else noSkills"
-                class="list-disc list-inside text-gray-600 space-y-1">
-                <li *ngFor="let skill of provider.additionalSkills">{{ skill }}</li>
-            </ul>
-            <ng-template #noSkills>
-                <p class="text-gray-400 italic">No additional skills listed.</p>
-            </ng-template>
-        </ng-container>
-    </div>
-
-    <!-- Awards and Recognition -->
-    <div class="mb-6">
-        <h3 class="text-lg font-medium text-gray-800 mb-3">
-            Awards and Recognition
-        </h3>
-        <!-- You can optionally bind this to provider.awards if dynamic -->
-        <ng-container *ngIf="true; else noAwards">
-            <div class="space-y-3">
-                <div class="flex items-start gap-3">
-                    <span class="text-yellow-500 text-xl">🏆</span>
-                    <div>
-                        <p class="font-medium">Best Service Provider 2023</p>
-                        <p class="text-sm text-gray-600">Plumbing Association of America</p>
+            <!-- Specialization and Expertise -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                    Specialization and Expertise
+                </h3>
+                <ng-container *ngIf="(provider$ | async) as provider">
+                    <div *ngIf="provider.expertise && provider.expertise.length > 0; else noExpertise"
+                        class="grid gap-4 sm:grid-cols-2">
+                        <div *ngFor="let expertise of provider.expertise"
+                            class="bg-green-50 border border-gray-200 px-4 py-3 rounded-lg shadow-sm">
+                            <div class="font-semibold text-gray-700 text-base">{{ expertise.specialization }}</div>
+                            <div class="text-sm text-gray-600 mt-1">{{ expertise.label }}</div>
+                        </div>
                     </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <span class="text-yellow-500 text-xl">⭐</span>
-                    <div>
-                        <p class="font-medium">Excellence in Emergency Services</p>
-                        <p class="text-sm text-gray-600">Local Business Awards 2022</p>
-                    </div>
-                </div>
+                    <ng-template #noExpertise>
+                        <p class="text-gray-400 italic">No expertise or specializations listed.</p>
+                    </ng-template>
+                </ng-container>
             </div>
-        </ng-container>
-        <ng-template #noAwards>
-            <p class="text-gray-400 italic">No awards or recognition listed.</p>
-        </ng-template>
+
+            <!-- Additional Skills -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-800 mb-3">
+                    Additional Skills
+                </h3>
+                <ng-container *ngIf="(provider$ | async) as provider">
+                    <ul *ngIf="provider.additionalSkills && provider.additionalSkills.length > 0; else noSkills"
+                        class="list-disc list-inside text-gray-600 space-y-1">
+                        <li *ngFor="let skill of provider.additionalSkills">{{ skill }}</li>
+                    </ul>
+                    <ng-template #noSkills>
+                        <p class="text-gray-400 italic">No additional skills listed.</p>
+                    </ng-template>
+                </ng-container>
+            </div>
+
+            <!-- Awards and Recognition -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-800 mb-3">
+                    Awards and Recognition
+                </h3>
+                <ng-container *ngIf="true; else noAwards">
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <span class="text-yellow-500 text-xl">🏆</span>
+                            <div>
+                                <p class="font-medium">Best Service Provider 2023</p>
+                                <p class="text-sm text-gray-600">Plumbing Association of America</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-yellow-500 text-xl">⭐</span>
+                            <div>
+                                <p class="font-medium">Excellence in Emergency Services</p>
+                                <p class="text-sm text-gray-600">Local Business Awards 2022</p>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-template #noAwards>
+                    <p class="text-gray-400 italic">No awards or recognition listed.</p>
+                </ng-template>
+            </div>
+
+            <!-- Known Languages -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-3">Languages</h3>
+                <ng-container *ngIf="(provider$ | async) as provider">
+                    <div *ngIf="provider.languages && provider.languages.length > 0; else noLanguages"
+                        class="flex flex-wrap gap-2">
+                        <span *ngFor="let lang of provider.languages"
+                            class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                            {{ lang.language }} ({{ lang.proficiency }})
+                            </span>
+                        </div>
+                    <ng-template #noLanguages>
+                        <p class="text-gray-400 italic">No languages specified.</p>
+                    </ng-template>
+                </ng-container>
+            </div>
+        </div>
     </div>
 
-    <!-- Known Languages -->
-    <div>
-        <h3 class="text-lg font-medium text-gray-800 mb-3">Languages</h3>
-        <ng-container *ngIf="(provider$ | async) as provider">
-            <div *ngIf="provider.languages && provider.languages.length > 0; else noLanguages"
-                class="flex flex-wrap gap-2">
-                <span *ngFor="let lang of provider.languages"
-                    class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                    {{ lang.language }} ({{ lang.proficiency }})
-                </span>
-            </div>
-            <ng-template #noLanguages>
-                <p class="text-gray-400 italic">No languages specified.</p>
-            </ng-template>
-        </ng-container>
-    </div>
+    <div class="lg:col-span-1">
+            <app-customer-provider-profile-availability-and-matrix></app-customer-provider-profile-availability-and-matrix>
+        </div>
 </div>

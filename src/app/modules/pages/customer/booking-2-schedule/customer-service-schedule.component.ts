@@ -101,7 +101,7 @@ export class CustomerServiceScheduleComponent implements OnInit, OnDestroy {
       this._reservationService.onLeaveProviderRoom(this._lastJoinedId);
       this._lastJoinedId = null;
     }
-    
+
     this._destroy$.next();
     this._destroy$.complete();
   }
@@ -111,12 +111,12 @@ export class CustomerServiceScheduleComponent implements OnInit, OnDestroy {
     * for downstream calculations (pricing, scheduling).
     * 
     * @param data Array of selected services
-    * @returns Array of objects containing service ID and associated sub-service IDs
+    * @returns Array of objects containing category ID and associated service IDs
     */
   private prepareTheDataForPriceCalculation(data: SelectedServiceType[]): SelectedServiceIdsType[] {
     return data.map(item => ({
       id: item.id,
-      selectedIds: item.subService.map(s => s.id)
+      selectedIds: item.services.map(s => s.id)
     }));
   }
 }

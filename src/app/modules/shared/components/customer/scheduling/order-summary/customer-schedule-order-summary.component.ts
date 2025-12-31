@@ -56,7 +56,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
     return this.selectedServiceData.map(item => {
       return {
         id: item.id,
-        selectedIds: item.subService.map(sub => sub.id)
+        selectedIds: item.services.map(s => s.id)
       }
     });
   }
@@ -95,10 +95,10 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
 
   private _prepareDataForPriceBreakup(data: SelectedServiceType[]): IPriceBreakup[] {
     return data
-      .filter(item => item.subService?.length)
+      .filter(item => item.services?.length)
       .map(item => ({
         serviceId: item.id,
-        subServiceIds: item.subService.map(sub => sub.id)
+        subServiceIds: item.services.map(sub => sub.id)
       }));
   }
 

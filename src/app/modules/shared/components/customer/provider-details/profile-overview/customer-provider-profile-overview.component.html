@@ -4,17 +4,17 @@
     <!-- Profile Image -->
     <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
 
-      <!-- Avatar image if exists -->
+        <!-- Avatar image if exists -->
       <img *ngIf="providerData?.avatar; else fallbackAvatar" [src]="providerData?.avatar" alt="User profile"
         class="w-full h-full object-cover rounded-full" />
 
-      <!-- Fallback avatar -->
-      <ng-template #fallbackAvatar>
+        <!-- Fallback avatar -->
+        <ng-template #fallbackAvatar>
         <div class="w-full h-full flex items-center justify-center rounded-full text-white text-6xl font-medium"
-          [style.background-color]="fallbackColor(providerData?.username)">
-          {{ fallbackChar }}
-        </div>
-      </ng-template>
+            [style.background-color]="fallbackColor(providerData?.username)">
+            {{ fallbackChar }}
+          </div>
+        </ng-template>
 
     </div>
 
@@ -22,14 +22,14 @@
     <div class="flex-1">
       <div class="flex items-center gap-4 mb-4">
         <h1 class="text-2xl font-bold text-gray-800">{{providerData?.fullname || providerData?.username}}
-        </h1>
+          </h1>
         <span *ngIf="providerData?.isCertified"
           class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Verified</span>
-      </div>
+          </div>
       <div class="flex items-center gap-2 mb-2">
         <span class="text-yellow-400">⭐</span>
         <span class="text-gray-500">(21 reviews)</span><!--todo-->
-      </div>
+        </div>
       <div class="flex flex-wrap gap-2 mb-4">
         <ng-container *ngIf="providerData?.profession">
           <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
