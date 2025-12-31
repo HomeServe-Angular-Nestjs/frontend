@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { encode as base64Encode } from 'js-base64';
-import { OfferedServicesService } from '../../../../../core/services/service-management.service';
+import { OfferedServicesService } from '../../../../../core/services/service-management-test.service';
 import { LocationService } from '../../../../../core/services/public/location.service';
 import { DebounceService } from '../../../../../core/services/public/debounce.service';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';

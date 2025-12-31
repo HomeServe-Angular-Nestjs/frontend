@@ -2,7 +2,7 @@ import { inject } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { offeredServiceActions } from "./offeredService.action";
 import { catchError, map, switchMap } from "rxjs";
-import { OfferedServicesService } from "../../core/services/service-management.service";
+import { OfferedServicesService } from "../../core/services/service-management-test.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { Router } from "@angular/router";

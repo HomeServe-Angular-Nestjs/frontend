@@ -2,7 +2,7 @@ import { Component, EventEmitter, inject, Input, Output } from "@angular/core";
 import { IOfferedService, IToggleServiceStatus, IUpdateSubservice } from "../../../../../../core/models/offeredService.model";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
-import { OfferedServicesService } from "../../../../../../core/services/service-management.service";
+import { OfferedServicesService } from "../../../../../../core/services/service-management-test.service";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../shared/confirm-dialog-box/confirm-dialog.component";

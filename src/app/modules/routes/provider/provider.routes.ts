@@ -31,6 +31,17 @@ export const providerRoutes: Routes = [
         canActivate: [AuthGuard],
       },
       {
+        path: 'manage-services',
+        canActivate: [AuthGuard],
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('../../shared/components/provider/manage-service/manage-service.component')
+              .then(c => c.ProviderManageServiceComponent),
+          },
+        ]
+      },
+      {
         path: 'manage_services',
         canActivate: [AuthGuard],
         children: [
@@ -149,7 +160,7 @@ export const providerRoutes: Routes = [
         loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
           .then(c => c.ProviderRevenueAnalyticsComponent)
       },
-      { 
+      {
         path: 'reviews',
         canActivate: [AuthGuard],
         loadComponent: () => import('../../pages/provider/reviews/review.component')

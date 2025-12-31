@@ -25,6 +25,7 @@ export const API_ENV = {
   analytics: `${domainName}/analytics`,
   availability: `${domainName}/availability`,
   category: `${domainName}/category`,
+  providerService: `${domainName}/provider-service`,
 };
 
 export const API_KEY = {
