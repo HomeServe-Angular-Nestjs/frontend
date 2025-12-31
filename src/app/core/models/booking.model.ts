@@ -1,7 +1,5 @@
-import { SelectedServiceIdsType } from "../../modules/pages/customer/booking-1-pick-service/customer-pick-a-service.component";
+import { SelectedServiceIdsType } from "./cart.model";
 import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../enums/enums";
-import { RazorpayOrder, RazorpayPaymentResponse } from "./payment.model";
-import { ISlotSource } from "./schedules.model";
 import { IAvailableSlot } from "./slot-rule.model";
 import { ILocation } from "./user.model";
 
@@ -23,10 +21,7 @@ export interface IPriceBreakup {
 export interface IPriceBreakupData {
   subTotal: number;
   tax: number;
-  fee: number;
   total: number;
-  taxRate?: number;
-  feeRate?: number;
 }
 
 export type CustomerLocationType = Omit<ILocation, 'type'> & { phone: string };

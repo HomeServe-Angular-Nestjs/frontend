@@ -4,11 +4,12 @@ import { filter, map, Observable, switchMap, tap } from 'rxjs';
 import { IProvider } from '../../../../../../core/models/user.model';
 import { ActivatedRoute } from '@angular/router';
 import { ProviderService } from '../../../../../../core/services/provider.service';
+import { CustomerProviderProfileAvailabilityAndMatrixComponent } from '../availability-and-metrix/customer-provider-profile-availability-and-matrix.component';
 
 @Component({
   selector: 'app-customer-provider-profile-about',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CustomerProviderProfileAvailabilityAndMatrixComponent],
   templateUrl: './customer-provider-profile-about.component.html',
 })
 export class CustomerProviderProfileAboutComponent implements OnInit {

@@ -14,6 +14,7 @@ import { DebounceService } from '../../../../../../core/services/public/debounce
 import { CustomerService } from '../../../../../../core/services/customer.service';
 import { ICustomerSearchServices } from '../../../../../../core/models/offeredService.model';
 import { selectTotalUnReadNotificationCount } from '../../../../../../store/notification/notification.selector';
+import { CartService } from '../../../../../../core/services/cart.service';
 
 @Component({
   selector: 'app-customer-header',
@@ -26,6 +27,7 @@ export class CustomerHeaderComponent implements OnInit {
   private readonly _debounceService = inject(DebounceService);
   private readonly _customerService = inject(CustomerService);
   private readonly _router = inject(Router);
+  public readonly _cartService = inject(CartService);
 
   private readonly _destroy$ = new Subject<void>();
 
@@ -76,6 +78,12 @@ export class CustomerHeaderComponent implements OnInit {
           this.fetchServices(search.search);
         }
       });
+
+    this._cartService.getCart().subscribe();
+  }
+
+  get cartCount(): number {
+    return this._cartService.cartItemCount();
   }
 
   ngOnDestroy(): void {
@@ -124,9 +132,7 @@ export class CustomerHeaderComponent implements OnInit {
     this.serviceSearch = '';
     this.fetchedServices = [];
     this.isLoadingServices = false;
-    this._router.navigate(['pick_a_service', data.provider], {
-      queryParams: { ids: data.offeredServiceIds.join(',') }
-    });
+    this._router.navigate(['provider_details', data.provider, 'services']);
   }
 
   logout(): void {

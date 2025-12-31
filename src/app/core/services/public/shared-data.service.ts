@@ -1,12 +1,12 @@
 import { Injectable } from "@angular/core";
-import { SelectedServiceType } from "../../../modules/pages/customer/booking-1-pick-service/customer-pick-a-service.component";
-import { IOfferedService } from "../../models/offeredService.model";
+import { SelectedServiceType } from "../../models/cart.model";
+import { IProviderService } from "../../models/provider-service.model";
 import { BehaviorSubject, ReplaySubject } from "rxjs";
 
 @Injectable({ providedIn: "root" })
 export class SharedDataService {
     private selectedServiceIds: SelectedServiceType[] = [];
-    private allServices: IOfferedService[] = [];
+    private allServices: IProviderService[] = [];
 
     private _adminHeaderSubject = new BehaviorSubject<string>('Default Title');
     adminHeader$ = this._adminHeaderSubject.asObservable();
@@ -26,11 +26,11 @@ export class SharedDataService {
         this.selectedServiceIds = [];
     }
 
-    setAllServices(data: IOfferedService[]): void {
+    setAllServices(data: IProviderService[]): void {
         this.allServices = data;
     }
 
-    getAllServices(): IOfferedService[] {
+    getAllServices(): IProviderService[] {
         return this.allServices;
     }
 

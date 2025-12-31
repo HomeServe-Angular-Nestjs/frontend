@@ -1,14 +1,10 @@
-<app-customer-breadcrumbs></app-customer-breadcrumbs>
 <main class="pt-4 px-4 md:px-8 max-w-7xl mx-auto pb-8">
     <app-customer-provider-profile-overview></app-customer-provider-profile-overview>
 
     <app-customer-provider-profile-nav [providerId]="providerId()"></app-customer-provider-profile-nav>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 space-y-6">
-            <router-outlet> </router-outlet>
-        </div>
-        <app-customer-provider-profile-availability-and-matrix></app-customer-provider-profile-availability-and-matrix>
+    <div class="space-y-6">
+        <router-outlet> </router-outlet>
     </div>
-    
+
 </main>
