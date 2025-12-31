@@ -22,17 +22,20 @@ export const customerRoutes: Routes = [
         loadComponent: () => import('../../pages/customer/customer-homepage/homepage.component')
           .then(c => c.CustomerHomepageComponent),
         canActivate: [ProfileAuthGuard, AuthGuard],
+        data: { breadcrumb: '' }
       },
       {
         path: 'view_providers',
         loadComponent: () => import('../../pages/customer/view-providers/customer-view-providers.component')
           .then(c => c.CustomerViewProvidersComponent),
-        canActivate: [AuthGuard]
+        canActivate: [AuthGuard],
+        data: { breadcrumb: 'Service Providers' }
       },
       {
         path: 'provider_details/:id',
         component: CustomerProviderProfileLayoutComponent,
         canActivate: [AuthGuard],
+        data: { breadcrumb: 'Provider Details' },
         children: [
           {
             path: '',
@@ -65,18 +68,21 @@ export const customerRoutes: Routes = [
         path: 'cart',
         loadComponent: () => import('../../pages/customer/cart/cart.component')
           .then(c => c.CartComponent),
-        canActivate: [AuthGuard]
+        canActivate: [AuthGuard],
+        data: { breadcrumb: 'Cart' }
       },
       {
         path: 'schedule_service/:id',
         loadComponent: () => import('../../pages/customer/booking-2-schedule/customer-service-schedule.component')
           .then(c => c.CustomerServiceScheduleComponent),
-        canActivate: [AuthGuard]
+        canActivate: [AuthGuard],
+        data: { breadcrumb: 'Schedule Service' }
       },
       {
         path: 'profile',
         component: CustomerProfileLayout,
         canActivate: [AuthGuard],
+        data: { breadcrumb: 'My Profile' },
         children: [
           {
             path: '',
@@ -86,32 +92,38 @@ export const customerRoutes: Routes = [
           {
             path: 'overview',
             loadComponent: () => import('../../shared/components/customer/profile/overview/profile-overview.component')
-              .then(c => c.CustomerProfileOverviewComponent)
+              .then(c => c.CustomerProfileOverviewComponent),
+            data: { breadcrumb: 'Overview' }
           },
           {
             path: 'overview/edit',
             loadComponent: () => import('../../shared/components/customer/profile/overview-edit/profile-overview-edit.component')
-              .then(c => c.CustomerProfileOverviewEditComponent)
+              .then(c => c.CustomerProfileOverviewEditComponent),
+            data: { breadcrumb: 'Edit Profile' }
           },
           {
             path: 'bookings',
             loadComponent: () => import('../../shared/components/customer/bookings/order-history/booking-lists.component')
-              .then(c => c.CustomerBookingListsComponent)
+              .then(c => c.CustomerBookingListsComponent),
+            data: { breadcrumb: 'My Bookings' }
           },
           {
             path: 'bookings/:id',
             loadComponent: () => import('../../shared/components/customer/bookings/view-details/booking-details.component')
-              .then(c => c.CustomerViewBookingDetailsComponent)
+              .then(c => c.CustomerViewBookingDetailsComponent),
+            data: { breadcrumb: 'Booking Details' }
           },
           {
             path: 'wallet',
             loadComponent: () => import('../../shared/components/customer/wallet/customer-wallet.component')
-              .then(c => c.CustomerWalletComponent)
+              .then(c => c.CustomerWalletComponent),
+            data: { breadcrumb: 'My Wallet' }
           },
           {
             path: 'notifications',
             loadComponent: () => import('../../shared/components/customer/notifications/notifications.component')
-              .then(c => c.CustomerNotificationComponent)
+              .then(c => c.CustomerNotificationComponent),
+            data: { breadcrumb: 'Notifications' }
           }
         ],
       },
@@ -121,18 +133,21 @@ export const customerRoutes: Routes = [
     path: 'chat',
     loadComponent: () => import('../../pages/customer/chat/customer-chat.component')
       .then(c => c.CustomerChatComponent),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { breadcrumb: 'Chat' }
   },
   {
     path: 'plans',
     loadComponent: () => import('../../pages/subscription/plans/subscription-plan.component')
       .then(c => c.ProviderSubscriptionPlansPage),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { breadcrumb: 'Subscription Plans' }
   },
   {
     path: 'subscription',
     loadComponent: () => import('../../pages/subscription/view-subscription/subscription-view.component')
       .then(c => c.ProviderViewSubscriptionPage),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { breadcrumb: 'My Subscription' }
   },
 ]

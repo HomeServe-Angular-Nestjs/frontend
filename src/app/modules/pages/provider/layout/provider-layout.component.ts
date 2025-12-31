@@ -5,6 +5,7 @@ import { Store } from '@ngrx/store';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { ProviderSidebarComponent } from '../../../shared/partials/sections/provider/sidebar/provider-sidebar.component';
 import { ProviderHeaderComponent } from "../../../shared/partials/sections/provider/header/provider-header.component";
+
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
 import { selectCheckStatus } from '../../../../store/auth/auth.selector';
 import { PaymentService } from '../../../../core/services/payment.service';
@@ -17,6 +18,8 @@ import { VideoCallService } from '../../../../core/services/video-call.service';
   templateUrl: './provider-layout.component.html',
   styleUrl: './provider-layout.component.scss',
   imports: [CommonModule, ProviderSidebarComponent, RouterOutlet, ProviderHeaderComponent],
+
+
   providers: [PaymentService, RazorpayWrapperService],
 })
 export class ProviderLayoutComponent implements OnInit, OnDestroy {

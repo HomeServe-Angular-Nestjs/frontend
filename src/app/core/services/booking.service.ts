@@ -51,8 +51,12 @@ export class BookingService {
   // ------------------------------------------------------------------------------------------------------------------------------
 
 
-  fetchPriceBreakup(data: IPriceBreakup[]): Observable<IPriceBreakupData> {
-    return this._http.post<IPriceBreakupData>(`${this._customerApi}/booking/price_breakup`, data);
+  // fetchPriceBreakup(data: IPriceBreakup[]): Observable<IPriceBreakupData> {
+  //   return this._http.post<IPriceBreakupData>(`${this._customerApi}/booking/price_breakup`, data);
+  // }
+
+  fetchPriceBreakup(): Observable<IResponse<IPriceBreakupData>> {
+    return this._http.get<IResponse<IPriceBreakupData>>(`${this._customerApi}/booking/price_breakup`);
   }
 
   preBookingData(data: IBookingData): Observable<IResponse<IBooking>> {

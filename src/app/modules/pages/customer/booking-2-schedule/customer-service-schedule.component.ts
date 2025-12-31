@@ -6,7 +6,6 @@ import { SharedDataService } from '../../../../core/services/public/shared-data.
 import { ISchedule } from '../../../../core/models/schedules.model';
 import { CustomerScheduleBookingDetailsComponent } from "../../../shared/components/customer/scheduling/booking-details/customer-schedule-booking-details.component";
 import { CustomerScheduleOrderSummaryComponent } from "../../../shared/components/customer/scheduling/order-summary/customer-schedule-order-summary.component";
-import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../core/models/cart.model';
 import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
 import { ReservationSocketService } from '../../../../core/services/socket-service/reservation-socket.service';
@@ -20,7 +19,6 @@ import { IProviderService } from '../../../../core/models/provider-service.model
     CommonModule,
     CustomerScheduleBookingDetailsComponent,
     CustomerScheduleOrderSummaryComponent,
-    CustomerBreadcrumbsComponent,
   ],
   templateUrl: './customer-service-schedule.component.html',
 })

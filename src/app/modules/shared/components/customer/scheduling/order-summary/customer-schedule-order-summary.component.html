@@ -39,12 +39,8 @@
                     <span>₹{{priceBreakup.subTotal.toFixed(2)}}</span>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Tax (GST {{priceBreakup.taxRate}}%)</span>
+                    <span class="text-gray-600">Tax (GST {{priceBreakup.tax}}%)</span>
                     <span>₹{{priceBreakup.tax.toFixed(2)}}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Platform Fee ({{priceBreakup.feeRate}}%)</span>
-                    <span>₹{{priceBreakup.fee.toFixed(2)}}</span>
                 </div>
             </div>
 

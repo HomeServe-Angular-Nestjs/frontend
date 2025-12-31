@@ -40,8 +40,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
   priceBreakup: IPriceBreakupData = {
     subTotal: 0.00,
     tax: 0.00,
-    fee: 0.00,
-    total: 0.00
+    total: 0.00,
   };
   location!: IAddress;
   selectedSlot: IAvailableSlot | null = null;
@@ -106,11 +105,15 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
       return;
     }
 
-    this._bookingService.fetchPriceBreakup(data).subscribe({
-      next: (priceBreakup) => this.priceBreakup = priceBreakup,
-      error: (err) => this._toastr.error(err),
-      complete: () => this.isLoading = false
-    });
+    this._bookingService.fetchPriceBreakup()
+      .pipe(
+        takeUntil(this._destroy$),
+        map((res) => res.data ?? this.priceBreakup),
+        finalize(() => this.isLoading = false)
+      )
+      .subscribe({
+        next: (priceBreakup) => this.priceBreakup = priceBreakup,
+      });
   }
 
   private _isAllDataAvailable(): boolean {

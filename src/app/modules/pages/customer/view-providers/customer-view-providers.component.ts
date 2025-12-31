@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { decode as base64Decode } from 'js-base64';
-import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
 import { IFilterFetchProviders, IHomeSearch, IProviderCardView } from '../../../../core/models/user.model';
 import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 import { ProviderViewCardFilterComponent } from "../../../shared/partials/sections/customer/provider-view-card-filter/provider-view-card-filter.component";
@@ -15,7 +14,8 @@ import { CustomerPaginationComponent } from '../../../shared/partials/sections/c
 
 @Component({
   selector: 'app-customer-view-providers',
-  imports: [CommonModule, CustomerBreadcrumbsComponent, FormsModule, CustomerProviderViewCardComponent, ProviderViewCardFilterComponent, CustomerPaginationComponent],
+  imports: [CommonModule, FormsModule, CustomerProviderViewCardComponent, ProviderViewCardFilterComponent, CustomerPaginationComponent],
+
   templateUrl: './customer-view-providers.component.html',
 })
 export class CustomerViewProvidersComponent implements OnInit, OnDestroy {

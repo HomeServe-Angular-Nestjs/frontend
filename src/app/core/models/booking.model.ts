@@ -21,10 +21,7 @@ export interface IPriceBreakup {
 export interface IPriceBreakupData {
   subTotal: number;
   tax: number;
-  fee: number;
   total: number;
-  taxRate?: number;
-  feeRate?: number;
 }
 
 export type CustomerLocationType = Omit<ILocation, 'type'> & { phone: string };

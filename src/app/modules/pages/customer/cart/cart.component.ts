@@ -1,12 +1,13 @@
 import { Component, computed, effect, inject, OnDestroy, OnInit, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
-import { IProviderService } from '../../../../core/models/provider-service.model';
+import { map, Subject, takeUntil } from 'rxjs';
 import { SelectedServiceType } from '../../../../core/models/cart.model';
 import { SharedDataService } from '../../../../core/services/public/shared-data.service';
 import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
 import { CartService } from '../../../../core/services/cart.service';
+import { BookingService } from '../../../../core/services/booking.service';
+import { IPriceBreakupData } from '../../../../core/models/booking.model';
 
 @Component({
     selector: 'app-customer-cart',
@@ -20,6 +21,7 @@ import { CartService } from '../../../../core/services/cart.service';
 export class CartComponent implements OnInit, OnDestroy {
     private readonly _sharedDataService = inject(SharedDataService);
     private readonly _toastr = inject(ToastNotificationService);
+    private readonly _bookingService = inject(BookingService);
     public readonly _cartService = inject(CartService);
     private readonly _router = inject(Router);
 
@@ -28,7 +30,11 @@ export class CartComponent implements OnInit, OnDestroy {
     // Derived signals from CartService
     cartItemCount = computed(() => this._cartService.cart()?.items.length || 0);
     cartItems = computed(() => this._cartService.cart()?.items || []);
-    totalPrice = computed(() => this.cartItems().reduce((acc, item) => acc + +item.price, 0));
+    priceBreakup = signal<IPriceBreakupData>({
+        subTotal: 0.00,
+        tax: 0.00,
+        total: 0.00,
+    });
 
     // Grouped list for UI
     purchasedServiceList = computed(() => {
@@ -54,6 +60,19 @@ export class CartComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this._fetchCart();
+        this._fetchPriceBreakup();
+    }
+
+    private _fetchPriceBreakup() {
+        this._bookingService.fetchPriceBreakup()
+            .pipe(
+                takeUntil(this.destroy$),
+                map((res) => res.data ?? this.priceBreakup())
+            )
+            .subscribe({
+                next: (priceBreakup) => this.priceBreakup.set(priceBreakup),
+                error: (err) => this._toastr.error(err),
+            });
     }
 
     private _fetchCart() {

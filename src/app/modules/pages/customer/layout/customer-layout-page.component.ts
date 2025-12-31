@@ -4,6 +4,8 @@ import { RouterOutlet } from '@angular/router';
 import { CustomerHeaderComponent } from '../../../shared/partials/sections/customer/header/header.component';
 import { CustomerFooterComponent } from "../../../shared/partials/sections/customer/footer/customer-footer.component";
 import { distinctUntilChanged, filter, map, Subject, takeUntil } from 'rxjs';
+import { BreadcrumbsComponent } from '../../../shared/partials/sections/customer/breadcrumbs/breadcrumbs.component';
+
 import { selectCheckStatus, } from '../../../../store/auth/auth.selector';
 import { Store } from '@ngrx/store';
 import { ChatSocketService } from '../../../../core/services/socket-service/chat.service';
@@ -16,7 +18,8 @@ import { VideoCallService } from '../../../../core/services/video-call.service';
 
 @Component({
   selector: 'app-customer-landing-page',
-  imports: [CommonModule, CustomerHeaderComponent, RouterOutlet, CustomerFooterComponent],
+  imports: [CommonModule, CustomerHeaderComponent, RouterOutlet, CustomerFooterComponent, BreadcrumbsComponent],
+
   templateUrl: './customer-layout-page.component.html',
 })
 export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
