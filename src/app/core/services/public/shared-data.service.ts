@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { SelectedServiceType } from "../../../modules/pages/customer/booking-1-pick-service/customer-pick-a-service.component";
+import { SelectedServiceType } from "../../models/cart.model";
 import { IProviderService } from "../../models/provider-service.model";
 import { BehaviorSubject, ReplaySubject } from "rxjs";
 

@@ -62,9 +62,9 @@ export const customerRoutes: Routes = [
         ]
       },
       {
-        path: 'pick_a_service/:id',
-        loadComponent: () => import('../../pages/customer/booking-1-pick-service/customer-pick-a-service.component')
-          .then(c => c.CustomerPickAServiceComponent),
+        path: 'cart',
+        loadComponent: () => import('../../pages/customer/cart/cart.component')
+          .then(c => c.CartComponent),
         canActivate: [AuthGuard]
       },
       {

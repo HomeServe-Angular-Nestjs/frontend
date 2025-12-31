@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, forkJoin, Subject, Subscription, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, takeUntil } from 'rxjs';
 import { IProvider } from '../../../../../../core/models/user.model';
 import { IProviderService } from '../../../../../../core/models/provider-service.model';
 import { ProviderService } from '../../../../../../core/services/provider.service';
@@ -10,13 +10,14 @@ import { ServiceManagementService } from '../../../../../../core/services/servic
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { IFilter, IPriceRange, IServiceDurationRange, ServiceDurationKey, SortOption } from '../../../../../../core/models/filter.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
+import { CartService } from '../../../../../../core/services/cart.service';
 
 @Component({
   selector: 'app-customer-provider-profile-services',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './customer-provider-profile-services.component.html',
-  providers: [DebounceService]
+  providers: [DebounceService, CartService]
 })
 export class CustomerProviderProfileServicesComponent implements OnInit {
   private _providerService = inject(ProviderService);
@@ -24,6 +25,7 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
   private _debounceService = inject(DebounceService)
   private _toastr = inject(ToastNotificationService);
   private _router = inject(Router);
+  private _cartService = inject(CartService);
   private _route = inject(ActivatedRoute);
 
   private _providerDataSub!: Subscription;
@@ -160,11 +162,14 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
     });
   }
 
-  bookService(selectedServiceId: string, ids: string[]) {
-    if (ids.length < 0 || !selectedServiceId) return;
-    this._router.navigate(['pick_a_service', this.providerId], {
-      queryParams: { ids: ids.join(','), selectedServiceId }
-    });
+  addServiceToCart(selectedServiceId: string) {
+    this._cartService.addItemsToCart(selectedServiceId)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe({
+        next: (res) => {
+          this._toastr.success(res.message);
+        }
+      });
   }
 
   triggerSearch() {

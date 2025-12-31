@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { combineLatest, finalize, map, Observable, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
-import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../pages/customer/booking-1-pick-service/customer-pick-a-service.component';
+import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../../core/models/cart.model';
 import { IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { IAddress } from '../../../../../../core/models/schedules.model';
@@ -11,10 +11,8 @@ import { ToastNotificationService } from '../../../../../../core/services/public
 import { PaymentService } from '../../../../../../core/services/payment.service';
 import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
 import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
-import { ITransaction } from '../../../../../../core/models/transaction.model';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
-import { PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
-import { customerActions } from '../../../../../../store/customer/customer.actions';
+import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
 import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
 
@@ -53,10 +51,10 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
   isProcessing = false;
 
   get getServiceIds(): SelectedServiceIdsType[] {
-    return this.selectedServiceData.map(item => {
+    return this.selectedServiceData.map((item: SelectedServiceType) => {
       return {
         id: item.id,
-        selectedIds: item.services.map(s => s.id)
+        selectedIds: item.services.map((s: any) => s.id)
       }
     });
   }
@@ -96,9 +94,9 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
   private _prepareDataForPriceBreakup(data: SelectedServiceType[]): IPriceBreakup[] {
     return data
       .filter(item => item.services?.length)
-      .map(item => ({
+      .map((item: SelectedServiceType) => ({
         serviceId: item.id,
-        subServiceIds: item.services.map(sub => sub.id)
+        subServiceIds: item.services.map((sub: any) => sub.id)
       }));
   }
 

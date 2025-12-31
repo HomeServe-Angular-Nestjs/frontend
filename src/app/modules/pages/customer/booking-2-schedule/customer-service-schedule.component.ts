@@ -7,9 +7,11 @@ import { ISchedule } from '../../../../core/models/schedules.model';
 import { CustomerScheduleBookingDetailsComponent } from "../../../shared/components/customer/scheduling/booking-details/customer-schedule-booking-details.component";
 import { CustomerScheduleOrderSummaryComponent } from "../../../shared/components/customer/scheduling/order-summary/customer-schedule-order-summary.component";
 import { CustomerBreadcrumbsComponent } from "../../../shared/partials/sections/customer/breadcrumbs/customer-breadcrumbs.component";
-import { SelectedServiceIdsType, SelectedServiceType } from '../booking-1-pick-service/customer-pick-a-service.component';
+import { SelectedServiceIdsType, SelectedServiceType } from '../../../../core/models/cart.model';
 import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
 import { ReservationSocketService } from '../../../../core/services/socket-service/reservation-socket.service';
+import { CartService } from '../../../../core/services/cart.service';
+import { IProviderService } from '../../../../core/models/provider-service.model';
 
 @Component({
   selector: 'app-customer-service-schedule',
@@ -28,9 +30,10 @@ export class CustomerServiceScheduleComponent implements OnInit, OnDestroy {
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-
+  private readonly _cartService = inject(CartService);
   private readonly _destroy$ = new Subject<void>();
   private _lastJoinedId: string | null = null;
+
   schedules$!: Observable<ISchedule[]> | null;
   selectedServiceData: SelectedServiceType[] = [];
   preparedDataForCalculation: SelectedServiceIdsType[] = [];
@@ -69,31 +72,58 @@ export class CustomerServiceScheduleComponent implements OnInit, OnDestroy {
     // Try fetching from shared data service
     this.selectedServiceData = this._sharedDataService.getSelectedServiceData();
 
-    // If nothing in shared state, try localStorage
+    // If nothing in shared state, fetch from CartService
     if (this.selectedServiceData.length <= 0) {
-      const savedData = localStorage.getItem('selectedServiceData');
-      if (savedData) {
-        try {
-          this.selectedServiceData = JSON.parse(savedData);
-        } catch (e) {
-          console.error('Error parsing selectedServiceData from localStorage', e);
-          localStorage.removeItem('selectedServiceData');
-        }
+      this._cartService.getCart()
+        .pipe(takeUntil(this._destroy$))
+        .subscribe({
+          next: (res) => {
+            if (res.success && res.data) {
+              this.selectedServiceData = this._processCartData(res.data.items);
+              if (this.selectedServiceData.length > 0) {
+                this.preparedDataForCalculation = this.prepareTheDataForPriceCalculation(this.selectedServiceData);
+              } else {
+                this._handleEmptyCart();
+              }
+            } else {
+              this._handleEmptyCart();
+            }
+          },
+          error: () => this._handleEmptyCart()
+        });
+    } else {
+      // Prepare data structure needed for calculation
+      this.preparedDataForCalculation = this.prepareTheDataForPriceCalculation(this.selectedServiceData);
+    }
+  }
+
+  private _processCartData(items: IProviderService[]): SelectedServiceType[] {
+    const categoryMap = new Map<string, SelectedServiceType>();
+    items.forEach(service => {
+      if (!categoryMap.has(service.category.id)) {
+        categoryMap.set(service.category.id, {
+          id: service.category.id,
+          name: service.category.name,
+          services: [service]
+        });
+      } else {
+        categoryMap.get(service.category.id)?.services.push(service);
       }
-    }
+    });
+    return Array.from(categoryMap.values());
+  }
 
-    // If still empty, notify user and redirect
-    if (this.selectedServiceData.length <= 0) {
-      this._toastr.error('Your cart is empty. Pick a service');
-      this._router.navigate(['homepage']);
-      return;
-    }
+  private _handleEmptyCart() {
+    this._toastr.error('Your cart is empty. Pick a service');
+    this._router.navigate(['homepage']);
+  }
 
-    // Persist data for session continuity
-    localStorage.setItem('selectedServiceData', JSON.stringify(this.selectedServiceData));
 
-    // Prepare data structure needed for calculation
-    this.preparedDataForCalculation = this.prepareTheDataForPriceCalculation(this.selectedServiceData);
+  private prepareTheDataForPriceCalculation(data: SelectedServiceType[]): SelectedServiceIdsType[] {
+    return data.map(item => ({
+      id: item.id,
+      selectedIds: item.services.map(s => s.id)
+    }));
   }
 
   ngOnDestroy(): void {
@@ -104,19 +134,5 @@ export class CustomerServiceScheduleComponent implements OnInit, OnDestroy {
 
     this._destroy$.next();
     this._destroy$.complete();
-  }
-
-  /**
-    * Transforms selected service data into a simplified ID structure
-    * for downstream calculations (pricing, scheduling).
-    * 
-    * @param data Array of selected services
-    * @returns Array of objects containing category ID and associated service IDs
-    */
-  private prepareTheDataForPriceCalculation(data: SelectedServiceType[]): SelectedServiceIdsType[] {
-    return data.map(item => ({
-      id: item.id,
-      selectedIds: item.services.map(s => s.id)
-    }));
   }
 }

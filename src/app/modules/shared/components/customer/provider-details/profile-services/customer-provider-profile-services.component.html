@@ -115,7 +115,8 @@
 
                 <div class="pt-5 border-t border-gray-50 flex items-center justify-between mt-auto">
                     <div class="flex flex-col">
-                        <span class="text-xs font-bold text-gray-400 uppercase tracking-tighter">Starting from</span>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-tighter">Price per {{
+                            service.pricingUnit }}</span>
                         <div class="flex items-baseline gap-1">
                             <span class="text-2xl font-black text-gray-900">₹{{ service.price }}</span>
                             <span class="text-xs font-medium text-gray-500">/ {{ service.pricingUnit }}</span>
@@ -129,9 +130,9 @@
                                 {{ service.estimatedTimeInMinutes }} mins
                             </div>
                         </div>
-                        <button (click)="bookService(service.id, [service.id])"
-                            class="bg-gray-900 hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 transform active:scale-95 hover:shadow-xl hover:shadow-blue-500/30">
-                            Book Now
+                        <button (click)="addServiceToCart(service.id)"
+                            class="bg-gray-900 hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-medium transition-all duration-300 transform active:scale-95 hover:shadow-xl hover:shadow-blue-500/30">
+                            &plus; Add to Cart
                         </button>
                     </div>
                 </div>
