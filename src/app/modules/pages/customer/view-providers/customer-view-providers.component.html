@@ -1,42 +1,90 @@
-<section class="pt-6 pb-12 bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-7xl">
-        <!-- Page Heading -->
-        <div class="mb-8 text-center md:text-left">
-            <h1 class="text-4xl font-bold text-gray-900">
-                Find Your Service Provider
-            </h1>
-            <p class="text-lg text-gray-600 mt-3 max-w-2xl">
-                Browse through our verified professionals and choose the best match for your needs
-            </p>
+<section class="bg-gradient-to-br from-neutral-50 via-white to-neutral-50">
+    <div class="container px-4 max-w-7xl py-8">
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-3">
+                <div
+                    class="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    <i class="fas fa-users text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-black text-neutral-900 tracking-tight">
+                        Find Your Service Provider
+                    </h1>
+                    <p class="text-sm text-neutral-500 font-medium mt-0.5">
+                        Browse through our verified professionals
+                    </p>
+                </div>
+            </div>
         </div>
 
-        <!-- Search and Filters Section -->
+        <!-- Filters Section -->
         <app-customer-provider-view-card-filter
             (filterEvents)="applyFilters($event)"></app-customer-provider-view-card-filter>
 
         <!-- Provider Cards Grid -->
-        <ng-container *ngIf="providers$ | async as providers; else noProviders">
+        <ng-container *ngIf="providers$ | async as providers; else loadingState">
             <ng-container *ngIf="providers.length > 0; else noProviders">
+                <!-- Results Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-lg font-bold text-neutral-700">Available Providers</h2>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold">
+                            {{ providers.length }} found
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Provider Cards -->
                 <app-customer-provider-view-card [providers]="providers"></app-customer-provider-view-card>
             </ng-container>
         </ng-container>
+
+        <!-- No Providers State -->
         <ng-template #noProviders>
-            <div class="bg-white rounded-xl shadow-sm p-8 text-center">
-                <svg class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No providers found</h3>
-                <p class="text-gray-600 max-w-md mx-auto">Try adjusting your search or filters to find what you're
-                    looking for.</p>
-                <button
-                    class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium"
-                    (click)="resetFilters()">
-                    Reset Filters
-                </button>
+            <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-12 text-center">
+                <div class="max-w-md mx-auto">
+                    <!-- Icon -->
+                    <div class="h-20 w-20 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-search text-3xl text-neutral-400"></i>
+                    </div>
+
+                    <!-- Message -->
+                    <h3 class="text-xl font-bold text-neutral-800 mb-2">No providers found</h3>
+                    <p class="text-neutral-500 mb-6">
+                        We couldn't find any providers matching your criteria. Try adjusting your filters or search
+                        terms.
+                    </p>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-center gap-3">
+                        <button
+                            class="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all text-sm font-bold shadow-lg shadow-indigo-200 flex items-center gap-2"
+                            (click)="resetFilters()">
+                            <i class="fas fa-redo"></i>
+                            Reset All Filters
+                        </button>
+                    </div>
+                </div>
             </div>
         </ng-template>
 
-        <app-customer-pagination [pagination]="pagination" (pageChanged)="changePage($event)"></app-customer-pagination>
+        <!-- Loading State -->
+        <ng-template #loadingState>
+            <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-12 text-center">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="h-12 w-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin">
+                    </div>
+                    <p class="text-neutral-600 font-medium">Loading providers...</p>
+                </div>
+            </div>
+        </ng-template>
+
+        <!-- Pagination -->
+        <div class="mt-8">
+            <app-customer-pagination [pagination]="pagination" (pageChanged)="changePage($event)">
+            </app-customer-pagination>
+        </div>
     </div>
 </section>

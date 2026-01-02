@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -33,15 +33,12 @@ export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
     lng: null,
   };
 
-  filters: IFilterFetchProviders = {
-    isCertified: false,
+  filters = signal<IFilterFetchProviders>({
     search: '',
-    status: 'all',
     page: 1,
-    lng: this.homeSearch.lng,
-    lat: this.homeSearch.lat,
-    title: this.homeSearch.title,
-  };
+    sort: 'all',
+    availability: null,
+  });
 
   pagination: IPagination = {
     total: 0,
@@ -66,14 +63,14 @@ export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
 
       this.homeSearch = parsedParam || this.homeSearch;
 
-      this.filters = {
-        ...this.filters,
+      this.filters.set({
+        ...this.filters(),
         lat: this.homeSearch.lat,
         lng: this.homeSearch.lng,
         title: this.homeSearch.title,
-      };
+      });
 
-      this._fetchProviders(this.filters);
+      this._fetchProviders(this.filters());
     });
   }
 
@@ -87,24 +84,23 @@ export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
     );
   }
 
-  applyFilters(newFilter: Partial<typeof this.filters>) {
-    this.filters = { ...this.filters, ...newFilter, page: 1 };
+  applyFilters(newFilter: IFilterFetchProviders) {
+    this.filters.set({ ...this.filters(), ...newFilter, page: 1 });
     this.pagination.page = 1;
-    this._fetchProviders(this.filters);
+    this._fetchProviders(this.filters());
   }
 
   resetFilters() {
-    this.filters = { search: '', isCertified: false, status: 'all', page: 1, };
+    this.filters.set({ search: '', isCertified: false, status: 'all', page: 1, });
     this.pagination.page = 1;
     this.filterComponent?.reset();
-    this._fetchProviders(this.filters);
+    this._fetchProviders(this.filters());
   }
 
   changePage(page: number) {
-    this.filters.page = page;
+    this.filters.set({ ...this.filters(), page });
     this.pagination.page = page;
-    console.log(this.filters);
-    this._fetchProviders(this.filters);
+    this._fetchProviders(this.filters());
   }
 
   ngOnDestroy(): void {
