@@ -34,28 +34,11 @@ export const providerRoutes: Routes = [
         data: { breadcrumb: 'Plans' }
       },
       {
-        path: 'manage_services',
+        path: 'manage-services',
         canActivate: [AuthGuard],
         data: { breadcrumb: 'Manage Services' },
-        children: [
-          {
-            path: '',
-            loadComponent: () => import('../../shared/components/provider/service-section/service-view/service-view.component')
-              .then(c => c.ServiceViewComponent),
-          },
-          {
-            path: 'create',
-            loadComponent: () => import('../../shared/components/provider/service-section/service-edit/service-create.component')
-              .then(c => c.ServiceCreateComponent),
-            data: { breadcrumb: 'Create Service' }
-          },
-          {
-            path: 'edit/:id',
-            loadComponent: () => import('../../shared/components/provider/service-section/service-edit/service-create.component')
-              .then(c => c.ServiceCreateComponent),
-            data: { breadcrumb: 'Edit Service' }
-          },
-        ]
+        loadComponent: () => import('../../shared/components/provider/manage-service/manage-service.component')
+          .then(c => c.ProviderManageServiceComponent),
       },
       {
         path: 'availability',

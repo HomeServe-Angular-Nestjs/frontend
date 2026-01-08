@@ -80,7 +80,7 @@ export class ProviderSidebarComponent implements OnInit {
         {
           name: 'Manage Services',
           icon: 'fas fa-layer-group',
-          route: 'manage_services',
+          route: 'manage-services',
           active: false
         },
         {
