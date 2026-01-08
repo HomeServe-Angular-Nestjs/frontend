@@ -1,10 +1,11 @@
-import { Component, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { Subject, switchMap, takeUntil, tap, finalize } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { decode as base64Decode } from 'js-base64';
-import { IFilterFetchProviders, IHomeSearch, IProviderCardView } from '../../../../core/models/user.model';
+import { IFilterFetchProviders, IHomeSearch } from '../../../../core/models/user.model';
 import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 import { ProviderViewCardFilterComponent } from "../../../shared/partials/sections/customer/provider-view-card-filter/provider-view-card-filter.component";
 import { ProviderService } from '../../../../core/services/provider.service';
@@ -15,98 +16,103 @@ import { CustomerPaginationComponent } from '../../../shared/partials/sections/c
 @Component({
   selector: 'app-customer-view-providers',
   imports: [CommonModule, FormsModule, CustomerProviderViewCardComponent, ProviderViewCardFilterComponent, CustomerPaginationComponent],
-
   templateUrl: './customer-view-providers.component.html',
 })
-export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
-  private readonly _providerService = inject(ProviderService);
-  private readonly _toastr = inject(ToastNotificationService);
-  private readonly _route = inject(ActivatedRoute);
-
-  private _destroy$ = new Subject<void>();
-
-  providers$!: Observable<IProviderCardView[]>;
-
-  homeSearch: IHomeSearch = {
-    title: null,
-    lat: null,
-    lng: null,
-  };
+export class CustomerViewProvidersComponent {
+  private readonly providerService = inject(ProviderService);
+  private readonly toastr = inject(ToastNotificationService);
+  private readonly route = inject(ActivatedRoute);
 
   filters = signal<IFilterFetchProviders>({
     search: '',
     page: 1,
+    limit: 10,
     status: 'all',
     availability: 'all',
   });
 
-  pagination: IPagination = {
-    total: 0,
+  pagination = signal<IPagination>({
+    total: 1,
     page: 1,
     limit: 10,
-  };
+  });
 
-  @ViewChild(ProviderViewCardFilterComponent)
-  filterComponent!: ProviderViewCardFilterComponent
+  private providersResponse = toSignal(
+    toObservable(this.filters).pipe(
+      switchMap(filters =>
+        this.providerService.getProviders(filters)
+      )
+    ),
+    { initialValue: null }
+  );
 
-  
-  ngOnInit(): void {
-    this._route.queryParams.subscribe(params => {
+  providers = computed(() =>
+    this.providersResponse()?.data?.providerCards ?? []
+  );
+
+  isLoading = computed(() => this.providersResponse() === null);
+
+  constructor() {
+    /* Sync pagination from API */
+    effect(() => {
+      const pagination = this.providersResponse()?.data?.pagination;
+      if (pagination) {
+        this.pagination.set(pagination);
+      }
+    });
+
+    /* Sync query params → filters */
+    const queryParams = toSignal<Params | null>(
+      this.route.queryParams,
+      { initialValue: null }
+    );
+
+    effect(() => {
+      const params = queryParams();
+      if (!params) return;
+
       const ls = params['ls'];
-      let parsedParam: IHomeSearch | undefined;
+      if (!ls) return;
 
       try {
-        if (ls) parsedParam = JSON.parse(base64Decode(ls));
-      } catch (err) {
-        this._toastr.error('Oops something went wrong.');
-        console.error('Invalid location search param:', err);
+        const parsed = JSON.parse(base64Decode(ls));
+        this.filters.set({
+          ...this.filters(),
+          ...parsed,
+          page: 1,
+        });
+      } catch {
+        this.toastr.error('Oops something went wrong.');
       }
-
-      this.homeSearch = parsedParam || this.homeSearch;
-
-      this.filters.set({
-        ...this.filters(),
-        lat: this.homeSearch.lat,
-        lng: this.homeSearch.lng,
-        title: this.homeSearch.title,
-      });
-
-      this._fetchProviders(this.filters());
     });
   }
 
-  private _fetchProviders(filter: IFilterFetchProviders = {}) {
-    console.log(filter)
-    this.providers$ = this._providerService.getProviders(filter).pipe(
-      takeUntil(this._destroy$),
-      map(res => {
-        this.pagination = res.data?.pagination ?? this.pagination;
-        return res.data?.providerCards ?? []
-      })
-    );
-  }
+  @ViewChild(ProviderViewCardFilterComponent)
+  filterComponent!: ProviderViewCardFilterComponent;
 
   applyFilters(newFilter: IFilterFetchProviders) {
-    this.filters.set({ ...this.filters(), ...newFilter, page: 1 });
-    this.pagination.page = 1;
-    this._fetchProviders(this.filters());
+    this.filters.set({
+      ...this.filters(),
+      ...newFilter,
+      page: 1,
+    });
   }
 
   resetFilters() {
-    this.filters.set({ search: '', status: 'all', page: 1, });
-    this.pagination.page = 1;
+    this.filters.set({
+      search: '',
+      status: 'all',
+      availability: 'all',
+      page: 1,
+    });
+
     this.filterComponent?.reset();
-    this._fetchProviders(this.filters());
   }
 
   changePage(page: number) {
-    this.filters.set({ ...this.filters(), page });
-    this.pagination.page = page;
-    this._fetchProviders(this.filters());
-  }
-
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
+    this.filters.set({
+      ...this.filters(),
+      page,
+    });
   }
 }

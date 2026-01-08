@@ -20,52 +20,57 @@
         </div>
 
         <!-- Filters Section -->
-        <app-customer-provider-view-card-filter
-            (filterEvents)="applyFilters($event)"></app-customer-provider-view-card-filter>
+        <app-customer-provider-view-card-filter (filterEvents)="applyFilters($event)">
+        </app-customer-provider-view-card-filter>
 
-        <!-- Provider Cards Grid -->
-        <ng-container *ngIf="providers$ | async as providers; else loadingState">
-            <ng-container *ngIf="providers.length > 0; else noProviders">
+        <!-- Loading State Checker -->
+        <ng-container *ngIf="!isLoading(); else loadingState">
+
+            <!-- Providers Found -->
+            <ng-container *ngIf="providers().length > 0; else emptyState">
+
                 <!-- Results Header -->
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
                         <h2 class="text-lg font-bold text-neutral-700">Available Providers</h2>
                         <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold">
-                            {{ providers.length }} found
+                            {{ providers().length }} found
                         </span>
                     </div>
                 </div>
 
                 <!-- Provider Cards -->
-                <app-customer-provider-view-card [providers]="providers"></app-customer-provider-view-card>
+                <app-customer-provider-view-card [providers]="providers()">
+                </app-customer-provider-view-card>
+
             </ng-container>
         </ng-container>
 
-        <!-- No Providers State -->
-        <ng-template #noProviders>
+        <!-- Empty State -->
+        <ng-template #emptyState>
             <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-12 text-center">
                 <div class="max-w-md mx-auto">
-                    <!-- Icon -->
+
                     <div class="h-20 w-20 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-search text-3xl text-neutral-400"></i>
                     </div>
 
-                    <!-- Message -->
-                    <h3 class="text-xl font-bold text-neutral-800 mb-2">No providers found</h3>
+                    <h3 class="text-xl font-bold text-neutral-800 mb-2">
+                        No providers found
+                    </h3>
+
                     <p class="text-neutral-500 mb-6">
                         We couldn't find any providers matching your criteria. Try adjusting your filters or search
                         terms.
                     </p>
 
-                    <!-- Actions -->
-                    <div class="flex items-center justify-center gap-3">
-                        <button
-                            class="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all text-sm font-bold shadow-lg shadow-indigo-200 flex items-center gap-2"
-                            (click)="resetFilters()">
-                            <i class="fas fa-redo"></i>
-                            Reset All Filters
-                        </button>
-                    </div>
+                    <button
+                        class="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all text-sm font-bold shadow-lg shadow-indigo-200 flex items-center gap-2 mx-auto"
+                        (click)="resetFilters()">
+                        <i class="fas fa-redo"></i>
+                        Reset All Filters
+                    </button>
+
                 </div>
             </div>
         </ng-template>
@@ -83,8 +88,9 @@
 
         <!-- Pagination -->
         <div class="mt-8">
-            <app-customer-pagination [pagination]="pagination" (pageChanged)="changePage($event)">
+            <app-customer-pagination [pagination]="pagination()" (pageChanged)="changePage($event)">
             </app-customer-pagination>
         </div>
+
     </div>
 </section>

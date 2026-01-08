@@ -15,8 +15,8 @@
           <ng-template #fallbackAvatar>
             <div
               class="h-16 w-16 flex items-center justify-center rounded-xl text-white font-bold text-xl shadow-sm transition-transform duration-300 group-hover:scale-105"
-              [style.background-color]="fallbackColor(provider.username)">
-              {{ fallbackChar }}
+              [style.background-color]="getAvatarColor(provider.username)">
+              {{ provider.username.charAt(0) | uppercase }}
             </div>
           </ng-template>
 

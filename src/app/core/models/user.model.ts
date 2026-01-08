@@ -212,6 +212,7 @@ export interface IFilterFetchProviders extends IHomeSearch {
     isCertified?: boolean;
     status?: string;
     page?: number;
+    limit?: number;
     availability?: AvailabilityType | 'all';
     date?: string;
     sort?: 'best_rated' | 'nearest' | 'all';
