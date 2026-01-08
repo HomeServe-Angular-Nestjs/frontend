@@ -38,4 +38,4 @@ export class CustomerProviderProfileLayoutComponent implements OnInit {
                 }
             });
     }
-}   
+}

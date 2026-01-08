@@ -1,5 +1,7 @@
 import { WeekEnum } from "../enums/enums";
 
+export type AvailabilityType = 'morning' | 'afternoon' | 'evening' | 'night';
+
 export interface IDateOverride {
     id: string;
     providerId: string;
@@ -51,4 +53,10 @@ export interface IDateOverrideViewList {
     }[],
     reason?: string,
     isAvailable: boolean,
+}
+
+export interface IAvailabilityViewList {
+    label: string;
+    icon: string;
+    value: AvailabilityType;
 }

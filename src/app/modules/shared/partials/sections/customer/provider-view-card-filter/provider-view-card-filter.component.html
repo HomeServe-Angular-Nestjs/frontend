@@ -1,38 +1,70 @@
-<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+<div class="p-3 mb-5">
 
-    <!-- Search Left -->
-    <div class="flex-1 min-w-[260px]">
-        <input type="text" placeholder="Search providers..." [(ngModel)]="searchQuery"
-            (ngModelChange)="onSearchTriggered()"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500" />
-    </div>
+    <!-- Single Row Layout -->
+    <div class="flex flex-col md:flex-row gap-3">
 
-    <!-- Filters Right -->
-    <div class="flex items-center gap-6">
-
-        <!-- Toggle -->
-        <label for="certified"
-            class="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
-            <span>Certified Only</span>
-
+        <!-- Search Input -->
+        <div class="flex-1 min-w-0">
             <div class="relative">
-                <input type="checkbox" id="certified" [(ngModel)]="certifiedOnly"
-                    (ngModelChange)="toggleCertifiedOnly()" class="sr-only peer" />
+                <input type="text" placeholder="Search providers..." [(ngModel)]="filter().search"
+                    (ngModelChange)="onSearchTriggered($event)"
+                    class="w-full h-9 border border-neutral-200 rounded-lg pl-8 pr-3 text-xs outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all placeholder:text-neutral-400" />
+                <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px]"></i>
+            </div>
+        </div>
 
-                <div class="w-10 h-5 bg-gray-300 rounded-full transition peer-checked:bg-indigo-600"></div>
-                <div
-                    class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition peer-checked:translate-x-5">
+        <!-- Sort Dropdown -->
+        <div class="w-full md:w-40">
+            <div class="relative">
+                <select [(ngModel)]="filter().status" (ngModelChange)="sortProviders()"
+                    class="w-full h-9 border border-neutral-200 rounded-lg pl-8 pr-8 text-xs cursor-pointer outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all bg-white appearance-none">
+                    <option value="all">All</option>
+                    <option value="best-rated">Best Rated</option>
+                    <option value="nearest">Nearest</option>
+                </select>
+                <i
+                    class="fas fa-sort absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none"></i>
+                <i
+                    class="fas fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none"></i>
+            </div>
+        </div>
+
+        <!-- Date & Availability Slots -->
+        <div class="flex items-center gap-4">
+            <!-- Date Selection -->
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-[10px] font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap hidden md:block">Date:</span>
+                <input type="date" [ngModel]="filter().date" (change)="onDateChange($event)"
+                    class="h-9 px-3 rounded-lg border border-neutral-200 text-xs font-medium text-neutral-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all cursor-pointer bg-white" />
+            </div>
+
+            <div class="h-6 w-px bg-neutral-200 hidden md:block"></div>
+
+            <!-- Time Selection -->
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-[10px] font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap hidden md:block">Time:</span>
+                <div class="flex gap-1.5">
+                    <button *ngFor="let slot of availabilitySlots" (click)="toggleAvailability(slot.value)"
+                        class="h-9 px-3 rounded-lg border transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap"
+                        [ngClass]="filter().availability === slot.value 
+                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' 
+                          : 'bg-white border-neutral-200 text-neutral-600 hover:border-indigo-300 hover:bg-indigo-50'">
+                        <i [class]="slot.icon" class="text-[11px]"></i>
+                        <span class="text-[10px] font-semibold">{{ slot.label }}</span>
+                    </button>
                 </div>
             </div>
-        </label>
+        </div>
 
-        <!-- Sort -->
-        <select [(ngModel)]="sortOption" (ngModelChange)="sortProviders()"
-            class="border border-gray-300 rounded-lg px-3 py-2 text-sm cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="all">All</option>
-            <option value="best-rated">Best Rated</option>
-            <option value="nearest">Nearest</option>
-        </select>
+        <div class="flex items-center">
+            <button (click)="reset()"
+                class="h-9 px-4 rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:border-red-300 hover:bg-red-50 hover:text-red-600 transition-all duration-150 flex items-center gap-2 whitespace-nowrap shadow-sm">
+                <i class="fas fa-rotate-left text-[11px]"></i>
+                <span class="text-xs font-semibold">Reset</span>
+            </button>
+        </div>
 
     </div>
 </div>

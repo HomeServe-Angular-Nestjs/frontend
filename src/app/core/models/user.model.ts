@@ -1,6 +1,7 @@
 import { EntityState } from '@ngrx/entity';
 import { SlotType } from './schedules.model';
 import { IPagination, IReview } from './booking.model';
+import { AvailabilityType } from './availability.model';
 export type UType = 'customer' | 'provider';
 
 export interface IDocs {
@@ -211,6 +212,9 @@ export interface IFilterFetchProviders extends IHomeSearch {
     isCertified?: boolean;
     status?: string;
     page?: number;
+    availability?: AvailabilityType | 'all';
+    date?: string;
+    sort?: 'best_rated' | 'nearest' | 'all';
 }
 
 export interface IStats {
