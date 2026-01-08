@@ -147,7 +147,7 @@ export interface IScheduleDetailFilters {
 //     slotId: string;
 // }
 
-export interface IAddress {
-    coordinates: [number, number];
-    address: string;
-}
+// export interface IAddress {
+//     coordinates: [number, number];
+//     address: string;
+// }

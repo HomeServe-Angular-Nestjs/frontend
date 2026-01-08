@@ -1,12 +1,11 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { inject, Injectable } from "@angular/core";
+import { inject, Injectable, signal } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, Observable, shareReplay } from "rxjs";
 import { IBooking, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists, IUpdateBookingsPaymentStatus } from "../models/booking.model";
-import { IAddress } from "../models/schedules.model";
 import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { ILocation } from "../models/user.model";
+import { ILocation, ILocationData } from "../models/user.model";
 import { ISelectedSlot } from "../models/slot-rule.model";
 import { IReviewFilter, IReviewWithPagination, ISubmitReview } from "../models/reviews.model";
 
@@ -14,8 +13,7 @@ import { IReviewFilter, IReviewWithPagination, ISubmitReview } from "../models/r
 export class BookingService {
   private _http = inject(HttpClient);
 
-  private _addressSource = new BehaviorSubject<IAddress & Omit<ILocation, 'type'> | null>(null);
-  address$ = this._addressSource.asObservable();
+  selectedAddress = signal<ILocationData | null>(null);
 
   private _phoneNumberSource = new BehaviorSubject<string | null>(null);
   phoneNumber$ = this._phoneNumberSource.asObservable();
@@ -26,8 +24,12 @@ export class BookingService {
   private _customerApi = API_ENV.customer;
   private _providerApi = API_ENV.provider;
 
-  setSelectedAddress(newAddress: IAddress & Omit<ILocation, 'type'>) {
-    this._addressSource.next(newAddress);
+  setSelectedAddress(newAddress: ILocationData) {
+    this.selectedAddress.set(newAddress);
+  }
+
+  getSelectedAddress(): ILocationData | null {
+    return this.selectedAddress();
   }
 
   setSelectedSlot(slot: ISelectedSlot | null) {

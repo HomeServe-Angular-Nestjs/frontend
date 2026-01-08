@@ -1,7 +1,7 @@
 import { SelectedServiceIdsType } from "./cart.model";
 import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../enums/enums";
 import { IAvailableSlot } from "./slot-rule.model";
-import { ILocation } from "./user.model";
+import { ILocation, ILocationData } from "./user.model";
 
 // --------------------
 // Shared Interfaces
@@ -64,7 +64,7 @@ export interface IReview {
 export interface IBookingData {
   providerId: string;
   total: number;
-  location: Omit<ILocation, 'type'>;
+  location: ILocationData;
   slotData: IAvailableSlot;
   serviceIds: SelectedServiceIdsType[];
   // transactionId: string | null;

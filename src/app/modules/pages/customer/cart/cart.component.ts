@@ -8,6 +8,8 @@ import { ToastNotificationService } from '../../../../core/services/public/toast
 import { CartService } from '../../../../core/services/cart.service';
 import { BookingService } from '../../../../core/services/booking.service';
 import { IPriceBreakupData } from '../../../../core/models/booking.model';
+import { OrderSummarySectionComponent } from '../../../shared/partials/sections/customer/order-summary-section/order-summary-section.component';
+
 
 @Component({
     selector: 'app-customer-cart',
@@ -16,6 +18,7 @@ import { IPriceBreakupData } from '../../../../core/models/booking.model';
     styleUrl: './cart.component.scss',
     imports: [
         CommonModule,
+        OrderSummarySectionComponent
     ],
 })
 export class CartComponent implements OnInit, OnDestroy {

@@ -93,4 +93,13 @@ export class ProviderService {
   getDashboardOverview(): Observable<IResponse> {
     return this._http.get<IResponse>(`${this._apiUrl}/dashboard/overview`);
   }
+
+  fetchAvailableSlots(providerId: string, selectedDate: string): Observable<IResponse> {
+    const params = new HttpParams().set('date', selectedDate);
+    return this._http.get<IResponse>(`${this._apiUrl}/available-slots/${providerId}`, { params });
+  }
+
+  updateBufferTime(bufferTime: number): Observable<IResponse<IProvider>> {
+    return this._http.patch<IResponse<IProvider>>(`${this._apiUrl}/buffer`, { bufferTime });
+  }
 }

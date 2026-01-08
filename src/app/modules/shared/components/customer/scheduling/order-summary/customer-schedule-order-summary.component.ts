@@ -1,12 +1,11 @@
-import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { combineLatest, finalize, map, Observable, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
+import { finalize, map, Observable, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../../core/models/cart.model';
-import { IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
+import { IBookingData, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
-import { IAddress } from '../../../../../../core/models/schedules.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { PaymentService } from '../../../../../../core/services/payment.service';
 import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
@@ -15,14 +14,16 @@ import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loa
 import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
 import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
+import { OrderSummarySectionComponent } from '../../../../partials/sections/customer/order-summary-section/order-summary-section.component';
+import { ILocationData } from '../../../../../../core/models/user.model';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
   templateUrl: './customer-schedule-order-summary.component.html',
-  imports: [CommonModule, LoadingCircleAnimationComponent],
+  imports: [CommonModule, LoadingCircleAnimationComponent, OrderSummarySectionComponent],
   providers: [PaymentService, RazorpayWrapperService]
 })
-export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges, OnDestroy {
+export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy {
   private readonly _reservationService = inject(ReservationSocketService);
   private readonly _razorpayWrapper = inject(RazorpayWrapperService);
   private readonly _toastr = inject(ToastNotificationService);
@@ -31,23 +32,22 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _store = inject(Store);
-
   private _destroy$ = new Subject<void>();
 
   @Input({ required: true }) selectedServiceData: SelectedServiceType[] = [];
 
   providerId: string | null = null;
+  selectedSlot: IAvailableSlot | null = null;
+  selectedPaymentSource!: PaymentSource;
+
+  isLoading = false;
+  isProcessing = false;
+
   priceBreakup: IPriceBreakupData = {
     subTotal: 0.00,
     tax: 0.00,
     total: 0.00,
   };
-  location!: IAddress;
-  selectedSlot: IAvailableSlot | null = null;
-  selectedPaymentSource!: PaymentSource;
-
-  isLoading = true;
-  isProcessing = false;
 
   get getServiceIds(): SelectedServiceIdsType[] {
     return this.selectedServiceData.map((item: SelectedServiceType) => {
@@ -58,137 +58,27 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
     });
   }
 
-  ngOnInit() {
-    combineLatest([
-      this._route.paramMap,
-      this._bookingService.address$,
-      this._bookingService.slot$
-    ])
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(([params, address, slotData]) => {
-        this.providerId = params.get('id')!;
-        if (address) this.location = address;
-        this.selectedSlot = slotData;
-
-        // Prepare price only when selectedServiceData exists
-        if (this.selectedServiceData) {
-          const priceData = this._prepareDataForPriceBreakup(this.selectedServiceData);
-          this._fetchPriceBreakup(priceData);
-        }
-      });
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedServiceData'] && !changes['selectedServiceData'].firstChange) {
-      const priceData = this._prepareDataForPriceBreakup(this.selectedServiceData);
-      this._fetchPriceBreakup(priceData);
-    }
-  }
-
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
-  }
-
-  private _prepareDataForPriceBreakup(data: SelectedServiceType[]): IPriceBreakup[] {
-    return data
-      .filter(item => item.services?.length)
-      .map((item: SelectedServiceType) => ({
-        serviceId: item.id,
-        subServiceIds: item.services.map((sub: any) => sub.id)
-      }));
-  }
-
-  private _fetchPriceBreakup(data: IPriceBreakup[]): void {
-    if (!data.length || !this.providerId) {
-      this._toastr.error('Cannot fetch price without services or provider.');
-      return;
-    }
-
-    this._bookingService.fetchPriceBreakup()
+  ngOnInit(): void {
+    this._route.paramMap
       .pipe(
         takeUntil(this._destroy$),
-        map((res) => res.data ?? this.priceBreakup),
-        finalize(() => this.isLoading = false)
+        tap(params => {
+          this.providerId = params.get('id')!;
+          this.selectedSlot = this._bookingService.getSelectedSlot();
+        })
       )
-      .subscribe({
-        next: (priceBreakup) => this.priceBreakup = priceBreakup,
-      });
-  }
-
-  private _isAllDataAvailable(): boolean {
-    return (
-      !!this.priceBreakup.total &&
-      this.selectedServiceData.length > 0 &&
-      !!this.providerId &&
-      !!this.selectedSlot &&
-      !!this._isValidLocation(this.location)
-    );
-  }
-
-  private _isValidLocation(location: IAddress | null): boolean {
-    return !!location && location.address !== '' && Array.isArray(location.coordinates);
-  }
-
-  private _verifyPaymentAndConfirmBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {
-    const orderData: IBookingOrder = {
-      id: order.id,
-      bookingId,
-      transactionType: TransactionType.BOOKING_PAYMENT,
-      amount: order.amount,
-      status: TransactionStatus.SUCCESS,
-      direction: PaymentDirection.DEBIT,
-      source: PaymentSource.RAZORPAY,
-      receipt: order.receipt,
-    };
-
-    return this._paymentService.verifyBookingPayment(response, orderData).pipe(
-      tap(() => {
-        this._router.navigate(['profile', 'bookings']);
-        this._toastr.success('Booking confirmed successfully.');
-      })
-    );
-  }
-
-  private _saveBooking(): Observable<any> {
-    const serviceIds: SelectedServiceIdsType[] = this.getServiceIds;
-
-    if (!this.selectedSlot) {
-      this._toastr.error('Please select a slot.');
-      return throwError(() => new Error('Slot not selected'));
-    }
-
-    const { status, ...slotData } = this.selectedSlot;
-
-    const phoneNumber = this._bookingService.getSelectedPhoneNumber();
-
-    if (!phoneNumber || phoneNumber.length !== 10 || isNaN(Number(phoneNumber))) {
-      this._toastr.error('Please enter a valid phone number.');
-      return throwError(() => new Error('Phone number is invalid.'));
-    }
-
-    const bookingData: IBookingData = {
-      providerId: this.providerId!,
-      total: Number(this.priceBreakup.total.toFixed(2)),
-      location: this.location,
-      slotData,
-      serviceIds,
-      phoneNumber,
-    };
-
-    return this._bookingService.preBookingData(bookingData).pipe(
-      finalize(() => this.isProcessing = false)
-    );
+      .subscribe(() => this._fetchPriceBreakup());
   }
 
   initiatePayment() {
     this.isProcessing = true;
 
-    if (!this._isAllDataAvailable()) {
-      this._toastr.info('Incomplete booking information.');
-      this.isProcessing = false;
-      return;
-    }
+    // if (!this._isAllDataAvailable()) {
+    //   this._toastr.info('Incomplete booking information.');
+    //   this.isProcessing = false;
+    //   return;
+    // }
+    return;
 
     const slotData = this._bookingService.getSelectedSlot();
     if (!slotData) {
@@ -201,7 +91,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
     const reservationData = { ...slotData, providerId: this.providerId as string };
 
     this._reservationService.canInitiatePayment = true;
-    this._reservationService.checkReservationUpdates(reservationData);
+    // this._reservationService.checkReservationUpdates(reservationData);
 
     if (!this._reservationService.canInitiatePayment) {
       this._toastr.error('Slot is already reserved. Please select another.');
@@ -209,7 +99,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
       return;
     }
 
-    this._reservationService.createReservation(reservationData);
+    // this._reservationService.createReservation(reservationData);
 
     this._saveBooking().pipe(
       takeUntil(this._destroy$),
@@ -255,5 +145,92 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
         this.isProcessing = false;
       }
     });
+  }
+
+  private _fetchPriceBreakup(): void {
+    this.isLoading = true;
+
+    this._bookingService.fetchPriceBreakup()
+      .pipe(
+        takeUntil(this._destroy$),
+        map(res => res.data ?? this.priceBreakup),
+        tap(priceBreakup => { this.priceBreakup = priceBreakup }),
+        finalize(() => this.isLoading = false)
+      )
+      .subscribe();
+  }
+
+
+  private _isAllDataAvailable(): boolean {
+    return (
+      !!this.priceBreakup.total &&
+      this.selectedServiceData.length > 0 &&
+      !!this.providerId &&
+      !!this.selectedSlot &&
+      !!this._isValidLocation(this._bookingService.getSelectedAddress())
+    );
+  }
+
+  private _isValidLocation(location: ILocationData | null): boolean {
+    return !!location
+      && location.address !== ''
+      && Array.isArray(location.coordinates)
+      && location.coordinates.length === 2;
+  }
+
+  private _verifyPaymentAndConfirmBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {
+    const orderData: IBookingOrder = {
+      id: order.id,
+      bookingId,
+      transactionType: TransactionType.BOOKING_PAYMENT,
+      amount: order.amount,
+      status: TransactionStatus.SUCCESS,
+      direction: PaymentDirection.DEBIT,
+      source: PaymentSource.RAZORPAY,
+      receipt: order.receipt,
+    };
+
+    return this._paymentService.verifyBookingPayment(response, orderData).pipe(
+      tap(() => {
+        this._router.navigate(['profile', 'bookings']);
+        this._toastr.success('Booking confirmed successfully.');
+      })
+    );
+  }
+
+  private _saveBooking(): Observable<any> {
+    const serviceIds: SelectedServiceIdsType[] = this.getServiceIds;
+
+    if (!this.selectedSlot) {
+      this._toastr.error('Please select a slot.');
+      return throwError(() => new Error('Slot not selected'));
+    }
+
+    const { status, ...slotData } = this.selectedSlot;
+
+    const phoneNumber = this._bookingService.getSelectedPhoneNumber();
+
+    if (!phoneNumber || phoneNumber.length !== 10 || isNaN(Number(phoneNumber))) {
+      this._toastr.error('Please enter a valid phone number.');
+      return throwError(() => new Error('Phone number is invalid.'));
+    }
+
+    const bookingData: IBookingData = {
+      providerId: this.providerId!,
+      total: Number(this.priceBreakup.total.toFixed(2)),
+      location: this._bookingService.getSelectedAddress()!,
+      slotData,
+      serviceIds,
+      phoneNumber,
+    };
+
+    return this._bookingService.preBookingData(bookingData).pipe(
+      finalize(() => this.isProcessing = false)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 }

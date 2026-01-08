@@ -1,19 +1,19 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { distinctUntilChanged, map, } from 'rxjs';
+import { distinctUntilChanged, filter, map, Subject, takeUntil, tap, } from 'rxjs';
 import { MapboxMapComponent } from "../../../../partials/shared/map/map.component";
-import { IAddress, } from '../../../../../../core/models/schedules.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { selectLocation, selectPhoneNumber } from '../../../../../../store/customer/customer.selector';
 import { LocationService } from '../../../../../../core/services/public/location.service';
-import { ILocation } from '../../../../../../core/models/user.model';
+import { ILocationData } from '../../../../../../core/models/user.model';
 import { SlotRuleService } from '../../../../../../core/services/slot-rule.service';
 import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
+import { ProviderService } from '../../../../../../core/services/provider.service';
 
 @Component({
   selector: 'app-customer-schedule-booking-details',
@@ -22,14 +22,16 @@ import { ReservationSocketService } from '../../../../../../core/services/socket
   templateUrl: './customer-schedule-booking-details.component.html',
   providers: [LocationService]
 })
-export class CustomerScheduleBookingDetailsComponent implements OnInit {
+export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestroy {
   private readonly _reservationService = inject(ReservationSocketService);
   private readonly _slotRuleService = inject(SlotRuleService);
+  private readonly _providerService = inject(ProviderService);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _locationService = inject(LocationService);
   private readonly _bookingService = inject(BookingService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _store = inject(Store);
+  private readonly _destroy$ = new Subject<void>();
 
   mapVisible = signal<boolean>(false);
   loadingLocation = signal<boolean>(false);
@@ -44,55 +46,11 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   readonly minDate = new Date().toISOString().split('T')[0];
 
   ngOnInit(): void {
-    this._route.paramMap.pipe(
-      map(params => params.get('id') ?? '')
-    ).subscribe(id => this.providerId = id);
-
-    this._store.select(selectPhoneNumber).subscribe(phoneNumber => {
-      if (phoneNumber) {
-        this.phoneNumber = phoneNumber;
-        this._bookingService.setSelectedPhoneNumber(phoneNumber);
-      }
-    });
-
-    this._store.select(selectLocation).subscribe(data => {
-      if (data && data.coordinates && data.address) {
-        this.selectedAddress = data.address;
-        this.center = data.coordinates;
-
-        const locationData: IAddress & Omit<ILocation, 'type'> = {
-          address: data.address,
-          coordinates: data.coordinates
-        }
-
-        this._bookingService.setSelectedAddress(locationData);
-      }
-
-      this._reservationService.informReservation$
-        .pipe(
-          distinctUntilChanged((prev, curr) =>
-            prev?.from === curr?.from &&
-            prev?.to === curr?.to &&
-            prev?.date === curr?.date
-          )
-        )
-        .subscribe(slot => {
-          if (!slot) return;
-
-          this.availableSlots = this.availableSlots.map(s => {
-            const isSameSlot =
-              s.from === slot.from &&
-              s.to === slot.to &&
-              this.selectedDate === slot.date;
-
-            return isSameSlot
-              ? { ...s, status: false }
-              : s;
-          });
-        });
-
-      this._slotRuleService._availableSlots$.subscribe(slots => this.availableSlots = slots)
-    });
+    this._initProviderId();
+    this._initPhoneNumber();
+    this._initLocation();
+    this._initReservationListener();
+    this._initAvailableSlots();
   }
 
   toggleMap() {
@@ -128,31 +86,35 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
   }
 
   getAvailableSlots() {
-    if (!this.providerId.trim()) {
+    if (!this.providerId) {
       this._toastr.error('Provider Id is missing.');
       return;
     }
 
-    if (!this.selectedDate.trim()) {
+    if (!this.selectedDate) {
       this._toastr.error('Please select a valid date.');
       return;
     }
 
-    this._slotRuleService.fetchAvailableSlots(this.providerId, this.selectedDate);
+    this._providerService.fetchAvailableSlots(this.providerId, this.selectedDate)
+      .pipe(
+        takeUntil(this._destroy$),
+      )
+      .subscribe();
   }
 
   selectSlot(slot: IAvailableSlot) {
-    if (!this.selectedDate) {
-      this._toastr.error('Date is missing.');
-      return;
-    }
+    // if (!this.selectedDate) {
+    //   this._toastr.error('Date is missing.');
+    //   return;
+    // }
 
-    this.selectedSlot = slot;
+    // this.selectedSlot = slot;
 
-    this._bookingService.setSelectedSlot({
-      ...slot,
-      date: this.selectedDate
-    });
+    // this._bookingService.setSelectedSlot({
+    //   ...slot,
+    //   date: this.selectedDate
+    // });
   }
 
   onPhoneNumberChange(phone: string) {
@@ -171,26 +133,123 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit {
     this.center = newCenter;
     const [lng, lat] = newCenter;
 
-    this._locationService.getAddressFromCoordinates(lng, lat).subscribe({
-      next: (response) => {
-        this.selectedAddress = response.features[0]?.place_name;
+    this._locationService.getAddressFromCoordinates(lng, lat)
+      .pipe()
+      .subscribe({
+        next: (response) => {
+          this.selectedAddress = response.features[0]?.place_name;
 
-        if (!this.selectedAddress) {
-          this._toastr.success('Address not found.');
-          return;
+          if (!this.selectedAddress) {
+            this._toastr.success('Address not found.');
+            return;
+          }
+
+          const location = {
+            address: this.selectedAddress ?? '',
+            coordinates: this.center,
+          }
+
+          this._bookingService.setSelectedAddress(location);
+        },
+        error: (err) => {
+          console.error(err);
+          this._toastr.error('Failed to fetch coordinates.');
         }
+      });
+  }
 
-        const location = {
-          address: this.selectedAddress ?? '',
-          coordinates: this.center,
-        }
+  /* -------------------- Route -------------------- */
 
-        this._bookingService.setSelectedAddress(location);
-      },
-      error: (err) => {
-        console.error(err);
-        this._toastr.error('Oops, something went wrong.');
-      }
-    });
+  private _initProviderId(): void {
+    this._route.paramMap
+      .pipe(
+        takeUntil(this._destroy$),
+        map(params => params.get('id')),
+        filter((id): id is string => !!id),
+        distinctUntilChanged()
+      )
+      .subscribe(id => {
+        this.providerId = id;
+      });
+  }
+
+  /* -------------------- Phone -------------------- */
+
+  private _initPhoneNumber(): void {
+    this._store.select(selectPhoneNumber)
+      .pipe(
+        takeUntil(this._destroy$),
+        filter((phone): phone is string => !!phone),
+        distinctUntilChanged()
+      )
+      .subscribe(phone => {
+        this.phoneNumber = phone;
+        this._bookingService.setSelectedPhoneNumber(phone);
+      });
+  }
+
+  /* -------------------- Location -------------------- */
+
+  private _initLocation(): void {
+    this._store.select(selectLocation)
+      .pipe(
+        takeUntil(this._destroy$),
+        filter((data): data is ILocationData => data !== null),
+        distinctUntilChanged((prev, curr) =>
+          prev.address === curr.address &&
+          prev.coordinates[0] === curr.coordinates[0] &&
+          prev.coordinates[1] === curr.coordinates[1]
+        ),
+        tap(({ address, coordinates }) => {
+          this.selectedAddress = address;
+          this.center = coordinates;
+
+          this._bookingService.setSelectedAddress({
+            address,
+            coordinates
+          });
+        })
+      )
+      .subscribe();
+  }
+
+  /* -------------------- Reservation -------------------- */
+
+  private _initReservationListener(): void {
+    // this._reservationService.informReservation$
+    //   .pipe(
+    //     takeUntil(this._destroy$),
+    //     distinctUntilChanged((prev, curr) =>
+    //       prev?.from === curr?.from &&
+    //       prev?.to === curr?.to &&
+    //       prev?.date === curr?.date
+    //     ),
+    //     filter(Boolean)
+    //   )
+    //   .subscribe(slot => {
+    //     this.availableSlots = this.availableSlots.map(s => {
+    //       const isSameSlot =
+    //         s.from === slot.from &&
+    //         s.to === slot.to &&
+    //         this.selectedDate === slot.date;
+
+    //       return isSameSlot ? { ...s, status: false } : s;
+    //     });
+    //   });
+  }
+
+  /* -------------------- Slots -------------------- */
+
+  private _initAvailableSlots(): void {
+    // this._slotRuleService._availableSlots$
+    //   .pipe(takeUntil(this._destroy$))
+    //   .subscribe(slots => {
+    //     this.availableSlots = slots;
+    // });
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 }
