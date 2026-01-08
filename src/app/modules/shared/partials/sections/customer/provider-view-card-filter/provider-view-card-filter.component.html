@@ -1,4 +1,3 @@
-<!-- Compact Filters Container -->
 <div class="p-3 mb-5">
 
     <!-- Single Row Layout -->
@@ -17,7 +16,7 @@
         <!-- Sort Dropdown -->
         <div class="w-full md:w-40">
             <div class="relative">
-                <select [(ngModel)]="filter().sort" (ngModelChange)="sortProviders()"
+                <select [(ngModel)]="filter().status" (ngModelChange)="sortProviders()"
                     class="w-full h-9 border border-neutral-200 rounded-lg pl-8 pr-8 text-xs cursor-pointer outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all bg-white appearance-none">
                     <option value="all">All</option>
                     <option value="best-rated">Best Rated</option>
@@ -30,19 +29,32 @@
             </div>
         </div>
 
-        <!-- Availability Slots -->
-        <div class="flex items-center gap-2">
-            <span
-                class="text-[10px] font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap hidden md:block">Time:</span>
-            <div class="flex gap-1.5">
-                <button *ngFor="let slot of availabilitySlots" (click)="toggleAvailability(slot.value)"
-                    class="h-9 px-3 rounded-lg border transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap"
-                    [ngClass]="filter().availability === slot.value 
-                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' 
-                      : 'bg-white border-neutral-200 text-neutral-600 hover:border-indigo-300 hover:bg-indigo-50'">
-                    <i [class]="slot.icon" class="text-[11px]"></i>
-                    <span class="text-[10px] font-semibold">{{ slot.label }}</span>
-                </button>
+        <!-- Date & Availability Slots -->
+        <div class="flex items-center gap-4">
+            <!-- Date Selection -->
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-[10px] font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap hidden md:block">Date:</span>
+                <input type="date" [ngModel]="filter().date" (change)="onDateChange($event)"
+                    class="h-9 px-3 rounded-lg border border-neutral-200 text-xs font-medium text-neutral-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all cursor-pointer bg-white" />
+            </div>
+
+            <div class="h-6 w-px bg-neutral-200 hidden md:block"></div>
+
+            <!-- Time Selection -->
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-[10px] font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap hidden md:block">Time:</span>
+                <div class="flex gap-1.5">
+                    <button *ngFor="let slot of availabilitySlots" (click)="toggleAvailability(slot.value)"
+                        class="h-9 px-3 rounded-lg border transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap"
+                        [ngClass]="filter().availability === slot.value 
+                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' 
+                          : 'bg-white border-neutral-200 text-neutral-600 hover:border-indigo-300 hover:bg-indigo-50'">
+                        <i [class]="slot.icon" class="text-[11px]"></i>
+                        <span class="text-[10px] font-semibold">{{ slot.label }}</span>
+                    </button>
+                </div>
             </div>
         </div>
 

@@ -36,19 +36,20 @@ export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
   filters = signal<IFilterFetchProviders>({
     search: '',
     page: 1,
-    sort: 'all',
-    availability: null,
+    status: 'all',
+    availability: 'all',
   });
 
   pagination: IPagination = {
     total: 0,
     page: 1,
-    limit: 0,
+    limit: 10,
   };
 
   @ViewChild(ProviderViewCardFilterComponent)
   filterComponent!: ProviderViewCardFilterComponent
 
+  
   ngOnInit(): void {
     this._route.queryParams.subscribe(params => {
       const ls = params['ls'];
@@ -75,6 +76,7 @@ export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
   }
 
   private _fetchProviders(filter: IFilterFetchProviders = {}) {
+    console.log(filter)
     this.providers$ = this._providerService.getProviders(filter).pipe(
       takeUntil(this._destroy$),
       map(res => {
@@ -91,7 +93,7 @@ export class CustomerViewProvidersComponent implements OnInit, OnDestroy {
   }
 
   resetFilters() {
-    this.filters.set({ search: '', isCertified: false, status: 'all', page: 1, });
+    this.filters.set({ search: '', status: 'all', page: 1, });
     this.pagination.page = 1;
     this.filterComponent?.reset();
     this._fetchProviders(this.filters());

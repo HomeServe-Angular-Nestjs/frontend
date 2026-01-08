@@ -31,7 +31,7 @@ export class ServiceManagementService {
   }
 
   getServicesByProviderId(providerId: string): Observable<IResponse<IProviderService[]>> {
-    return this._http.get<IResponse<IProviderService[]>>(`${this._apiUrl}/provider/${providerId}`);
+    return this._http.get<IResponse<IProviderService[]>>(`${this._apiUrl}/${providerId}`);
   }
 
   getOneService(serviceId: string): Observable<IResponse<IProviderService>> {

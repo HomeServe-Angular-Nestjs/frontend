@@ -1,10 +1,11 @@
 import { Component, effect, EventEmitter, inject, OnDestroy, OnInit, Output, signal, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
 import { AvailabilityType, IAvailabilityViewList } from '../../../../../../core/models/availability.model';
 import { IFilterFetchProviders } from '../../../../../../core/models/user.model';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 @Component({
     selector: 'app-customer-provider-view-card-filter',
@@ -14,13 +15,14 @@ import { IFilterFetchProviders } from '../../../../../../core/models/user.model'
 })
 export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
     private _debounceService = inject(DebounceService);
-    // private _filters$ = new BehaviorSubject({});
+    private readonly _toastr = inject(ToastNotificationService);
     private _destroy$ = new Subject<void>();
 
     filter = signal<IFilterFetchProviders>({
         search: '',
-        availability: null,
-        sort: 'all'
+        availability: 'all',
+        status: 'all',
+        date: ''
     });
 
     availabilitySlots: IAvailabilityViewList[] = [
@@ -29,7 +31,6 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
         { label: 'Evening', icon: 'fas fa-moon', value: 'evening' },
         { label: 'Night', icon: 'fas fa-star', value: 'night' },
     ];
-
 
     @Output() filterEvents = new EventEmitter<IFilterFetchProviders>();
 
@@ -40,12 +41,6 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        // this._filters$
-        //     .pipe(takeUntil(this._destroy$))
-        //     .subscribe(() => {
-        //         this._emitFilter();
-        //     });
-
         this._debounceService.onSearch(700)
             .pipe(takeUntil(this._destroy$))
             .subscribe(() => {
@@ -65,30 +60,53 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
         this._emitFilter();
     }
 
+    onDateChange(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const date = input.value;
+        const currentFilter = this.filter();
+
+        // If date is cleared, reset availability
+        if (!date) {
+            this.filter.set({ ...currentFilter, date, availability: 'all' });
+        } else {
+            this.filter.set({ ...currentFilter, date });
+        }
+    }
+
     toggleAvailability(value: AvailabilityType) {
-        // this.selectedAvailability = this.selectedAvailability === value ? null : value;
-        this._emitFilter();
+        const currentFilter = this.filter();
+
+        // Enforce date selection
+        if (!currentFilter.date?.trim()) {
+            this._toastr.warning('Please select a date');
+            return;
+        }
+
+        // Toggle logic: if clicking same value, revert to 'all'
+        const newAvailability = currentFilter.availability === value ? 'all' : value;
+
+        this.filter.set({ ...currentFilter, availability: newAvailability });
     }
 
     clearAvailability() {
-        // this.selectedAvailability = null;
-        this._emitFilter();
+        this.filter.set({ ...this.filter(), availability: 'all' });
     }
 
     reset() {
         this.filter.set({
             search: '',
-            availability: null,
-            sort: 'all'
+            availability: 'all',
+            status: 'all',
+            date: ''
         });
-        this._emitFilter();
     }
 
     private _emitFilter() {
         const filter = {
             search: this.filter().search?.trim() || '',
             availability: this.filter().availability,
-            sort: this.filter().sort,
+            status: this.filter().status,
+            date: this.filter().date
         };
 
         this.filterEvents.emit(filter);
