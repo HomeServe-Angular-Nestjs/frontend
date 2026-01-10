@@ -12,23 +12,29 @@ export class CustomerTestimonialSectionComponent {
     {
       name: "Sarah Johnson",
       avatar: "assets/images/testimonials/female-1.jpg",
-      text: "Excellent service! The cleaning team was professional and thorough. Would definitely recommend!",
+      text: "The professional who came for the deep cleaning was absolutely fantastic. No corner was left untouched, and the attention to detail was beyond my expectations!",
       rating: 5,
-      service: "Cleaning Service"
+      service: "Deep Cleaning Service",
+      date: "2 days ago",
+      location: "San Francisco, CA"
     },
     {
-      name: "Mike Thompson",
+      name: "Mark Thompson",
       avatar: "assets/images/testimonials/male-1.jpg",
-      text: "Quick response time and very professional plumbing service. Fixed my issue in no time!",
+      text: "Had a major leak emergency on a Sunday night. Within 45 minutes, a plumber was at my door. Fast, efficient, and very reasonably priced.",
       rating: 5,
-      service: "Plumbing Service"
+      service: "Emergency Plumbing",
+      date: "1 week ago",
+      location: "Austin, TX"
     },
     {
-      name: "Emily Davis",
+      name: "Emily Rodriguez",
       avatar: "assets/images/testimonials/female-2.jpg",
-      text: "The painters did an amazing job! Very detail-oriented and clean work. My house looks brand new!",
-      rating: 4,
-      service: "Painting Service"
+      text: "Booking a painter was so easy through HomeServe. The quality of work was top-notch, and they finished the entire living room in just one day!",
+      rating: 5,
+      service: "Professional Painting",
+      date: "3 days ago",
+      location: "Miami, FL"
     }
   ];
 }

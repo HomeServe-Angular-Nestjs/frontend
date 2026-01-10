@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil, filter } from 'rxjs';
 import { authActions } from '../../../../../../store/auth/auth.actions';
 import { selectCheckStatus } from '../../../../../../store/auth/auth.selector';
 import { StatusType } from '../../../../../../core/models/auth.model';
@@ -34,6 +34,7 @@ export class CustomerHeaderComponent implements OnInit {
   @Input() isFixed: boolean = true;
   showMobileSearch = false;
   defaultImg = 'https://via.placeholder.com/48';
+  isHomepage = false;
 
 
   // User observables
@@ -80,6 +81,19 @@ export class CustomerHeaderComponent implements OnInit {
       });
 
     this._cartService.getCart().subscribe();
+
+    this.checkHomepage();
+    this._router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this._destroy$)
+    ).subscribe(() => {
+      this.checkHomepage();
+    });
+  }
+
+  private checkHomepage() {
+    const url = this._router.url;
+    this.isHomepage = url === '/homepage' || url.split('?')[0] === '/';
   }
 
   get cartCount(): number {
@@ -137,6 +151,21 @@ export class CustomerHeaderComponent implements OnInit {
 
   logout(): void {
     this._store.dispatch(authActions.logout({ fromInterceptor: false }));
+  }
+
+  scrollToSection(sectionId: string): void {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // If not on homepage, navigate to homepage first then scroll
+      this._router.navigate(['/']).then(() => {
+        setTimeout(() => {
+          const el = document.getElementById(sectionId);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      });
+    }
   }
 
 }

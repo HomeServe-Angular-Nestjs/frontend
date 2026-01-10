@@ -7,17 +7,27 @@
     <div class="flex items-center justify-between h-16">
 
       <!-- Logo Section -->
-      <a routerLink="/" class="flex items-center gap-2 group focus:outline-none">
+      <a routerLink="/homepage" class="flex items-center gap-2 group focus:outline-none shrink-0">
         <div
           class="relative flex items-center justify-center w-8 h-8 bg-indigo-600 rounded-lg shadow-md shadow-indigo-200 overflow-hidden transition-transform group-hover:scale-105 duration-200">
           <i class="fas fa-home text-white text-sm"></i>
           <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
         </div>
         <span
-          class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600">
+          class="hidden sm:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600">
           HomeServe
         </span>
       </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav *ngIf="isHomepage" class="hidden lg:flex items-center gap-1 ml-8 mr-auto">
+        <button (click)="scrollToSection('explore')"
+          class="px-3 py-2 text-sm font-semibold text-gray-600 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all">Explore</button>
+        <button (click)="scrollToSection('services')"
+          class="px-3 py-2 text-sm font-semibold text-gray-600 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all">Services</button>
+        <button (click)="scrollToSection('testimonials')"
+          class="px-3 py-2 text-sm font-semibold text-gray-600 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all">Reviews</button>
+      </nav>
 
       <!-- Center Search Section (Desktop) -->
       <div class="hidden md:flex flex-1 max-w-xl mx-6 relative z-20">
