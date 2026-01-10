@@ -1,5 +1,3 @@
-import { PlanDuration } from "../enums/enums";
-
 export function formatFullDateWithTimeHelper(dateInput: string | Date): string {
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) {

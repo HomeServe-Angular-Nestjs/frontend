@@ -62,11 +62,11 @@
       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" />
 
     <div class="mt-6">
-      <div *ngIf="availableSlots.length; else noSlots" class="grid grid-cols-2 gap-3">
+      <div *ngIf="availableSlots.length; else noSlots" class="grid grid-cols-4 gap-3">
         <ng-container *ngIf="selectedDate">
           <ng-container *ngFor="let slot of availableSlots">
             <div class="relative">
-              <button (click)="selectSlot(slot)" [disabled]="!slot.status"
+              <button (click)="selectSlot(slot)" [disabled]="!slot.isAvailable"
                 [class.ring-2]="selectedSlot?.from === slot.from" [class.ring-black]="selectedSlot?.from === slot.from"
                 [ngClass]="{
                     'bg-slate-900 text-white shadow-md': selectedSlot?.from === slot.from,
@@ -74,12 +74,13 @@
                 }" class="w-full px-3 py-3 rounded-2xl font-bold transition-all
                             text-xs flex flex-col items-center disabled:opacity-50 disabled:cursor-not-allowed">
 
-                <span>{{ slot.from }} – {{ slot.to }}</span>
+                <span>{{ slot.from | meridiem }}</span>
 
-                <span *ngIf="!slot.status" class="text-[9px] text-rose-500 font-bold uppercase tracking-wider mt-1">
+                <span *ngIf="!slot.isAvailable"
+                  class="text-[9px] text-rose-500 font-bold uppercase tracking-wider mt-1">
                   Reserved
                 </span>
-                <span *ngIf="slot.status && selectedSlot?.from === slot.from"
+                <span *ngIf="slot.isAvailable && selectedSlot?.from === slot.from"
                   class="text-[9px] text-white/70 font-bold uppercase tracking-wider mt-1">
                   Selected
                 </span>

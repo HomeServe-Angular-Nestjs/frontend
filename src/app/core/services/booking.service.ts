@@ -2,12 +2,12 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable, signal } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, Observable, shareReplay } from "rxjs";
-import { IBooking, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakup, IPriceBreakupData, IResponseProviderBookingLists, IUpdateBookingsPaymentStatus } from "../models/booking.model";
+import { IBooking, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakupData, IResponseProviderBookingLists, IUpdateBookingsPaymentStatus } from "../models/booking.model";
 import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { ILocation, ILocationData } from "../models/user.model";
-import { ISelectedSlot } from "../models/slot-rule.model";
+import { ILocationData } from "../models/user.model";
 import { IReviewFilter, IReviewWithPagination, ISubmitReview } from "../models/reviews.model";
+import { ISelectedSlot } from "../models/availability.model";
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {

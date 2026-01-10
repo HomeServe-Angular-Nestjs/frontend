@@ -42,6 +42,3 @@ export interface IAvailableSlot {
     status?: boolean;
 }
 
-export interface ISelectedSlot extends IAvailableSlot {
-    date: string;
-}

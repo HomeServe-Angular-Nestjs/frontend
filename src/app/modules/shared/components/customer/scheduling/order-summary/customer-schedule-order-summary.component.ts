@@ -12,10 +12,10 @@ import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from '../../../
 import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
-import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
 import { OrderSummarySectionComponent } from '../../../../partials/sections/customer/order-summary-section/order-summary-section.component';
 import { ILocationData } from '../../../../../../core/models/user.model';
+import { ISelectedSlot } from '../../../../../../core/models/availability.model';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
@@ -37,7 +37,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   @Input({ required: true }) selectedServiceData: SelectedServiceType[] = [];
 
   providerId: string | null = null;
-  selectedSlot: IAvailableSlot | null = null;
+  selectedSlot: ISelectedSlot | null = null;
   selectedPaymentSource!: PaymentSource;
 
   isLoading = false;
@@ -206,7 +206,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       return throwError(() => new Error('Slot not selected'));
     }
 
-    const { status, ...slotData } = this.selectedSlot;
+    const { isAvailable, ...slotData } = this.selectedSlot;
 
     const phoneNumber = this._bookingService.getSelectedPhoneNumber();
 

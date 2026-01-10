@@ -11,14 +11,15 @@ import { selectLocation, selectPhoneNumber } from '../../../../../../store/custo
 import { LocationService } from '../../../../../../core/services/public/location.service';
 import { ILocationData } from '../../../../../../core/models/user.model';
 import { SlotRuleService } from '../../../../../../core/services/slot-rule.service';
-import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
 import { ProviderService } from '../../../../../../core/services/provider.service';
+import { ISlotUI } from '../../../../../../core/models/availability.model';
+import { MeridiemPipe } from '../../../../../../core/pipes/meridiem-time.pipe';
 
 @Component({
   selector: 'app-customer-schedule-booking-details',
   standalone: true,
-  imports: [CommonModule, MapboxMapComponent, FormsModule],
+  imports: [CommonModule, MapboxMapComponent, FormsModule, MeridiemPipe],
   templateUrl: './customer-schedule-booking-details.component.html',
   providers: [LocationService]
 })
@@ -39,9 +40,9 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
   selectedAddress: string | null = null;
   selectedDate: string = '';
   phoneNumber: string | null = null;
-  selectedSlot: IAvailableSlot | null = null;
+  selectedSlot: ISlotUI | null = null;
   providerId: string = '';
-  availableSlots: IAvailableSlot[] = [];
+  availableSlots: ISlotUI[] = [];
 
   readonly minDate = new Date().toISOString().split('T')[0];
 
@@ -86,6 +87,8 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
   }
 
   getAvailableSlots() {
+    this.selectedSlot = null;
+
     if (!this.providerId) {
       this._toastr.error('Provider Id is missing.');
       return;
@@ -99,22 +102,26 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
     this._providerService.fetchAvailableSlots(this.providerId, this.selectedDate)
       .pipe(
         takeUntil(this._destroy$),
-      )
-      .subscribe();
+        map((res) => {
+          const slots: ISlotUI[] = Array.isArray(res) ? res : (res.data || []);
+          return slots.map(s => ({ ...s, isAvailable: true }));
+        }),
+        tap(slots => this.availableSlots = slots)
+      ).subscribe();
   }
 
-  selectSlot(slot: IAvailableSlot) {
-    // if (!this.selectedDate) {
-    //   this._toastr.error('Date is missing.');
-    //   return;
-    // }
+  selectSlot(slot: ISlotUI) {
+    if (!this.selectedDate) {
+      this._toastr.error('Date is missing.');
+      return;
+    }
 
-    // this.selectedSlot = slot;
+    this.selectedSlot = slot;
 
-    // this._bookingService.setSelectedSlot({
-    //   ...slot,
-    //   date: this.selectedDate
-    // });
+    this._bookingService.setSelectedSlot({
+      ...slot,
+      date: this.selectedDate
+    });
   }
 
   onPhoneNumberChange(phone: string) {

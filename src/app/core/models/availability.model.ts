@@ -60,3 +60,13 @@ export interface IAvailabilityViewList {
     icon: string;
     value: AvailabilityType;
 }
+
+export interface ISlotUI {
+    from: string;
+    to: string;
+    isAvailable?: boolean;
+}
+
+export interface ISelectedSlot extends ISlotUI {
+    date: string;
+}
