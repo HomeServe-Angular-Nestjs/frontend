@@ -1,29 +1,12 @@
 <div class="max-w-5xl mx-auto px-4 py-8">
-    <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Notifications</h1>
-            <p class="text-gray-500 mt-2">Stay updated with your bookings and account activity</p>
-        </div>
-
-        <div class="flex items-center gap-3">
-            <button
-                class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 hover:text-indigo-600 transition-all flex items-center gap-2 shadow-sm"
-                aria-label="Mark all as read">
-                <i class="fas fa-check-double"></i>
-                <span>Mark all as read</span>
-            </button>
-        </div>
-    </div>
-
     <!-- Main Content Card -->
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
 
         <!-- Filter Tabs -->
-        <div class="border-b border-gray-100 p-2 overflow-x-auto">
-            <div class="flex items-center gap-1 min-w-max">
+        <div class="border-b border-gray-100 p-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-1 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
                 <button *ngFor="let opt of buttonOption" (click)="setCurrentSelect(opt.value)"
-                    class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2"
+                    class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 whitespace-nowrap"
                     [ngClass]="(currentSelect$ | async) === opt.value 
                         ? 'bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-100' 
                         : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-transparent'">
@@ -31,6 +14,13 @@
                     {{opt.text}}
                 </button>
             </div>
+
+            <button
+                class="bg-white border border-gray-200 text-gray-500 px-4 py-2 rounded-xl text-xs font-medium hover:bg-gray-50 hover:text-indigo-600 transition-all flex items-center gap-2 shadow-sm whitespace-nowrap mr-2"
+                aria-label="Mark all as read">
+                <i class="fas fa-check-double"></i>
+                <span>Mark all as read</span>
+            </button>
         </div>
 
         <!-- Notification List -->
@@ -40,58 +30,50 @@
                 <!-- Empty State -->
                 <div *ngIf="filteredNotifications.length === 0"
                     class="flex flex-col items-center justify-center h-full py-20 text-center animate-fadeIn">
-                    <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-bell-slash text-gray-300 text-4xl"></i>
+                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-bell-slash text-gray-300 text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">No notifications yet</h3>
-                    <p class="text-gray-500 max-w-sm">We'll notify you when there's an update on your bookings or
-                        account status.</p>
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">No notifications</h3>
+                    <p class="text-sm text-gray-500 max-w-xs">You're all caught up! Check back later for updates.</p>
                 </div>
 
                 <!-- List Items -->
                 <div class="divide-y divide-gray-50">
                     <div *ngFor="let notification of filteredNotifications"
-                        class="group p-6 hover:bg-gray-50/50 transition-all duration-200 cursor-pointer animate-fadeIn relative"
-                        [ngClass]="{'bg-indigo-50/10': !notification.isRead}">
+                        class="group p-5 hover:bg-gray-50/80 transition-all duration-200 animate-fadeIn relative"
+                        [ngClass]="{'bg-indigo-50/20': !notification.isRead}">
 
                         <!-- Unread Indicator Dot -->
                         <div *ngIf="!notification.isRead"
-                            class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-indigo-500 rounded-r-full">
+                            class="absolute left-0 top-6 w-1 h-8 bg-indigo-500 rounded-r-full">
                         </div>
 
-                        <div class="flex gap-5">
+                        <div class="flex gap-4">
                             <!-- Icon -->
-                            <div class="shrink-0">
-                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm transition-transform group-hover:scale-105"
+                            <div class="shrink-0 pt-1">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm"
                                     [ngClass]="getColorClasses(notification.type)">
-                                    <i [class]="getIcon(notification.type) + ' text-lg'"></i>
+                                    <i [class]="getIcon(notification.type)"></i>
                                 </div>
                             </div>
 
                             <!-- Content -->
                             <div class="flex-1 min-w-0">
-                                <div class="flex justify-between items-start gap-4 mb-2">
-                                    <h4
-                                        class="text-base font-bold text-gray-900 leading-tight group-hover:text-indigo-600 transition-colors">
+                                <div class="flex justify-between items-start gap-4 mb-1">
+                                    <h4 class="text-sm font-bold text-gray-900 leading-tight">
                                         {{notification.title}}
                                     </h4>
-                                    <span
-                                        class="text-xs font-medium text-gray-400 whitespace-nowrap bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
+                                    <span class="text-[10px] font-medium text-gray-400 whitespace-nowrap">
                                         {{notification.createdAt | relativeTime}}
                                     </span>
                                 </div>
-                                <p class="text-sm text-gray-500 leading-relaxed max-w-2xl">
+                                <p class="text-sm text-gray-500 leading-relaxed mb-2">
                                     {{notification.message}}
                                 </p>
-                            </div>
 
-                            <!-- Action -->
-                            <div class="self-center shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                *ngIf="!notification.isRead">
-                                <button (click)="markAsRead(notification.id, $event)"
-                                    class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-md hover:scale-110 flex items-center justify-center transition-all"
-                                    title="Mark as read">
-                                    <i class="fas fa-check"></i>
+                                <button *ngIf="!notification.isRead" (click)="markAsRead(notification.id, $event)"
+                                    class="text-xs font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                                    <span>Mark as read</span>
                                 </button>
                             </div>
                         </div>

@@ -4,7 +4,7 @@
     <aside class="bg-white rounded-2xl shadow-sm border border-gray-100 h-full overflow-y-auto">
       <div class="p-5">
         <ng-container *ngIf="(customer$ | async) as customer">
-          <div class="flex items-center gap-3 mb-8 pb-6 border-b border-gray-100">
+          <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
             <img [src]="customer.avatar || 'assets/images/profile_placeholder.jpg'" alt="Profile"
               class="w-10 h-10 rounded-full object-cover ring-2 ring-gray-50" />
             <div class="overflow-hidden">
@@ -16,15 +16,15 @@
           </div>
         </ng-container>
 
-        <div *ngFor="let section of menuSections" class="mb-6 last:mb-0">
-          <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-3">
+        <div *ngFor="let section of menuSections" class="mb-4 last:mb-0">
+          <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 px-3">
             {{ section.title }}
           </h3>
-          <nav class="space-y-1">
+          <nav class="space-y-0.5">
             <a *ngFor="let item of section.items" [routerLink]="item.route"
               routerLinkActive="bg-indigo-50 text-indigo-600 font-semibold shadow-sm"
               [routerLinkActiveOptions]="{ exact: true }"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50 hover:text-indigo-600 hover:shadow-sm group text-sm">
+              class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50 hover:text-indigo-600 hover:shadow-sm group text-sm">
               <div class="w-6 flex justify-center">
                 <i [class]="item.icon" class="transition-colors group-hover:text-indigo-500"></i>
               </div>
