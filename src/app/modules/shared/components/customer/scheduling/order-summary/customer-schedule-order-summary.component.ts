@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, effect, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
@@ -37,7 +37,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   @Input({ required: true }) selectedServiceData: SelectedServiceType[] = [];
 
   providerId: string | null = null;
-  selectedSlot: ISelectedSlot | null = null;
+  selectedSlot = signal<ISelectedSlot | null>(null);
   selectedPaymentSource!: PaymentSource;
 
   isLoading = false;
@@ -58,13 +58,19 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     });
   }
 
+  constructor() {
+    effect(() => {
+      const slot = this._bookingService.getSelectedSlot();
+      this.selectedSlot.set(slot);
+    });
+  }
+
   ngOnInit(): void {
     this._route.paramMap
       .pipe(
         takeUntil(this._destroy$),
         tap(params => {
           this.providerId = params.get('id')!;
-          this.selectedSlot = this._bookingService.getSelectedSlot();
         })
       )
       .subscribe(() => this._fetchPriceBreakup());
@@ -73,20 +79,12 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   initiatePayment() {
     this.isProcessing = true;
 
-    // if (!this._isAllDataAvailable()) {
-    //   this._toastr.info('Incomplete booking information.');
-    //   this.isProcessing = false;
-    //   return;
-    // }
-    return;
-
-    const slotData = this._bookingService.getSelectedSlot();
-    if (!slotData) {
-      this._toastr.error('Please select a slot.');
+    if (!this._isAllDataAvailable()) {
       this.isProcessing = false;
       return;
     }
 
+    const slotData = this.selectedSlot;
     const totalAmount = this.priceBreakup.total;
     const reservationData = { ...slotData, providerId: this.providerId as string };
 
@@ -100,7 +98,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     }
 
     // this._reservationService.createReservation(reservationData);
-
+    return;
     this._saveBooking().pipe(
       takeUntil(this._destroy$),
       switchMap((bookingResponse) => {
@@ -162,13 +160,34 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
 
 
   private _isAllDataAvailable(): boolean {
-    return (
-      !!this.priceBreakup.total &&
-      this.selectedServiceData.length > 0 &&
-      !!this.providerId &&
-      !!this.selectedSlot &&
-      !!this._isValidLocation(this._bookingService.getSelectedAddress())
-    );
+    if (!this.providerId) {
+      this._toastr.error('Provider information is missing.');
+      return false;
+    }
+
+    if (!this.selectedSlot()) {
+      this._toastr.error('Please select a scheduled time slot.');
+      return false;
+    }
+
+    const address = this._bookingService.getSelectedAddress();
+    if (!this._isValidLocation(address)) {
+      this._toastr.error('Please provide a valid service delivery address.');
+      return false;
+    }
+
+    const phoneNumber = this._bookingService.getSelectedPhoneNumber();
+    if (!phoneNumber || phoneNumber.length !== 10 || isNaN(Number(phoneNumber))) {
+      this._toastr.error('Please enter a valid 10-digit contact number.');
+      return false;
+    }
+
+    if (!this.priceBreakup.total || this.priceBreakup.total <= 0) {
+      this._toastr.error('Price calculation is unavailable.');
+      return false;
+    }
+
+    return true;
   }
 
   private _isValidLocation(location: ILocationData | null): boolean {
@@ -201,19 +220,8 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private _saveBooking(): Observable<any> {
     const serviceIds: SelectedServiceIdsType[] = this.getServiceIds;
 
-    if (!this.selectedSlot) {
-      this._toastr.error('Please select a slot.');
-      return throwError(() => new Error('Slot not selected'));
-    }
-
-    const { isAvailable, ...slotData } = this.selectedSlot;
-
-    const phoneNumber = this._bookingService.getSelectedPhoneNumber();
-
-    if (!phoneNumber || phoneNumber.length !== 10 || isNaN(Number(phoneNumber))) {
-      this._toastr.error('Please enter a valid phone number.');
-      return throwError(() => new Error('Phone number is invalid.'));
-    }
+    const { isAvailable, ...slotData } = this.selectedSlot()!;
+    const phoneNumber = this._bookingService.getSelectedPhoneNumber()!;
 
     const bookingData: IBookingData = {
       providerId: this.providerId!,

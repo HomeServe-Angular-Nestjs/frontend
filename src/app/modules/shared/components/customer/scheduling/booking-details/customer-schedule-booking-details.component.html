@@ -1,80 +1,103 @@
 <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
-  <h1 class="text-xl font-bold text-black uppercase tracking-widest mb-8 border-b border-slate-100 pb-4">
-    Booking Details
-  </h1>
-
-  <!-- Mobile Verification -->
-  <div class="mb-8">
-    <label class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Mobile Number</label>
-
-    <div class="flex items-end space-x-4">
-      <div class="flex-1">
-        <div class="flex">
-          <input type="tel" placeholder="Enter your mobile number" [(ngModel)]="phoneNumber"
-            (ngModelChange)="onPhoneNumberChange($event)"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all placeholder:text-slate-400">
-        </div>
-      </div>
-    </div>
+  <div class="flex justify-between items-start mb-8 border-b border-slate-100 pb-4">
+    <h1 class="text-xl font-bold text-black uppercase tracking-widest">
+      Booking Details
+    </h1>
+    <button (click)="navigateToProfile()"
+      class="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 uppercase tracking-widest transition-colors flex items-center gap-1.5 bg-indigo-50 px-3 py-1.5 rounded-full">
+      <i class="fas fa-user-edit"></i>
+      <span>Update Details</span>
+    </button>
   </div>
 
-  <!-- Service Location with Map -->
-  <div class="mb-8">
-    <div class="flex justify-between items-end mb-2">
-      <label class="block text-slate-500 text-xs font-bold uppercase tracking-wider">Your Location</label>
+  <!-- Customer Info -->
+  <div class="bg-slate-50/50 rounded-2xl p-6 mb-8 border border-slate-100">
 
-      <button
-        class="text-[10px] font-bold text-slate-400 hover:text-black uppercase tracking-widest transition-colors flex items-center gap-1"
-        (click)="toggleMap()">
-        <i class="fas fa-map-marker-alt"></i>
-        <span> {{ mapVisible() ? 'Hide Map' : 'Change Location' }}</span>
-      </button>
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-    <div
-      class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-start relative group hover:border-slate-200 transition-colors">
-      <div
-        class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm mr-3 flex-shrink-0">
-        <i class="fas fa-map-pin text-xs"></i>
+      <!-- Full Name -->
+      <div class="flex items-start gap-3">
+        <i class="fas fa-user text-slate-400 mt-1 text-xs"></i>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Full Name
+          </p>
+          <p class="text-sm font-semibold text-slate-900">
+            {{ fullName || '---' }}
+          </p>
+        </div>
       </div>
-      <p class="text-slate-700 text-sm font-medium mt-1.5 leading-snug">{{ selectedAddress || 'No location selected' }}
-      </p>
-    </div>
 
-    <div *ngIf="loadingLocation()"
-      class="mt-2 text-xs font-bold text-slate-400 uppercase tracking-widest animate-pulse">
-      Fetching your location...
-    </div>
+      <!-- Email -->
+      <div class="flex items-start gap-3">
+        <i class="fas fa-envelope text-slate-400 mt-1 text-xs"></i>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Email
+          </p>
+          <p class="text-sm font-semibold text-slate-900 break-all">
+            {{ email || '---' }}
+          </p>
+        </div>
+      </div>
 
-    <!-- Map Container -->
-    <div *ngIf="mapVisible()" class="mt-4 rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-      <app-mapbox-map [center]="center" [search]="true" (locationChanged)="onMapLocationChanged($event)">
-      </app-mapbox-map>
+      <!-- Phone -->
+      <div class="flex items-start gap-3">
+        <i class="fas fa-phone text-slate-400 mt-1 text-xs"></i>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Phone
+          </p>
+          <p class="text-sm font-semibold text-slate-900">
+            {{ phoneNumber || '---' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Empty spacer to preserve grid rhythm -->
+      <div class="hidden md:block"></div>
+
+      <!-- Service Location (Full Width, Grid-Aligned) -->
+      <div class="md:col-span-2 flex items-start gap-3 pt-4 border-t border-slate-200">
+        <i class="fas fa-map-marker-alt text-slate-400 mt-1 text-xs"></i>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Service Location
+          </p>
+          <p class="text-sm font-semibold text-slate-700 leading-snug">
+            {{ selectedAddress || 'No location selected' }}
+          </p>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <!-- Date and Time Picker -->
-  <div class="mb-2">
-    <label for="date" class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-3">
-      Select Date & Time
+  <div class="pt-8 border-t border-slate-100">
+    <label for="date" class="block text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-4">
+      Choose Preferred Date & Time
     </label>
-    <input type="date" id="date" [(ngModel)]="selectedDate" [min]="minDate" (ngModelChange)="getAvailableSlots()"
-      class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" />
+
+    <div class="relative max-w-sm mb-6">
+      <input type="date" id="date" [(ngModel)]="selectedDate" [min]="minDate" (ngModelChange)="getAvailableSlots()"
+        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all cursor-pointer" />
+    </div>
 
     <div class="mt-6">
-      <div *ngIf="availableSlots.length; else noSlots" class="grid grid-cols-4 gap-3">
+      <div *ngIf="availableSlots.length; else noSlots" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         <ng-container *ngIf="selectedDate">
           <ng-container *ngFor="let slot of availableSlots">
             <div class="relative">
               <button (click)="selectSlot(slot)" [disabled]="!slot.isAvailable"
                 [class.ring-2]="selectedSlot?.from === slot.from" [class.ring-black]="selectedSlot?.from === slot.from"
                 [ngClass]="{
-                    'bg-slate-900 text-white shadow-md': selectedSlot?.from === slot.from,
+                    'bg-black text-white shadow-lg scale-[1.02]': selectedSlot?.from === slot.from,
                     'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200': selectedSlot?.from !== slot.from
-                }" class="w-full px-3 py-3 rounded-2xl font-bold transition-all
-                            text-xs flex flex-col items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                }" class="w-full px-3 py-3 rounded-2xl font-bold transition-all duration-200
+                            text-xs flex flex-col items-center disabled:opacity-40 disabled:cursor-not-allowed">
 
-                <span>{{ slot.from | meridiem }}</span>
+                <span class="text-sm tracking-tight">{{ slot.from | meridiem }}</span>
 
                 <span *ngIf="!slot.isAvailable"
                   class="text-[9px] text-rose-500 font-bold uppercase tracking-wider mt-1">
@@ -88,12 +111,16 @@
             </div>
           </ng-container>
         </ng-container>
-
       </div>
 
       <ng-template #noSlots>
-        <div class="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 mt-4">
-          <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">No slots available</p>
+        <div class="py-12 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200 mt-4">
+          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+            <i class="far fa-calendar-times text-slate-300 text-lg"></i>
+          </div>
+          <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+            {{ selectedDate ? 'No available slots for this date' : 'Please select a date above' }}
+          </p>
         </div>
       </ng-template>
     </div>
