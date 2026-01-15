@@ -1,86 +1,157 @@
-<section *ngIf="bookingDetails$ | async as bookingDetails"
-    class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md mb-2">
-    <!-- Header -->
-    <div class="mb-6 border-b pb-4">
-        <h1 class="text-2xl font-bold text-gray-800">Booking Details</h1>
-        <p class="text-sm text-gray-500 mt-1">Booking ID: <span
-                class="font-medium text-gray-700 uppercase">#{{bookingDetails.bookingId}}</span></p>
-    </div>
+<div class="w-full max-w-5xl mx-auto px-4 py-8">
+    <div *ngIf="bookingDetails$ | async as bookingDetails; else loading">
 
-    <!-- Booking Summary -->
-    <div class="grid sm:grid-cols-2 gap-6 mb-8">
-        <div>
-            <p class="text-sm text-gray-500">Booking Status</p>
-            <p class="text-base font-semibold text-blue-600 capitalize">{{bookingDetails.bookingStatus}}</p>
-        </div>
-        <div>
-            <p class="text-sm text-gray-500">Payment Status</p>
-            <p class="text-base font-semibold text-green-600 capitalize">{{bookingDetails.paymentStatus}}</p>
-        </div>
-        <div>
-            <p class="text-sm text-gray-500">Booking Date</p>
-            <p class="text-base font-medium text-gray-800">{{formatDate(bookingDetails.createdAt)}}</p>
-        </div>
-        <div>
-            <p class="text-sm text-gray-500">Expected Arrival</p>
-            <p class="text-base font-medium text-gray-800">{{formatDate(bookingDetails.expectedArrivalTime)}}</p>
-        </div>
-        <div>
-            <p class="text-sm text-gray-500">Total Amount</p>
-            <p class="text-lg font-bold text-gray-900">₹{{bookingDetails.totalAmount}}</p>
-        </div>
-    </div>
-
-    <!-- Provider Info -->
-    <div class="mb-8">
-        <h2 class="text-lg font-semibold text-gray-800 mb-2">Service Provider</h2>
-        <div class="bg-gray-50 p-4 rounded border text-sm text-gray-700 space-y-1">
-            <p><span class="font-medium">Name:</span> {{bookingDetails.provider.name}}</p>
-            <p><span class="font-medium">Email:</span> {{bookingDetails.provider.email}}</p>
-            <p><span class="font-medium">Phone:</span> {{bookingDetails.provider.phone || 'N/A'}}</p>
-        </div>
-    </div>
-
-    <!-- Services Booked -->
-    <div class="mb-10">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Services Booked</h2>
-
-        <div class="border rounded-lg divide-y divide-gray-200">
-            <div class="px-4 py-2 bg-gray-100 font-medium text-sm text-gray-600 grid grid-cols-3">
-                <span>Title</span>
-                <span class="text-center">Estimated Time</span>
-                <span class="text-right">Price</span>
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div class="flex items-center gap-4">
+                <button routerLink=".."
+                    class="p-2.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:text-indigo-600 hover:border-indigo-100 transition-all">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">Booking Details</h1>
+                    <p class="text-xs text-gray-500 font-medium">Ref: #{{bookingDetails.bookingId}}</p>
+                </div>
             </div>
 
-            <ul *ngFor="let service of bookingDetails.orderedServices">
-                <li class="px-4 py-3 grid grid-cols-3 items-center text-sm text-gray-700">
-                    <span>{{ service.title }}</span>
-                    <span class="text-center">{{ service.estimatedTime }}</span>
-                    <span class="text-right font-semibold text-gray-900">₹{{ service.price }}</span>
-                </li>
-            </ul>
+            <div class="flex items-center gap-3">
+                <div [ngClass]="{
+                    'bg-amber-50 text-amber-700': bookingDetails.bookingStatus === 'pending',
+                    'bg-emerald-50 text-emerald-700': bookingDetails.bookingStatus === 'completed',
+                    'bg-rose-50 text-rose-700': bookingDetails.bookingStatus === 'cancelled',
+                    'bg-indigo-50 text-indigo-700': bookingDetails.bookingStatus === 'confirmed' || bookingDetails.bookingStatus === 'in_progress'
+                }" class="px-3 py-1.5 rounded-full text-xs font-bold capitalize">
+                    {{bookingDetails.bookingStatus.replace('_', ' ')}}
+                </div>
+                <button (click)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
+                    class="px-4 py-2 text-xs font-bold bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all">
+                    Download
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Main Content: Services -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-50">
+                        <h2 class="text-sm font-bold text-gray-800">Services Scheduled</h2>
+                    </div>
+
+                    <div class="divide-y divide-gray-50">
+                        <div *ngFor="let service of bookingDetails.orderedServices"
+                            class="px-6 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                    <i class="fas fa-wrench text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900">{{service.title}}</p>
+                                    <p class="text-[11px] text-gray-400">Fixed duration: {{service.estimatedTime}} mins
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="text-sm font-bold text-gray-900">₹{{service.price}}</p>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-5 bg-gray-50/50 flex justify-between items-center border-t border-gray-100">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Charge</span>
+                        <span class="text-xl font-bold text-gray-900">₹{{bookingDetails.totalAmount}}</span>
+                    </div>
+                </div>
+
+                <!-- Logistics Card -->
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Service
+                                Address</p>
+                            <p class="text-sm font-bold text-gray-800">Home Address</p>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">{{bookingDetails.provider.location}}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Timing
+                                Breakdown</p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500">Booked on:</span>
+                                    <span
+                                        class="text-xs font-bold text-gray-700">{{formatDate(bookingDetails.createdAt)}}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500">Estimated Arrival:</span>
+                                    <span
+                                        class="text-xs font-bold text-indigo-600">{{formatDate(bookingDetails.expectedArrivalTime)}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Info -->
+            <div class="space-y-6">
+                <!-- Professional info -->
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Service Professional
+                    </p>
+                    <div class="flex items-center gap-4 mb-5">
+                        <div
+                            class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+                            {{bookingDetails.provider.name.charAt(0)}}
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-900 leading-tight">{{bookingDetails.provider.name}}
+                            </p>
+                            <p class="text-[11px] text-emerald-500 font-bold mt-0.5 flex items-center gap-1">
+                                <!-- <i class="fas fa-check-circle text-[10px]"></i> Verified -->
+                            </p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-xs text-gray-500">
+                            <i class="far fa-envelope w-4"></i>
+                            <span class="truncate">{{bookingDetails.provider.email}}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-gray-500">
+                            <i class="fas fa-phone-alt rotate-90 w-4 text-[11px]"></i>
+                            <span>{{bookingDetails.provider.phone || 'N/A'}}</span>
+                        </div>
+                    </div>
+                    <app-button
+                        buttonClass="w-full py-2.5 bg-indigo-50 text-indigo-600 font-bold rounded-lg hover:bg-indigo-100 transition-colors text-xs"
+                        text="Chat Now"></app-button>
+                </div>
+
+                <!-- Payment Status -->
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Payment Overview</p>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs text-gray-500">Method</span>
+                        <span class="text-xs font-bold text-gray-800">{{bookingDetails.transaction?.paymentMethod ||
+                            'Razorpay'}}</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-4 border-b border-gray-50">
+                        <span class="text-xs text-gray-500">Status</span>
+                        <span
+                            class="text-xs font-bold text-emerald-600 uppercase">{{bookingDetails.paymentStatus}}</span>
+                    </div>
+                    <p class="text-[9px] font-mono text-gray-400 mt-4 break-all opacity-60">ID:
+                        {{bookingDetails.transaction?.id || 'TXN_485920193'}}</p>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-
-    <!-- Payment Details -->
-    <div class="mb-8">
-        <h2 class="text-lg font-semibold text-gray-800 mb-2">Payment Details</h2>
-        <div class="bg-gray-50 p-4 rounded border text-sm text-gray-700 space-y-1">
-            <p><span class="font-medium">Transaction ID:</span>
-                {{bookingDetails.transaction?.id || 'N/A'}}</p>
-            <p><span class="font-medium">Payment Method:</span>
-                {{bookingDetails.transaction?.paymentMethod || 'N/A'}}</p>
-            <p><span class="font-medium">Payment Date:</span>
-                {{(bookingDetails.transaction?.paymentDate | date) || 'N/A'}}</p>
-        </div>
+<ng-template #loading>
+    <div class="flex flex-col items-center justify-center min-h-[400px]">
+        <app-loading-circle-animation></app-loading-circle-animation>
+        <p class="mt-4 text-gray-400 font-bold text-[10px] uppercase tracking-widest animate-pulse">Syncing Details...
+        </p>
     </div>
-
-    <!-- Actions -->
-    <div class="flex flex-wrap gap-4 mt-6 border-t pt-6">
-        <app-button *ngIf="bookingDetails.bookingStatus === 'completed'"
-            (clicked)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
-            buttonClass="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
-            text="Download Invoice"></app-button>
-    </div>
-</section>
+</ng-template>

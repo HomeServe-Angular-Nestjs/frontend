@@ -104,10 +104,7 @@ export interface IBookingResponse {
     email: string;
     phone: string;
   };
-  services: {
-    id: string;
-    name: string;
-  }[];
+  services: string[];
   expectedArrivalTime: Date | string;
   bookingStatus: BookingStatus;
   paymentStatus: PaymentStatus;
@@ -129,6 +126,7 @@ export interface IBookingDetailCustomer extends IBookingDetailsBase {
     name: string;
     email: string;
     phone: string;
+    location: string;
   };
 }
 

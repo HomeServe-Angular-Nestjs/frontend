@@ -8,11 +8,12 @@ import { IBookingDetailCustomer } from "../../../../../../core/models/booking.mo
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { BookingStatus } from "../../../../../../core/enums/enums";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
+import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 
 @Component({
     selector: 'app-customer-view-booking-details',
     templateUrl: './booking-details.component.html',
-    imports: [CommonModule, ButtonComponent]
+    imports: [CommonModule, ButtonComponent, LoadingCircleAnimationComponent]
 })
 export class CustomerViewBookingDetailsComponent implements OnInit {
     private readonly _bookingService = inject(BookingService);
@@ -40,7 +41,7 @@ export class CustomerViewBookingDetailsComponent implements OnInit {
             this._toastr.error('You can only download invoice for completed bookings.');
             return;
         }
-        
+
         this._bookingService.downloadInvoice(bookingId)
             .pipe(takeUntil(this._destroy$))
             .subscribe({
