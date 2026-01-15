@@ -1,10 +1,9 @@
 import { Component, effect, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Store } from '@ngrx/store';
-import { finalize, first, map, Observable, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
+import { finalize, first, map, Observable, of, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../../core/models/cart.model';
-import { IPriceBreakupData } from '../../../../../../core/models/booking.model';
+import { IBooking, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { PaymentService } from '../../../../../../core/services/payment.service';
@@ -30,7 +29,6 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private readonly _paymentService = inject(PaymentService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _store = inject(Store);
   private _destroy$ = new Subject<void>();
 
   @Input({ required: true }) selectedServiceData: SelectedServiceType[] = [];
@@ -52,7 +50,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     return this.selectedServiceData.map((item: SelectedServiceType) => {
       return {
         id: item.id,
-        selectedIds: item.services.map((s: any) => s.id)
+        selectedIds: item.services.map((s) => s.id)
       }
     });
   }
@@ -106,13 +104,20 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
         // Proceed to save booking once reserved
         return this._saveBooking();
       }),
-      switchMap((bookingResponse: any) => {
-        if (!bookingResponse?.data?.id) {
+      switchMap((res) => {
+        if (!res?.data) {
+          return throwError(() => new Error('Failed to confirm booking.'));
+        }
+
+        return of(res.data);
+      }),
+      switchMap((bookingResponse: IBooking) => {
+        if (!bookingResponse?.id) {
           return throwError(() => new Error('Failed to confirm booking.'));
         }
 
         return this._paymentService.createRazorpayOrder(totalAmount).pipe(
-          map(order => ({ order, bookingId: bookingResponse.data.id })),
+          map(order => ({ order, bookingId: bookingResponse.id })),
           tap({
             error: () => this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe()
           })
@@ -130,7 +135,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
                     observer.next();
                     observer.complete();
                   },
-                  error: (err: any) => {
+                  error: (err) => {
                     observer.error(err);
                   },
                 });
@@ -145,7 +150,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       ),
       finalize(() => (this.isProcessing = false))
     ).subscribe({
-      error: (err: any) => {
+      error: (err) => {
         console.error('Payment initiation failed:', err);
         this.isProcessing = false;
       }
@@ -185,7 +190,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     );
   }
 
-  private _saveBooking(): Observable<any> {
+  private _saveBooking() {
     const { isAvailable, ...slotData } = this.selectedSlot()!;
 
     return this._bookingService.saveBooking(slotData, this.providerId!).pipe(
