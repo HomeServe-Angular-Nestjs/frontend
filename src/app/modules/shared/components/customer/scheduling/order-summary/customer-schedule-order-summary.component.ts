@@ -12,6 +12,7 @@ import { RazorpayWrapperService } from '../../../../../../core/services/public/r
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
+import { CartService } from '../../../../../../core/services/cart.service';
 import { OrderSummarySectionComponent } from '../../../../partials/sections/customer/order-summary-section/order-summary-section.component';
 import { ISelectedSlot } from '../../../../../../core/models/availability.model';
 
@@ -27,6 +28,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _bookingService = inject(BookingService);
   private readonly _paymentService = inject(PaymentService);
+  private readonly _cartService = inject(CartService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private _destroy$ = new Subject<void>();
@@ -184,8 +186,9 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
 
     return this._paymentService.verifyBookingPayment(response, orderData).pipe(
       tap(() => {
-        this._router.navigate(['profile', 'bookings']);
+        this._cartService.clearCart().subscribe();
         this._toastr.success('Booking confirmed successfully.');
+        this._router.navigate(['profile', 'bookings']);
       })
     );
   }
