@@ -54,23 +54,22 @@ export interface IReview {
   desc: string;
   rating: number;
   writtenAt: Date | string;
-  // isActive: boolean;
-  // isReported: boolean;
 }
 
 // --------------------
 // Customer Related Interfaces
 // --------------------
 
-export interface IBookingData {
+export interface IBookingData { //todo
   providerId: string;
   total: number;
   location: ILocationData;
   slotData: ISelectedSlot;
   serviceIds: SelectedServiceIdsType[];
-  // transactionId: string | null;
   phoneNumber: string | null;
 }
+
+export interface ISaveBooking extends Omit<ISelectedSlot, 'isAvailable'> { }
 
 export interface IBooking {
   id: string;

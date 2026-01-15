@@ -70,7 +70,10 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
         takeUntil(this._destroy$),
         map((res) => {
           const slots: ISlotUI[] = Array.isArray(res) ? res : (res.data || []);
-          return slots.map(s => ({ ...s, isAvailable: true }));
+          return slots.map(s => ({
+            ...s,
+            isAvailable: s.isAvailable 
+          }));
         }),
         tap(slots => this.availableSlots = slots)
       ).subscribe();
@@ -84,7 +87,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
 
     this.selectedSlot = slot;
 
-    this._bookingService.setSelectedSlot({
+    this._bookingService.selectedSlot.set({
       ...slot,
       date: this.selectedDate
     });

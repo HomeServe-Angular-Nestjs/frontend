@@ -24,8 +24,8 @@ export class CartService {
         );
     }
 
-    addItemsToCart(providerServiceId: string): Observable<IResponse<ICartUI>> {
-        return this._http.patch<IResponse<ICartUI>>(`${this._apiUrl}/add`, { providerServiceId }).pipe(
+    addItemsToCart(providerId: string, providerServiceId: string): Observable<IResponse<ICartUI>> {
+        return this._http.patch<IResponse<ICartUI>>(`${this._apiUrl}/add`, { providerServiceId, providerId }).pipe(
             tap(res => {
                 if (res.success && res.data) {
                     this._cart.set(res.data);

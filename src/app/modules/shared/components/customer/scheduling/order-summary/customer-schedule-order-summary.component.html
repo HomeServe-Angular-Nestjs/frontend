@@ -10,7 +10,7 @@
                         class="flex justify-between items-center text-sm group">
                         <span class="font-medium text-slate-700 group-hover:text-black transition-colors">{{
                             service.category.name }}</span>
-                        <span class="font-bold text-black">₹{{ service.price }}</span>
+                        <span class="font-bold text-black">₹{{ service.price | number:'1.2-2' }}</span>
                     </div>
                 </ng-container>
             </div>

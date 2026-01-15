@@ -2,9 +2,9 @@ import { Component, effect, inject, Input, OnDestroy, OnInit, signal } from '@an
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { finalize, map, Observable, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
+import { finalize, first, map, Observable, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../../core/models/cart.model';
-import { IBookingData, IPriceBreakupData } from '../../../../../../core/models/booking.model';
+import { IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { PaymentService } from '../../../../../../core/services/payment.service';
@@ -14,7 +14,6 @@ import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loa
 import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
 import { OrderSummarySectionComponent } from '../../../../partials/sections/customer/order-summary-section/order-summary-section.component';
-import { ILocationData } from '../../../../../../core/models/user.model';
 import { ISelectedSlot } from '../../../../../../core/models/availability.model';
 
 @Component({
@@ -60,7 +59,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
 
   constructor() {
     effect(() => {
-      const slot = this._bookingService.getSelectedSlot();
+      const slot = this._bookingService.selectedSlot();
       this.selectedSlot.set(slot);
     });
   }
@@ -79,35 +78,44 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   initiatePayment() {
     this.isProcessing = true;
 
-    if (!this._isAllDataAvailable()) {
+    const slotData = this.selectedSlot();
+
+    if (!slotData) {
+      this._toastr.error('Please select a scheduled time slot.');
       this.isProcessing = false;
       return;
     }
 
-    const slotData = this.selectedSlot;
     const totalAmount = this.priceBreakup.total;
     const reservationData = { ...slotData, providerId: this.providerId as string };
 
-    this._reservationService.canInitiatePayment = true;
-    // this._reservationService.checkReservationUpdates(reservationData);
+    // Start reservation process via socket
+    this._reservationService.createReservation(reservationData);
 
-    if (!this._reservationService.canInitiatePayment) {
-      this._toastr.error('Slot is already reserved. Please select another.');
-      this.isProcessing = false;
-      return;
-    }
-
-    // this._reservationService.createReservation(reservationData);
-    return;
-    this._saveBooking().pipe(
+    // Listen for reservation status
+    this._reservationService.reservationStatus$.pipe(
       takeUntil(this._destroy$),
-      switchMap((bookingResponse) => {
+      first(),
+      switchMap((isReserved) => {
+        if (!isReserved) {
+          this._toastr.error('Slot is already reserved. Please select another.');
+          this.isProcessing = false;
+          return throwError(() => new Error('Slot already reserved'));
+        }
+
+        // Proceed to save booking once reserved
+        return this._saveBooking();
+      }),
+      switchMap((bookingResponse: any) => {
         if (!bookingResponse?.data?.id) {
           return throwError(() => new Error('Failed to confirm booking.'));
         }
 
         return this._paymentService.createRazorpayOrder(totalAmount).pipe(
-          map(order => ({ order, bookingId: bookingResponse.data.id }))
+          map(order => ({ order, bookingId: bookingResponse.data.id })),
+          tap({
+            error: () => this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe()
+          })
         );
       }),
       switchMap(({ order, bookingId }) =>
@@ -120,26 +128,25 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
                 .subscribe({
                   next: () => {
                     observer.next();
-                    observer.complete()
+                    observer.complete();
                   },
-                  error: (err) => {
-                    observer.error(err)
+                  error: (err: any) => {
+                    observer.error(err);
                   },
                 });
             },
             () => {
+              this.isProcessing = false;
+              this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe();
               observer.complete();
             }
           );
         })
-      )
+      ),
+      finalize(() => (this.isProcessing = false))
     ).subscribe({
-      error: (err) => {
-        console.error(err);
-        this._toastr.error(err.message || err);
-        this.isProcessing = false;
-      },
-      complete: () => {
+      error: (err: any) => {
+        console.error('Payment initiation failed:', err);
         this.isProcessing = false;
       }
     });
@@ -156,45 +163,6 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
         finalize(() => this.isLoading = false)
       )
       .subscribe();
-  }
-
-
-  private _isAllDataAvailable(): boolean {
-    if (!this.providerId) {
-      this._toastr.error('Provider information is missing.');
-      return false;
-    }
-
-    if (!this.selectedSlot()) {
-      this._toastr.error('Please select a scheduled time slot.');
-      return false;
-    }
-
-    const address = this._bookingService.getSelectedAddress();
-    if (!this._isValidLocation(address)) {
-      this._toastr.error('Please provide a valid service delivery address.');
-      return false;
-    }
-
-    const phoneNumber = this._bookingService.getSelectedPhoneNumber();
-    if (!phoneNumber || phoneNumber.length !== 10 || isNaN(Number(phoneNumber))) {
-      this._toastr.error('Please enter a valid 10-digit contact number.');
-      return false;
-    }
-
-    if (!this.priceBreakup.total || this.priceBreakup.total <= 0) {
-      this._toastr.error('Price calculation is unavailable.');
-      return false;
-    }
-
-    return true;
-  }
-
-  private _isValidLocation(location: ILocationData | null): boolean {
-    return !!location
-      && location.address !== ''
-      && Array.isArray(location.coordinates)
-      && location.coordinates.length === 2;
   }
 
   private _verifyPaymentAndConfirmBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {
@@ -218,21 +186,9 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   }
 
   private _saveBooking(): Observable<any> {
-    const serviceIds: SelectedServiceIdsType[] = this.getServiceIds;
-
     const { isAvailable, ...slotData } = this.selectedSlot()!;
-    const phoneNumber = this._bookingService.getSelectedPhoneNumber()!;
 
-    const bookingData: IBookingData = {
-      providerId: this.providerId!,
-      total: Number(this.priceBreakup.total.toFixed(2)),
-      location: this._bookingService.getSelectedAddress()!,
-      slotData,
-      serviceIds,
-      phoneNumber,
-    };
-
-    return this._bookingService.preBookingData(bookingData).pipe(
+    return this._bookingService.saveBooking(slotData, this.providerId!).pipe(
       finalize(() => this.isProcessing = false)
     );
   }

@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable, signal } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, Observable, shareReplay } from "rxjs";
-import { IBooking, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakupData, IResponseProviderBookingLists, IUpdateBookingsPaymentStatus } from "../models/booking.model";
+import { IBooking, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakupData, IResponseProviderBookingLists, ISaveBooking, IUpdateBookingsPaymentStatus } from "../models/booking.model";
 import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { ILocationData } from "../models/user.model";
@@ -14,12 +14,11 @@ export class BookingService {
   private _http = inject(HttpClient);
 
   selectedAddress = signal<ILocationData | null>(null);
+  selectedSlot = signal<ISelectedSlot | null>(null);
 
   private _phoneNumberSource = new BehaviorSubject<string | null>(null);
   phoneNumber$ = this._phoneNumberSource.asObservable();
 
-  private _slotSource = new BehaviorSubject<ISelectedSlot | null>(null);
-  slot$ = this._slotSource.asObservable();
 
   private _customerApi = API_ENV.customer;
   private _providerApi = API_ENV.provider;
@@ -32,38 +31,29 @@ export class BookingService {
     return this.selectedAddress();
   }
 
-  setSelectedSlot(slot: ISelectedSlot | null) {
-    this._slotSource.next(slot);
-  }
-
-  getSelectedSlot(): ISelectedSlot | null {
-    return this._slotSource.getValue();
-  }
-
   setSelectedPhoneNumber(phoneNumber: string) {
     this._phoneNumberSource.next(phoneNumber);
   }
 
-  getSelectedPhoneNumber(): string | null {
-    return this._phoneNumberSource.getValue();
-  }
+  // getSelectedPhoneNumber(): string | null {
+  //   return this._phoneNumberSource.getValue();
+  // }
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // **************************************************[Customer Related APIs]*******************************************************
   // ------------------------------------------------------------------------------------------------------------------------------
 
-
-  // fetchPriceBreakup(data: IPriceBreakup[]): Observable<IPriceBreakupData> {
-  //   return this._http.post<IPriceBreakupData>(`${this._customerApi}/booking/price_breakup`, data);
-  // }
-
   fetchPriceBreakup(): Observable<IResponse<IPriceBreakupData>> {
     return this._http.get<IResponse<IPriceBreakupData>>(`${this._customerApi}/booking/price_breakup`);
   }
 
-  preBookingData(data: IBookingData): Observable<IResponse<IBooking>> {
-    return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, data);
+  saveBooking(slotData: ISaveBooking, providerId: string): Observable<IResponse<IBooking>> {
+    return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, { ...slotData, providerId });
   }
+
+  // preBookingData(data: IBookingData): Observable<IResponse<IBooking>> { //todo
+  //   return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, data);
+  // }
 
   updateBooking(data: { transactionId: string | null, bookingId: string }): Observable<IResponse> {
     return this._http.patch<IResponse>(`${this._customerApi}/booking/update`, data);

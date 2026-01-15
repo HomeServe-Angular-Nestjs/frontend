@@ -163,7 +163,7 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
   }
 
   addServiceToCart(selectedServiceId: string) {
-    this._cartService.addItemsToCart(selectedServiceId)
+    this._cartService.addItemsToCart(this.providerId, selectedServiceId)
       .pipe(takeUntil(this._destroy$))
       .subscribe({
         next: (res) => {

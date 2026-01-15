@@ -1,6 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { BaseSocketService } from "./base-socket.service";
-import { BehaviorSubject, lastValueFrom, Observable } from "rxjs";
+import { BehaviorSubject, lastValueFrom, Observable, Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { authActions } from "../../../store/auth/auth.actions";
 import { Store } from "@ngrx/store";
@@ -18,6 +18,7 @@ export class ReservationSocketService extends BaseSocketService {
   private readonly CHECK_RESERVATION = 'reservation:check';
   private readonly CREATE_RESERVATION = 'reservation:create';
   private readonly IS_RESERVED = 'reservation:reserved';
+  private readonly RESERVATION_ERROR = 'reservation:error';
   private readonly INFORM_RESERVATION = 'reservation:inform';
   private readonly JOIN_PROVIDER_ROOM = 'provider_room:join';
   private readonly LEAVE_PROVIDER_ROOM = 'provider_room:leave';
@@ -36,6 +37,9 @@ export class ReservationSocketService extends BaseSocketService {
     this._initiatePaymentSource.next(value);
   }
 
+  private _reservationStatusSource = new Subject<boolean>();
+  reservationStatus$ = this._reservationStatusSource.asObservable();
+
   constructor() {
     super();
   }
@@ -43,9 +47,23 @@ export class ReservationSocketService extends BaseSocketService {
   protected override onConnect(): void {
     console.log('[ReservationSocketService] Connected');
     this._setupAuthErrorHandler();
-    this._onIsReserved(() => this._initiatePaymentSource.next(false));
-    this._onNotReserved(() => this._initiatePaymentSource.next(true));
+
+    this._onIsReserved(() => {
+      this._initiatePaymentSource.next(false);
+      this._reservationStatusSource.next(false);
+    });
+
+    this._onNotReserved((slot: any) => {
+      this._initiatePaymentSource.next(true);
+      this._reservationStatusSource.next(true);
+    });
+    
     this._onInformReservation((slot: any) => this._informReservationSource.next(slot));
+
+    this.listen(this.RESERVATION_ERROR, (err: any) => {
+      console.error('[ReservationSocket] Error:', err);
+      this._reservationStatusSource.next(false);
+    });
   }
 
   protected override onDisconnect(reason: string): void {
@@ -87,13 +105,12 @@ export class ReservationSocketService extends BaseSocketService {
     return this._http.post<void>(`${this.reservationApi}/new_access_token`, {}, { withCredentials: true });
   }
 
-  checkReservationUpdates(slot: ISendReservation) {
-    this.emit<ISendReservation>(this.CHECK_RESERVATION, slot);
+  createReservation(slot: ISendReservation) {
+    this.emit<ISendReservation>(this.CREATE_RESERVATION, slot);
   }
 
-  createReservation(slot: ISendReservation) {
-    this._initiatePaymentSource.next(true);
-    this.emit<ISendReservation>(this.CREATE_RESERVATION, slot);
+  checkReservationUpdates(slot: ISendReservation) {
+    this.emit<ISendReservation>(this.CHECK_RESERVATION, slot);
   }
 
   onJoinProviderRoom(providerId: string) {
@@ -106,5 +123,7 @@ export class ReservationSocketService extends BaseSocketService {
 
   stopListeningReservationUpdates(): void {
     this.removeListener(this.NEW_RESERVATION);
+    this.removeListener(this.IS_RESERVED);
+    this.removeListener(this.RESERVATION_ERROR);
   }
 }
