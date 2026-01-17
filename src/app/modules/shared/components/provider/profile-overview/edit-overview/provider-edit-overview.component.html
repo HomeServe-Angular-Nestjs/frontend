@@ -1,131 +1,181 @@
-<form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="divide-y divide-gray-200 p-6">
-    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-sm overflow-hidden">
+<div class="min-h-screen bg-transparent p-4 md:p-8">
+    <div class=" mx-auto">
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-6">
 
-        <!-- Header with Save/Cancel -->
-        <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-800">Edit Profile</h2>
-            <div class="flex gap-3">
+            <!-- Section 1: Basic Information -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-user-circle text-green-600"></i>
+                        Basic Information
+                    </h2>
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">Step 1 of 3</span>
+                </div>
+
+                <div class="p-6 space-y-8">
+                    <!-- Avatar Upload -->
+                    <div class="flex flex-col md:flex-row items-center gap-8">
+                        <div class="relative group">
+                            <div
+                                class="w-32 h-32 rounded-2xl overflow-hidden ring-4 ring-gray-50 shadow-md bg-gray-100">
+                                <img [src]="previewImage" alt="Profile Preview" class="w-full h-full object-cover">
+                            </div>
+                            <input type="file" id="profileImage" accept="image/*" class="hidden"
+                                (change)="handleImageUpload($event)">
+                            <label for="profileImage"
+                                class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer rounded-2xl backdrop-blur-sm">
+                                <i class="fas fa-camera text-white text-xl mb-1"></i>
+                                <span class="text-white text-xs font-bold">Change Photo</span>
+                            </label>
+                        </div>
+
+                        <div class="flex-grow w-full space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-1.5">
+                                    <label class="text-sm font-bold text-gray-700 ml-1">Full Name</label>
+                                    <div class="relative">
+                                        <i
+                                            class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                                        <input formControlName="fullname" type="text"
+                                            class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium"
+                                            placeholder="Enter your full name">
+                                    </div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-sm font-bold text-gray-700 ml-1">Profession</label>
+                                    <div class="relative">
+                                        <i
+                                            class="fas fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                                        <select formControlName="profession"
+                                            class="w-full pl-11 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium appearance-none">
+                                            <option value="" disabled>Select your profession</option>
+                                            <option *ngFor="let p of professions" [value]="p.name">{{ p.name | titlecase}}</option>
+                                        </select>
+                                        <i
+                                            class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-sm font-bold text-gray-700 ml-1">Years of Experience</label>
+                                <div class="relative max-w-xs">
+                                    <i
+                                        class="fas fa-history absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                                    <input formControlName="experience" type="number"
+                                        class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium"
+                                        placeholder="Years of experience">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Location & Service Coverage -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-map-marked-alt text-green-600"></i>
+                        Location & Coverage
+                    </h2>
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">Step 2 of 3</span>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <div class="space-y-3">
+                        <label class="text-sm font-bold text-gray-700 ml-1">Service Area (Map)</label>
+                        <div class="rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
+                            <app-mapbox-map [center]="center" [zoom]="zoom" [search]="true"
+                                (locationChanged)="onMapLocationChanged($event)">
+                            </app-mapbox-map>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2 space-y-1.5">
+                            <label class="text-sm font-bold text-gray-700 ml-1">Selected Address</label>
+                            <div class="relative">
+                                <i
+                                    class="fas fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                                <input formControlName="address" type="text" readonly
+                                    class="w-full pl-11 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 cursor-not-allowed"
+                                    placeholder="Selected on map">
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-sm font-bold text-gray-700 ml-1">Service Radius (km)</label>
+                            <div class="relative">
+                                <i
+                                    class="fas fa-arrows-left-right absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                                <input formControlName="serviceRadius" type="number"
+                                    class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium"
+                                    placeholder="Radius">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Availability Schedule -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-clock text-green-600"></i>
+                        Availability Schedule
+                    </h2>
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">Step 3 of 3</span>
+                </div>
+
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <label class="text-sm font-bold text-gray-700 ml-1 flex items-center gap-2">
+                            <i class="fas fa-calendar-days text-gray-400 text-xs"></i>
+                            Working Days
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <select formControlName="workingDaysStart"
+                                class="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium appearance-none">
+                                <option *ngFor="let day of daysOfWeek" [value]="day">{{ day }}</option>
+                            </select>
+                            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">to</span>
+                            <select formControlName="workingDaysEnd"
+                                class="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium appearance-none">
+                                <option *ngFor="let day of daysOfWeek" [value]="day">{{ day }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="text-sm font-bold text-gray-700 ml-1 flex items-center gap-2">
+                            <i class="fas fa-business-time text-gray-400 text-xs"></i>
+                            Working Hours
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <div class="relative flex-1">
+                                <input formControlName="workingHoursStart" type="time"
+                                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium">
+                            </div>
+                            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">to</span>
+                            <div class="relative flex-1">
+                                <input formControlName="workingHoursEnd" type="time"
+                                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Action Bar -->
+            <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-100">
                 <button type="button" (click)="cancelEdit()"
-                    class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium">
-                    Cancel
+                    class="px-6 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all">
+                    Discard Changes
                 </button>
                 <button type="submit"
-                    class="px-4 py-2 bg-[#16A34A] text-white hover:bg-green-700 rounded-lg transition-colors font-medium disabled:opacity-70">
-                    Save Changes
+                    class="px-8 py-2.5 bg-green-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-green-200 hover:bg-green-700 hover:shadow-green-300 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Save Profile
                 </button>
             </div>
-        </div>
-
-        <!-- Profile Picture Section -->
-        <div class="p-6 flex items-start gap-8">
-            <div class="flex-shrink-0">
-                <div class="relative group">
-                    <div class="w-32 h-32 rounded-lg overflow-hidden border-2 border-gray-200">
-                        <img [src]="previewImage" alt="Profile" class="w-full h-full object-cover">
-                    </div>
-                    <input type="file" id="profileImage" accept="image/*" class="hidden"
-                        (change)="handleImageUpload($event)">
-                    <label for="profileImage"
-                        class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white mb-1" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span class="text-white text-sm font-medium">Change</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="flex-1 space-y-4">
-                <div>
-                    <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input formControlName="fullname" type="text" id="fullName"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-
-                <div>
-                    <label for="profession" class="block text-sm font-medium text-gray-700 mb-1">Profession</label>
-                    <input formControlName="profession" type="text" id="profession"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-            </div>
-        </div>
-
-        <!-- Map/Address Section -->
-        <div class="p-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-            <div>
-                <app-mapbox-map [center]="center" [zoom]="zoom" [search]="true"
-                    (locationChanged)="onMapLocationChanged($event)">
-                </app-mapbox-map>
-            </div>
-            <input formControlName="location" type="text" [value]="selectedAddress.toString()"
-                placeholder="select a location" readonly
-                class="w-full px-4 py-2 mt-3 border border-gray-300 rounded-lg outline-none">
-        </div>
-
-        <!-- Personal Information Section -->
-        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Service Radius (miles)
-                    <span class="text-xs text-gray-500">Optional</span>
-                </label>
-                <input formControlName="serviceRadius" type="number" min="1" max="100"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                <input formControlName="experience" type="number" min="0" max="50"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-        </div>
-
-        <!-- Availability Section -->
-        <div class="p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Availability</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Working Days</label>
-                    <div class="flex items-center gap-2">
-                        <select formControlName="workingDaysStart"
-                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option *ngFor="let day of daysOfWeek" [value]="day">{{ day }}</option>
-                        </select>
-                        <span class="text-gray-500">to</span>
-                        <select formControlName="workingDaysEnd"
-                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option *ngFor="let day of daysOfWeek" [value]="day">{{ day }}</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Working Hours</label>
-                    <div class="flex items-center gap-2">
-                        <input formControlName="workingHoursStart" type="time"
-                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <span class="text-gray-500">to</span>
-                        <input formControlName="workingHoursEnd" type="time"
-                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex gap-3 justify-end mt-4 pb-4">
-            <button type="button" (click)="cancelEdit()"
-                class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium">
-                Cancel
-            </button>
-            <button type="submit"
-                class="px-4 py-2 bg-[#16A34A] text-white hover:bg-green-700 rounded-lg transition-colors font-medium disabled:opacity-70">
-                Save Changes
-            </button>
-        </div>
+        </form>
     </div>
-</form>
+</div>

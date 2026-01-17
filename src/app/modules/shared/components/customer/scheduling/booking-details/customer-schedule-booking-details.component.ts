@@ -9,7 +9,6 @@ import { ToastNotificationService } from '../../../../../../core/services/public
 import { selectCustomer, selectLocation, selectPhoneNumber } from '../../../../../../store/customer/customer.selector';
 import { LocationService } from '../../../../../../core/services/public/location.service';
 import { ILocationData } from '../../../../../../core/models/user.model';
-import { SlotRuleService } from '../../../../../../core/services/slot-rule.service';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
 import { ProviderService } from '../../../../../../core/services/provider.service';
 import { ISlotUI } from '../../../../../../core/models/availability.model';
@@ -25,7 +24,6 @@ import { MeridiemPipe } from '../../../../../../core/pipes/meridiem-time.pipe';
 export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestroy {
   private readonly _router = inject(Router);
   private readonly _reservationService = inject(ReservationSocketService);
-  private readonly _slotRuleService = inject(SlotRuleService);
   private readonly _providerService = inject(ProviderService);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _locationService = inject(LocationService);

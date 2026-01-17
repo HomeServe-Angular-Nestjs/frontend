@@ -1,6 +1,5 @@
 import { SelectedServiceIdsType } from "./cart.model";
 import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../enums/enums";
-import { IAvailableSlot } from "./slot-rule.model";
 import { ILocation, ILocationData } from "./user.model";
 import { ISelectedSlot } from "./availability.model";
 

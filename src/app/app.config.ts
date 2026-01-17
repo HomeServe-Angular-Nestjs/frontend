@@ -11,17 +11,13 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 import { authFeature } from './store/auth/auth.feature';
 import { userFeature } from './store/users/user.feature';
-import { offeredServiceFeature } from './store/offered-services/offeredServices.feature';
 import { providerFeature } from './store/provider/provider.feature';
-import { scheduleFeature } from './store/schedules/schedule.feature';
 import { customerFeature } from './store/customer/customer.feature';
 import { chatFeature } from './store/chat/chat.feature';
 
 import { authEffects } from './store/auth/auth.effects';
 import { userEffects } from './store/users/user.effect';
 import { providerEffects } from './store/provider/provider.effects';
-import { offeredServiceEffects } from './store/offered-services/offeredServices.effects';
-import { scheduleEffects } from './store/schedules/schedule.effects';
 import { customerEffects } from './store/customer/customer.effects';
 import { ToastrModule } from 'ngx-toastr';
 import { chatEffects } from './store/chat/chats.effect';
@@ -58,17 +54,13 @@ export const appConfig: ApplicationConfig = {
     provideStore({
       [authFeature.name]: authFeature.reducer,
       [userFeature.name]: userFeature.reducer,
-      [offeredServiceFeature.name]: offeredServiceFeature.reducer,
       [providerFeature.name]: providerFeature.reducer,
-      [scheduleFeature.name]: scheduleFeature.reducer,
       [customerFeature.name]: customerFeature.reducer,
       [chatFeature.name]: chatFeature.reducer,
       [notificationFeature.name]: notificationFeature.reducer,
     }, { metaReducers }),
     provideEffects(
-      offeredServiceEffects,
       notificationEffects,
-      scheduleEffects,
       customerEffects,
       providerEffects,
       authEffects,
