@@ -1,5 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { ProviderBookingFilterComponent } from "../../../shared/components/provider/bookings/booking-filters/booking-filters.component";
 import { ProviderBookingOverviewComponent } from "../../../shared/components/provider/bookings/booking-overview/booking-overview.component";
 import { ProviderBookingRecentComponent } from "../../../shared/components/provider/bookings/bookings-recent/booking-recent.component";
@@ -9,12 +10,13 @@ import { SharedDataService } from "../../../../core/services/public/shared-data.
 @Component({
     selector: 'app-provider-bookings',
     templateUrl: './bookings.component.html',
-    imports: [CommonModule, ProviderBookingFilterComponent, ProviderBookingOverviewComponent, ProviderBookingRecentComponent]
+    imports: [CommonModule, FormsModule, ProviderBookingFilterComponent, ProviderBookingOverviewComponent, ProviderBookingRecentComponent]
 })
 export class ProviderBookingsComponent implements OnInit {
     private readonly _sharedService = inject(SharedDataService);
 
     filters: IBookingFilter = {};
+    searchTerm: string = '';
 
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Booking Management')
@@ -22,5 +24,19 @@ export class ProviderBookingsComponent implements OnInit {
 
     onFiltersChanged(updatedFilters: IBookingFilter) {
         this.filters = updatedFilters;
+    }
+
+    onSearchChange() {
+        // Search term is passed to child component via input binding
+    }
+
+    getCurrentDate(): string {
+        const options: Intl.DateTimeFormatOptions = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        return new Date().toLocaleDateString('en-US', options);
     }
 }

@@ -26,9 +26,9 @@ export class ProviderBookingOverviewComponent implements OnInit {
         {
             label: 'Total Bookings',
             value: 0,
-            icon: 'fas fa-calendar-check text-green-700',
+            icon: 'fas fa-calendar-check',
             meta: {
-                icon: 'fas fa-arrow-up text-green-600',
+                icon: 'fas fa-arrow-up',
                 value: 10,
                 desc: 'vs last month',
             },
@@ -36,9 +36,9 @@ export class ProviderBookingOverviewComponent implements OnInit {
         {
             label: 'Pending Requests',
             value: 0,
-            icon: 'fas fa-hourglass-half text-blue-700',
+            icon: 'fas fa-hourglass-half',
             meta: {
-                icon: 'fas fa-arrow-up text-blue-600',
+                icon: 'fas fa-arrow-up',
                 value: 0,
                 desc: 'vs last month',
             }
@@ -46,9 +46,9 @@ export class ProviderBookingOverviewComponent implements OnInit {
         {
             label: 'Completed Jobs',
             value: 0,
-            icon: 'fas fa-check-circle text-green-700',
+            icon: 'fas fa-check-circle',
             meta: {
-                icon: 'fas fa-arrow-up text-green-600',
+                icon: 'fas fa-arrow-up',
                 value: 0,
                 desc: 'vs last month',
             },
@@ -56,9 +56,9 @@ export class ProviderBookingOverviewComponent implements OnInit {
         {
             label: 'Pending Payments',
             value: 0,
-            icon: 'fas fa-credit-card text-yellow-700',
+            icon: 'fas fa-credit-card',
             meta: {
-                icon: 'fas fa-arrow-up text-yellow-600',
+                icon: 'fas fa-arrow-up',
                 value: 0,
                 desc: 'vs last month',
             }
@@ -66,9 +66,9 @@ export class ProviderBookingOverviewComponent implements OnInit {
         {
             label: 'Canceled Bookings',
             value: 0,
-            icon: 'fas fa-ban text-red-700',
+            icon: 'fas fa-ban',
             meta: {
-                icon: 'fas fa-arrow-down text-red-600',
+                icon: 'fas fa-arrow-down',
                 value: 10,
                 desc: 'vs last month',
             },
@@ -97,7 +97,7 @@ export class ProviderBookingOverviewComponent implements OnInit {
                             updatedValue = data.pendingRequests;
                             if (data.changes)
                                 updatedMeta = {
-                                    icon: data.changes.pendingRequestsChange >= 0 ? 'fas fa-arrow-up text-green-600' : 'fas fa-arrow-down text-red-600',
+                                    icon: data.changes.pendingRequestsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
                                     value: Math.abs(data.changes.pendingRequestsChange),
                                     desc: 'vs last month',
                                 };
@@ -107,7 +107,7 @@ export class ProviderBookingOverviewComponent implements OnInit {
                             updatedValue = data.completedJobs;
                             if (data.changes)
                                 updatedMeta = {
-                                    icon: data.changes.completedJobsChange >= 0 ? 'fas fa-arrow-up text-green-600' : 'fas fa-arrow-down text-red-600',
+                                    icon: data.changes.completedJobsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
                                     value: Math.abs(data.changes.completedJobsChange),
                                     desc: 'vs last month',
                                 };
@@ -117,7 +117,7 @@ export class ProviderBookingOverviewComponent implements OnInit {
                             updatedValue = data.pendingPayments;
                             if (data.changes)
                                 updatedMeta = {
-                                    icon: data.changes.pendingPaymentsChange >= 0 ? 'fas fa-arrow-up text-yellow-600' : 'fas fa-arrow-down text-red-600',
+                                    icon: data.changes.pendingPaymentsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
                                     value: Math.abs(data.changes.pendingPaymentsChange),
                                     desc: 'vs last month',
                                 };
@@ -127,7 +127,7 @@ export class ProviderBookingOverviewComponent implements OnInit {
                             updatedValue = data.cancelledBookings;
                             if (data.changes)
                                 updatedMeta = {
-                                    icon: data.changes.cancelledBookingsChange >= 0 ? 'fas fa-arrow-up text-green-600' : 'fas fa-arrow-down text-red-600',
+                                    icon: data.changes.cancelledBookingsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
                                     value: Math.abs(data.changes.cancelledBookingsChange),
                                     desc: 'vs last month',
                                 };
@@ -143,11 +143,12 @@ export class ProviderBookingOverviewComponent implements OnInit {
         });
     }
 
-    getIconBgColor(label: string): string {
-        if (label.includes('Pending')) return 'bg-yellow-500';
-        if (label.includes('Completed')) return 'bg-green-600';
-        if (label.includes('Canceled') || label.includes('Cancelled')) return 'bg-red-600';
-        return 'bg-blue-600';
+    getIconContainerClass(label: string): string {
+        if (label.includes('Pending Requests')) return 'bg-blue-50 text-blue-600';
+        if (label.includes('Completed')) return 'bg-green-50 text-green-600';
+        if (label.includes('Canceled') || label.includes('Cancelled')) return 'bg-red-50 text-red-600';
+        if (label.includes('Pending Payments')) return 'bg-amber-50 text-amber-600';
+        return 'bg-green-50 text-green-600';
     }
 
 
