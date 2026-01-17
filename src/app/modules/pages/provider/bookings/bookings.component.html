@@ -40,32 +40,7 @@
 
         <!-- Bookings Table Section -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="px-6 py-5 border-b border-gray-200">
-                <div class="flex items-center justify-between gap-4">
-                    <!-- Left: Title and Icon -->
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-list text-green-600"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-bold text-gray-900">Recent Bookings</h2>
-                            <p class="text-sm text-gray-500">View and manage your booking requests</p>
-                        </div>
-                    </div>
-
-                    <!-- Right: Search Box -->
-                    <div class="relative w-full max-w-xs">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-search text-gray-400 text-sm"></i>
-                        </div>
-                        <input type="text" placeholder="Search bookings..." [(ngModel)]="searchTerm"
-                            (ngModelChange)="onSearchChange()" class="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg 
-                                   focus:ring-2 focus:ring-green-200 focus:border-green-500 focus:bg-white
-                                   transition-all placeholder-gray-400" />
-                    </div>
-                </div>
-            </div>
-            <app-provider-booking-recent [filters]="filters" [searchTerm]="searchTerm"></app-provider-booking-recent>
+            <app-provider-booking-recent [filters]="filters"></app-provider-booking-recent>
         </div>
 
     </div>

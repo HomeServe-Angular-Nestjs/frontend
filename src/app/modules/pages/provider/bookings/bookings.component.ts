@@ -16,7 +16,6 @@ export class ProviderBookingsComponent implements OnInit {
     private readonly _sharedService = inject(SharedDataService);
 
     filters: IBookingFilter = {};
-    searchTerm: string = '';
 
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Booking Management')
@@ -24,10 +23,6 @@ export class ProviderBookingsComponent implements OnInit {
 
     onFiltersChanged(updatedFilters: IBookingFilter) {
         this.filters = updatedFilters;
-    }
-
-    onSearchChange() {
-        // Search term is passed to child component via input binding
     }
 
     getCurrentDate(): string {

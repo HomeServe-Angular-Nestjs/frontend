@@ -32,12 +32,12 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
   @Input() filters: IBookingFilter = {};
   @Input() showFilters: boolean = true;
   @Input() actionable: boolean = true;
-  @Input() searchTerm: string = '';
 
   private _destroy$ = new Subject<void>();
   private _filters$ = new BehaviorSubject<IBookingFilter>({});
 
   bookingResponseData$!: Observable<IResponseProviderBookingLists>;
+  searchTerm: string = '';
 
   ngOnInit(): void {
     this._filters$.next({ ...this.filters, search: this.searchTerm });
@@ -58,10 +58,6 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['filters'] && changes['filters'].currentValue) {
       this._emitFilters();
-    }
-
-    if (changes['searchTerm'] && !changes['searchTerm'].firstChange) {
-      this._debounceService.delay(this.searchTerm);
     }
   }
 
@@ -105,12 +101,11 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
     return parts[2]?.trim() || '';
   }
 
-  onSearchTriggered() {
+  onSearchChange() {
     this._debounceService.delay(this.searchTerm);
   }
 
   goToChat(customerId: string) {
-    console.log(customerId)
     if (customerId) {
       this._chatService.fetchChat({ id: customerId, type: 'customer' })
         .subscribe({
