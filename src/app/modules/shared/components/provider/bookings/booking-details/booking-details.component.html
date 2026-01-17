@@ -1,165 +1,360 @@
-<div class="max-w-screen-xl mx-auto p-6">
-  <section *ngIf="bookingData$ | async as bookingDetails" class="bg-white p-8 space-y-8 mt-4">
+<div class="min-h-screen bg-gray-50">
+  <section *ngIf="bookingData$ | async as bookingDetails" class="max-w-7xl mx-auto">
 
-    <section class="h-[15rem] p-6 bg-gray-50">
-      <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
-        <div class="space-y-2">
-          <h1 class="text-2xl font-bold text-gray-900">Order Details</h1>
-          <div class="text-sm text-gray-600 space-y-1">
-            <p>
-              <span class="font-semibold">Booking ID:</span>
-              #{{ bookingDetails.bookingId | slice:0:10 | uppercase }}
-            </p>
-            <p>
-              <span class="font-semibold">Booking Date:</span> {{ formateData(bookingDetails.createdAt) }}
-            </p>
-            <p>
-              <span class="font-semibold">Expected Arrival:</span> {{
-              formateData(bookingDetails.expectedArrivalTime) }}
-            </p>
-            <p>
-              <span class="font-semibold">Total Amount:</span>
-              <span class="font-semibold text-gray-900">₹{{ bookingDetails.totalAmount }}</span>
-            </p>
+    <!-- Sticky Action Bar -->
+    <div class="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
+      <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <!-- Left: Booking Info -->
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-calendar-check text-green-600"></i>
+              </div>
+              <div>
+                <h1 class="text-lg font-bold text-gray-900">
+                  #{{ bookingDetails.bookingId | uppercase }}
+                </h1>
+                <p class="text-xs text-gray-500">{{ formateData(bookingDetails.createdAt) }}</p>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="flex justify-end items-center gap-4 text-gray-500 text-lg">
-          <button title="Chat" class="hover:text-green-600 transition">
-            <i class="fas fa-comments"></i>
-          </button>
-          <button title="Send Notification" class="hover:text-green-600 transition">
-            <i class="fas fa-bell"></i>
-          </button>
-        </div>
-      </div>
-      <div class="flex flex-wrap gap-3 mt-8">
-        <span [ngClass]="getBookingBadgeClass(bookingDetails.bookingStatus)"
-          class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium shadow-sm">
-          {{ bookingDetails.bookingStatus }}
-        </span>
-
-        <span [ngClass]="getPaymentBadgeClass(bookingDetails.paymentStatus)"
-          class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium shadow-sm">
-          {{ bookingDetails.paymentStatus }}
-        </span>
-      </div>
-    </section>
-
-    <!-- Customer Info -->
-    <div class="bg-gray-50 rounded-xl p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">Customer Information</h2>
-        <app-button (clicked)="toggleReportModal()"
-          buttonClass="px-3 py-1 text-xs font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition"
-          text="Report">
-        </app-button>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 text-sm text-gray-700">
-        <p><span class="font-medium">Name:</span> {{ bookingDetails.customer.name || 'N/A' }}</p>
-        <p><span class="font-medium">Email:</span> {{ bookingDetails.customer.email || 'N/A' }}</p>
-        <p><span class="font-medium">Address:</span> {{ bookingDetails.customer.location || 'N/A' }}</p>
-        <p><span class="font-medium">Phone:</span> {{ bookingDetails.customer.phone || 'N/A' }}</p>
-      </div>
-    </div>
-
-    <!-- Services -->
-    <div class="bg-gray-50 rounded-xl p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Services Booked</h2>
-      <div class="grid grid-cols-3 text-sm font-semibold text-gray-600 border-b pb-2">
-        <span>Service</span>
-        <span>Price</span>
-        <span>Estimated Time</span>
-      </div>
-
-      <div *ngFor="let service of bookingDetails.orderedServices"
-        class="grid grid-cols-3 gap-4 text-sm py-3 border-b last:border-0">
-        <span class="text-gray-900">{{ service.title }}</span>
-        <span class="text-gray-900 font-medium">₹{{ service.price }}</span>
-        <span class="text-gray-600">{{ service.estimatedTime }}</span>
-      </div>
-    </div>
-
-    <div *ngIf="bookingDetails.cancelStatus" class="bg-red-50 p-5 rounded-xl border border-red-200">
-      <h4 class="text-sm font-semibold text-red-700 mb-1">
-        {{ bookingDetails.cancelStatus === 'in_progress' ? 'Cancel Requested' : 'Cancelled Booking' }}
-      </h4>
-      <p class="text-sm text-gray-800">
-        Reason: <span class="font-medium">{{ bookingDetails.cancelReason || 'No reason provided.' }}</span>
-      </p>
-      <p class="text-sm text-gray-600 mt-1">
-        Cancelled At: <span class="font-medium">{{ bookingDetails.cancelledAt | date:'medium' }}</span>
-      </p>
-    </div>
-
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pt-4 border-t">
-      <div class="flex items-center space-x-6 w-full md:w-auto overflow-x-auto">
-        <ng-container *ngFor="let status of bookingSelectOption; let i = index">
-          <div class="flex items-center flex-shrink-0">
-            <button
-              [disabled]="isStatusDisabled(status.value, bookingDetails.bookingStatus, bookingDetails.cancelStatus)"
-              (click)="changeBookingStatus(bookingDetails.bookingId, status.value, bookingDetails.bookingStatus)"
-              class="relative flex items-center justify-center w-10 h-10 rounded-full border-2 font-medium transition"
-              [ngClass]="{
-                                'bg-green-600 border-green-600 text-white': bookingDetails.bookingStatus===status.value,
-                                'bg-gray-200 border-gray-300 text-gray-600': bookingDetails.bookingStatus !==status.value,
-                                'opacity-50 cursor-not-allowed': isStatusDisabled(status.value, bookingDetails.bookingStatus, bookingDetails.cancelStatus)
-                                }">
-              {{ i + 1 }}
+          <!-- Right: Quick Actions -->
+          <div class="flex items-center gap-3 flex-wrap">
+            <button title="Chat with Customer"
+              class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition flex items-center gap-2 text-sm font-medium text-gray-700">
+              <i class="fas fa-comments text-green-600"></i>
+              <span class="hidden sm:inline">Chat</span>
             </button>
-            <span class="ml-2 text-sm font-medium whitespace-nowrap" [ngClass]="{
-                            'text-green-600': bookingDetails.bookingStatus === status.value,
-                            'text-gray-500': bookingDetails.bookingStatus !== status.value
-                            }">
-              {{ status.label }}
-            </span>
+
+            <!-- <button title="Send Notification"
+              class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition flex items-center gap-2 text-sm font-medium text-gray-700">
+              <i class="fas fa-bell text-amber-600"></i>
+              <span class="hidden sm:inline">Notify</span>
+            </button> -->
+
+            <button (click)="toggleReportModal()" title="Report Customer"
+              class="px-4 py-2 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition flex items-center gap-2 text-sm font-medium text-red-600">
+              <i class="fas fa-flag"></i>
+              <span class="hidden sm:inline">Report</span>
+            </button>
+
+            <button *ngIf="bookingDetails?.transaction?.id && bookingDetails.bookingStatus === 'completed'"
+              (click)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 text-sm font-medium shadow-sm">
+              <i class="fas fa-download"></i>
+              <span class="hidden sm:inline">Invoice</span>
+            </button>
           </div>
-          <!-- Connector -->
-          <div *ngIf="i < bookingSelectOption.length - 1" class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
-        </ng-container>
-
-
-        <!-- cancel status button -->
-        <div class="flex items-center flex-shrink-0">
-          <button [disabled]="isStatusDisabled(cancelled, bookingDetails.bookingStatus, bookingDetails.cancelStatus)"
-            (click)="onCancelButtonClick(bookingDetails.bookingId, bookingDetails.cancelStatus)"
-            class="relative flex items-center justify-center w-10 h-10 rounded-full border-2 font-medium transition"
-            [ngClass]="{
-              'bg-green-600 border-green-600 text-white': bookingDetails.bookingStatus===cancelled,
-              'bg-gray-200 border-gray-300 text-gray-600': bookingDetails.bookingStatus !==cancelled,
-              'opacity-50 cursor-not-allowed': isStatusDisabled(cancelled, bookingDetails.bookingStatus, bookingDetails.cancelStatus)
-              }">
-            5
-          </button>
-          <span class="ml-2 text-sm font-medium whitespace-nowrap" [ngClass]="{
-                            'text-green-600': bookingDetails.bookingStatus === cancelled,
-                            'text-gray-500': bookingDetails.bookingStatus !== cancelled
-                            }">
-            {{bookingDetails.cancelStatus === 'cancelled' ? bookingDetails.cancelStatus : 'Cancel'}}
-          </span>
         </div>
-      </div>
-
-      <div class="flex gap-3 mt-4 md:mt-0">
-        <app-button *ngIf="bookingDetails?.transaction?.id && bookingDetails.bookingStatus === 'completed'"
-          (clicked)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
-          buttonClass="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 transition"
-          text=" Download Invoice">
-        </app-button>
       </div>
     </div>
 
-    <!-- Report Modal -->
+    <!-- Main Content -->
+    <div class="px-6 py-8 space-y-6">
+
+      <!-- Status Management Section - NOW AT TOP -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-tasks text-green-600"></i>
+          </div>
+          <h2 class="text-lg font-bold text-gray-900">Booking Status Management</h2>
+        </div>
+
+        <!-- Status Stepper -->
+        <div class="relative">
+          <div class="flex items-center justify-between overflow-x-auto pb-4">
+            <ng-container *ngFor="let status of bookingSelectOption; let i = index">
+              <div class="flex items-center flex-shrink-0 min-w-[140px]">
+                <div class="flex flex-col items-center">
+                  <button
+                    [disabled]="isStatusDisabled(status.value, bookingDetails.bookingStatus, bookingDetails.cancelStatus)"
+                    (click)="changeBookingStatus(bookingDetails.bookingId, status.value, bookingDetails.bookingStatus)"
+                    class="relative flex items-center justify-center w-12 h-12 rounded-full border-3 font-bold transition-all duration-300 shadow-md"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-green-500 to-green-600 border-green-600 text-white shadow-green-200': bookingDetails.bookingStatus === status.value,
+                      'bg-white border-gray-300 text-gray-400 hover:border-gray-400': bookingDetails.bookingStatus !== status.value && !isStatusDisabled(status.value, bookingDetails.bookingStatus, bookingDetails.cancelStatus),
+                      'opacity-40 cursor-not-allowed': isStatusDisabled(status.value, bookingDetails.bookingStatus, bookingDetails.cancelStatus)
+                    }">
+                    <i class="fas" [ngClass]="{
+                      'fa-clock': i === 0,
+                      'fa-spinner': i === 1,
+                      'fa-check-circle': i === 2,
+                      'fa-flag-checkered': i === 3
+                    }"></i>
+                  </button>
+                  <span class="mt-2 text-xs font-semibold text-center whitespace-nowrap" [ngClass]="{
+                    'text-green-600': bookingDetails.bookingStatus === status.value,
+                    'text-gray-500': bookingDetails.bookingStatus !== status.value
+                  }">
+                    {{ status.label }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Connector Line -->
+              <div *ngIf="i < bookingSelectOption.length - 1"
+                class="flex-1 h-1 mx-2 rounded-full transition-all duration-300"
+                [ngClass]="isStepCompleted(i, bookingDetails.bookingStatus) ? 'bg-green-500' : 'bg-gray-300'">
+              </div>
+            </ng-container>
+
+            <!-- Cancel Button -->
+            <div class="flex items-center flex-shrink-0 min-w-[140px]">
+              <div class="flex flex-col items-center">
+                <button
+                  [disabled]="isStatusDisabled(cancelled, bookingDetails.bookingStatus, bookingDetails.cancelStatus)"
+                  (click)="onCancelButtonClick(bookingDetails.bookingId, bookingDetails.cancelStatus)"
+                  class="relative flex items-center justify-center w-12 h-12 rounded-full border-3 font-bold transition-all duration-300 shadow-md"
+                  [ngClass]="{
+                    'bg-gradient-to-br from-red-500 to-red-600 border-red-600 text-white shadow-red-200': bookingDetails.bookingStatus === cancelled,
+                    'bg-white border-red-300 text-red-500 hover:border-red-400': bookingDetails.bookingStatus !== cancelled && !isStatusDisabled(cancelled, bookingDetails.bookingStatus, bookingDetails.cancelStatus),
+                    'opacity-40 cursor-not-allowed': isStatusDisabled(cancelled, bookingDetails.bookingStatus, bookingDetails.cancelStatus)
+                  }">
+                  <i class="fas fa-times-circle"></i>
+                </button>
+                <span class="mt-2 text-xs font-semibold text-center whitespace-nowrap" [ngClass]="{
+                  'text-red-600': bookingDetails.bookingStatus === cancelled,
+                  'text-gray-500': bookingDetails.bookingStatus !== cancelled
+                }">
+                  {{ bookingDetails.cancelStatus === 'cancelled' ? 'Cancelled' : 'Cancel' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cancellation Info (if applicable) -->
+      <div *ngIf="bookingDetails.cancelStatus"
+        class="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl border-l-4 border-red-500 p-6 shadow-sm">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-exclamation-triangle text-red-600"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="text-base font-bold text-red-700 mb-2">
+              {{ bookingDetails.cancelStatus === 'in_progress' ? 'Cancellation Requested' : 'Booking Cancelled' }}
+            </h4>
+            <p class="text-sm text-gray-800 mb-2">
+              <span class="font-semibold">Reason:</span> {{ bookingDetails.cancelReason || 'No reason provided.' }}
+            </p>
+            <p class="text-sm text-gray-600">
+              <span class="font-semibold">Cancelled At:</span> {{ bookingDetails.cancelledAt | date:'medium' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Overview Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Booking Details Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-info-circle text-green-600"></i>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900">Booking Details</h2>
+          </div>
+
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="text-gray-600 font-medium">Booking ID</span>
+              <span class="text-gray-900 font-semibold">#{{ bookingDetails.bookingId | slice:0:10 | uppercase }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="text-gray-600 font-medium">Booking Date</span>
+              <span class="text-gray-900">{{ formateData(bookingDetails.createdAt) }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="text-gray-600 font-medium">Booking Status</span>
+              <span [ngClass]="getBookingBadgeClass(bookingDetails.bookingStatus)"
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold">
+                {{ bookingDetails.bookingStatus }}
+              </span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="text-gray-600 font-medium">Expected Arrival</span>
+              <span class="text-gray-900">{{ formateData(bookingDetails.expectedArrivalTime) }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2">
+              <span class="text-gray-600 font-medium">Total Amount</span>
+              <span class="text-lg font-bold text-green-600">₹{{ bookingDetails.totalAmount }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Information Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-user text-teal-600"></i>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900">Customer Info</h2>
+          </div>
+
+          <div class="space-y-3 text-sm">
+            <div class="py-2 border-b border-gray-100">
+              <p class="text-gray-600 font-medium mb-1">Name</p>
+              <p class="text-gray-900">{{ bookingDetails.customer.name || 'N/A' }}</p>
+            </div>
+            <div class="py-2 border-b border-gray-100">
+              <p class="text-gray-600 font-medium mb-1">Email</p>
+              <p class="text-gray-900 break-all">{{ bookingDetails.customer.email || 'N/A' }}</p>
+            </div>
+            <div class="py-2 border-b border-gray-100">
+              <p class="text-gray-600 font-medium mb-1">Phone</p>
+              <p class="text-gray-900">{{ bookingDetails.customer.phone || 'N/A' }}</p>
+            </div>
+            <div class="py-2">
+              <p class="text-gray-600 font-medium mb-1">Address</p>
+              <p class="text-gray-900">{{ bookingDetails.customer.location || 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transaction Info Card (if exists) -->
+        <div *ngIf="bookingDetails.transaction" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-credit-card text-purple-600"></i>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900">Payment Info</h2>
+          </div>
+
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="text-gray-600 font-medium">Transaction ID</span>
+              <span class="text-gray-900 font-mono text-xs">{{ bookingDetails.transaction.id | slice:0:12 }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="text-gray-600 font-medium">Payment Method</span>
+              <span class="text-gray-900">{{ bookingDetails.transaction.paymentMethod || 'N/A' }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="text-gray-600 font-medium">Payment Status</span>
+              <span [ngClass]="getPaymentBadgeClass(bookingDetails.paymentStatus)"
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold">
+                {{ bookingDetails.paymentStatus }}
+              </span>
+            </div>
+            <div class="flex justify-between items-center py-2">
+              <span class="text-gray-600 font-medium">Amount Paid</span>
+              <span class="text-lg font-bold text-green-600">₹{{ bookingDetails.totalAmount }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Services Booked -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-briefcase text-green-600"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Services Booked</h2>
+              <p class="text-xs text-gray-500">{{ bookingDetails.orderedServices.length }} service(s)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services List -->
+        <div class="space-y-3 mb-6">
+          <div *ngFor="let service of bookingDetails.orderedServices; let i = index"
+            class="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-green-200 hover:bg-green-50/30 transition-all duration-200">
+
+            <!-- Left: Service Info -->
+            <div class="flex items-center gap-4 flex-1">
+              <div
+                class="w-10 h-10 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <span class="text-sm font-bold text-green-700">#{{ i + 1 }}</span>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-sm font-semibold text-gray-900 mb-0.5">{{ service.title }}</h3>
+                <div class="flex items-center gap-3 text-xs text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <i class="fas fa-clock text-gray-400"></i>
+                    {{ service.estimatedTime }} min
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Price -->
+            <div class="text-right">
+              <p class="text-base font-bold text-gray-900">₹{{ service.price }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="border-t-2 border-gray-200 pt-4">
+          <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-100">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-receipt text-green-600"></i>
+                <span class="text-sm font-semibold text-gray-700">Order Summary</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">Total Services</span>
+                <span class="font-semibold text-gray-900">{{ bookingDetails.orderedServices.length }}</span>
+              </div>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">Total Duration</span>
+                <span class="font-semibold text-gray-900">
+                  {{ totalEstimatedTime(bookingDetails.orderedServices) }} min
+                </span>
+              </div>
+              <div class="flex justify-between items-center pt-3 border-t border-green-200">
+                <span class="text-base font-bold text-gray-900">Total Amount</span>
+                <span class="text-xl font-extrabold text-green-600">₹{{ bookingDetails.totalAmount }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cancellation Info (if applicable) -->
+      <div *ngIf="bookingDetails.cancelStatus"
+        class="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl border-l-4 border-red-500 p-6 shadow-sm">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-exclamation-triangle text-red-600"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="text-base font-bold text-red-700 mb-2">
+              {{ bookingDetails.cancelStatus === 'in_progress' ? 'Cancellation Requested' : 'Booking Cancelled' }}
+            </h4>
+            <p class="text-sm text-gray-800 mb-2">
+              <span class="font-semibold">Reason:</span> {{ bookingDetails.cancelReason || 'No reason provided.' }}
+            </p>
+            <p class="text-sm text-gray-600">
+              <span class="font-semibold">Cancelled At:</span> {{ bookingDetails.cancelledAt | date:'medium' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
     <ng-container *ngIf="showReportModal()">
       <app-report-modal (submitEvent)="submitReport($event, bookingDetails.customer.id)"
-        (closeEvent)="toggleReportModal()"></app-report-modal>
+        (closeEvent)="toggleReportModal()">
+      </app-report-modal>
     </ng-container>
 
-    <!-- Cancellation Modal -->
     <ng-container *ngIf="showCancelBookingModal()">
-      <app-submit-cancellation (close)=" toggleCancelBookingModal()"
-        (submitCancel)="handleCancellation(bookingDetails.bookingId, $event)"></app-submit-cancellation>
+      <app-submit-cancellation (close)="toggleCancelBookingModal()"
+        (submitCancel)="handleCancellation(bookingDetails.bookingId, $event)">
+      </app-submit-cancellation>
     </ng-container>
   </section>
 </div>

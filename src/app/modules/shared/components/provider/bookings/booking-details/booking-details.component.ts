@@ -2,25 +2,25 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { BehaviorSubject, Observable, Subject, filter, finalize, map, of, pipe, switchMap, takeUntil } from "rxjs";
+import { BehaviorSubject, Subject, filter, finalize, map, switchMap, takeUntil } from "rxjs";
 
-import { IBookingDetailProvider } from "../../../../../../core/models/booking.model";
+import { IBookingDetailProvider, IOrderedServiceUI } from "../../../../../../core/models/booking.model";
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { BookingStatus, CancelStatus, PaymentStatus } from "../../../../../../core/enums/enums";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
-import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { ReportModalComponent } from "../../../../partials/shared/report-modal/report-modal.component";
 import { IReportSubmit, ReportService } from "../../../../../../core/services/report.service";
 import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 import { SubmitCancellationComponent } from "../../../../partials/shared/submit-cancellation/submit-cancellation.component";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
+import { IProviderService } from "../../../../../../core/models/provider-service.model";
 
 @Component({
   selector: 'app-provider-view-booking-details',
   templateUrl: './booking-details.component.html',
-  imports: [CommonModule, FormsModule, ButtonComponent, ReportModalComponent, SubmitCancellationComponent],
+  imports: [CommonModule, FormsModule, ReportModalComponent, SubmitCancellationComponent],
   providers: [ReportService]
 })
 export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
@@ -44,8 +44,8 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
 
   bookingSelectOption: { value: BookingStatus; label: string; }[] = [
     { value: BookingStatus.PENDING, label: 'Pending' },
-    { value: BookingStatus.IN_PROGRESS, label: 'In Progress' },
     { value: BookingStatus.CONFIRMED, label: 'Confirmed' },
+    { value: BookingStatus.IN_PROGRESS, label: 'In Progress' },
     { value: BookingStatus.COMPLETED, label: 'Completed' },
   ];
 
@@ -175,16 +175,14 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
       return optionStatus !== BookingStatus.CANCELLED;
     }
 
+    // Workflow: pending → confirmed → in_progress → completed
+    // Can cancel at any stage except completed
     const allowedTransitions: Record<BookingStatus, BookingStatus[]> = {
-      [BookingStatus.PENDING]: [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
-      [BookingStatus.IN_PROGRESS]: [
-        BookingStatus.COMPLETED,
-        BookingStatus.CANCELLED,
-        BookingStatus.CONFIRMED
-      ],
-      [BookingStatus.CONFIRMED]: [BookingStatus.COMPLETED, BookingStatus.CANCELLED],
-      [BookingStatus.COMPLETED]: [],
-      [BookingStatus.CANCELLED]: [],
+      [BookingStatus.PENDING]: [BookingStatus.CONFIRMED, BookingStatus.CANCELLED],
+      [BookingStatus.CONFIRMED]: [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
+      [BookingStatus.IN_PROGRESS]: [BookingStatus.COMPLETED, BookingStatus.CANCELLED],
+      [BookingStatus.COMPLETED]: [], // Cannot transition from completed
+      [BookingStatus.CANCELLED]: [], // Cannot transition from cancelled
     };
 
     if (optionStatus === bookingStatus) return false;
@@ -192,6 +190,15 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
     const allowed = allowedTransitions[bookingStatus] ?? [];
 
     return !allowed.includes(optionStatus);
+  }
+
+  isStepCompleted(stepIndex: number, currentStatus: BookingStatus): boolean {
+    const currentIndex = this.bookingSelectOption.findIndex(s => s.value === currentStatus);
+    return stepIndex < currentIndex;
+  }
+
+  totalEstimatedTime(services: IOrderedServiceUI[]): number {
+    return services.reduce((total, service) => total += service.estimatedTime, 0);
   }
 
   toggleReportModal() {

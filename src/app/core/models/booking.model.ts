@@ -37,16 +37,18 @@ export interface IBookingDetailsBase {
   cancelReason: string | null;
   cancelledAt: Date | null;
   totalAmount: number;
-  orderedServices: {
-    title: string;
-    price: string;
-    estimatedTime: string;
-  }[];
+  orderedServices: IOrderedServiceUI[];
   transaction: {
     id: string;
     paymentMethod: string;
     paymentDate: Date
   } | null;
+}
+
+export interface IOrderedServiceUI {
+  title: string;
+  price: number;
+  estimatedTime: number;
 }
 
 export interface IReview {
