@@ -21,8 +21,7 @@ export class CustomerProfileLayout {
         {
             title: 'Account',
             items: [
-                { label: 'Profile Overview', icon: 'fas fa-chart-line', route: '/profile/overview' },
-                { label: 'Edit Profile', icon: 'fas fa-edit', route: '/profile/overview/edit' },
+                { label: 'My Profile', icon: 'fas fa-user-circle', route: '/profile/overview' },
             ],
         },
         {

@@ -1,7 +1,8 @@
 import { SelectedServiceIdsType } from "./cart.model";
 import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../enums/enums";
 import { IAvailableSlot } from "./slot-rule.model";
-import { ILocation } from "./user.model";
+import { ILocation, ILocationData } from "./user.model";
+import { ISelectedSlot } from "./availability.model";
 
 // --------------------
 // Shared Interfaces
@@ -53,23 +54,22 @@ export interface IReview {
   desc: string;
   rating: number;
   writtenAt: Date | string;
-  // isActive: boolean;
-  // isReported: boolean;
 }
 
 // --------------------
 // Customer Related Interfaces
 // --------------------
 
-export interface IBookingData {
+export interface IBookingData { //todo
   providerId: string;
   total: number;
-  location: Omit<ILocation, 'type'>;
-  slotData: IAvailableSlot;
+  location: ILocationData;
+  slotData: ISelectedSlot;
   serviceIds: SelectedServiceIdsType[];
-  // transactionId: string | null;
   phoneNumber: string | null;
 }
+
+export interface ISaveBooking extends Omit<ISelectedSlot, 'isAvailable'> { }
 
 export interface IBooking {
   id: string;
@@ -104,10 +104,7 @@ export interface IBookingResponse {
     email: string;
     phone: string;
   };
-  services: {
-    id: string;
-    name: string;
-  }[];
+  services: string[];
   expectedArrivalTime: Date | string;
   bookingStatus: BookingStatus;
   paymentStatus: PaymentStatus;
@@ -129,6 +126,7 @@ export interface IBookingDetailCustomer extends IBookingDetailsBase {
     name: string;
     email: string;
     phone: string;
+    location: string;
   };
 }
 

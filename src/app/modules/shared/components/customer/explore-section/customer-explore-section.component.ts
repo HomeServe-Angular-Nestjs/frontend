@@ -12,6 +12,7 @@ import { ISearchedLocation } from '../../../../../core/models/user.model';
 
 @Component({
   selector: 'app-customer-explore-section',
+  standalone: true,
   templateUrl: './customer-explore-section.component.html',
   imports: [CommonModule, FormsModule, RouterLink],
   providers: [LocationService, DebounceService],
@@ -39,7 +40,7 @@ export class CustomerExploreSectionComponent {
   loadingCurrentLocation = false;
   selectedLocation!: ISearchedLocation;
 
-  currentSlide = 0;
+  currentSlide: number = 0;
 
   services = [
     {

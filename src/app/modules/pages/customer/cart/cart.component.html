@@ -84,52 +84,9 @@
 
             <!-- Right Side: Order Summary -->
             <div class="w-full lg:w-[380px]">
-                <div class="simple-summary shadow-sm">
-                    <h2
-                        class="text-xs font-bold text-black uppercase tracking-widest mb-8 border-b border-slate-100 pb-4">
-                        Order Summary
-                    </h2>
-
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-slate-500 font-medium">Subtotal</span>
-                            <span class="text-black font-bold">₹{{ priceBreakup().subTotal }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-slate-500 font-medium">Tax</span>
-                            <span class="text-emerald-600 font-bold">₹{{ priceBreakup().tax }}</span>
-                        </div>
-
-                        <div class="pt-6 mt-6 border-t border-slate-100">
-                            <div class="flex justify-between items-center mb-8">
-                                <span class="text-sm font-bold text-black uppercase tracking-tight">Total Payable</span>
-                                <span class="text-2xl font-black text-black">₹{{ priceBreakup().total }}</span>
-                            </div>
-
-                            <button id="proceed-schedule-btn" (click)="scheduleTime()"
-                                [disabled]="cartItems().length === 0" class="btn-black">
-                                Checkout
-                                <i class="fas fa-arrow-right text-[10px]"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 space-y-2">
-                    <div class="info-badge">
-                        <i class="fas fa-info-circle text-xs"></i>
-                        <p class="text-[10px] text-slate-500 font-semibold leading-tight">
-                            Prices are inclusive of all applied taxes and fees.
-                        </p>
-                    </div>
-
-                    <div class="info-badge">
-                        <i class="fas fa-info-circle text-xs"></i>
-                        <p class="text-[10px] text-slate-500 font-semibold leading-tight">
-                            Cancellation is only possible within 24 hours of booking.
-                        </p>
-                    </div>
-                </div>
+                <app-customer-order-summary-section [priceBreakup]="priceBreakup()" [buttonText]="'Checkout'"
+                    [disabled]="cartItems().length === 0" (actionClick)="scheduleTime()">
+                </app-customer-order-summary-section>
             </div>
         </div>
     </main>

@@ -22,7 +22,6 @@ export class CustomerProviderViewCardComponent implements OnInit, OnDestroy {
   private _destroy$ = new Subject<void>();
 
   @Input({ required: true }) providers!: IProviderCardView[];
-  fallbackChar: string = '';
 
   ngOnInit(): void {
 
@@ -37,8 +36,7 @@ export class CustomerProviderViewCardComponent implements OnInit, OnDestroy {
     provider.isActive = !provider.isActive;
   }
 
-  fallbackColor(text: string) {
-    this.fallbackChar = text.charAt(0).toUpperCase();
+  getAvatarColor(text: string) {
     return getColorFromChar(text.charAt(0));
   }
 

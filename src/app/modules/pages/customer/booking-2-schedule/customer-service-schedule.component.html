@@ -1,13 +1,16 @@
-<div class="flex">
+<div class="flex min-h-screen bg-slate-50">
     <!-- Left Section - Booking Form -->
-    <div class="w-1/2 p-8 overflow-y-auto flex flex-col justify-between">
-        <app-customer-schedule-booking-details></app-customer-schedule-booking-details>
+    <div class="w-1/2 p-8 lg:p-12 overflow-y-auto">
+        <div class="max-w-xl mx-auto">
+            <app-customer-schedule-booking-details></app-customer-schedule-booking-details>
+        </div>
     </div>
 
     <!-- Right Section - Order Summary -->
-    <div class="w-1/2 p-8 overflow-y-auto flex flex-col">
-        <app-customer-schedule-order-summary
-            [selectedServiceData]="selectedServiceData"></app-customer-schedule-order-summary>
-
+    <div class="w-1/2 p-8 lg:p-12 overflow-y-auto border-l border-slate-100 bg-white/50">
+        <div class="max-w-md">
+            <app-customer-schedule-order-summary [selectedServiceData]="selectedServiceData">
+            </app-customer-schedule-order-summary>
+        </div>
     </div>
 </div>

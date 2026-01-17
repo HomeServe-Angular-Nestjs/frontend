@@ -1,5 +1,5 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
-import { ICustomerState } from "../../core/models/user.model";
+import { ICustomerState, ILocationData } from "../../core/models/user.model";
 import { state } from "@angular/animations";
 
 export const selectCustomerState = createFeatureSelector<ICustomerState>('customer');
@@ -20,13 +20,25 @@ export const selectPhoneNumber = createSelector(
 
 export const selectLocation = createSelector(
     selectCustomerState,
-    (state) => {
-        return {
-            coordinates: state.customer?.location?.coordinates,
-            address: state.customer?.address
+    (state): ILocationData | null => {
+        const coordinates = state.customer?.location?.coordinates;
+        const address = state.customer?.address;
+
+        if (
+            !Array.isArray(coordinates) ||
+            coordinates.length !== 2 ||
+            !address
+        ) {
+            return null;
         }
+
+        return {
+            coordinates: [coordinates[0], coordinates[1]],
+            address
+        };
     }
 );
+
 
 export const selectCustomerId = createSelector(
     selectCustomerState,

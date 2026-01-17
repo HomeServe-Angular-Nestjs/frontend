@@ -2,7 +2,12 @@ import { EntityState } from '@ngrx/entity';
 import { SlotType } from './schedules.model';
 import { IPagination, IReview } from './booking.model';
 import { AvailabilityType } from './availability.model';
+
+
 export type UType = 'customer' | 'provider';
+export type UsersType = ICustomer[] | IProvider[];
+export type Day = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thur' | 'Fri' | 'Sat';
+export type VerificationStatusType = 'pending' | 'verified' | 'rejected';
 
 export interface IDocs {
     id: string;
@@ -19,6 +24,11 @@ export interface ILocation {
     coordinates: [number, number];
 };
 
+export interface ILocationData {
+    address: string;
+    coordinates: [number, number]; // [lat, lng]
+};
+
 export interface IExpertise {
     specialization: string;
     label: string;
@@ -28,8 +38,6 @@ export interface ILanguage {
     language: string;
     proficiency: string;
 }
-
-export type Day = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thur' | 'Fri' | 'Sat';
 
 export type Availability = {
     day: {
@@ -63,8 +71,6 @@ export interface ICustomer extends IBaseUser {
     savedProviders?: string[];
     isReviewed: boolean;
 }
-
-export type VerificationStatusType = 'pending' | 'verified' | 'rejected';
 
 export interface IProvider extends IBaseUser {
     bio?: string;
@@ -109,10 +115,6 @@ export interface ICustomerState {
     error: string | null;
 }
 
-export type UsersType = ICustomer[] | IProvider[];
-
-export type UserUpdationType = Partial<ICustomer> | Partial<IProvider>;
-
 export interface IUserData {
     id: string;
     username: string;
@@ -147,7 +149,6 @@ export interface IProviderUpdateBio {
     additionalSkills?: string[];
     languages?: ILanguage[];
 }
-
 
 export interface IVerificationStatusMetrics {
     count: number;
@@ -212,6 +213,7 @@ export interface IFilterFetchProviders extends IHomeSearch {
     isCertified?: boolean;
     status?: string;
     page?: number;
+    limit?: number;
     availability?: AvailabilityType | 'all';
     date?: string;
     sort?: 'best_rated' | 'nearest' | 'all';

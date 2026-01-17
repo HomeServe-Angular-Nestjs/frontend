@@ -95,12 +95,7 @@ export const customerRoutes: Routes = [
               .then(c => c.CustomerProfileOverviewComponent),
             data: { breadcrumb: 'Overview' }
           },
-          {
-            path: 'overview/edit',
-            loadComponent: () => import('../../shared/components/customer/profile/overview-edit/profile-overview-edit.component')
-              .then(c => c.CustomerProfileOverviewEditComponent),
-            data: { breadcrumb: 'Edit Profile' }
-          },
+
           {
             path: 'bookings',
             loadComponent: () => import('../../shared/components/customer/bookings/order-history/booking-lists.component')

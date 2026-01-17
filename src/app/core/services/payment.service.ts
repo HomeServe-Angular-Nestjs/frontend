@@ -52,4 +52,7 @@ export class PaymentService {
         return this._http.post<ISubscriptionPaymentVerification>(`${this._apiUrl}/verify_subscription`, { verifyData, orderData });
     }
 
+    unlockPayment(): Observable<any> {
+        return this._http.post(`${this._apiUrl}/release_lock`, {});
+    }
 }

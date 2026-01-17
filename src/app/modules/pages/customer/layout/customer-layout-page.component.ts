@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { CustomerHeaderComponent } from '../../../shared/partials/sections/customer/header/header.component';
 import { CustomerFooterComponent } from "../../../shared/partials/sections/customer/footer/customer-footer.component";
 import { distinctUntilChanged, filter, map, Subject, takeUntil } from 'rxjs';
@@ -18,6 +18,7 @@ import { VideoCallService } from '../../../../core/services/video-call.service';
 
 @Component({
   selector: 'app-customer-landing-page',
+  standalone: true,
   imports: [CommonModule, CustomerHeaderComponent, RouterOutlet, CustomerFooterComponent, BreadcrumbsComponent],
 
   templateUrl: './customer-layout-page.component.html',
@@ -28,12 +29,24 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
   private readonly _videoSocketService = inject(VideoCallSocketService);
   private readonly _videoCallService = inject(VideoCallService); //? initiated the instance
   private readonly _chatSocket = inject(ChatSocketService);
+  private readonly _router = inject(Router);
 
   private readonly _store = inject(Store);
 
   private _destroy$ = new Subject<void>();
 
+  isHomepage = false;
+
   ngOnInit(): void {
+    // Check homepage status
+    this._router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this._destroy$)
+    ).subscribe(() => {
+      this.checkHomepage();
+    });
+    this.checkHomepage();
+
     const authStatus$ = this._store.select(selectCheckStatus).pipe(
       distinctUntilChanged(),
       takeUntil(this._destroy$)
@@ -93,6 +106,11 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
         this._notificationService.removeNotification(NotificationTemplateId.INCOMPLETE_PROFILE);
       }
     });
+  }
+
+  private checkHomepage() {
+    const url = this._router.url;
+    this.isHomepage = url === '/' || url === '/homepage' || url.startsWith('/homepage?');
   }
 
   ngOnDestroy(): void {

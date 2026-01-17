@@ -1,133 +1,175 @@
-import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, effect, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Store } from '@ngrx/store';
-import { combineLatest, finalize, map, Observable, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
+import { finalize, first, map, Observable, of, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
 import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../../core/models/cart.model';
-import { IBookingData, IPriceBreakup, IPriceBreakupData } from '../../../../../../core/models/booking.model';
+import { IBooking, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
-import { IAddress } from '../../../../../../core/models/schedules.model';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { PaymentService } from '../../../../../../core/services/payment.service';
 import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
 import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
-import { IAvailableSlot } from '../../../../../../core/models/slot-rule.model';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
+import { CartService } from '../../../../../../core/services/cart.service';
+import { OrderSummarySectionComponent } from '../../../../partials/sections/customer/order-summary-section/order-summary-section.component';
+import { ISelectedSlot } from '../../../../../../core/models/availability.model';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
   templateUrl: './customer-schedule-order-summary.component.html',
-  imports: [CommonModule, LoadingCircleAnimationComponent],
+  imports: [CommonModule, LoadingCircleAnimationComponent, OrderSummarySectionComponent],
   providers: [PaymentService, RazorpayWrapperService]
 })
-export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges, OnDestroy {
+export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy {
   private readonly _reservationService = inject(ReservationSocketService);
   private readonly _razorpayWrapper = inject(RazorpayWrapperService);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _bookingService = inject(BookingService);
   private readonly _paymentService = inject(PaymentService);
+  private readonly _cartService = inject(CartService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _store = inject(Store);
-
   private _destroy$ = new Subject<void>();
 
   @Input({ required: true }) selectedServiceData: SelectedServiceType[] = [];
 
   providerId: string | null = null;
+  selectedSlot = signal<ISelectedSlot | null>(null);
+  selectedPaymentSource!: PaymentSource;
+
+  isLoading = false;
+  isProcessing = false;
+
   priceBreakup: IPriceBreakupData = {
     subTotal: 0.00,
     tax: 0.00,
     total: 0.00,
   };
-  location!: IAddress;
-  selectedSlot: IAvailableSlot | null = null;
-  selectedPaymentSource!: PaymentSource;
-
-  isLoading = true;
-  isProcessing = false;
 
   get getServiceIds(): SelectedServiceIdsType[] {
     return this.selectedServiceData.map((item: SelectedServiceType) => {
       return {
         id: item.id,
-        selectedIds: item.services.map((s: any) => s.id)
+        selectedIds: item.services.map((s) => s.id)
       }
     });
   }
 
-  ngOnInit() {
-    combineLatest([
-      this._route.paramMap,
-      this._bookingService.address$,
-      this._bookingService.slot$
-    ])
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(([params, address, slotData]) => {
-        this.providerId = params.get('id')!;
-        if (address) this.location = address;
-        this.selectedSlot = slotData;
-
-        // Prepare price only when selectedServiceData exists
-        if (this.selectedServiceData) {
-          const priceData = this._prepareDataForPriceBreakup(this.selectedServiceData);
-          this._fetchPriceBreakup(priceData);
-        }
-      });
+  constructor() {
+    effect(() => {
+      const slot = this._bookingService.selectedSlot();
+      this.selectedSlot.set(slot);
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedServiceData'] && !changes['selectedServiceData'].firstChange) {
-      const priceData = this._prepareDataForPriceBreakup(this.selectedServiceData);
-      this._fetchPriceBreakup(priceData);
-    }
+  ngOnInit(): void {
+    this._route.paramMap
+      .pipe(
+        takeUntil(this._destroy$),
+        tap(params => {
+          this.providerId = params.get('id')!;
+        })
+      )
+      .subscribe(() => this._fetchPriceBreakup());
   }
 
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
-  }
+  initiatePayment() {
+    this.isProcessing = true;
 
-  private _prepareDataForPriceBreakup(data: SelectedServiceType[]): IPriceBreakup[] {
-    return data
-      .filter(item => item.services?.length)
-      .map((item: SelectedServiceType) => ({
-        serviceId: item.id,
-        subServiceIds: item.services.map((sub: any) => sub.id)
-      }));
-  }
+    const slotData = this.selectedSlot();
 
-  private _fetchPriceBreakup(data: IPriceBreakup[]): void {
-    if (!data.length || !this.providerId) {
-      this._toastr.error('Cannot fetch price without services or provider.');
+    if (!slotData) {
+      this._toastr.error('Please select a scheduled time slot.');
+      this.isProcessing = false;
       return;
     }
+
+    const totalAmount = this.priceBreakup.total;
+    const reservationData = { ...slotData, providerId: this.providerId as string };
+
+    // Start reservation process via socket
+    this._reservationService.createReservation(reservationData);
+
+    // Listen for reservation status
+    this._reservationService.reservationStatus$.pipe(
+      takeUntil(this._destroy$),
+      first(),
+      switchMap((isReserved) => {
+        if (!isReserved) {
+          this._toastr.error('Slot is already reserved. Please select another.');
+          this.isProcessing = false;
+          return throwError(() => new Error('Slot already reserved'));
+        }
+
+        // Proceed to save booking once reserved
+        return this._saveBooking();
+      }),
+      switchMap((res) => {
+        if (!res?.data) {
+          return throwError(() => new Error('Failed to confirm booking.'));
+        }
+
+        return of(res.data);
+      }),
+      switchMap((bookingResponse: IBooking) => {
+        if (!bookingResponse?.id) {
+          return throwError(() => new Error('Failed to confirm booking.'));
+        }
+
+        return this._paymentService.createRazorpayOrder(totalAmount).pipe(
+          map(order => ({ order, bookingId: bookingResponse.id })),
+          tap({
+            error: () => this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe()
+          })
+        );
+      }),
+      switchMap(({ order, bookingId }) =>
+        new Observable<void>((observer) => {
+          this._razorpayWrapper.openCheckout(
+            order,
+            (paymentResponse: RazorpayPaymentResponse) => {
+              this._verifyPaymentAndConfirmBooking(paymentResponse, order, bookingId)
+                .pipe(takeUntil(this._destroy$))
+                .subscribe({
+                  next: () => {
+                    observer.next();
+                    observer.complete();
+                  },
+                  error: (err) => {
+                    observer.error(err);
+                  },
+                });
+            },
+            () => {
+              this.isProcessing = false;
+              this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe();
+              observer.complete();
+            }
+          );
+        })
+      ),
+      finalize(() => (this.isProcessing = false))
+    ).subscribe({
+      error: (err) => {
+        console.error('Payment initiation failed:', err);
+        this.isProcessing = false;
+      }
+    });
+  }
+
+  private _fetchPriceBreakup(): void {
+    this.isLoading = true;
 
     this._bookingService.fetchPriceBreakup()
       .pipe(
         takeUntil(this._destroy$),
-        map((res) => res.data ?? this.priceBreakup),
+        map(res => res.data ?? this.priceBreakup),
+        tap(priceBreakup => { this.priceBreakup = priceBreakup }),
         finalize(() => this.isLoading = false)
       )
-      .subscribe({
-        next: (priceBreakup) => this.priceBreakup = priceBreakup,
-      });
-  }
-
-  private _isAllDataAvailable(): boolean {
-    return (
-      !!this.priceBreakup.total &&
-      this.selectedServiceData.length > 0 &&
-      !!this.providerId &&
-      !!this.selectedSlot &&
-      !!this._isValidLocation(this.location)
-    );
-  }
-
-  private _isValidLocation(location: IAddress | null): boolean {
-    return !!location && location.address !== '' && Array.isArray(location.coordinates);
+      .subscribe();
   }
 
   private _verifyPaymentAndConfirmBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {
@@ -144,116 +186,23 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnChanges,
 
     return this._paymentService.verifyBookingPayment(response, orderData).pipe(
       tap(() => {
-        this._router.navigate(['profile', 'bookings']);
+        this._cartService.clearCart().subscribe();
         this._toastr.success('Booking confirmed successfully.');
+        this._router.navigate(['profile', 'bookings']);
       })
     );
   }
 
-  private _saveBooking(): Observable<any> {
-    const serviceIds: SelectedServiceIdsType[] = this.getServiceIds;
+  private _saveBooking() {
+    const { isAvailable, ...slotData } = this.selectedSlot()!;
 
-    if (!this.selectedSlot) {
-      this._toastr.error('Please select a slot.');
-      return throwError(() => new Error('Slot not selected'));
-    }
-
-    const { status, ...slotData } = this.selectedSlot;
-
-    const phoneNumber = this._bookingService.getSelectedPhoneNumber();
-
-    if (!phoneNumber || phoneNumber.length !== 10 || isNaN(Number(phoneNumber))) {
-      this._toastr.error('Please enter a valid phone number.');
-      return throwError(() => new Error('Phone number is invalid.'));
-    }
-
-    const bookingData: IBookingData = {
-      providerId: this.providerId!,
-      total: Number(this.priceBreakup.total.toFixed(2)),
-      location: this.location,
-      slotData,
-      serviceIds,
-      phoneNumber,
-    };
-
-    return this._bookingService.preBookingData(bookingData).pipe(
+    return this._bookingService.saveBooking(slotData, this.providerId!).pipe(
       finalize(() => this.isProcessing = false)
     );
   }
 
-  initiatePayment() {
-    this.isProcessing = true;
-
-    if (!this._isAllDataAvailable()) {
-      this._toastr.info('Incomplete booking information.');
-      this.isProcessing = false;
-      return;
-    }
-
-    const slotData = this._bookingService.getSelectedSlot();
-    if (!slotData) {
-      this._toastr.error('Please select a slot.');
-      this.isProcessing = false;
-      return;
-    }
-
-    const totalAmount = this.priceBreakup.total;
-    const reservationData = { ...slotData, providerId: this.providerId as string };
-
-    this._reservationService.canInitiatePayment = true;
-    this._reservationService.checkReservationUpdates(reservationData);
-
-    if (!this._reservationService.canInitiatePayment) {
-      this._toastr.error('Slot is already reserved. Please select another.');
-      this.isProcessing = false;
-      return;
-    }
-
-    this._reservationService.createReservation(reservationData);
-
-    this._saveBooking().pipe(
-      takeUntil(this._destroy$),
-      switchMap((bookingResponse) => {
-        if (!bookingResponse?.data?.id) {
-          return throwError(() => new Error('Failed to confirm booking.'));
-        }
-
-        return this._paymentService.createRazorpayOrder(totalAmount).pipe(
-          map(order => ({ order, bookingId: bookingResponse.data.id }))
-        );
-      }),
-      switchMap(({ order, bookingId }) =>
-        new Observable<void>((observer) => {
-          this._razorpayWrapper.openCheckout(
-            order,
-            (paymentResponse: RazorpayPaymentResponse) => {
-              this._verifyPaymentAndConfirmBooking(paymentResponse, order, bookingId)
-                .pipe(takeUntil(this._destroy$))
-                .subscribe({
-                  next: () => {
-                    observer.next();
-                    observer.complete()
-                  },
-                  error: (err) => {
-                    observer.error(err)
-                  },
-                });
-            },
-            () => {
-              observer.complete();
-            }
-          );
-        })
-      )
-    ).subscribe({
-      error: (err) => {
-        console.error(err);
-        this._toastr.error(err.message || err);
-        this.isProcessing = false;
-      },
-      complete: () => {
-        this.isProcessing = false;
-      }
-    });
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 }

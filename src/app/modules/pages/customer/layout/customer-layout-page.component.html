@@ -1,8 +1,14 @@
 <app-customer-header></app-customer-header>
-<main class="mt-[4.2rem]">
-    <div class="container mx-auto px-4 py-4">
-        <app-breadcrumbs></app-breadcrumbs>
+<main class="mt-16 min-h-screen bg-gray-50/30">
+    <ng-container *ngIf="!isHomepage">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <app-breadcrumbs></app-breadcrumbs>
+            <router-outlet></router-outlet>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="isHomepage">
         <router-outlet></router-outlet>
-    </div>
+    </ng-container>
 </main>
 <app-customer-footer></app-customer-footer>

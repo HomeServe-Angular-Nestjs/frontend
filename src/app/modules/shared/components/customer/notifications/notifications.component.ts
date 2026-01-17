@@ -21,7 +21,7 @@ export class CustomerNotificationComponent implements OnInit {
     private readonly _store = inject(Store);
 
     allNotifications$: Observable<INotification[]> = of([]);
-    currentSelect: NotificationCrumb = 'all';
+    currentSelect$ = new BehaviorSubject<NotificationCrumb>('all');
 
     filteredNotifications$: Observable<INotification[]> = of([]);
 
@@ -33,18 +33,17 @@ export class CustomerNotificationComponent implements OnInit {
     };
 
     notificationColors: Record<NotificationType, string> = {
-        [NotificationType.SYSTEM]: 'text-gray-600',
-        [NotificationType.EVENT]: 'text-blue-600',
-        [NotificationType.REMINDER]: 'text-yellow-500',
-        [NotificationType.CUSTOM]: 'text-purple-600',
+        [NotificationType.SYSTEM]: 'text-indigo-600 bg-indigo-50 border-indigo-100',
+        [NotificationType.EVENT]: 'text-blue-600 bg-blue-50 border-blue-100',
+        [NotificationType.REMINDER]: 'text-amber-600 bg-amber-50 border-amber-100',
+        [NotificationType.CUSTOM]: 'text-purple-600 bg-purple-50 border-purple-100',
     };
 
-    buttonOption: { text: string, value: NotificationCrumb }[] = [
-        { text: 'All', value: 'all' },
-        { text: 'Bookings', value: 'booking' },
-        { text: 'Payments', value: 'payment' },
-        { text: 'System', value: 'system' },
-        { text: 'Read', value: 'read' },
+    buttonOption: { text: string, value: NotificationCrumb, icon: string }[] = [
+        { text: 'All', value: 'all', icon: 'fas fa-th-large' },
+        { text: 'Bookings', value: 'booking', icon: 'fas fa-calendar-alt' },
+        { text: 'Payments', value: 'payment', icon: 'fas fa-credit-card' },
+        { text: 'System', value: 'system', icon: 'fas fa-cog' },
     ];
 
     ngOnInit(): void {
@@ -54,39 +53,48 @@ export class CustomerNotificationComponent implements OnInit {
 
         this.filteredNotifications$ = combineLatest([
             this.allNotifications$,
-            new BehaviorSubject(this.currentSelect)
+            this.currentSelect$
         ]).pipe(
             map(([notifications, current]) => this._filterNotifications(notifications, current)),
         );
     }
 
     private _filterNotifications(notifications: INotification[], filter: string): INotification[] {
-        if (filter === 'all') return notifications;
+        if (!notifications) return [];
 
-        if (filter === 'read') return notifications.filter(n => n.isRead);
+        let sorted = [...notifications].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-        // For 'booking', 'payment', 'system' → filter by templateId or type
-        return notifications.filter(n =>
+        if (filter === 'all') return sorted;
+
+        if (filter === 'read') return sorted.filter(n => n.isRead);
+
+        return sorted.filter(n =>
             n.type.toLowerCase().includes(filter) || n.templateId.toLowerCase().includes(filter)
         );
     }
 
-    markAsRead(id: string) {
+    markAsRead(id: string, event?: Event) {
+        if (event) event.stopPropagation();
         this._notificationService.markAsRead(id);
     }
 
+    markAllAsRead() {
+        // Implement logic to mark all as read
+        // Ideally this should send a request to backend or loop through unread ones
+        // For now, let's just assume individual marking available or we need a service method for 'markAll'
+        // this._notificationService.markAllAsRead(); // Assuming this exists or similar
+    }
+
     setCurrentSelect(select: NotificationCrumb) {
-        this.currentSelect = select;
-        this.filteredNotifications$ = this.allNotifications$.pipe(
-            map(notifications => this._filterNotifications(notifications, this.currentSelect))
-        );
+        this.currentSelect$.next(select);
     }
 
     getIcon(type: NotificationType) {
-        return this.notificationIcons[type];
+        return this.notificationIcons[type] || 'fas fa-bell';
     }
 
-    getColor(type: NotificationType) {
-        return this.notificationColors[type];
+    // Now returns the full class string for styling
+    getColorClasses(type: NotificationType) {
+        return this.notificationColors[type] || 'text-gray-600 bg-gray-50 border-gray-100';
     }
 }

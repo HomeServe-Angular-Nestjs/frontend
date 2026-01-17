@@ -8,7 +8,12 @@ import { IPagination } from "../../../../../../core/models/booking.model";
     imports: [CommonModule]
 })
 export class CustomerPaginationComponent {
-    @Input() pagination!: IPagination;
+    @Input({ required: true }) pagination: IPagination = {
+        page: 1,
+        limit: 10,
+        total: 1,
+    };
+    
     @Output() pageChanged = new EventEmitter<number>();
 
     currentPage = 1;

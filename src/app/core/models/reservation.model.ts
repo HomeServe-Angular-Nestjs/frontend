@@ -11,7 +11,6 @@ export interface IReservation {
 export interface ISendReservation {
     from: string;
     to: string;
-    ruleId: string;
     date: string;
     providerId: string;
 }

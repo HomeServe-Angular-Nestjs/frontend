@@ -7,7 +7,7 @@ import { IOfferedService, IServiceFilter, IToggleServiceStatus, IUpdateSubservic
 import { FilterDeletedSubservicePipe } from '../../../../../../core/pipes/filter-deleted-sub-services.pipe';
 import { OfferedServicesService } from '../../../../../../core/services/service-management-test.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
-import { ProviderServiceFilterComponent } from "../service-filter/service-filter.component";
+import { ProviderServiceFilterComponent } from "../../manage-service/service-filter/service-filter.component";
 import { IFilter } from '../../../../../../core/models/filter.model';
 import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagination/provider-pagination.component";
 import { IPagination } from '../../../../../../core/models/booking.model';
