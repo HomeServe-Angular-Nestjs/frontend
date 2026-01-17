@@ -1,27 +1,35 @@
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
     <ng-container *ngFor="let overview of overviewTemplateItems">
-        <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col items-center text-center h-full">
-
-            <!-- Icon Centered Below -->
-            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-3"
-                [ngClass]="getIconBgColor(overview.label)">
-                <i [class]="overview.icon + ' text-white text-lg'"></i>
+        <div
+            class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-all duration-300 group cursor-default">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-200"
+                    [ngClass]="getIconContainerClass(overview.label)">
+                    <i [class]="overview.icon + ' text-lg'"></i>
+                </div>
+                <!-- Meta Section -->
+                <div *ngIf="overview.meta" class="flex items-center gap-1">
+                    <span class="flex items-center text-[11px] font-bold px-1.5 py-0.5 rounded-md"
+                        [ngClass]="overview.meta.value >= 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'">
+                        <i [class]="overview.meta.icon + ' mr-1 text-[10px]'"></i>
+                        {{ overview.meta.value }}%
+                    </span>
+                </div>
             </div>
 
-            <!-- Label -->
-            <p class="text-sm font-medium text-gray-500 mb-1">{{ overview.label }}</p>
+            <div class="space-y-1">
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                    {{ overview.label }}
+                </p>
+                <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight">
+                    {{ overview.value }}
+                </h3>
+            </div>
 
-            <!-- Value -->
-            <p class="text-3xl font-bold text-gray-900 ">{{ overview.value }}</p>
-
-            <!-- Meta Section -->
-            <div *ngIf="overview.meta" class="flex items-center text-xs text-gray-500">
-                <span class="flex items-center font-medium"
-                    [ngClass]="overview.meta.value >= 0 ? 'text-green-600' : 'text-red-600'">
-                    <i [class]="overview.meta.icon + ' mr-1'"></i>
-                    {{ overview.meta.value }}%
-                </span>
-                <span class="ml-2">{{ overview.meta.desc }}</span>
+            <div *ngIf="overview.meta" class="mt-3 pt-3 border-t border-gray-50">
+                <p class="text-[11px] text-gray-500 font-medium">
+                    {{ overview.meta.desc }}
+                </p>
             </div>
         </div>
     </ng-container>

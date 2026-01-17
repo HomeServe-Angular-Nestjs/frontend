@@ -89,12 +89,6 @@ export const providerRoutes: Routes = [
             data: { breadcrumb: 'About' }
           },
           {
-            path: 'rules',
-            loadComponent: () => import('../../shared/components/provider/slot-management/layout/slot-management-layout.component')
-              .then(c => c.ProviderSlotManagementComponent),
-            data: { breadcrumb: 'Slot Rules' }
-          },
-          {
             path: 'gallery',
             loadComponent: () => import('../../shared/components/provider/gallery/provider-gallery.component')
               .then(c => c.ProviderGalleryComponent),

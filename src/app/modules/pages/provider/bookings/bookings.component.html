@@ -1,12 +1,47 @@
-<div class="max-w-screen-xl mx-auto p-8">
-    <!-- Filters and Controls -->
-    <div class="mb-8">
-        <app-provider-booking-filter (filtersChanged)="onFiltersChanged($event)"></app-provider-booking-filter>
+<!-- Main Container with Background -->
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Booking Overview</h1>
+                    <p class="text-gray-600">Track and manage all your service bookings</p>
+                </div>
+                <div class="hidden md:flex items-center gap-3">
+                    <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-calendar-alt text-green-600"></i>
+                            <span class="text-sm font-medium text-gray-700">{{ getCurrentDate() }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Overview Cards -->
+        <div class="mb-8">
+            <app-provider-booking-overview></app-provider-booking-overview>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="mb-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-filter text-green-600"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-gray-900">Filter Bookings</h2>
+                </div>
+                <app-provider-booking-filter (filtersChanged)="onFiltersChanged($event)"></app-provider-booking-filter>
+            </div>
+        </div>
+
+        <!-- Bookings Table Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <app-provider-booking-recent [filters]="filters"></app-provider-booking-recent>
+        </div>
+
     </div>
-
-    <!-- Statistics Cards -->
-    <app-provider-booking-overview></app-provider-booking-overview>
-
-    <!-- Recent Bookings Section -->
-    <app-provider-booking-recent [filters]="filters"></app-provider-booking-recent>
 </div>

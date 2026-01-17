@@ -101,12 +101,11 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
     return parts[2]?.trim() || '';
   }
 
-  onSearchTriggered() {
+  onSearchChange() {
     this._debounceService.delay(this.searchTerm);
   }
 
   goToChat(customerId: string) {
-    console.log(customerId)
     if (customerId) {
       this._chatService.fetchChat({ id: customerId, type: 'customer' })
         .subscribe({

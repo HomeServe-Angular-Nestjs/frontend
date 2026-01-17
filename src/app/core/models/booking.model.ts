@@ -1,6 +1,5 @@
 import { SelectedServiceIdsType } from "./cart.model";
 import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../enums/enums";
-import { IAvailableSlot } from "./slot-rule.model";
 import { ILocation, ILocationData } from "./user.model";
 import { ISelectedSlot } from "./availability.model";
 
@@ -37,16 +36,18 @@ export interface IBookingDetailsBase {
   cancelReason: string | null;
   cancelledAt: Date | null;
   totalAmount: number;
-  orderedServices: {
-    title: string;
-    price: string;
-    estimatedTime: string;
-  }[];
+  orderedServices: IOrderedServiceUI[];
   transaction: {
     id: string;
     paymentMethod: string;
     paymentDate: Date
   } | null;
+}
+
+export interface IOrderedServiceUI {
+  title: string;
+  price: number;
+  estimatedTime: number;
 }
 
 export interface IReview {

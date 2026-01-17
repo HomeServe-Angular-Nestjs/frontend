@@ -5,7 +5,7 @@
     <h2 class="text-lg sm:text-xl font-semibold text-gray-800 mb-5">
       Overview
     </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
       <ng-container *ngFor="let card of overviewCards">
         <app-provider-overview-cards [data]="card"></app-provider-overview-cards>
       </ng-container>
@@ -25,17 +25,7 @@
 
   <!-- Recent Bookings Section -->
   <section>
-    <div class="p-4 sm:p-5">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-lg sm:text-xl font-semibold text-gray-800">
-          Recent Bookings
-        </h2>
-        <button class="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition">
-          View All
-        </button>
-      </div>
-      <app-provider-booking-recent [showFilters]="false" [actionable]="false"></app-provider-booking-recent>
-    </div>
+    <app-provider-booking-recent [showFilters]="false" [actionable]="false"></app-provider-booking-recent>
   </section>
 
 </main>
