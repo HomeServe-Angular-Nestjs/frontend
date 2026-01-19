@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable, signal } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, Observable, shareReplay } from "rxjs";
-import { IBooking, IBookingData, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakupData, IResponseProviderBookingLists, ISaveBooking, IUpdateBookingsPaymentStatus } from "../models/booking.model";
+import { IBooking, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakupData, IResponseProviderBookingLists, ISaveBooking } from "../models/booking.model";
 import { BookingStatus } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { ILocationData } from "../models/user.model";
@@ -35,13 +35,9 @@ export class BookingService {
     this._phoneNumberSource.next(phoneNumber);
   }
 
-  // getSelectedPhoneNumber(): string | null {
-  //   return this._phoneNumberSource.getValue();
-  // }
-
-  // ------------------------------------------------------------------------------------------------------------------------------
-  // **************************************************[Customer Related APIs]*******************************************************
-  // ------------------------------------------------------------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------------------------
+  // ****************************************[Customer Related APIs]*******************************
+  // ----------------------------------------------------------------------------------------------
 
   fetchPriceBreakup(): Observable<IResponse<IPriceBreakupData>> {
     return this._http.get<IResponse<IPriceBreakupData>>(`${this._customerApi}/booking/price_breakup`);
@@ -51,16 +47,8 @@ export class BookingService {
     return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, { ...slotData, providerId });
   }
 
-  // preBookingData(data: IBookingData): Observable<IResponse<IBooking>> { //todo
-  //   return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, data);
-  // }
-
   updateBooking(data: { transactionId: string | null, bookingId: string }): Observable<IResponse> {
     return this._http.patch<IResponse>(`${this._customerApi}/booking/update`, data);
-  }
-
-  updatePaymentStatus(data: IUpdateBookingsPaymentStatus): Observable<IResponse<boolean>> {
-    return this._http.patch<IResponse<boolean>>(`${this._customerApi}/booking/payment_status`, data);
   }
 
   fetchBookings(page: number = 1): Observable<IBookingWithPagination> {

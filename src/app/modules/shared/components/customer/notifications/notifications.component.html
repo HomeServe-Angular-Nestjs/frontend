@@ -40,7 +40,8 @@
                 <!-- List Items -->
                 <div class="divide-y divide-gray-50">
                     <div *ngFor="let notification of filteredNotifications"
-                        class="group p-5 hover:bg-gray-50/80 transition-all duration-200 animate-fadeIn relative"
+                        class="group p-5 hover:bg-gray-50/80 transition-all cursor-pointer duration-200 animate-fadeIn relative"
+                        (click)="handleNotificationClick(notification)"
                         [ngClass]="{'bg-indigo-50/20': !notification.isRead}">
 
                         <!-- Unread Indicator Dot -->
