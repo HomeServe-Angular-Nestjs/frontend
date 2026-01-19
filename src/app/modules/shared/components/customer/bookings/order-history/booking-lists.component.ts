@@ -84,12 +84,11 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     };
 
     this._bookingService.updateBooking(bookingData)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-        }
-      });
+      .pipe(
+        takeUntil(this._destroy$),
+        tap((res) => this._toastr.success(res.message))
+      )
+      .subscribe();
   }
 
   private _verifyPaymentAndUpdateBooking(response: RazorpayPaymentResponse, order: RazorpayOrder, bookingId: string) {

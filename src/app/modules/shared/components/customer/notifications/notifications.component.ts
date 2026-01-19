@@ -6,8 +6,9 @@ import { BehaviorSubject, combineLatest, filter, map, Observable, of } from "rxj
 import { INotification } from "../../../../../core/models/notification.model";
 import { selectAllNotifications } from "../../../../../store/notification/notification.selector";
 import { RelativeTimePipe } from "../../../../../core/pipes/relative-time.pipe";
-import { NotificationType } from "../../../../../core/enums/enums";
+import { NotificationTemplateId, NotificationType } from "../../../../../core/enums/enums";
 import { NotificationSocketService } from "../../../../../core/services/socket-service/notification.service";
+import { Router } from "@angular/router";
 
 type NotificationCrumb = 'all' | 'booking' | 'payment' | 'system' | 'read';
 
@@ -19,6 +20,7 @@ type NotificationCrumb = 'all' | 'booking' | 'payment' | 'system' | 'read';
 export class CustomerNotificationComponent implements OnInit {
     private readonly _notificationService = inject(NotificationSocketService);
     private readonly _store = inject(Store);
+    private readonly _router = inject(Router);
 
     allNotifications$: Observable<INotification[]> = of([]);
     currentSelect$ = new BehaviorSubject<NotificationCrumb>('all');
@@ -93,8 +95,22 @@ export class CustomerNotificationComponent implements OnInit {
         return this.notificationIcons[type] || 'fas fa-bell';
     }
 
-    // Now returns the full class string for styling
     getColorClasses(type: NotificationType) {
         return this.notificationColors[type] || 'text-gray-600 bg-gray-50 border-gray-100';
+    }
+
+    handleNotificationClick(notification: INotification) {
+        if (!notification.entityId) return;
+
+        if ([
+            NotificationTemplateId.BOOKING_CONFIRMED,
+            NotificationTemplateId.BOOKING_CANCELLED
+        ].includes(notification.templateId as NotificationTemplateId)) {
+            this._router.navigate(['/customer/profile/bookings', notification.entityId]);
+        }
+
+        if (!notification.isRead) {
+            this.markAsRead(notification.id);
+        }
     }
 }
