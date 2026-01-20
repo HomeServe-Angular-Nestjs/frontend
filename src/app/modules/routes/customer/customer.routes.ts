@@ -4,13 +4,15 @@ import { CustomerLayoutPageComponent } from "../../pages/customer/layout/custome
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
 import { CustomerProviderProfileLayoutComponent } from "../../pages/customer/provider-details-page/customer-provider-profile-layout.component";
 import { CustomerProfileLayout } from "../../pages/customer/profile-layout/layout.component";
+import { GuestGuard } from "../../../core/guards/guest.guard";
 
 export const customerRoutes: Routes = [
   {
     path: 'landing_page',
     pathMatch: 'full',
     loadComponent: () => import('../../pages/customer/landing-page/customer-landing-page.component')
-      .then(c => c.CustomerLandingPageComponent)
+      .then(c => c.CustomerLandingPageComponent),
+    canActivate: [GuestGuard]
   },
   {
     path: '',
