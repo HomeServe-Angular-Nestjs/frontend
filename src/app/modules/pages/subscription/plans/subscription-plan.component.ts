@@ -237,7 +237,6 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     }
 
     proceedSub(plan: IPlan): void {
-        console.log(plan);
         if (plan.duration === PlanDuration.LIFETIME) {
             this._handleFreePlan();
             return;
@@ -259,7 +258,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
                     this._toastr.info('Payment dismissed.');
                 }
             },
-        });
+        }); 
     }
 
     getPlanButtonClass(plan: any): string {

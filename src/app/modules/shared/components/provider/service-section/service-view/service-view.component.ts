@@ -8,7 +8,6 @@ import { FilterDeletedSubservicePipe } from '../../../../../../core/pipes/filter
 import { OfferedServicesService } from '../../../../../../core/services/service-management-test.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { ProviderServiceFilterComponent } from "../../manage-service/service-filter/service-filter.component";
-import { IFilter } from '../../../../../../core/models/filter.model';
 import { ProviderPaginationComponent } from "../../../../partials/sections/provider/pagination/provider-pagination.component";
 import { IPagination } from '../../../../../../core/models/booking.model';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
