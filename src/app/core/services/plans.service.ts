@@ -1,6 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { IPlan, IUpdatePlanStatus } from "../models/plan.model";
+import { ICreatePlan, IPlan, IUpdatePlanStatus } from "../models/plan.model";
 import { API_ENV } from "../../../environments/env";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { HttpClient, HttpParams } from "@angular/common/http";
@@ -36,7 +36,15 @@ export class PlanService {
         return this._http.patch<IResponse<IPlan>>(`${this._planApi}/status`, updateData);
     }
 
+    createPlan(plan: ICreatePlan): Observable<IResponse<IPlan>> {
+        return this._http.post<IResponse<IPlan>>(`${this._planApi}/save`, plan);
+    }
+
     updatePlan(plan: Partial<IPlan>): Observable<IResponse<IPlan>> {
         return this._http.put<IResponse<IPlan>>(`${this._planApi}/update`, plan);
+    }
+
+    deletePlan(planId: string): Observable<IResponse> {
+        return this._http.delete<IResponse>(`${this._planApi}/remove/${planId}`);
     }
 }

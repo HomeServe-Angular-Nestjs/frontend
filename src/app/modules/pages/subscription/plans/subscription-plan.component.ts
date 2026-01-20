@@ -4,9 +4,8 @@ import { Store } from "@ngrx/store";
 import { Router } from "@angular/router";
 import { selectAuthUserType } from "../../../../store/auth/auth.selector";
 import { catchError, combineLatest, filter, map, Observable, of, pairwise, shareReplay, Subject, switchMap, takeUntil, throwError } from "rxjs";
-import { IPlan } from "../../../../core/models/plan.model";
+import { FEATURE_REGISTRY, IPlan } from "../../../../core/models/plan.model";
 import { PlanService } from "../../../../core/services/plans.service";
-import { CapitalizeFirstPipe } from "../../../../core/pipes/capitalize-first.pipe";
 import { PaymentService } from "../../../../core/services/payment.service";
 import { RazorpayWrapperService } from "../../../../core/services/public/razorpay-wrapper.service";
 import { ToastNotificationService } from "../../../../core/services/public/toastr.service";
@@ -16,10 +15,12 @@ import { ICreateSubscription, ISubscription } from "../../../../core/models/subs
 import { PaymentDirection, PaymentSource, PaymentStatus, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
 import { SharedDataService } from "../../../../core/services/public/shared-data.service";
 
+import { KeyValuePipe } from "@angular/common";
+
 @Component({
     selector: 'app-subscription-plan-page',
     templateUrl: './subscription-plan.component.html',
-    imports: [CommonModule, CapitalizeFirstPipe],
+    imports: [CommonModule, KeyValuePipe],
     providers: [PaymentService, RazorpayWrapperService]
 })
 export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
@@ -31,6 +32,13 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     private readonly _razorpayWrapper = inject(RazorpayWrapperService);
     private readonly _subscriptionService = inject(SubscriptionService);
     private readonly _paymentService = inject(PaymentService);
+
+    readonly featureRegistry = FEATURE_REGISTRY;
+
+    getFeatureLabel(key: string): string {
+        const feature = Object.values(this.featureRegistry).find(f => f.key === key);
+        return feature ? feature.label : key;
+    }
 
     private _destroy$ = new Subject<void>();
 
@@ -229,6 +237,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     }
 
     proceedSub(plan: IPlan): void {
+        console.log(plan);
         if (plan.duration === PlanDuration.LIFETIME) {
             this._handleFreePlan();
             return;

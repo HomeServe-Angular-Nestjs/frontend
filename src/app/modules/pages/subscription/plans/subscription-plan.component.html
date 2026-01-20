@@ -1,74 +1,125 @@
-<section class="max-w-screen bg-gray-50 pt-10 pb-4 px-4 fixed inset-0 z-50 overflow-auto">
-    <div class="max-w-6xl mx-auto text-center">
-        <h2 class="text-4xl font-extrabold text-gray-800">Simple, Transparent Pricing</h2>
-        <p class="text-gray-500 mt-3 text-lg">Choose the plan that aligns with your needs</p>
+<section class="min-h-screen bg-[#fcfcfd] pb-10 pt-8 px-4 md:px-8 fixed inset-0 z-50 overflow-auto">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-16 space-y-4">
+            <h2 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
+                Simple, <span class="text-transparent bg-clip-text"
+                    [ngClass]="userType === 'customer' ? 'bg-gradient-to-r from-blue-600 to-indigo-600' : 'bg-gradient-to-r from-green-600 to-emerald-600'">
+                    Transparent</span>
+                Pricing
+            </h2>
+            <p class="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto">
+                Elevate your experience with our premium plans tailored for your success.
+            </p>
+        </div>
 
-        <div class="mt-12 flex flex-col lg:flex-row gap-10 items-stretch justify-center">
-            <ng-container *ngIf="plans$ | async as plans">
-                <ng-container *ngFor="let plan of plans">
-                    <div class="w-full max-w-sm p-8 rounded-3xl border shadow-sm flex flex-col justify-between transition duration-300 transform hover:scale-[1.04]"
-                        [ngClass]="{
-                            'bg-white text-gray-800': plan.name.toLowerCase() === 'free',
-                            'bg-green-50 text-green-900': userType === 'provider' && plan.name.toLowerCase() !== 'free',
-                            'bg-blue-50 text-blue-900': userType === 'customer' && plan.name.toLowerCase() !== 'free',
-                            'opacity-50 grayscale pointer-events-none': isYearly() && !isCurrentPlan(plan)
-                            }">
+        <!-- Plans Grid -->
+        <div *ngIf="plans$ | async as plans"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 justify-center items-stretch max-w-5xl mx-auto">
+            <ng-container *ngFor="let plan of plans">
+                <div class="group relative flex flex-col bg-white rounded-[1.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden w-full max-w-[320px] mx-auto"
+                    [ngClass]="{
+                        'ring-1 ring-offset-2': plan.name.toLowerCase() !== 'free',
+                        'ring-blue-500': plan.name.toLowerCase() !== 'free' && userType === 'customer',
+                        'ring-green-500': plan.name.toLowerCase() !== 'free' && userType === 'provider',
+                        'opacity-50 grayscale pointer-events-none': isYearly() && !isCurrentPlan(plan)
+                     }">
 
-                        <span class="inline-block px-3 py-1 text-xs font-medium rounded-full mb-4 w-max mx-auto"
-                            [ngClass]="{
-                                'bg-gray-100 text-gray-600': plan.name.toLowerCase() === 'basic',
-                                'bg-white border border-current text-green-700': userType === 'provider' && plan.name.toLowerCase() !== 'basic',
-                                'bg-white border border-current text-blue-700': userType === 'customer' && plan.name.toLowerCase() !== 'basic'
-                                }">
-                            {{ plan.name.toLowerCase() === 'free' ? 'Starter' : 'Most Popular' }}
-                        </span>
+                    <!-- Popular Badge -->
+                    <div *ngIf="plan.price !== 0" class="absolute top-0 right-0">
+                        <div class="text-white text-[9px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-bl-xl shadow-md"
+                            [ngClass]="userType === 'customer' ? 'bg-gradient-to-l from-blue-600 to-indigo-600' : 'bg-gradient-to-l from-green-600 to-emerald-600'">
+                            Most Popular
+                        </div>
+                    </div>
 
-                        <!-- Plan Details -->
-                        <div class="text-center">
-                            <h3 class="text-2xl font-semibold">{{ plan.name | capitalizeFirst }}</h3>
-                            <p class="text-5xl font-extrabold mt-4 mb-6">
-                                {{ plan.price === 0 ? 'Free' : '$' + plan.price }}
-                                <span *ngIf="plan.duration" class="text-lg font-light">/ {{ plan.duration }}</span>
-                            </p>
-                            <ul class="text-sm text-left space-y-2 mb-6">
-                                <li *ngFor="let feature of plan.features" class="list-disc list-inside">{{ feature }}
+                    <!-- Plan Header -->
+                    <div class="p-6 pb-4 bg-gray-50/50">
+                        <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4">
+                            <i class="fas text-sm" [ngClass]="{
+                                    'fa-rocket text-gray-400': plan.name.toLowerCase() === 'free',
+                                    'fa-crown text-blue-600': plan.name.toLowerCase() !== 'free' && userType === 'customer',
+                                    'fa-crown text-green-600': plan.name.toLowerCase() !== 'free' && userType === 'provider'
+                                }"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 capitalize mb-1">{{ plan.name }}</h3>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-black text-gray-900">₹{{ plan.price }}</span>
+                            <span class="text-xs font-medium text-gray-400 capitalize">/ {{ plan.duration }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Features List -->
+                    <div class="flex-1 p-6 pt-4 space-y-4">
+                        <div class="space-y-3">
+                            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Included Features
+                            </h4>
+                            <ul class="space-y-3">
+                                <li *ngFor="let feature of plan.features | keyvalue" class="flex items-start gap-2.5">
+                                    <div class="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-colors"
+                                        [ngClass]="{
+                                            'bg-blue-50 text-blue-600': feature.value && userType === 'customer',
+                                            'bg-green-50 text-green-600': feature.value && userType === 'provider',
+                                            'bg-gray-100 text-gray-300': !feature.value
+                                        }">
+                                        <i class="fas"
+                                            [ngClass]="feature.value ? 'fa-check text-[8px]' : 'fa-times text-[8px]'"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-semibold text-gray-600 leading-tight truncate"
+                                            [title]="getFeatureLabel(feature.key)">
+                                            {{ getFeatureLabel(feature.key) }}
+                                        </p>
+                                        <p *ngIf="feature.value !== true && feature.value !== false"
+                                            class="text-[10px] font-black mt-0.5"
+                                            [ngClass]="userType === 'customer' ? 'text-blue-600' : 'text-green-600'">
+                                            {{ feature.value }}
+                                        </p>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
+                    </div>
 
+                    <!-- Action Button -->
+                    <div class="p-6 pt-0 mt-auto">
                         <button (click)="proceedSub(plan)" [disabled]="isCurrentPlan(plan)"
-                            class="mt-auto w-full py-3 rounded-xl font-semibold border transition duration-200 ease-in-out"
+                            class="w-full py-3 rounded-xl font-bold text-xs transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-white"
                             [ngClass]="{
-                                'bg-gray-800 text-white border-transparent hover:bg-gray-700': isCurrentPlan(plan),
-                                'bg-green-100 text-green-800 hover:bg-green-200 border-green-300': userType === 'provider' && plan.name.toLowerCase() !== 'basic' && !isCurrentPlan(plan),
-                                'bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-300': userType === 'customer' && plan.name.toLowerCase() !== 'basic' && !isCurrentPlan(plan),
-                                'bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-300': plan.name.toLowerCase() === 'basic' && !isCurrentPlan(plan)
+                                    'bg-gray-900 hover:bg-black': isCurrentPlan(plan),
+                                    'bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90': !isCurrentPlan(plan) && userType === 'customer',
+                                    'bg-gradient-to-r from-green-600 to-emerald-600 hover:opacity-90': !isCurrentPlan(plan) && userType === 'provider'
                                 }">
-                            <span *ngIf="isCurrentPlan(plan)">Current Plan</span>
-                            <ng-container *ngIf="!isCurrentPlan(plan)">
-                                {{ getPlanButtonText(plan) | titlecase }}
-                            </ng-container>
+                            <span *ngIf="isCurrentPlan(plan)" class="flex items-center justify-center gap-2">
+                                <i class="fas fa-check-circle"></i>
+                                Current Plan
+                            </span>
+                            <span *ngIf="!isCurrentPlan(plan)">
+                                {{ getPlanButtonText(plan) }}
+                            </span>
                         </button>
                     </div>
-                </ng-container>
+                </div>
             </ng-container>
         </div>
 
+        <!-- Warning & Back Section -->
+        <div class="mt-18 flex flex-col items-center space-y-8">
+            <div *ngIf="isYearly()"
+                class="max-w-xl p-4 bg-red-50 text-red-600 rounded-2xl text-center text-sm font-medium border border-red-100 flex items-center gap-3">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>You are a yearly subscriber. Transitions are locked until your current term expires.</span>
+            </div>
 
-        <div *ngIf="isYearly()" class="mt-12 mx-auto max-w-xl text-center text-red-500 text-sm">
-            You are a yearly subscriber and can't change to monthly or free <br> until the time expires or you cancel
-            the subscription.
-        </div>
-
-        <div class="mt-6 text-center space-y-4 flex flex-col left-0 right-0">
-            <p class="text-sm text-gray-500">
-                All plans include booking management and {{ userType }} support.
+            <p class="text-gray-400 text-sm italic">
+                All plans include priority service and 24/7 dedicated support.
             </p>
-            <ng-container *ngIf="currentPlanId">
-                <button (click)="goBack()" class="text-sm text-gray-500 hover:text-gray-700 transition">
-                    ← Back
-                </button>
-            </ng-container>
+
+            <button *ngIf="currentPlanId" (click)="goBack()"
+                class="group flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold transition-all">
+                <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                Return to Dashboard
+            </button>
         </div>
     </div>
 </section>

@@ -1,34 +1,103 @@
-<section class="rounded-xl shadow-md bg-white p-6 space-y-4">
-    <h1 class="text-xl font-medium text-gray-800 mb-3">
-        Plans
-    </h1>
+<section class="space-y-6">
+    <!-- Header Section with Stats/Actions -->
+    <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Subscription Plans</h1>
+            <p class="text-sm text-gray-500 mt-1">Manage and configure your service subscription tiers</p>
+        </div>
+        <button (click)="openCreateModal()"
+            class="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-95">
+            <i class="fas fa-plus"></i>
+            Create New Plan
+        </button>
+    </div>
 
-    <ng-container *ngIf="tableData$ | async as planTableData; else noData">
-        <app-admin-table-template [table]="planTableData"
-            (adminTableActionEvent)="adminTableActionTriggered($event)"></app-admin-table-template>
-    </ng-container>
+    <!-- Plans Grid -->
+    <div *ngIf="plans.length > 0; else noData" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
+        <div *ngFor="let plan of plans"
+            class="group relative bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
 
+            <!-- Plan Header -->
+            <div class="p-6 pb-4 border-b border-gray-50 bg-gradient-to-br from-white to-gray-50/50">
+                <div class="flex justify-between items-start mb-4">
+                    <span
+                        class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-blue-50 text-blue-600 border border-blue-100">
+                        {{ plan.role }}
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button (click)="togglePlanStatus(plan)" [title]="plan.isActive ? 'Deactivate' : 'Activate'"
+                            class="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                            [ngClass]="plan.isActive ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-red-50 text-red-600 hover:bg-red-100'">
+                            <i class="fas" [ngClass]="plan.isActive ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                        </button>
+                        <button (click)="handlePlanDelete(plan.id)"
+                            class="w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-trash text-red-600 hover:text-red-700"></i>
+                        </button>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 capitalize mb-1">{{ plan.name }}</h3>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-3xl font-black text-gray-900">₹{{ plan.price }}</span>
+                    <span class="text-sm font-medium text-gray-400">/ {{ plan.duration }}</span>
+                </div>
+            </div>
 
-    <ng-container *ngIf="isViewPlanModalOpen">
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
-                <app-admin-plan-details (closeModalEvent)="closeModal()" [plan]="planToView"
-                    (savePlanEvent)="updatePlan($event)" [isEditMode]="isEditMode"></app-admin-plan-details>
+            <!-- Plan Features Summary -->
+            <div class="p-6 space-y-4">
+                <div class="space-y-3">
+                    <div *ngFor="let featureConfig of featureRegistry | slice:0:3"
+                        class="flex items-center gap-3 text-sm">
+                        <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                            [ngClass]="plan.features[featureConfig.key] ? 'bg-blue-50 text-blue-500' : 'bg-gray-50 text-gray-300'">
+                            <i class="fas fa-check text-[10px]"></i>
+                        </div>
+                        <span class="text-gray-600 font-medium truncate">{{ featureConfig.label }}</span>
+                        <span *ngIf="featureConfig.type === 'number'" class="ml-auto font-bold text-gray-900">
+                            {{ plan.features[featureConfig.key] }}
+                        </span>
+                        <span *ngIf="featureConfig.type === 'enum'" class="ml-auto font-bold text-gray-900 capitalize">
+                            {{ plan.features[featureConfig.key] }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3 pt-4 border-t border-gray-50">
+                    <button (click)="viewPlan(plan)"
+                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold rounded-xl transition-colors">
+                        <i class="fas fa-eye text-xs"></i>
+                        View
+                    </button>
+                    <button (click)="editPlan(plan)"
+                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold rounded-xl transition-colors">
+                        <i class="fas fa-edit text-xs"></i>
+                        Edit
+                    </button>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- Modals -->
+    <ng-container *ngIf="isViewPlanModalOpen">
+        <app-admin-plan-details [plan]="planToView" [isEditMode]="isEditMode" [isCreateMode]="isCreateMode"
+            (closeModalEvent)="closeModal()" (savePlanEvent)="handlePlanSave($event)"
+            (deletePlanEvent)="handlePlanDelete($event, true)">
+        </app-admin-plan-details>
     </ng-container>
 
+    <!-- Empty State -->
     <ng-template #noData>
         <div
-            class="flex flex-col items-center justify-center min-h-[280px] text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300 p-8">
-
-            <svg class="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9.75 9.75h4.5m-4.5 4.5h4.5M4.5 6.75h15M6.75 6.75v10.5A2.25 2.25 0 009 19.5h6a2.25 2.25 0 002.25-2.25V6.75" />
-            </svg>
-
-            <p class="text-xl font-semibold">No subscription plans found</p>
+            class="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-3xl border-2 border-dashed border-gray-100 p-12 text-center">
+            <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-layer-group text-3xl text-gray-300"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">No Subscription Plans</h2>
+            <p class="text-gray-500 max-w-sm mb-8">Ready to grow? Start by creating your first subscription tier to
+                monetize your platform.</p>
         </div>
     </ng-template>
 </section>
