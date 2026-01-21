@@ -1,11 +1,11 @@
-import { Component, computed, effect, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subject, switchMap, takeUntil, tap, finalize } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { decode as base64Decode } from 'js-base64';
-import { IFilterFetchProviders, IHomeSearch } from '../../../../core/models/user.model';
+import { IFilterFetchProviders } from '../../../../core/models/user.model';
 import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 import { ProviderViewCardFilterComponent } from "../../../shared/partials/sections/customer/provider-view-card-filter/provider-view-card-filter.component";
 import { ProviderService } from '../../../../core/services/provider.service';
@@ -19,9 +19,12 @@ import { CustomerPaginationComponent } from '../../../shared/partials/sections/c
   templateUrl: './customer-view-providers.component.html',
 })
 export class CustomerViewProvidersComponent {
-  private readonly providerService = inject(ProviderService);
-  private readonly toastr = inject(ToastNotificationService);
-  private readonly route = inject(ActivatedRoute);
+  private readonly _providerService = inject(ProviderService);
+  private readonly _toastr = inject(ToastNotificationService);
+  private readonly _route = inject(ActivatedRoute);
+
+  @ViewChild(ProviderViewCardFilterComponent)
+  filterComponent!: ProviderViewCardFilterComponent;
 
   filters = signal<IFilterFetchProviders>({
     search: '',
@@ -29,6 +32,7 @@ export class CustomerViewProvidersComponent {
     limit: 10,
     status: 'all',
     availability: 'all',
+    categoryId: ''
   });
 
   pagination = signal<IPagination>({
@@ -40,7 +44,7 @@ export class CustomerViewProvidersComponent {
   private providersResponse = toSignal(
     toObservable(this.filters).pipe(
       switchMap(filters =>
-        this.providerService.getProviders(filters)
+        this._providerService.getProviders(filters)
       )
     ),
     { initialValue: null }
@@ -62,8 +66,8 @@ export class CustomerViewProvidersComponent {
     });
 
     /* Sync query params → filters */
-    const queryParams = toSignal<Params | null>(
-      this.route.queryParams,
+    const queryParams = toSignal<ParamMap | null>(
+      this._route.queryParamMap,
       { initialValue: null }
     );
 
@@ -71,24 +75,33 @@ export class CustomerViewProvidersComponent {
       const params = queryParams();
       if (!params) return;
 
-      const ls = params['ls'];
-      if (!ls) return;
+      const nextFilters: Partial<IFilterFetchProviders> = {};
 
-      try {
-        const parsed = JSON.parse(base64Decode(ls));
-        this.filters.set({
-          ...this.filters(),
-          ...parsed,
-          page: 1,
-        });
-      } catch {
-        this.toastr.error('Oops something went wrong.');
+      const categoryId = params.get('categoryId');
+      if (categoryId?.trim()) {
+        nextFilters.categoryId = categoryId;
+      }
+
+      const ls = params.get('ls');
+      if (ls) {
+        try {
+          Object.assign(nextFilters, JSON.parse(base64Decode(ls)));
+        } catch {
+          this._toastr.error('Invalid filter parameters.');
+          return;
+        }
+      }
+
+      if (Object.keys(nextFilters).length === 0) return;
+
+      const current = this.filters();
+      const merged = { ...current, ...nextFilters, page: 1 };
+
+      if (JSON.stringify(current) !== JSON.stringify(merged)) {
+        this.filters.set(merged);
       }
     });
   }
-
-  @ViewChild(ProviderViewCardFilterComponent)
-  filterComponent!: ProviderViewCardFilterComponent;
 
   applyFilters(newFilter: IFilterFetchProviders) {
     this.filters.set({

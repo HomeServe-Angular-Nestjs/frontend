@@ -40,27 +40,26 @@
               <i
                 class="fas fa-search text-gray-400 group-focus-within/service:text-indigo-500 transition-colors text-xs"></i>
             </div>
-            <input type="text" [(ngModel)]="serviceSearch" (ngModelChange)="searchServices()"
+            <input type="text" [(ngModel)]="categorySearch" (ngModelChange)="searchCategories()"
               class="block w-full pl-9 pr-3 py-2 bg-transparent border-0 text-gray-900 placeholder:text-gray-500 focus:ring-0 text-sm font-medium outline-none"
               placeholder="What service?">
 
             <!-- Service Dropdown -->
-            <div *ngIf="serviceSearch.trim()"
-              class="absolute top-full left-0 w-80 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden py-1 animate-fadeIn z-50">
-              <div *ngIf="isLoadingServices" class="flex items-center justify-center py-4 text-gray-400 text-xs">
+            <div *ngIf="categorySearch.trim()"
+              class="absolute top-full left-0 w-full max-w-70 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden py-1 animate-fadeIn z-50">
+              <div *ngIf="isLoadingCategories" class="flex items-center justify-center py-4 text-gray-400 text-xs">
                 <i class="fas fa-spinner fa-spin mr-2"></i> Searching...
               </div>
 
-              <ul *ngIf="!isLoadingServices" class="max-h-60 overflow-y-auto custom-scrollbar outline-none">
-                <ng-container *ngIf="fetchedServices.length; else noServices">
-                  <li *ngFor="let service of fetchedServices" (click)="handleServiceClick(service)"
+              <ul *ngIf="!isLoadingCategories" class="max-h-60 overflow-y-auto custom-scrollbar outline-none">
+                <ng-container *ngIf="fetchedCategories.length; else noServices">
+                  <li *ngFor="let category of fetchedCategories" (click)="handleCategoryClick(category.categoryId)"
                     class="px-3 py-2 hover:bg-indigo-50/50 cursor-pointer flex items-center gap-3 transition-colors border-b border-gray-50 last:border-0">
-                    <img [src]="service.image || defaultImg"
-                      class="w-8 h-8 rounded-md object-cover bg-gray-100 shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+                      <i class="fas fa-search text-indigo-500 text-xs"></i>
+                    </div>
                     <div class="min-w-0">
-                      <p class="text-xs font-semibold text-gray-900 truncate">{{ service.title }}</p>
-                      <p class="text-[10px] text-indigo-500 font-medium truncate">by {{ service.providerName ||
-                        'Provider' }}</p>
+                      <p class="text-xs font-semibold text-gray-900 truncate">{{ category.categoryName }}</p>
                     </div>
                   </li>
                 </ng-container>
@@ -111,20 +110,13 @@
               </ul>
             </div>
           </div>
-
-          <!-- Search Button -->
-          <button
-            class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md shadow-indigo-200 transition-all hover:scale-105 active:scale-95 shrink-0 my-auto mr-0.5">
-            <i class="fas fa-search text-xs"></i>
-          </button>
-
         </div>
       </div>
 
       <!-- Right Actions Section -->
       <div class="flex items-center gap-2 sm:gap-3">
 
-        <ng-container *ngIf="userStatus$ | async as userStatus; else guestActions">
+        <ng-container *ngIf="userStatus() as userStatus; else guestActions">
           <ng-container *ngIf="userStatus === 'authenticated'; else guestActions">
 
             <!-- Subscription -->
@@ -138,7 +130,7 @@
             <a routerLink="/profile/notifications"
               class="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 relative">
               <i class="fas fa-bell text-lg"></i>
-              <ng-container *ngIf="(unReadNotificationCount$ | async) as count">
+              <ng-container *ngIf="unReadNotificationCount() as count">
                 <span *ngIf="count > 0"
                   class="absolute top-1.5 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
               </ng-container>
@@ -160,15 +152,15 @@
             <div class="relative group pl-1">
               <button class="flex items-center gap-2 focus:outline-none">
                 <div class="relative">
-                  <ng-container *ngIf="(avatar$ | async) as avatar; else fallbackAvatar">
+                  <ng-container *ngIf="avatar() as avatar; else fallbackAvatar">
                     <img [src]="avatar"
                       class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md group-hover:shadow-lg transition-transform group-hover:scale-105 duration-200">
                   </ng-container>
                   <ng-template #fallbackAvatar>
                     <div
                       class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md group-hover:shadow-lg transition-transform group-hover:scale-105 duration-200"
-                      [style.background-color]="(fallbackColor$ | async) || '#4f46e5'">
-                      {{ (fallbackChar$ | async) }}
+                      [style.background-color]="fallbackColor() || '#4f46e5'">
+                      {{ fallbackChar() }}
                     </div>
                   </ng-template>
                   <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full">
@@ -180,9 +172,9 @@
               <div
                 class="absolute right-0 top-full mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
                 <div class="p-4 bg-gray-50/50 border-b border-gray-100">
-                  <p class="text-sm font-bold text-gray-900 truncate">{{ (fullname$ | async) || (username$ | async) }}
+                  <p class="text-sm font-bold text-gray-900 truncate">{{ fullname() || username() }}
                   </p>
-                  <p class="text-xs text-gray-500 truncate mt-0.5">{{ email$ | async }}</p>
+                  <p class="text-xs text-gray-500 truncate mt-0.5">{{ email() }}</p>
                 </div>
                 <div class="p-2">
                   <a routerLink="/profile"

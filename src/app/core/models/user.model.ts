@@ -217,6 +217,7 @@ export interface IFilterFetchProviders extends IHomeSearch {
     availability?: AvailabilityType | 'all';
     date?: string;
     sort?: 'best_rated' | 'nearest' | 'all';
+    categoryId?: string;
 }
 
 export interface IStats {

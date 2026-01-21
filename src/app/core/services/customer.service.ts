@@ -6,6 +6,7 @@ import { catchError, Observable, throwError } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { ISubmitReview } from "../models/reviews.model";
+import { ICustomerSearchCategories } from "../models/category.model";
 
 @Injectable({ providedIn: 'root' })
 export class CustomerService {
@@ -41,9 +42,9 @@ export class CustomerService {
         return this._http.get<IResponse>(`${this._apiUrl}/search_providers`, { params });
     }
 
-    searchService(search: string): Observable<IResponse> {
+    searchCategories(search: string): Observable<IResponse<ICustomerSearchCategories[]>> {
         const params = new HttpParams().set('search', search);
-        return this._http.get<IResponse>(`${this._apiUrl}/search_services`, { params });
+        return this._http.get<IResponse<ICustomerSearchCategories[]>>(`${this._apiUrl}/search-services`, { params });
     }
 
     updateProfile(profileData: ICustomerProfileData): Observable<IResponse<ICustomer>> {
