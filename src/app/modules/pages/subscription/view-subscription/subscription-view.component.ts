@@ -4,15 +4,15 @@ import { ISubscription } from "../../../../core/models/subscription.model";
 import { Store } from "@ngrx/store";
 import { map, Observable, of, Subject, takeUntil } from "rxjs";
 import { selectAuthUserType } from "../../../../store/auth/auth.selector";
-import { CapitalizeFirstPipe } from "../../../../core/pipes/capitalize-first.pipe";
-import { Router, RouterLink } from "@angular/router";
+import { Router } from "@angular/router";
 import { SharedDataService } from "../../../../core/services/public/shared-data.service";
 import { SubscriptionService } from "../../../../core/services/subscription.service";
+import { FEATURE_REGISTRY } from "../../../../core/models/plan.model";
 
 @Component({
     selector: 'app-subscription-view-page',
     templateUrl: './subscription-view.component.html',
-    imports: [CommonModule, CapitalizeFirstPipe]
+    imports: [CommonModule]
 })
 export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
     private readonly _subscriptionService = inject(SubscriptionService);
@@ -24,6 +24,7 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
 
     subscription$!: Observable<ISubscription | null>;
     userType = 'customer';
+    readonly featureRegistry = FEATURE_REGISTRY;
 
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Subscription');
@@ -52,6 +53,11 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
             ? 'plans'
             : 'provider/plans'
         this._router.navigate([url]);
+    }
+
+    getFeatureLabel(key: string): string {
+        const feature = Object.values(this.featureRegistry).find(f => f.key === key);
+        return feature ? feature.label : key;
     }
 
     ngOnDestroy(): void {
