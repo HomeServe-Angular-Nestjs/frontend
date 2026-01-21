@@ -15,6 +15,7 @@ import { CustomerService } from '../../../../../../core/services/customer.servic
 import { selectTotalUnReadNotificationCount } from '../../../../../../store/notification/notification.selector';
 import { CartService } from '../../../../../../core/services/cart.service';
 import { ICustomerSearchCategories } from '../../../../../../core/models/category.model';
+import { CategoryService } from '../../../../../../core/services/category.service';
 
 @Component({
   selector: 'app-customer-header',
@@ -23,11 +24,12 @@ import { ICustomerSearchCategories } from '../../../../../../core/models/categor
   providers: [DebounceService]
 })
 export class CustomerHeaderComponent implements OnInit {
-  private readonly _store = inject(Store);
   private readonly _debounceService = inject(DebounceService);
   private readonly _customerService = inject(CustomerService);
-  private readonly _router = inject(Router);
+  private readonly _categoryService = inject(CategoryService);
   public readonly _cartService = inject(CartService);
+  private readonly _router = inject(Router);
+  private readonly _store = inject(Store);
 
   private readonly _destroy$ = new Subject<void>();
 
@@ -148,16 +150,16 @@ export class CustomerHeaderComponent implements OnInit {
   }
 
   private fetchProviders(search: string): void {
-    this._customerService.searchProviders(search).subscribe({
-      next: (res) => {
-        if (res.success && res.data) this.fetchedProviders = res.data;
-      },
-      complete: () => this.isLoadingProviders = false
-    });
+    // this._customerService.searchProviders(search).subscribe({
+    //   next: (res) => {
+    //     if (res.success && res.data) this.fetchedProviders = res.data;
+    //   },
+    //   complete: () => this.isLoadingProviders = false
+    // });
   }
 
   private fetchCategories(search: string): void {
-    this._customerService.searchCategories(search)
+    this._categoryService.searchCategories(search)
       .pipe(
         takeUntil(this._destroy$),
         finalize(() => this.isLoadingCategories = false)

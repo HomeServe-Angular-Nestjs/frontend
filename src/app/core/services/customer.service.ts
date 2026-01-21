@@ -37,16 +37,6 @@ export class CustomerService {
         return this._http.patch<ICustomer>(`${this._apiUrl}/saved_providers`, { providerId });
     }
 
-    searchProviders(search: string): Observable<IResponse> {
-        const params = new HttpParams().set('search', search);
-        return this._http.get<IResponse>(`${this._apiUrl}/search_providers`, { params });
-    }
-
-    searchCategories(search: string): Observable<IResponse<ICustomerSearchCategories[]>> {
-        const params = new HttpParams().set('search', search);
-        return this._http.get<IResponse<ICustomerSearchCategories[]>>(`${this._apiUrl}/search-services`, { params });
-    }
-
     updateProfile(profileData: ICustomerProfileData): Observable<IResponse<ICustomer>> {
         return this._http.put<IResponse<ICustomer>>(`${this._apiUrl}/profile`, profileData);
     }

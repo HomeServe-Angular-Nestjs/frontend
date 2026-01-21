@@ -93,4 +93,9 @@ export class ProviderService {
   updateBufferTime(bufferTime: number): Observable<IResponse<IProvider>> {
     return this._http.patch<IResponse<IProvider>>(`${this._apiUrl}/buffer`, { bufferTime });
   }
+
+  searchProvidersByAddress(address: string): Observable<IResponse<IProvider[]>> {
+    const params = new HttpParams().set('address', address);
+    return this._http.get<IResponse<IProvider[]>>(`${this._apiUrl}/search-providers`, { params });
+  }
 }

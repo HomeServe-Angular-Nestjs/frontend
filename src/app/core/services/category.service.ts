@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, Observable, tap } from "rxjs";
-import { IProfession, IProfessionFilter, IServiceCategory, IServiceCategoryFilter, IServiceCategoryWithPagination } from "../models/category.model";
+import { ICustomerSearchCategories, IProfession, IProfessionFilter, IServiceCategory, IServiceCategoryFilter, IServiceCategoryWithPagination } from "../models/category.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 
 
@@ -94,5 +94,10 @@ export class CategoryService {
 
     removeServiceCategory(id: string): Observable<IResponse<boolean>> {
         return this._http.delete<IResponse<boolean>>(`${this._categoryUrl}/service/${id}`);
+    }
+
+    searchCategories(search: string): Observable<IResponse<ICustomerSearchCategories[]>> {
+        const params = new HttpParams().set('search', search);
+        return this._http.get<IResponse<ICustomerSearchCategories[]>>(`${this._categoryUrl}/search`, { params });
     }
 }
