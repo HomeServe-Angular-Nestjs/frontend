@@ -203,9 +203,8 @@ export interface ISearchedLocation {
 }
 
 export interface IHomeSearch {
-    title?: string | null;
-    lat?: number | null,
-    lng?: number | null;
+    lat: number | null,
+    lng: number | null;
 }
 
 export interface IFilterFetchProviders extends IHomeSearch {

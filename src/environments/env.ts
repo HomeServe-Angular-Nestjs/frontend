@@ -72,6 +72,33 @@ export const ICE_SERVERS = [
   },
 ];
 
+export const OPEN_CAGE_LOCATION_TYPE = [
+  // admin / areas
+  'city',
+  'town',
+  'municipality',
+  'village',
+  'suburb',
+  'neighbourhood',
+  'district',
+  'state_district',
+  'county',
+
+  // locality-style
+  'locality',
+  'hamlet',
+  'quarter',
+  'borough',
+
+  // important named places
+  'building',
+  'industrial',
+  'commercial',
+  'residential',
+]
+
+export const OPEN_CAGE_LOCATION_BOUNDS = '74.86,8.17,77.70,12.97'; // Kerala
+
 export const ICONS = {
   razorpay: `<?xml version="1.0" encoding="utf-8"?>
                     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 122.88 26.53" style="enable-background:new 0 0 122.88 26.53" xml:space="preserve"><style type="text/css">

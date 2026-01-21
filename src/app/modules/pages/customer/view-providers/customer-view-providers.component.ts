@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -22,6 +22,7 @@ export class CustomerViewProvidersComponent {
   private readonly _providerService = inject(ProviderService);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
 
   @ViewChild(ProviderViewCardFilterComponent)
   filterComponent!: ProviderViewCardFilterComponent;
@@ -32,7 +33,10 @@ export class CustomerViewProvidersComponent {
     limit: 10,
     status: 'all',
     availability: 'all',
-    categoryId: ''
+    date: '',
+    categoryId: '',
+    lat: null,
+    lng: null,
   });
 
   pagination = signal<IPagination>({
@@ -75,27 +79,22 @@ export class CustomerViewProvidersComponent {
       const params = queryParams();
       if (!params) return;
 
+      const current = this.filters();
       const nextFilters: Partial<IFilterFetchProviders> = {};
 
       const categoryId = params.get('categoryId');
-      if (categoryId?.trim()) {
-        nextFilters.categoryId = categoryId;
-      }
+      nextFilters.categoryId = categoryId || '';
 
-      const ls = params.get('ls');
-      if (ls) {
-        try {
-          Object.assign(nextFilters, JSON.parse(base64Decode(ls)));
-        } catch {
-          this._toastr.error('Invalid filter parameters.');
-          return;
-        }
-      }
+      const lat = params.get('lat');
+      const lng = params.get('lng');
+      nextFilters.lat = lat ? Number(lat) : null;
+      nextFilters.lng = lng ? Number(lng) : null;
 
-      if (Object.keys(nextFilters).length === 0) return;
-
-      const current = this.filters();
-      const merged = { ...current, ...nextFilters, page: 1 };
+      const merged = {
+        ...current,
+        ...nextFilters,
+        page: 1
+      };
 
       if (JSON.stringify(current) !== JSON.stringify(merged)) {
         this.filters.set(merged);
@@ -103,22 +102,16 @@ export class CustomerViewProvidersComponent {
     });
   }
 
-  applyFilters(newFilter: IFilterFetchProviders) {
-    this.filters.set({
-      ...this.filters(),
+  applyFilters(newFilter: Partial<IFilterFetchProviders>) {
+    this.filters.update(current => ({
+      ...current,
       ...newFilter,
       page: 1,
-    });
+    }));
   }
 
   resetFilters() {
-    this.filters.set({
-      search: '',
-      status: 'all',
-      availability: 'all',
-      page: 1,
-    });
-
+    this._router.navigate(['/view_providers']);
     this.filterComponent?.reset();
   }
 

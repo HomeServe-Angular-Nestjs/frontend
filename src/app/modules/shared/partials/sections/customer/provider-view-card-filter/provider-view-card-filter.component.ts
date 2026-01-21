@@ -22,7 +22,10 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
         search: '',
         availability: 'all',
         status: 'all',
-        date: ''
+        date: '',
+        categoryId: '',
+        lat: null,
+        lng: null,
     });
 
     availabilitySlots: IAvailabilityViewList[] = [
@@ -32,10 +35,12 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
         { label: 'Night', icon: 'fas fa-star', value: 'night' },
     ];
 
-    @Output() filterEvents = new EventEmitter<IFilterFetchProviders>();
+    @Output() filterEvents = new EventEmitter<Partial<IFilterFetchProviders>>();
 
     constructor() {
+        // Automatically emit on filter changes (except search which is debounced)
         effect(() => {
+            const { availability, status, date } = this.filter();
             this._emitFilter();
         });
     }
@@ -45,51 +50,50 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this._destroy$))
             .subscribe(() => {
                 this._emitFilter()
-            })
+            });
     }
 
     onSearchTriggered(value: string) {
+        this.filter.update(curr => ({ ...curr, search: value }));
         this._debounceService.delay(value);
     }
 
     toggleCertifiedOnly() {
-        this._emitFilter();
+        // Not implemented in UI yet, but keeping for future
     }
 
-    sortProviders() {
-        this._emitFilter();
+    onStatusChange(status: any) {
+        this.filter.update(curr => ({ ...curr, status }));
     }
 
     onDateChange(event: Event) {
         const input = event.target as HTMLInputElement;
         const date = input.value;
-        const currentFilter = this.filter();
 
         // If date is cleared, reset availability
-        if (!date) {
-            this.filter.set({ ...currentFilter, date, availability: 'all' });
-        } else {
-            this.filter.set({ ...currentFilter, date });
-        }
+        this.filter.update(curr => ({
+            ...curr,
+            date,
+            availability: !date ? 'all' : curr.availability
+        }));
     }
 
     toggleAvailability(value: AvailabilityType) {
-        const currentFilter = this.filter();
+        const current = this.filter();
 
         // Enforce date selection
-        if (!currentFilter.date?.trim()) {
+        if (!current.date?.trim()) {
             this._toastr.warning('Please select a date');
             return;
         }
 
         // Toggle logic: if clicking same value, revert to 'all'
-        const newAvailability = currentFilter.availability === value ? 'all' : value;
-
-        this.filter.set({ ...currentFilter, availability: newAvailability });
+        const newAvailability = current.availability === value ? 'all' : value;
+        this.filter.update(curr => ({ ...curr, availability: newAvailability }));
     }
 
     clearAvailability() {
-        this.filter.set({ ...this.filter(), availability: 'all' });
+        this.filter.update(curr => ({ ...curr, availability: 'all' }));
     }
 
     reset() {
@@ -97,16 +101,25 @@ export class ProviderViewCardFilterComponent implements OnInit, OnDestroy {
             search: '',
             availability: 'all',
             status: 'all',
-            date: ''
+            date: '',
+            categoryId: '',
+            lat: null,
+            lng: null,
         });
+        
+        this._emitFilter();
     }
 
     private _emitFilter() {
-        const filter = {
-            search: this.filter().search?.trim() || '',
-            availability: this.filter().availability,
-            status: this.filter().status,
-            date: this.filter().date
+        const current = this.filter();
+        const filter: Partial<IFilterFetchProviders> = {
+            search: current.search?.trim(),
+            availability: current.availability,
+            status: current.status,
+            date: current.date,
+            categoryId: current.categoryId,
+            lat: current.lat,
+            lng: current.lng,
         };
 
         this.filterEvents.emit(filter);

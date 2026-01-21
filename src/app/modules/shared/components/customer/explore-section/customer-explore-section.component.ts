@@ -122,7 +122,7 @@ export class CustomerExploreSectionComponent {
     this.isLocationSearchLoading = true;
     this._locationService.getCoordinatesFromText(value).subscribe({
       next: (result) => {
-        this.locationData$.next(result);
+        // this.locationData$.next(result);
         this.isLocationSearchLoading = false;
       },
       error: () => {

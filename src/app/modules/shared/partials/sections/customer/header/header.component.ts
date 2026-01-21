@@ -16,17 +16,19 @@ import { selectTotalUnReadNotificationCount } from '../../../../../../store/noti
 import { CartService } from '../../../../../../core/services/cart.service';
 import { ICustomerSearchCategories } from '../../../../../../core/models/category.model';
 import { CategoryService } from '../../../../../../core/services/category.service';
+import { IOpenCageLocation, LocationService } from '../../../../../../core/services/public/location.service';
 
 @Component({
   selector: 'app-customer-header',
   imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './header.component.html',
-  providers: [DebounceService]
+  providers: [DebounceService, LocationService]
 })
 export class CustomerHeaderComponent implements OnInit {
   private readonly _debounceService = inject(DebounceService);
   private readonly _customerService = inject(CustomerService);
   private readonly _categoryService = inject(CategoryService);
+  private readonly _locationService = inject(LocationService);
   public readonly _cartService = inject(CartService);
   private readonly _router = inject(Router);
   private readonly _store = inject(Store);
@@ -35,9 +37,8 @@ export class CustomerHeaderComponent implements OnInit {
 
   @Input() isFixed: boolean = true;
   showMobileSearch = false;
-  defaultImg = 'https://via.placeholder.com/48';
+  defaultImg = 'assets/images/profile_placeholder.jpg';
   isHomepage = false;
-
 
   // User Signals
   public readonly userStatus = toSignal(this._store.select(selectCheckStatus));
@@ -58,32 +59,36 @@ export class CustomerHeaderComponent implements OnInit {
     { initialValue: 0 }
   );
 
-  // Provider Search
-  providerSearch = '';
-  fetchedProviders: any[] = [];
-  isLoadingProviders = false;
-
   // Service Search
   categorySearch = '';
   fetchedCategories: ICustomerSearchCategories[] = [];
   isLoadingCategories = false;
+
+  // location
+  locationSearch = '';
+  locationData = signal<IOpenCageLocation[]>([]);
+  isLocationSearchLoading = false;
 
   ngOnInit(): void {
     this._store.dispatch(customerActions.fetchOneCustomer());
 
     this._debounceService.onSearch(700)
       .pipe(takeUntil(this._destroy$))
-      .subscribe((search: any) => {
-        if (search.type === 'provider') {
-          this.fetchProviders(search.search);
-        } else if (search.type === 'category') {
-          this.fetchCategories(search.search);
+      .subscribe((searchObj: { search: string, type: string }) => {
+        if (searchObj.type === 'location') {
+          this.fetchLocations(searchObj.search);
+        } else if (searchObj.type === 'category') {
+          this.fetchCategories(searchObj.search);
+        } else {
+          this.isLoadingCategories = false;
+          this.isLocationSearchLoading = false;
         }
       });
 
     this._cartService.getCart().subscribe();
 
     this.checkHomepage();
+
     this._router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       takeUntil(this._destroy$)
@@ -101,10 +106,10 @@ export class CustomerHeaderComponent implements OnInit {
     return this._cartService.cartItemCount();
   }
 
-  searchProviders(): void {
-    if (!this.providerSearch.trim()) return;
-    this.isLoadingProviders = true;
-    this._debounceService.delay({ search: this.providerSearch, type: 'provider' });
+  searchLocations(): void {
+    if (!this.locationSearch.trim()) return;
+    this.isLocationSearchLoading = true;
+    this._debounceService.delay({ search: this.locationSearch, type: 'location' });
   }
 
   searchCategories(): void {
@@ -113,20 +118,35 @@ export class CustomerHeaderComponent implements OnInit {
     this._debounceService.delay({ search: this.categorySearch, type: 'category' });
   }
 
-  handleProviderClick(provider: any): void {
-    this.providerSearch = '';
-    this.fetchedProviders = [];
-    this.isLoadingProviders = false;
-    this._router.navigate(['provider_details', provider.id, 'about']);
+  handleLocationClick(locationSearch: IOpenCageLocation): void {
+    this.locationSearch = '';
+    this.locationData.set([]);
+    this.isLocationSearchLoading = false;
+
+    const current = this._router.routerState.snapshot.root.queryParams;
+
+    this._router.navigate(['/view_providers'], {
+      queryParams: {
+        lat: locationSearch.coordinates.lat,
+        lng: locationSearch.coordinates.lng,
+        categoryId: current['categoryId'] || ''
+      },
+    });
   }
 
   handleCategoryClick(categoryId: string): void {
     this.categorySearch = '';
     this.fetchedCategories = [];
     this.isLoadingCategories = false;
+
+    const current = this._router.routerState.snapshot.root.queryParams;
+
     this._router.navigate(['/view_providers'], {
-      queryParams: { categoryId },
-      queryParamsHandling: 'merge',
+      queryParams: {
+        categoryId,
+        lat: current['lng'] || '',
+        lng: current['lat'] || '',
+      },
     });
   }
 
@@ -149,13 +169,20 @@ export class CustomerHeaderComponent implements OnInit {
     }
   }
 
-  private fetchProviders(search: string): void {
-    // this._customerService.searchProviders(search).subscribe({
-    //   next: (res) => {
-    //     if (res.success && res.data) this.fetchedProviders = res.data;
-    //   },
-    //   complete: () => this.isLoadingProviders = false
-    // });
+  private fetchLocations(search: string): void {
+    this._locationService.getCoordinatesFromText(search)
+      .pipe(
+        takeUntil(this._destroy$),
+        finalize(() => this.isLocationSearchLoading = false)
+      )
+      .subscribe({
+        next: (result) => {
+          this.locationData.set(result);
+        },
+        error: () => {
+          this.locationData.set([]);
+        }
+      });
   }
 
   private fetchCategories(search: string): void {
