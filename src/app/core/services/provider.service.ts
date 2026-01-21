@@ -5,19 +5,20 @@ import { IDisplayReviews, IFilterFetchProviders, IProvider, IProviderCardWithPag
 import { API_ENV } from "../../../environments/env";
 import { SlotType } from "../models/schedules.model";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { IProfession, IServiceCategory } from "../models/category.model";
-import { IProviderService } from "../models/provider-service.model";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
   private _http = inject(HttpClient);
-
-  private providerDataSource = new BehaviorSubject<IProvider | null>(null);
   private readonly _apiUrl = API_ENV.provider;
 
+  private providerDataSource = new BehaviorSubject<IProvider | null>(null);
   providerData$ = this.providerDataSource.asObservable();
 
-  private _buildFilterParams(filter: object): HttpParams {
+  setProviderData(data: IProvider) {
+    this.providerDataSource.next(data);
+  }
+
+  getProviders(filter: IFilterFetchProviders): Observable<IResponse<IProviderCardWithPagination>> {
     let params = new HttpParams();
 
     Object.entries(filter).forEach(([key, value]) => {
@@ -25,16 +26,6 @@ export class ProviderService {
         params = params.set(key, value);
       }
     });
-
-    return params;
-  }
-
-  setProviderData(data: IProvider) {
-    this.providerDataSource.next(data);
-  }
-
-  getProviders(filter: IFilterFetchProviders): Observable<IResponse<IProviderCardWithPagination>> {
-    let params = this._buildFilterParams(filter);
 
     return this._http.get<IResponse<IProviderCardWithPagination>>(`${this._apiUrl}/fetch_providers`, { params });
   }

@@ -1,14 +1,11 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProviderScheduleDefaultTimeComponent } from "../schedule-default-time/provider-schedule-default-time.component";
 import { IProvider } from '../../../../../../core/models/user.model';
 import { catchError, combineLatest, filter, map, Observable, of, shareReplay, startWith, Subject, switchMap, takeUntil, timer } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectProvider } from '../../../../../../store/provider/provider.selector';
 import { ISchedule, SlotType } from '../../../../../../core/models/schedules.model';
-import { scheduleActions } from '../../../../../../store/schedules/schedule.action';
-import { ScheduleService } from '../../../../../../core/services/schedule.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 @Component({
@@ -19,7 +16,6 @@ import { ToastNotificationService } from '../../../../../../core/services/public
 })
 export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   private readonly _store = inject(Store);
-  private readonly _scheduleService = inject(ScheduleService);
   private readonly _toastr = inject(ToastNotificationService);
 
   private _destroy$ = new Subject<void>();
@@ -40,28 +36,28 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
     this.providerData$ = this._store.select(selectProvider);
     const delayed$ = timer(3000); // min 3 sec delay
 
-    const fetchedSchedules$ = this.providerData$.pipe(
-      takeUntil(this._destroy$),
-      filter((provider): provider is IProvider => !!provider && !!provider.id),
-      switchMap(provider =>
-        this._scheduleService.fetchSchedules(provider.id).pipe(
-          catchError(err => {
-            this._toastr.error('Failed to load schedules');
-            console.error(err);
-            return of([]);
-          })
-        )
-      ),
-      shareReplay(1)
-    );
+    // const fetchedSchedules$ = this.providerData$.pipe(
+    //   takeUntil(this._destroy$),
+    //   filter((provider): provider is IProvider => !!provider && !!provider.id),
+    //   switchMap(provider =>
+    //     this._scheduleService.fetchSchedules(provider.id).pipe(
+    //       catchError(err => {
+    //         this._toastr.error('Failed to load schedules');
+    //         console.error(err);
+    //         return of([]);
+    //       })
+    //     )
+    //   ),
+    //   shareReplay(1)
+    // );
 
     // this.schedules$ = fetchedSchedules$;
 
-    this.loading$ = combineLatest([fetchedSchedules$, delayed$]).pipe(
-      takeUntil(this._destroy$),
-      map(() => false),
-      startWith(true)
-    );
+    // this.loading$ = combineLatest([fetchedSchedules$, delayed$]).pipe(
+    //   takeUntil(this._destroy$),
+    //   map(() => false),
+    //   startWith(true)
+    // );
 
     this._syncDateInputToCurrent();
     this._generateWeek(this.currentDate);
@@ -109,16 +105,16 @@ export class ProviderScheduleCalenderComponent implements OnInit, OnDestroy {
   }
 
   addToDefaultSlot(slot: SlotType) {
-    this._store.dispatch(scheduleActions.updateSchedule({
-      updateData: {
-        scheduleDate: this.pickedDate,
-        slot
-      }
-    }));
+    // this._store.dispatch(scheduleActions.updateSchedule({
+    //   updateData: {
+    //     scheduleDate: this.pickedDate,
+    //     slot
+    //   }
+    // }));
   }
 
   clearSlots(date: string, id: string, event: MouseEvent) {
-    this._store.dispatch(scheduleActions.removeSchedule({ date, id }));
+    // this._store.dispatch(scheduleActions.removeSchedule({ date, id }));
   }
 
   setDefaultHours() {
