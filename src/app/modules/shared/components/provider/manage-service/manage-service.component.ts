@@ -15,6 +15,8 @@ import { SharedDataService } from '../../../../../core/services/public/shared-da
 import { ProviderServiceFilterComponent } from './service-filter/service-filter.component';
 import { IServiceFilter } from '../../../../../core/models/offeredService.model';
 import { SortEnum } from '../../../../../core/enums/enums';
+import { IPagination } from '../../../../../core/models/booking.model';
+import { ProviderPaginationComponent } from "../../../partials/sections/provider/pagination/provider-pagination.component";
 
 @Component({
   selector: 'app-provider-manage-service',
@@ -23,7 +25,8 @@ import { SortEnum } from '../../../../../core/enums/enums';
     CommonModule,
     ReactiveFormsModule,
     LoadingCircleAnimationComponent,
-    ProviderServiceFilterComponent
+    ProviderServiceFilterComponent,
+    ProviderPaginationComponent
   ],
   templateUrl: './manage-service.component.html',
   styles: [`
@@ -105,47 +108,13 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     search: ''
   });
 
-  filteredServices = computed(() => {
-    let list = this.services();
-    const filters = this.activeFilters();
-
-    if (filters.search) {
-      const search = filters.search.toLowerCase();
-      list = list.filter(s =>
-        s.category.name.toLowerCase().includes(search) ||
-        s.profession.name.toLowerCase().includes(search) ||
-        s.description.toLowerCase().includes(search)
-      );
-    }
-
-    if (filters.status && filters.status !== 'all') {
-      const isActive = filters.status === 'true';
-      list = list.filter(s => s.isActive === isActive);
-    }
-
-    if (filters.sort) {
-      list = [...list].sort((a, b) => {
-        switch (filters.sort) {
-          case SortEnum.LATEST:
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-          case SortEnum.OLDEST:
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-          case SortEnum.A_Z:
-            return a.category.name.localeCompare(b.category.name);
-          case SortEnum.Z_A:
-            return b.category.name.localeCompare(a.category.name);
-          case SortEnum.PRICE_HIGH_TO_LOW:
-            return b.price - a.price;
-          case SortEnum.PRICE_LOW_TO_HIGH:
-            return a.price - b.price;
-          default:
-            return 0;
-        }
-      });
-    }
-
-    return list;
+  pagination = signal<IPagination>({
+    page: 1,
+    limit: 10,
+    total: 0
   });
+
+
 
   constructor() {
     effect(() => {
@@ -248,6 +217,8 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
 
   onFiltersChanged(filters: IServiceFilter) {
     this.activeFilters.set(filters);
+    this.pagination.update(prev => ({ ...prev, page: 1 }));
+    this._loadServices();
   }
 
   onSubmit() {
@@ -289,19 +260,34 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     });
   }
 
+  changePage(newPage: number) {
+    this.pagination.update(prev => ({ ...prev, page: newPage }));
+    this._loadServices();
+  }
+
   private _loadServices() {
     this.loading.set(true);
-    this._providerServiceManagementService.getServices()
-      .pipe(takeUntil(this._destroy$))
+    const filters = this.activeFilters();
+    const pag = this.pagination();
+
+    this._providerServiceManagementService.getServices({
+      search: filters.search,
+      status: filters.status,
+      sort: filters.sort,
+      page: pag.page,
+      limit: pag.limit
+    })
+      .pipe(
+        finalize(() => this.loading.set(false)),
+        takeUntil(this._destroy$))
       .subscribe({
         next: (res) => {
           if (res.data) {
             this.services.set(res.data);
+            this.pagination.update(prev => ({ ...prev, total: res.data?.length || 0 }));
             this._updateStats();
           }
-          this.loading.set(false);
         },
-        error: () => this.loading.set(false)
       });
   }
 

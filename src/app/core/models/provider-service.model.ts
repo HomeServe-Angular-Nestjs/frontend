@@ -21,3 +21,11 @@ export interface IProviderService {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface IProviderServiceFilter {
+    search?: string;
+    status?: string;
+    sort?: string;
+    page?: number;
+    limit?: number;
+}
