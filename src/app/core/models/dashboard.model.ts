@@ -31,8 +31,8 @@ export interface IProviderDashboardOverview {
   };
   avgRating: number;
   completionRate: number;
-  nextAvailableSlot: { from: string; to: string };
-  availability: {
+  nextAvailableSlot: { from: string; to: string; date: string };
+  workingHours: {
     day: { from: string; to: string };
     time: { from: string; to: string };
   };
