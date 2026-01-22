@@ -9,6 +9,7 @@ import { LocationService } from '../../../../../core/services/public/location.se
 import { DebounceService } from '../../../../../core/services/public/debounce.service';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
 import { ISearchedLocation } from '../../../../../core/models/user.model';
+import { CategoryService } from '../../../../../core/services/category.service';
 
 @Component({
   selector: 'app-customer-explore-section',
@@ -22,6 +23,7 @@ export class CustomerExploreSectionComponent {
   private readonly _locationService = inject(LocationService);
   private readonly _debounceService = inject(DebounceService);
   private readonly _toastr = inject(ToastNotificationService);
+  private readonly _categoryService = inject(CategoryService);
   private readonly _router = inject(Router);
 
   private _allServiceTitles$ = new BehaviorSubject<string[]>([]);
@@ -120,7 +122,7 @@ export class CustomerExploreSectionComponent {
     this.isLocationSearchLoading = true;
     this._locationService.getCoordinatesFromText(value).subscribe({
       next: (result) => {
-        this.locationData$.next(result);
+        // this.locationData$.next(result);
         this.isLocationSearchLoading = false;
       },
       error: () => {

@@ -37,4 +37,8 @@ export class ServiceManagementService {
   getOneService(serviceId: string): Observable<IResponse<IProviderService>> {
     return this._http.get<IResponse<IProviderService>>(`${this._apiUrl}/${serviceId}`);
   }
+
+  canCreateService(): Observable<IResponse<boolean>> {
+    return this._http.post<IResponse<boolean>>(`${this._apiUrl}/can-create-service`, {});
+  }
 }

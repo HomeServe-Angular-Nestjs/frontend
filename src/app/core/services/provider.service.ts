@@ -5,36 +5,27 @@ import { IDisplayReviews, IFilterFetchProviders, IProvider, IProviderCardWithPag
 import { API_ENV } from "../../../environments/env";
 import { SlotType } from "../models/schedules.model";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { IProfession, IServiceCategory } from "../models/category.model";
-import { IProviderService } from "../models/provider-service.model";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
   private _http = inject(HttpClient);
-
-  private providerDataSource = new BehaviorSubject<IProvider | null>(null);
   private readonly _apiUrl = API_ENV.provider;
 
+  private providerDataSource = new BehaviorSubject<IProvider | null>(null);
   providerData$ = this.providerDataSource.asObservable();
-
-  private _buildFilterParams(filter: object): HttpParams {
-    let params = new HttpParams();
-
-    Object.entries(filter).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params = params.set(key, value);
-      }
-    });
-
-    return params;
-  }
 
   setProviderData(data: IProvider) {
     this.providerDataSource.next(data);
   }
 
   getProviders(filter: IFilterFetchProviders): Observable<IResponse<IProviderCardWithPagination>> {
-    let params = this._buildFilterParams(filter);
+    let params = new HttpParams();
+
+    Object.entries(filter).forEach(([key, value]) => {
+      if (value && value !== undefined && value !== null) {
+        params = params.set(key, value);
+      }
+    });
 
     return this._http.get<IResponse<IProviderCardWithPagination>>(`${this._apiUrl}/fetch_providers`, { params });
   }
@@ -101,5 +92,10 @@ export class ProviderService {
 
   updateBufferTime(bufferTime: number): Observable<IResponse<IProvider>> {
     return this._http.patch<IResponse<IProvider>>(`${this._apiUrl}/buffer`, { bufferTime });
+  }
+
+  searchProvidersByAddress(address: string): Observable<IResponse<IProvider[]>> {
+    const params = new HttpParams().set('address', address);
+    return this._http.get<IResponse<IProvider[]>>(`${this._apiUrl}/search-providers`, { params });
   }
 }

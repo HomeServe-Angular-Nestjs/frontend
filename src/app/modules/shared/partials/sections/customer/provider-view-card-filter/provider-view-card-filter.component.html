@@ -6,7 +6,7 @@
         <!-- Search Input -->
         <div class="flex-1 min-w-0">
             <div class="relative">
-                <input type="text" placeholder="Search providers..." [(ngModel)]="filter().search"
+                <input type="text" placeholder="Search providers..." [ngModel]="filter().search"
                     (ngModelChange)="onSearchTriggered($event)"
                     class="w-full h-9 border border-neutral-200 rounded-lg pl-8 pr-3 text-xs outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all placeholder:text-neutral-400" />
                 <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px]"></i>
@@ -16,7 +16,7 @@
         <!-- Sort Dropdown -->
         <div class="w-full md:w-40">
             <div class="relative">
-                <select [(ngModel)]="filter().status" (ngModelChange)="sortProviders()"
+                <select [ngModel]="filter().status" (ngModelChange)="onStatusChange($event)"
                     class="w-full h-9 border border-neutral-200 rounded-lg pl-8 pr-8 text-xs cursor-pointer outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all bg-white appearance-none">
                     <option value="all">All</option>
                     <option value="best-rated">Best Rated</option>

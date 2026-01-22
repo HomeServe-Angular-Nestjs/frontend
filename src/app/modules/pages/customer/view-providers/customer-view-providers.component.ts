@@ -1,11 +1,11 @@
-import { Component, computed, effect, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subject, switchMap, takeUntil, tap, finalize } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { decode as base64Decode } from 'js-base64';
-import { IFilterFetchProviders, IHomeSearch } from '../../../../core/models/user.model';
+import { IFilterFetchProviders } from '../../../../core/models/user.model';
 import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 import { ProviderViewCardFilterComponent } from "../../../shared/partials/sections/customer/provider-view-card-filter/provider-view-card-filter.component";
 import { ProviderService } from '../../../../core/services/provider.service';
@@ -19,9 +19,13 @@ import { CustomerPaginationComponent } from '../../../shared/partials/sections/c
   templateUrl: './customer-view-providers.component.html',
 })
 export class CustomerViewProvidersComponent {
-  private readonly providerService = inject(ProviderService);
-  private readonly toastr = inject(ToastNotificationService);
-  private readonly route = inject(ActivatedRoute);
+  private readonly _providerService = inject(ProviderService);
+  private readonly _toastr = inject(ToastNotificationService);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
+
+  @ViewChild(ProviderViewCardFilterComponent)
+  filterComponent!: ProviderViewCardFilterComponent;
 
   filters = signal<IFilterFetchProviders>({
     search: '',
@@ -29,6 +33,10 @@ export class CustomerViewProvidersComponent {
     limit: 10,
     status: 'all',
     availability: 'all',
+    date: '',
+    categoryId: '',
+    lat: null,
+    lng: null,
   });
 
   pagination = signal<IPagination>({
@@ -40,7 +48,7 @@ export class CustomerViewProvidersComponent {
   private providersResponse = toSignal(
     toObservable(this.filters).pipe(
       switchMap(filters =>
-        this.providerService.getProviders(filters)
+        this._providerService.getProviders(filters)
       )
     ),
     { initialValue: null }
@@ -62,8 +70,8 @@ export class CustomerViewProvidersComponent {
     });
 
     /* Sync query params → filters */
-    const queryParams = toSignal<Params | null>(
-      this.route.queryParams,
+    const queryParams = toSignal<ParamMap | null>(
+      this._route.queryParamMap,
       { initialValue: null }
     );
 
@@ -71,41 +79,39 @@ export class CustomerViewProvidersComponent {
       const params = queryParams();
       if (!params) return;
 
-      const ls = params['ls'];
-      if (!ls) return;
+      const current = this.filters();
+      const nextFilters: Partial<IFilterFetchProviders> = {};
 
-      try {
-        const parsed = JSON.parse(base64Decode(ls));
-        this.filters.set({
-          ...this.filters(),
-          ...parsed,
-          page: 1,
-        });
-      } catch {
-        this.toastr.error('Oops something went wrong.');
+      const categoryId = params.get('categoryId');
+      nextFilters.categoryId = categoryId || '';
+
+      const lat = params.get('lat');
+      const lng = params.get('lng');
+      nextFilters.lat = lat ? Number(lat) : null;
+      nextFilters.lng = lng ? Number(lng) : null;
+
+      const merged = {
+        ...current,
+        ...nextFilters,
+        page: 1
+      };
+
+      if (JSON.stringify(current) !== JSON.stringify(merged)) {
+        this.filters.set(merged);
       }
     });
   }
 
-  @ViewChild(ProviderViewCardFilterComponent)
-  filterComponent!: ProviderViewCardFilterComponent;
-
-  applyFilters(newFilter: IFilterFetchProviders) {
-    this.filters.set({
-      ...this.filters(),
+  applyFilters(newFilter: Partial<IFilterFetchProviders>) {
+    this.filters.update(current => ({
+      ...current,
       ...newFilter,
       page: 1,
-    });
+    }));
   }
 
   resetFilters() {
-    this.filters.set({
-      search: '',
-      status: 'all',
-      availability: 'all',
-      page: 1,
-    });
-
+    this._router.navigate(['/view_providers']);
     this.filterComponent?.reset();
   }
 

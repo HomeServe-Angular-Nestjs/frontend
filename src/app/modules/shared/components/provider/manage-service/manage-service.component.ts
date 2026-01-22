@@ -53,7 +53,7 @@ import { SharedDataService } from '../../../../../core/services/public/shared-da
 export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   private readonly _fb = inject(FormBuilder);
   private readonly _toastr = inject(ToastNotificationService);
-  private readonly _providerService = inject(ServiceManagementService);
+  private readonly _providerServiceManagementService = inject(ServiceManagementService);
   private readonly _categoryService = inject(CategoryService);
   private readonly _dialog = inject(MatDialog);
   private readonly _destroy$ = new Subject<void>();
@@ -128,27 +128,17 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   }
 
   toggleView(mode: 'list' | 'form', service?: IProviderService) {
-    this.viewMode.set(mode);
-    this.isEditing.set(!!service);
-    this.categorySearchControl.setValue('');
-    this.selectedFile = null;
-    this.imagePreview = service?.image || null;
+    if (mode === 'list') {
+      this._openListView();
+      return;
+    }
 
     if (service) {
-      this.serviceForm.patchValue({
-        id: service.id,
-        professionId: service.profession.id,
-        categoryId: service.category.id,
-        categoryName: service.category.name,
-        description: service.description,
-        price: service.price,
-        pricingUnit: service.pricingUnit,
-        estimatedTimeInMinutes: service.estimatedTimeInMinutes,
-        isActive: service.isActive
-      });
-    } else {
-      this.serviceForm.reset({ pricingUnit: 'hour', isActive: true, professionId: '', categoryId: '', categoryName: '' });
+      this._openEditForm(service);
+      return;
     }
+
+    this._attemptCreateForm();
   }
 
   deleteService(id: string) {
@@ -161,7 +151,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
       .afterClosed()
       .subscribe(confirm => {
         if (!confirm) return;
-        this._providerService.deleteService(id)
+        this._providerServiceManagementService.deleteService(id)
           .pipe(takeUntil(this._destroy$))
           .subscribe({
             next: () => {
@@ -177,7 +167,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     const ele = event.target as HTMLInputElement;
     ele.checked = service.isActive;
 
-    this._providerService.toggleServiceStatus(service.id)
+    this._providerServiceManagementService.toggleServiceStatus(service.id)
       .pipe(takeUntil(this._destroy$))
       .subscribe({
         next: () => {
@@ -211,8 +201,8 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
 
     this.isCreating.set(true);
     const action$ = this.isEditing()
-      ? this._providerService.updateService(val.id, formData)
-      : this._providerService.createService(formData);
+      ? this._providerServiceManagementService.updateService(val.id, formData)
+      : this._providerServiceManagementService.createService(formData);
 
 
     action$.pipe(
@@ -229,7 +219,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
 
   private _loadServices() {
     this.loading.set(true);
-    this._providerService.getServices()
+    this._providerServiceManagementService.getServices()
       .pipe(takeUntil(this._destroy$))
       .subscribe({
         next: (res) => {
@@ -289,6 +279,65 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
           this.serviceCategories.set(res.data.services);
         }
       });
+  }
+
+  private _attemptCreateForm(): void {
+    this._providerServiceManagementService
+      .canCreateService()
+      .subscribe({
+        next: (res) => {
+          if (!res.success) {
+            return;
+          }
+
+          this._openCreateForm();
+        }
+      });
+  }
+
+  private _openCreateForm(): void {
+    this.viewMode.set('form');
+    this.isEditing.set(false);
+
+    this.categorySearchControl.setValue('');
+    this.selectedFile = null;
+    this.imagePreview = null;
+
+    this.serviceForm.reset({
+      pricingUnit: 'hour',
+      isActive: true,
+      professionId: '',
+      categoryId: '',
+      categoryName: ''
+    });
+  }
+
+  private _openEditForm(service: IProviderService): void {
+    this.viewMode.set('form');
+    this.isEditing.set(true);
+    this.isCreating.set(false);
+
+    this.categorySearchControl.setValue('');
+    this.selectedFile = null;
+    this.imagePreview = service.image || null;
+
+    this.serviceForm.patchValue({
+      id: service.id,
+      professionId: service.profession.id,
+      categoryId: service.category.id,
+      categoryName: service.category.name,
+      description: service.description,
+      price: service.price,
+      pricingUnit: service.pricingUnit,
+      estimatedTimeInMinutes: service.estimatedTimeInMinutes,
+      isActive: service.isActive
+    });
+  }
+
+  private _openListView(): void {
+    this.viewMode.set('list');
+    this.isEditing.set(false);
+    this.isCreating.set(false);
   }
 
   ngOnDestroy(): void {

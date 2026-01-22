@@ -24,7 +24,6 @@ export class CustomerProviderViewCardComponent implements OnInit, OnDestroy {
   @Input({ required: true }) providers!: IProviderCardView[];
 
   ngOnInit(): void {
-
   }
 
   ngOnDestroy(): void {

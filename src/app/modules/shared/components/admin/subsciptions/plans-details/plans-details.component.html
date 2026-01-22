@@ -1,96 +1,106 @@
-<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
-
+<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <!-- Header -->
-        <div class="flex justify-between items-center px-6 py-4 border-b">
-            <h2 class="text-lg font-semibold">
-                {{ isEditMode ? 'Edit Plan' : 'Plan Details' }}
+        <div class="flex justify-between items-center px-6 py-4 border-b bg-gray-50/50">
+            <h2 class="text-xl font-bold text-gray-800">
+                {{ isCreateMode ? 'Create New Plan' : (isEditMode ? 'Edit Plan' : 'Plan Details') }}
             </h2>
-
-            <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl">
-                ✕
+            <button (click)="closeModal()"
+                class="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100">
+                <i class="fas fa-times text-lg"></i>
             </button>
         </div>
 
         <!-- Body -->
-        <div class="px-6 py-5 space-y-6 text-sm">
-
+        <div class="px-6 py-6 overflow-y-auto space-y-8 flex-1">
             <!-- VIEW MODE -->
-            <ng-container *ngIf="!isEditMode">
-                <div class="grid grid-cols-3 gap-4">
-                    <div>
-                        <p class="text-gray-500">Plan Name</p>
-                        <p class="font-medium">{{ planForm.value.name }}</p>
-                    </div>
-
-                    <div>
-                        <p class="text-gray-500">Price</p>
-                        <p class="font-medium">₹{{ planForm.value.price }}</p>
+            <ng-container *ngIf="!isEditMode && !isCreateMode">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="space-y-1">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Plan Name</p>
+                        <p class="text-lg font-medium text-gray-900 capitalize">{{ plan?.name }}</p>
                     </div>
 
                     <div class="space-y-1">
-                        <p class="text-gray-500">Status</p>
-                        <p class="font-medium ">
-                            <span class="text-white px-2 py-1 rounded-xl"
-                                [ngClass]="planForm.value.status ? 'bg-green-500' : 'bg-red-500'">
-                                {{ planForm.value.status ?
-                                'Active' : 'Inactive' }}
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Price</p>
+                        <p class="text-lg font-bold text-blue-600">₹{{ plan?.price }}</p>
+                    </div>
+
+                    <div class="space-y-1">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</p>
+                        <div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                [ngClass]="plan?.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                                <span class="w-1.5 h-1.5 rounded-full mr-1.5"
+                                    [ngClass]="plan?.isActive ? 'bg-green-400' : 'bg-red-400'"></span>
+                                {{ plan?.isActive ? 'Active' : 'Inactive' }}
                             </span>
-                        </p>
+                        </div>
                     </div>
 
-                    <div>
-                        <p class="text-gray-500">Role</p>
-                        <p class="font-medium capitalize">{{ planForm.value.role }}</p>
+                    <div class="space-y-1">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Role</p>
+                        <p class="text-base font-medium text-gray-700 capitalize">{{ plan?.role }}</p>
                     </div>
 
-                    <div>
-                        <p class="text-gray-500">Duration</p>
-                        <p class="font-medium">{{ planForm.value.duration }}</p>
+                    <div class="space-y-1">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Billing Cycle</p>
+                        <p class="text-base font-medium text-gray-700 capitalize">{{ plan?.duration }}</p>
                     </div>
                 </div>
 
-                <div>
-                    <p class="text-gray-500 mb-2">Features</p>
-
-                    <ol class="list-decimal list-inside space-y-1 text-sm">
-                        <li *ngFor="let feature of planForm.value.features" class="text-gray-700">
-                            {{ feature }}
-                        </li>
-                    </ol>
+                <div class="pt-4 border-t border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-star text-blue-500 mr-2"></i>
+                        Plan Features
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div *ngFor="let feature of featureRegistry"
+                            class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <span class="text-sm text-gray-600 font-medium">{{ feature.label }}</span>
+                            <div [ngSwitch]="feature.type">
+                                <i *ngSwitchCase="'boolean'" class="fas"
+                                    [ngClass]="plan?.features?.[feature.key] ? 'fa-check-circle text-green-500' : 'fa-times-circle text-gray-300'"></i>
+                                <span *ngSwitchCase="'number'" class="text-sm font-bold text-blue-600">{{
+                                    plan?.features?.[feature.key] }}</span>
+                                <span *ngSwitchCase="'enum'"
+                                    class="text-xs font-bold uppercase py-1 px-2 bg-blue-100 text-blue-700 rounded-md">
+                                    {{ plan?.features?.[feature.key] }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </ng-container>
 
-            <!-- EDIT MODE -->
-            <form *ngIf="isEditMode" [formGroup]="planForm" class="space-y-6">
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-500 mb-1">Plan Name</label>
-                        <input formControlName="name"
-                            class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            <!-- EDIT/CREATE MODE -->
+            <form *ngIf="isEditMode || isCreateMode" [formGroup]="planForm" class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700">Plan Name</label>
+                        <input formControlName="name" placeholder="e.g. Premium Plan"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
                     </div>
 
-                    <div>
-                        <label class="block text-gray-500 mb-1">Price</label>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700">Price (₹)</label>
                         <input type="number" formControlName="price"
-                            class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
                     </div>
 
-                    <div>
-                        <label class="block text-gray-500 mb-1">Role</label>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700">Role</label>
                         <select formControlName="role"
-                            class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer">
                             <option value="customer">Customer</option>
                             <option value="provider">Provider</option>
                         </select>
                     </div>
 
-                    <div>
-                        <label class="block text-gray-500 mb-1">Duration</label>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700">Billing Cycle</label>
                         <select formControlName="duration"
-                            class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer">
                             <option value="monthly">Monthly</option>
                             <option value="yearly">Yearly</option>
                             <option value="lifetime">Lifetime</option>
@@ -98,50 +108,72 @@
                     </div>
                 </div>
 
-                <!-- Features -->
-                <div formArrayName="features">
-                    <div class="flex justify-between items-center mb-2">
-                        <p class="text-gray-500">Features</p>
-                        <button type="button" (click)="addFeature()" class="text-blue-600 text-xs hover:underline">
-                            + Add Feature
-                        </button>
-                    </div>
+                <div class="pt-6 border-t border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-sliders-h text-blue-500 mr-2"></i>
+                        Configure Features
+                    </h3>
+                    <div formGroupName="features" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div *ngFor="let feature of featureRegistry" class="space-y-2">
+                            <label class="text-sm font-medium text-gray-600 mb-1 flex justify-between items-center">
+                                {{ feature.label }}
+                                <span class="text-[10px] uppercase text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{{
+                                    feature.type }}</span>
+                            </label>
 
-                    <div class="space-y-2">
-                        <div *ngFor="let ctrl of features.controls; let i = index" class="flex gap-2">
-                            <input [formControlName]="i"
-                                class="flex-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-                            <button type="button" (click)="removeFeature(i)" class="text-red-500 hover:text-red-700">
-                                ✕
-                            </button>
+                            <!-- Boolean Toggle -->
+                            <div *ngIf="feature.type === 'boolean'" class="flex items-center">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" [formControlName]="feature.key" class="sr-only peer">
+                                    <div
+                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
+                                <span class="ml-3 text-sm font-medium text-gray-500">{{
+                                    featuresFormGroup.get(feature.key)?.value ? 'Enabled' : 'Disabled' }}</span>
+                            </div>
+
+                            <!-- Number Input -->
+                            <input *ngIf="feature.type === 'number'" type="number" [formControlName]="feature.key"
+                                class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+
+                            <!-- Enum Select -->
+                            <select *ngIf="feature.type === 'enum'" [formControlName]="feature.key"
+                                class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer">
+                                <option *ngFor="let val of feature.values" [value]="val">{{ val | titlecase }}</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-
             </form>
-
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 border-t flex justify-end gap-3">
-
-            <ng-container *ngIf="!isEditMode">
-                <button (click)="enableEdit()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-                    Edit Plan
+        <div class="px-6 py-4 border-t bg-gray-50/50 flex justify-between items-center">
+            <div>
+                <button *ngIf="!isCreateMode" (click)="deletePlan()"
+                    class="text-red-500 hover:text-red-700 text-sm font-semibold flex items-center transition-colors">
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    Delete Plan
                 </button>
-            </ng-container>
+            </div>
 
-            <ng-container *ngIf="isEditMode">
-                <button (click)="cancelEdit()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100">
+            <div class="flex gap-3">
+                <button (click)="cancelEdit()"
+                    class="px-5 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-100 transition-all">
                     Cancel
                 </button>
 
-                <button (click)="saveChanges()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-                    Save Changes
+                <button *ngIf="!isEditMode && !isCreateMode" (click)="enableEdit()"
+                    class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all">
+                    Edit Plan
                 </button>
-            </ng-container>
 
+                <button *ngIf="isEditMode || isCreateMode" (click)="saveChanges()" [disabled]="planForm.invalid"
+                    class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all">
+                    {{ isCreateMode ? 'Create Plan' : 'Update Plan' }}
+                </button>
+            </div>
         </div>
-
     </div>
 </div>

@@ -1,21 +1,21 @@
-import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from "@angular/core";
-import { ITableRow } from "../../../../../../core/models/table.model";
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { filter, map, Subject, takeUntil } from "rxjs";
 import { CommonModule } from "@angular/common";
 import { PlanService } from "../../../../../../core/services/plans.service";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
-import { IPlan } from "../../../../../../core/models/plan.model";
-import { createPlansTable } from "../../../../../../core/utils/generate-tables.utils";
-import { AdminTableComponent } from "../../../../partials/sections/admin/tables/admin-table/table.component";
+import { IPlan, ICreatePlan, FEATURE_REGISTRY } from "../../../../../../core/models/plan.model";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
 import { AdminPlanDetailsComponent } from "../plans-details/plans-details.component";
 import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 
+import { MatDialogModule } from "@angular/material/dialog";
+
 @Component({
     selector: 'app-admin-view-plans',
     templateUrl: 'current-plans.component.html',
-    imports: [CommonModule, AdminTableComponent, AdminPlanDetailsComponent]
+    standalone: true,
+    imports: [CommonModule, AdminPlanDetailsComponent, MatDialogModule]
 })
 export class CurrentPlansComponent implements OnInit, OnDestroy {
     private readonly _planService = inject(PlanService);
@@ -24,75 +24,114 @@ export class CurrentPlansComponent implements OnInit, OnDestroy {
     private _dialog = inject(MatDialog);
     private _destroy$ = new Subject<void>();
 
-    tableData$ = this._planService.tableData$;
-    columns: string[] = ['id', 'plan name', 'pricing', 'role', 'billing cycle', 'created date', 'status'];
+    plans: IPlan[] = [];
     isViewPlanModalOpen = false;
-    planToView!: IPlan;
+    planToView?: IPlan;
     isEditMode = false;
+    isCreateMode = false;
+
+    readonly featureRegistry = Object.values(FEATURE_REGISTRY);
 
     ngOnInit(): void {
         this._sharedService.setAdminHeader('Subscriptions & Plans');
-        this._loadTableData();
+        this._loadPlans();
     }
 
-    public updateOrInsertRow(plan: IPlan) {
-        const currentTable = this._planService.getTableData;
-        const newRow = this._mapPlanToRow(plan);
-        const index = currentTable.rows.findIndex(r => r['id'] === plan.id);
-
-        let updatedRows;
-        if (index > -1) {
-            updatedRows = currentTable.rows.map(r => r['id'] === plan.id ? newRow : r);
-        } else {
-            updatedRows = [newRow, ...currentTable.rows];
-        }
-
-        this._planService.setTableData = {
-            ...currentTable,
-            rows: updatedRows,
-        };
-    }
-
-    private _loadTableData() {
+    private _loadPlans() {
         this._planService.fetchPlans().pipe(
-            map(response => response.data),
-            filter(plans => !!plans),
-            map(plans => createPlansTable(this.columns, plans)),
+            map(response => response.data || []),
             takeUntil(this._destroy$)
-        ).subscribe(table => this._planService.setTableData = table);
+        ).subscribe(plans => this.plans = plans);
     }
 
-    private _mapPlanToRow(plan: IPlan): ITableRow {
-        return {
-            id: plan.id,
-            'plan name': plan.name,
-            pricing: `₹${plan.price}`,
-            role: plan.role,
-            'billing cycle': plan.duration,
-            'created date': plan.createdAt,
-            status: plan.isActive,
-            createdAt: plan.createdAt,
-            actions: [
-                {
-                    toolTip: plan.isActive ? 'Deactivate Plan' : 'Activate Plan',
-                    icon: plan.isActive ? 'fas fa-circle-check' : 'fas fa-circle-xmark',
-                    styles: plan.isActive ? 'text-green-500' : 'text-red-400',
-                    action: 'toggle',
+    openCreateModal() {
+        this.planToView = undefined;
+        this.isEditMode = true;
+        this.isCreateMode = true;
+        this.isViewPlanModalOpen = true;
+    }
+
+    viewPlan(plan: IPlan) {
+        this.planToView = plan;
+        this.isEditMode = false;
+        this.isCreateMode = false;
+        this.isViewPlanModalOpen = true;
+    }
+
+    editPlan(plan: IPlan) {
+        this.planToView = plan;
+        this.isEditMode = true;
+        this.isCreateMode = false;
+        this.isViewPlanModalOpen = true;
+    }
+
+    togglePlanStatus(plan: IPlan) {
+        const action = plan.isActive ? 'deactivate' : 'activate';
+        this._openConfirmationDialog(`Are you sure you want to ${action} this plan?`, 'Confirm Status Change')
+            .afterClosed()
+            .subscribe(confirmed => {
+                if (!confirmed) return;
+
+                this._planService.updatePlanStatus({ id: plan.id, status: plan.isActive }).subscribe({
+                    next: (res) => {
+                        if (res.success && res.data) {
+                            const index = this.plans.findIndex(p => p.id === res.data!.id);
+                            if (index !== -1) {
+                                this.plans[index] = res.data!;
+                            }
+                            this._toastr.success(`Plan ${action}d successfully.`);
+                        }
+                    },
+                    error: () => this._toastr.error('Failed to update status.')
+                });
+            });
+    }
+
+    handlePlanSave(planData: IPlan | ICreatePlan) {
+        if (this.isCreateMode) {
+            this._planService.createPlan(planData as ICreatePlan).subscribe({
+                next: (res) => {
+                    if (res.success && res.data) {
+                        this.plans = [res.data, ...this.plans];
+                        this._toastr.success('Plan created successfully.');
+                        this.closeModal();
+                    }
                 },
-                {
-                    toolTip: 'View Plan',
-                    icon: 'fas fa-eye',
-                    styles: 'text-blue-600',
-                    action: 'view',
+                error: (err) => this._toastr.error(err.error?.message || 'Failed to create plan.')
+            });
+        } else {
+            this._planService.updatePlan(planData as IPlan).subscribe({
+                next: (res) => {
+                    if (res.success && res.data) {
+                        const index = this.plans.findIndex(p => p.id === res.data!.id);
+                        if (index !== -1) {
+                            this.plans[index] = res.data!;
+                        }
+                        this._toastr.success('Plan updated successfully.');
+                        this.closeModal();
+                    }
                 },
-                {
-                    toolTip: 'Edit Plan',
-                    icon: 'fas fa-edit',
-                    styles: 'text-green-600',
-                    action: 'edit',
-                },
-            ]
-        };
+                error: (err) => this._toastr.error(err.error?.message || 'Failed to update plan.')
+            });
+        }
+    }
+
+    handlePlanDelete(planId: string, modal: boolean = false) {
+        this._openConfirmationDialog('Are you sure you want to delete this plan? This action cannot be undone.', 'Delete Plan')
+            .afterClosed()
+            .subscribe(confirmed => {
+                if (!confirmed) return;
+
+                this._planService.deletePlan(planId).subscribe({
+                    next: (res) => {
+                        if (res.success) {
+                            this.plans = this.plans.filter(p => p.id !== planId);
+                            this._toastr.success('Plan deleted successfully.');
+                            if (modal) this.closeModal();
+                        }
+                    }
+                });
+            });
     }
 
     private _openConfirmationDialog(message: string, title: string) {
@@ -101,104 +140,15 @@ export class CurrentPlansComponent implements OnInit, OnDestroy {
         });
     }
 
-    private _togglePlanStatus(row: any) {
-        this._planService.updatePlanStatus({ id: row.id, status: row.status }).pipe(
-            map((res) => res.data),
-            filter(plan => !!plan)
-        ).subscribe({
-            next: (updatedPlan) => {
-                const currentTable = this._planService.getTableData;
-
-                const updatedRows = currentTable.rows.map(r =>
-                    r['id'] === updatedPlan.id ? this._mapPlanToRow(updatedPlan) : r
-                );
-
-                this._planService.setTableData = {
-                    ...currentTable,
-                    rows: updatedRows
-                };
-
-                this._toastr.success('Plan status updated.');
-            },
-            error: () => {
-                this._toastr.error('Failed to update plan.');
-            }
-        });
-    }
-
-    private _viewPlan(planId: string) {
-        this._planService.fetchOnePlan(planId)
-            .pipe(takeUntil(this._destroy$))
-            .subscribe({
-                next: (res) => {
-                    if (res.success && res.data) {
-                        this.planToView = res.data;
-                        this.isViewPlanModalOpen = true;
-                    }
-                },
-            });
-    }
-
-    adminTableActionTriggered(event: { action: string; row: any }) {
-        let action = event.action;
-
-        if (action === 'view') {
-            this._viewPlan(event.row.id);
-            return;
-        }
-
-        if (action === 'toggle') {
-            action = event.row.status ? 'deactivate' : 'activate';
-        }
-
-        this._openConfirmationDialog(`Are you sure you want to ${action} the plan?`, 'Confirm Action')
-            .afterClosed()
-            .subscribe(confirmed => {
-                if (!confirmed) return;
-
-                switch (event.action) {
-                    case 'toggle':
-                        this._togglePlanStatus(event.row);
-                        break;
-                    case 'edit': {
-                        this.isEditMode = true;
-                        this._viewPlan(event.row.id);
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            });
-    }
-
-    updatePlan(newPlan: IPlan) {
-        this._planService.updatePlan(newPlan)
-            .pipe(takeUntil(this._destroy$))
-            .subscribe({
-                next: (res) => {
-                    const currentTable = this._planService.getTableData;
-
-                    const updatedRows = currentTable.rows.map(row =>
-                        row['id'] === newPlan.id ? this._mapPlanToRow(newPlan) : row
-                    );
-
-                    this._planService.setTableData = {
-                        ...currentTable,
-                        rows: updatedRows
-                    };
-
-                    this._toastr.success(res.message);
-                },
-            });
-    }
-
     closeModal() {
         this.isViewPlanModalOpen = false;
+        this.planToView = undefined;
+        this.isEditMode = false;
+        this.isCreateMode = false;
     }
 
     ngOnDestroy(): void {
         this._destroy$.next();
         this._destroy$.complete();
     }
-
 }

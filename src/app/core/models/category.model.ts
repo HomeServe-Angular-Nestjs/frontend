@@ -30,3 +30,8 @@ export interface IServiceCategoryWithPagination {
 export interface IServiceCategoryFilter extends IProfessionFilter {
     profession?: string;
 }
+
+export interface ICustomerSearchCategories {
+    categoryId: string;
+    categoryName: string;
+}

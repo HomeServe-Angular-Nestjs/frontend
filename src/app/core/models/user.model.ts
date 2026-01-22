@@ -203,9 +203,8 @@ export interface ISearchedLocation {
 }
 
 export interface IHomeSearch {
-    title?: string | null;
-    lat?: number | null,
-    lng?: number | null;
+    lat: number | null,
+    lng: number | null;
 }
 
 export interface IFilterFetchProviders extends IHomeSearch {
@@ -217,6 +216,7 @@ export interface IFilterFetchProviders extends IHomeSearch {
     availability?: AvailabilityType | 'all';
     date?: string;
     sort?: 'best_rated' | 'nearest' | 'all';
+    categoryId?: string;
 }
 
 export interface IStats {

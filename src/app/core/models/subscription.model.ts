@@ -1,4 +1,4 @@
-import { PlanRoleType } from "./plan.model";
+import { PlanFeatures, PlanName, PlanRoleType } from "./plan.model";
 import { PaymentStatus, PlanDuration } from "../enums/enums";
 import { IPagination } from "./booking.model";
 
@@ -15,7 +15,8 @@ export interface ISubscription {
     name: string;
     duration: PlanDuration;
     role: PlanRoleType;
-    features: string[];
+    features: PlanFeatures;
+    price: number;
 
     startTime: string;
     endDate: string | null;
