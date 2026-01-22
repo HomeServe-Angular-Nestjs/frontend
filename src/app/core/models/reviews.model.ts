@@ -46,11 +46,16 @@ export interface IReviewFilters {
 }
 
 
-export interface IReviewDetails extends IReview {
-  avatar: string;
-  email: string;
-  username: string;
-  serviceTitles: string[];
+export interface IReviewDetails {
+  bookingId: string;
+  desc: string;
+  rating: number;
+  writtenAt: string;
+  customer: {
+    avatar: string;
+    email: string;
+    username: string;
+  }
 }
 
 export interface IReviewWithPagination {

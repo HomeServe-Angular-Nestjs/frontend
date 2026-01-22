@@ -3,11 +3,12 @@ import { combineLatest, Subject, switchMap, takeUntil } from 'rxjs';
 import { BookingService } from '../../../../core/services/booking.service';
 import { CommonModule } from '@angular/common';
 import { ProviderPaginationComponent } from '../../../shared/partials/sections/provider/pagination/provider-pagination.component';
-import { IReviewDetails, IReviewFilter } from '../../../../core/models/reviews.model';
+import { IReviewFilter } from '../../../../core/models/reviews.model';
 import { FormsModule } from '@angular/forms';
 import { DebounceService } from '../../../../core/services/public/debounce.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { SharedDataService } from '../../../../core/services/public/shared-data.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-provider-review',
@@ -19,6 +20,7 @@ export class ProviderReviewComponent implements OnInit, OnDestroy {
   private readonly _sharedService = inject(SharedDataService);
   private readonly _bookingService = inject(BookingService);
   private readonly _debounceService = inject(DebounceService);
+  private readonly _router = inject(Router);
 
   private _destroy$ = new Subject<void>();
 
@@ -85,6 +87,10 @@ export class ProviderReviewComponent implements OnInit, OnDestroy {
   updateSort(value: any) {
     this.filter.update(f => ({ ...f, sort: value }));
     this.page.set(1);
+  }
+
+  viewDetails(bookingId: string) {
+    this._router.navigate(['/provider/bookings', bookingId]);
   }
 
   ngOnDestroy(): void {
