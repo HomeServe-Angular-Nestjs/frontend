@@ -69,3 +69,9 @@ export interface IReviewFilter {
   sort?: 'asc' | 'desc';
   time?: "all" | "last_6_months" | "last_year";
 }
+export interface IAdminReviewStats {
+  totalReviews: number;
+  activeReviews: number;
+  reportedReviews: number;
+  averageRating: number;
+}

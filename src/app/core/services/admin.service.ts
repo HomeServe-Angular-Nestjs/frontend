@@ -6,7 +6,7 @@ import { BehaviorSubject, Observable, tap } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { IAdminBookingDetails, IAdminBookingFilter, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
-import { IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
+import { IAdminReviewStats, IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
 import { IAdminDashboardRevenue, IAdminDashboardSubscription } from "../models/subscription.model";
 import { IReportDownloadBookingData, IReportDownloadTransactionData, IReportDownloadUserData } from "../models/admin-report.model";
 import { IAdminSettings } from "../models/admin-settings.model";
@@ -101,7 +101,12 @@ export class AdminService {
         return this._http.get<IResponse<PaginatedReviewResponse>>(`${this._adminUrl}/reviews`, { params });
     }
 
+    getReviewStats(): Observable<IResponse<IAdminReviewStats>> {
+        return this._http.get<IResponse<IAdminReviewStats>>(`${this._adminUrl}/reviews/stats`);
+    }
+
     updateReviewStatus(data: { reviewId: string, providerId: string, status: boolean }): Observable<IResponse> {
+
         return this._http.patch<IResponse>(`${this._adminUrl}/reviews/status`, data);
     }
 

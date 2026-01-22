@@ -26,7 +26,7 @@ export class AdminSidebarComponent {
       subItems: [
         { name: 'Users', route: 'admin/users', icon: 'fa-users' },
         { name: 'Ratings & Reviews', route: 'admin/ratings&reviews', icon: 'fa-star' },
-        { name: 'Approvals', route: 'admin/approvals', icon: 'fa-circle-check' }
+        // { name: 'Approvals', route: 'admin/approvals', icon: 'fa-circle-check' }
       ]
     },
     {

@@ -93,7 +93,14 @@ export const adminRoute: Routes = [
                         loadComponent: () => import('../../shared/components/admin/category/category-layout/category-layout.component')
                             .then(c => c.AdminCategoryLayoutComponent),
                         data: { breadcrumb: 'Categories' }
+                    },
+                    {
+                        path: 'ratings&reviews',
+                        loadComponent: () => import('../../shared/components/admin/reviews/admin-review-management.component')
+                            .then(c => c.AdminReviewManagementComponent),
+                        data: { breadcrumb: 'Ratings & Reviews' }
                     }
+
                 ]
             },
         ]
