@@ -1,119 +1,152 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { EChartsOption, graphic } from 'echarts';
 import { AdminService } from '../../../../../../core/services/admin.service';
-import { EChartsOption } from 'echarts';
-
+import { filter, map } from 'rxjs';
 
 @Component({
     selector: 'app-admin-dashboard-revenue-chart',
-    templateUrl: './revenue-chart.component.html',
-    styles: [`
-    :host {
-        display: block;
-    }
-    `],
+    standalone: true,
     imports: [CommonModule, NgxEchartsModule],
+    templateUrl: './revenue-chart.component.html',
 })
 export class AdminRevenueChartComponent implements OnInit {
-    options: EChartsOption = {};
-    updateOptions: EChartsOption = {};
+    private readonly _adminService = inject(AdminService);
 
-    private oneDay = 24 * 3600 * 1000;
-    private now!: Date;
-    private value!: number;
-    private data!: [string, number][];
-    private timer: any;
+    options: EChartsOption = {};
+    isLoading = true;
 
     ngOnInit(): void {
-        this.data = [];
-        this.now = new Date(2024, 0, 1); // Starting date
-        this.value = Math.random() * 10000;
+        this._fetchRevenueData();
+    }
 
-        for (let i = 0; i < 100; i++) {
-            this.data.push(this.randomData());
-        }
+    private _fetchRevenueData(): void {
+        this._adminService.getDashboardRevenueData().pipe(
+            map(res => res.data),
+            filter(Boolean)
+        ).subscribe({
+            next: (data) => {
+                this._setupChart(data);
+                this.isLoading = false;
+            },
+            error: (err) => {
+                console.error('Error fetching revenue data:', err);
+                this.isLoading = false;
+            }
+        });
+    }
+
+    private _setupChart(data: { date: string, amount: number }[]): void {
+        const dates = data.map(item => new Date(item.date).toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short'
+        }));
+        const amounts = data.map(item => item.amount);
 
         this.options = {
-            title: {
-                text: 'Revenue Analysis',
-                left: 'left',
-                textStyle: {
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: '#333',
-                },
-            },
             tooltip: {
                 trigger: 'axis',
-                formatter: (params: any) => {
-                    const p = params[0];
-                    const date = new Date(p.value[0]).toLocaleString();
-                    const amount = p.value[1];
-                    return `📅 Date: ${date}<br/>💰 Amount: ₹${amount.toLocaleString()}`;
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: 12,
+                padding: [10, 15],
+                textStyle: {
+                    color: '#1e293b',
+                    fontSize: 13
                 },
                 axisPointer: {
-                    animation: false,
+                    lineStyle: {
+                        color: '#6366f1',
+                        width: 2,
+                        type: 'dashed'
+                    }
                 },
+                formatter: (params: any) => {
+                    const p = params[0];
+                    return `
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">${p.name}</span>
+                            <div class="flex items-center gap-2 pt-1">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                <span class="text-slate-500 font-medium">Revenue:</span>
+                                <span class="text-indigo-600 font-black">₹${p.value.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            grid: {
+                top: '5%',
+                left: '3%',
+                right: '4%',
+                bottom: '5%',
+                containLabel: true
             },
             xAxis: {
-                type: 'time',
-                name: 'Date & Time',
-                axisLabel: {
-                    formatter: (value: any) => new Date(value).toLocaleDateString(),
+                type: 'category',
+                data: dates,
+                axisTick: { show: false },
+                axisLine: {
+                    lineStyle: {
+                        color: '#f1f5f9'
+                    }
                 },
-                splitLine: { show: false },
+                axisLabel: {
+                    color: '#94a3b8',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    margin: 15
+                }
             },
             yAxis: {
                 type: 'value',
-                name: 'Amount (₹)',
-                boundaryGap: [0, '10%'],
-                splitLine: { show: true },
+                splitLine: {
+                    lineStyle: {
+                        type: 'dashed',
+                        color: '#f1f5f9'
+                    }
+                },
+                axisLabel: {
+                    color: '#94a3b8',
+                    fontSize: 11,
+                    formatter: (value: number) => {
+                        if (value >= 1000) return `₹${value / 1000}k`;
+                        return `₹${value}`;
+                    }
+                }
             },
             series: [
                 {
                     name: 'Revenue',
                     type: 'line',
-                    showSymbol: false,
+                    showSymbol: true,
+                    symbol: 'circle',
+                    symbolSize: 8,
                     smooth: true,
-                    symbolSize: 6,
-                    data: this.data,
+                    data: amounts,
                     lineStyle: {
-                        color: '#556B2F',
-                        width: 2,
+                        color: '#6366f1',
+                        width: 3
                     },
                     itemStyle: {
-                        color: '#8FBC8F',
+                        color: '#6366f1',
+                        borderWidth: 2,
+                        borderColor: '#fff'
                     },
                     areaStyle: {
-                        color: 'rgba(143, 188, 143, 0.2)',
+                        color: new graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(99, 102, 241, 0.2)' },
+                            { offset: 1, color: 'rgba(99, 102, 241, 0)' }
+                        ])
                     },
-                },
-            ],
+                    // emphasis: {
+                    //     itemStyle: {
+                    //         // scale: true,
+                    //         // size: 10
+                    //     }
+                    // }
+                }
+            ]
         };
-
-        this.timer = setInterval(() => {
-            for (let i = 0; i < 2; i++) {
-                this.data.shift();
-                this.data.push(this.randomData());
-            }
-
-            this.updateOptions = {
-                series: [{ data: this.data }],
-            };
-        }, 1000);
-    }
-
-    ngOnDestroy(): void {
-        clearInterval(this.timer);
-    }
-
-    randomData(): [string, number] {
-        this.now = new Date(this.now.getTime() + this.oneDay);
-        this.value = this.value + Math.random() * 1000 - 500;
-        return [
-            this.now.toISOString(),
-            Math.max(0, Math.round(this.value)),
-        ];
     }
 }

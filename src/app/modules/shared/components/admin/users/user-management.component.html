@@ -3,7 +3,7 @@
 </div>
 
 <ng-container *ngIf="tableData$ | async as tableData; else noData">
-    <app-table [tableData]="tableData" (actionTriggeredEvent)="onActionFromTable($event)"></app-table>
+    <app-admin-table [tableData]="tableData" (actionTriggeredEvent)="onActionFromTable($event)"></app-admin-table>
 </ng-container>
 
 <ng-template #noData>

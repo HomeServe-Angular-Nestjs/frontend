@@ -1,69 +1,108 @@
-<table class="min-w-full table-auto bg-white text-sm">
-    <thead class="bg-gray-100 text-xs text-gray-600 uppercase tracking-wide">
-        <tr>
-            <th *ngFor="let column of table.columns" class="px-4 py-3 text-left border-b border-gray-300 font-semibold">
-                {{ column }}
-            </th>
-            <th class="px-4 py-3 text-left border-b border-gray-300 font-semibold">Actions</th>
-        </tr>
-    </thead>
+<div class="overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+    <table class="min-w-full table-auto text-sm border-collapse">
+        <thead class="bg-gray-100/80 border-b border-gray-200">
+            <tr>
+                <th *ngFor="let column of tableData.columns"
+                    class="px-4 py-3 text-left text-[11px] font-bold text-gray-600 uppercase tracking-wider">
+                    {{ column }}
+                </th>
+                <th class="px-4 py-3 text-right text-[11px] font-bold text-gray-600 uppercase tracking-wider">
+                    Actions
+                </th>
+            </tr>
+        </thead>
 
-    <tbody>
-        <!-- Data rows -->
-        <tr *ngFor="let row of table.rows" class="hover:bg-gray-50 transition">
-            <td *ngFor="let column of table.columns" class="px-4 py-3 border-b border-gray-100 text-gray-800">
-                <ng-container [ngSwitch]="column.toLowerCase()">
+        <tbody class="divide-y divide-gray-100">
+            <!-- Data rows -->
+            <tr *ngFor="let row of tableData.rows" class="hover:bg-blue-50/20 transition-all duration-200">
+                <td *ngFor="let column of tableData.columns" class="px-4 py-2.5 whitespace-nowrap">
+                    <ng-container [ngSwitch]="column.toLowerCase()">
 
-                    <!-- STATUS -->
-                    <span *ngSwitchCase="'status'">
-                        <span class="inline-block px-3 py-1 text-xs font-medium rounded-full" [ngClass]="{
-                            'bg-green-100 text-green-700': row[column],'bg-red-100 text-red-700': !row[column]
-                            }">
-                            {{ row[column] ? 'Active' : 'Inactive' }}
+                        <!-- STATUS -->
+                        <span *ngSwitchCase="'status'">
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold transition-all"
+                                [ngClass]="{
+                                    'bg-green-50 text-green-700 ring-1 ring-green-100': row[column] === 'Active',
+                                    'bg-red-50 text-red-700 ring-1 ring-red-100': row[column] !== 'Active'
+                                }">
+                                <span class="w-1 h-1 rounded-full mr-1.5"
+                                    [ngClass]="row[column] === 'Active' ? 'bg-green-500 animate-pulse' : 'bg-red-500'"></span>
+                                {{ row[column] | uppercase }}
+                            </span>
                         </span>
-                    </span>
 
-                    <!-- CREATED DATE -->
-                    <span *ngSwitchCase="'created date'">
-                        {{ row[column] | date: 'mediumDate' }}
-                    </span>
+                        <!-- JOINED / CREATED DATE -->
+                        <span *ngSwitchCase="'joined'">
+                            <span class="text-gray-400 text-[11px] font-medium">
+                                {{ row[column] }}
+                            </span>
+                        </span>
 
-                    <!-- ID (SHORT) -->
-                    <span *ngSwitchCase="'id'">
-                        <code class="bg-gray-100 uppercase text-xs font-mono px-2 py-0.5 rounded text-gray-700">
-                            {{ row[column] | slice: 0:10 }}
-                        </code>
-                    </span>
+                        <span *ngSwitchCase="'created date'">
+                            <span class="text-gray-500 font-medium">
+                                {{ row[column] | date: 'mediumDate' }}
+                            </span>
+                        </span>
 
-                    <!-- DEFAULT -->
-                    <span *ngSwitchDefault>
-                        {{ row[column] | capitalizeFirst }}
-                    </span>
+                        <!-- ID -->
+                        <span *ngSwitchCase="'id'">
+                            <code
+                                class="bg-gray-50 text-[10px] font-mono px-1.5 py-0.5 rounded text-gray-400 border border-gray-100 select-all hover:text-gray-600">
+                                #{{ row[column] | uppercase }}
+                            </code>
+                        </span>
 
-                </ng-container>
-            </td>
+                        <!-- EMAIL -->
+                        <span *ngSwitchCase="'email'">
+                            <span class="text-gray-800 font-medium text-xs">
+                                {{ row[column] }}
+                            </span>
+                        </span>
 
-            <!-- Actions -->
-            <td class="px-4 py-3 border-b border-gray-100 space-x-1">
-                <button *ngFor="let action of row.actions" (click)="actionsTriggered(action, row)"
-                    [title]="action.toolTip" [ngClass]="action.styles"
-                    class="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-200 transition duration-150">
-                    <i [class]="'text-[18px] ' + action.icon"></i>
-                </button>
-            </td>
-        </tr>
+                        <!-- USERNAME / DEFAULT -->
+                        <span *ngSwitchDefault>
+                            <span class="text-gray-700 font-medium text-xs">
+                                {{ row[column] | titlecase }}
+                            </span>
+                        </span>
 
-        <!-- Empty State Row -->
-        <tr *ngIf="table.rows.length === 0">
-            <td [attr.colspan]="table.columns.length + 1"
-                class="text-center py-6 text-gray-500 italic border-b border-gray-200">
-                <div class="flex flex-col items-center space-y-2">
-                    <i class="fas fa-database text-4xl text-gray-300"></i>
-                    <p class="text-lg font-semibold">No records found</p>
-                    <p class="text-sm text-gray-400">Try adjusting your filters or come back later.</p>
-                </div>
-            </td>
-        </tr>
-    </tbody>
+                    </ng-container>
+                </td>
 
-</table>
+                <!-- Actions -->
+                <td class="px-4 py-2.5 text-right whitespace-nowrap space-x-1.5">
+                    <button *ngFor="let action of row.actions" (click)="emitAction(action.action, row)"
+                        [title]="action.toolTip"
+                        class="inline-flex items-center justify-center w-7 h-7 rounded-lg hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-all duration-200 group"
+                        [ngClass]="action.styles">
+                        <i [class]="'text-base ' + action.icon + ' group-hover:scale-110 transition-transform'"></i>
+                    </button>
+                </td>
+            </tr>
+
+            <!-- Empty State Row -->
+            <tr *ngIf="tableData.rows.length === 0">
+                <td [attr.colspan]="tableData.columns.length + 1"
+                    class="px-4 py-16 text-center text-gray-500 bg-gray-50/5">
+                    <div class="flex flex-col items-center justify-center max-w-xs mx-auto">
+                        <div
+                            class="w-16 h-16 bg-white border border-gray-100 rounded-2xl shadow-sm flex items-center justify-center mb-6">
+                            <i class="fas fa-search text-2xl text-gray-200"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">No Results Found</h3>
+                        <p class="text-xs text-gray-500 mb-6 font-medium">
+                            Try adjusting your filters or search terms.
+                        </p>
+                        <button
+                            class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-all active:scale-95 group flex items-center gap-2"
+                            (click)="refreshPage()">
+                            <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-500"></i>
+                            Reset View
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

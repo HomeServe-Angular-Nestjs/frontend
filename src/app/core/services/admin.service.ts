@@ -7,7 +7,7 @@ import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { IAdminBookingDetails, IAdminBookingFilter, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
 import { IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
-import { IAdminDashboardSubscription } from "../models/subscription.model";
+import { IAdminDashboardRevenue, IAdminDashboardSubscription } from "../models/subscription.model";
 import { IReportDownloadBookingData, IReportDownloadTransactionData, IReportDownloadUserData } from "../models/admin-report.model";
 import { IAdminSettings } from "../models/admin-settings.model";
 
@@ -109,9 +109,9 @@ export class AdminService {
         return this._http.get<IResponse>(`${this._adminUrl}/dashboard/overview`);
     }
 
-    // getDashboardRevenueData(): Observable<IResponse> {-
-    //     return this._http.get<IResponse>(`${this._adminUrl}/dashboard/revenue`);
-    // }
+    getDashboardRevenueData(): Observable<IResponse<IAdminDashboardRevenue[]>> {
+        return this._http.get<IResponse<IAdminDashboardRevenue[]>>(`${this._adminUrl}/dashboard/revenue`);
+    }
 
     getSubscriptionData(): Observable<IResponse<IAdminDashboardSubscription>> {
         return this._http.get<IResponse<IAdminDashboardSubscription>>(`${this._adminUrl}/dashboard/subscription`);

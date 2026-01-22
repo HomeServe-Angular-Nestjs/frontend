@@ -1,1 +1,22 @@
-<div echarts [options]="chartOptions" class="h-96 p-4"></div>
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col h-full">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h3 class="text-lg font-bold text-slate-800 tracking-tight">Access Distribution</h3>
+            <p class="text-xs font-medium text-slate-400 mt-0.5 uppercase tracking-wider">User Plan Breakdown</p>
+        </div>
+        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+            <i class="fas fa-chart-pie text-indigo-500"></i>
+        </div>
+    </div>
+
+    <div class="relative flex-1 min-h-[300px]">
+        <!-- Center Label - Positioned to match chart center ['40%', '50%'] -->
+        <div class="absolute top-1/2 left-[40%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none"
+            *ngIf="!isLoading">
+            <span class="text-3xl font-black text-slate-800">{{ totalSubscribers }}</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Providers</span>
+        </div>
+
+        <div echarts [options]="chartOptions" class="w-full h-full" [loading]="isLoading"></div>
+    </div>
+</div>

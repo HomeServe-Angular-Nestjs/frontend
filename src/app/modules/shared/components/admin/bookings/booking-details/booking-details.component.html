@@ -82,25 +82,20 @@
     </div>
 
     <!-- PAYMENT BREAKDOWN -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-        <div class="kpi kpi-indigo">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+        <div class="kpi kpi-indigo shadow-sm border border-indigo-100/50">
             <p class="label">Customer Paid</p>
-            <p class="kpi-value">₹{{ bookingDetails.breakdown.customerPaid }}</p>
+            <p class="kpi-value text-2xl">₹{{ bookingDetails.breakdown.customerPaid }}</p>
         </div>
 
-        <div class="kpi kpi-green">
+        <div class="kpi kpi-green shadow-sm border border-green-100/50">
             <p class="label">Provider Amount</p>
-            <p class="kpi-value">₹{{ bookingDetails.breakdown.providerAmount }}</p>
+            <p class="kpi-value text-2xl">₹{{ bookingDetails.breakdown.providerAmount }}</p>
         </div>
 
-        <div class="kpi kpi-yellow">
-            <p class="label">Commission</p>
-            <p class="kpi-value">₹{{ bookingDetails.breakdown.commissionEarned }}</p>
-        </div>
-
-        <div class="kpi kpi-gray">
+        <div class="kpi kpi-gray shadow-sm border border-gray-100/50">
             <p class="label">GST</p>
-            <p class="kpi-value">₹{{ bookingDetails.breakdown.gst }}</p>
+            <p class="kpi-value text-2xl">₹{{ bookingDetails.breakdown.gst }}</p>
         </div>
     </div>
 

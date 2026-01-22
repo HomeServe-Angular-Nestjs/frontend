@@ -239,8 +239,6 @@ export class AdminCategoryServiceComponent implements OnInit, OnDestroy {
       isActive: this.selectedStatus(),
     };
 
-    console.log(filter)
-
     // Use the passed page number for the request
     this._categoryService.getServiceCategories(filter, page, this.pagination().limit)
       .pipe(takeUntil(this._destroy$))

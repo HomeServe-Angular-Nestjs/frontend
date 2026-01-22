@@ -8,6 +8,7 @@ import { IAdminDashboardSubscription } from '../../../../../../core/models/subsc
 
 @Component({
     selector: 'app-admin-subscription-pie-chart',
+    standalone: true,
     imports: [CommonModule, NgxEchartsModule],
     templateUrl: './subscription-pie-chart.component.html',
 })
@@ -15,6 +16,8 @@ export class SubscriptionPieChartComponent implements OnInit {
     private readonly _adminService = inject(AdminService);
 
     chartOptions: EChartsOption = {};
+    isLoading = true;
+    totalSubscribers = 0;
 
     ngOnInit() {
         this._adminService.getSubscriptionData().pipe(
@@ -22,64 +25,91 @@ export class SubscriptionPieChartComponent implements OnInit {
             filter(Boolean)
         ).subscribe({
             next: (data) => {
+                this.totalSubscribers = data.totalProviders;
                 this._setChart(data);
+                this.isLoading = false;
             },
             error: (err) => {
                 console.error('Error fetching subscription data:', err);
+                this.isLoading = false;
             }
         });
     }
 
     private _setChart(subscriptionData: IAdminDashboardSubscription) {
-        const { free, totalPremium, monthlyPremium, yearlyPremium } = subscriptionData;
+        const { monthlyPremium, yearlyPremium } = subscriptionData;
 
         this.chartOptions = {
-            title: {
-                text: 'Subscription Plan Distribution',
-                left: 'left',
-                textStyle: {
-                    fontSize: 16,
-                    fontWeight: 600
-                }
-            },
             tooltip: {
                 trigger: 'item',
-                formatter: '{b}: {c} ({d}%)'
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: 12,
+                padding: [10, 15],
+                textStyle: {
+                    color: '#1e293b',
+                    fontSize: 13
+                },
+                formatter: (params: any) => {
+                    return `
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full" style="background-color: ${params.color}"></span>
+                            <span class="font-bold text-slate-700">${params.name}:</span>
+                            <span class="text-slate-500">${params.value} (${params.percent}%)</span>
+                        </div>
+                    `;
+                }
             },
             legend: {
-                top: 'bottom'
+                orient: 'vertical',
+                right: '5%',
+                top: 'middle',
+                icon: 'circle',
+                itemWidth: 10,
+                itemHeight: 10,
+                itemGap: 20,
+                textStyle: {
+                    color: '#64748b',
+                    fontSize: 12,
+                    fontWeight: 500
+                }
             },
             series: [
                 {
-                    name: 'Subscribers',
+                    name: 'Subscriptions',
                     type: 'pie',
-                    selectedMode: 'single',
-                    radius: [0, '50%'],
-                    label: {
-                        position: 'inner',
-                        fontSize: 14
+                    radius: ['55%', '85%'],
+                    center: ['40%', '50%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 12,
+                        borderColor: '#fff',
+                        borderWidth: 3
                     },
-                    data: [
-                        { value: free, name: 'Free' },
-                        { value: totalPremium, name: 'Premium' }
-                    ]
-                },
-                {
-                    name: 'Premium Split',
-                    type: 'pie',
-                    radius: ['60%', '80%'],
                     label: {
-                        formatter: '{b|{b}}\n{c} ({d}%)',
-                        rich: {
-                            b: {
-                                fontSize: 14,
-                                lineHeight: 20
-                            }
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        scale: true,
+                        scaleSize: 8,
+                        label: {
+                            show: false
                         }
                     },
+                    labelLine: {
+                        show: false
+                    },
                     data: [
-                        { value: monthlyPremium, name: 'Monthly' },
-                        { value: yearlyPremium, name: 'Yearly' }
+                        {
+                            value: monthlyPremium,
+                            name: 'Monthly',
+                            itemStyle: { color: '#6366f1' } // indigo-500
+                        },
+                        {
+                            value: yearlyPremium,
+                            name: 'Yearly',
+                            itemStyle: { color: '#10b981' } // emerald-500
+                        }
                     ]
                 }
             ]

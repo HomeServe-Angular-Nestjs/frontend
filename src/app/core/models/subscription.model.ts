@@ -45,6 +45,12 @@ export interface IAdminDashboardSubscription {
     totalPremium: number;
     monthlyPremium: number;
     yearlyPremium: number;
+    totalProviders: number;
+}
+
+export interface IAdminDashboardRevenue {
+    amount: number;
+    date: string;
 }
 
 export interface IUpdateSubscriptionPaymentStatus {

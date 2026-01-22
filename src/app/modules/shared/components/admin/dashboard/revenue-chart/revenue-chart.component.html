@@ -1,1 +1,15 @@
-<div echarts [options]="options" [merge]="updateOptions" class="w-full h-[500px]"></div>
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col h-full">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h3 class="text-lg font-bold text-slate-800 tracking-tight">Revenue Analytics</h3>
+            <p class="text-xs font-medium text-slate-400 mt-0.5 uppercase tracking-wider">Live platform performance</p>
+        </div>
+        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+            <i class="fas fa-chart-line text-indigo-500"></i>
+        </div>
+    </div>
+
+    <div class="relative flex-1 min-h-[500px]">
+        <div echarts [options]="options" class="w-full h-full" [loading]="isLoading"></div>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { filter, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { filter, map, Observable, Subject, switchMap, takeUntil, tap, BehaviorSubject, combineLatest } from 'rxjs';
 import { IUpdateUserStatus, IUserData, UType } from '../../../../../core/models/user.model';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
 import { createAdminTableUI } from '../../../../../core/utils/generate-tables.utils';
@@ -10,14 +10,14 @@ import { IFilter } from '../../../../../core/models/filter.model';
 import { TableData, UserTableRow } from '../../../../../core/models/table.model';
 import { AdminPaginationComponent } from "../../../partials/sections/admin/pagination/pagination.component";
 import { FiltersComponent } from '../../../partials/sections/admin/filters/filters.component';
-import { TableComponent } from '../../../partials/sections/admin/tables/table.component';
+import { AdminTableComponent } from '../../../partials/sections/admin/tables/admin-table/table.component';
 import { SharedDataService } from '../../../../../core/services/public/shared-data.service';
 
 
 @Component({
   selector: 'app-user-management',
   templateUrl: './user-management.component.html',
-  imports: [CommonModule, TableComponent, FiltersComponent, AdminPaginationComponent],
+  imports: [CommonModule, AdminTableComponent, FiltersComponent, AdminPaginationComponent],
 })
 export class UserManagementComponent implements OnInit, OnDestroy {
   private readonly _userManagementService = inject(AdminService);
@@ -25,44 +25,55 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   private readonly _sharedData = inject(SharedDataService);
 
   private readonly destroy$ = new Subject<void>();
+  private readonly _refresh$ = new BehaviorSubject<void>(undefined);
+
+  private _currentPage = 1;
+  private _currentFilter: IFilter = {};
 
   tableData$!: Observable<TableData<UserTableRow>>;
   pagination!: IPagination;
-  column: string[] = ['id', 'username', 'email', 'contact', 'status', 'joined', 'actions'];
-  lastFilterUsed: IFilter = {};
+  column: string[] = ['id', 'username', 'email', 'contact', 'status', 'joined'];
 
   ngOnInit(): void {
     this._sharedData.setAdminHeader('User Management');
 
-    this._loadTableData({});
-    this.tableData$ = this._userManagementService.userData$.pipe(
-      filter((users): users is IUserData[] => users !== null),
-      map(users => {
-        const filtered = users.filter(user => !user.isDeleted);
-        return createAdminTableUI(this.column, filtered);
-      })
+    this.tableData$ = combineLatest([
+      this._userManagementService.role$,
+      this._refresh$
+    ]).pipe(
+      takeUntil(this.destroy$),
+      switchMap(([role]) =>
+        this._userManagementService.getUsers(role, this._currentFilter, this._currentPage).pipe(
+          tap(userData => this.pagination = userData.pagination),
+          map(userData => createAdminTableUI(this.column, userData.data))
+        )
+      )
     );
   }
 
   filterEvent(filter: IFilter) {
-    this._loadTableData(filter);
+    this._currentFilter = filter;
+    this._currentPage = 1;
+    this._refresh$.next();
   }
 
   onRoleChange(role: UType) {
     this._userManagementService.setRole(role);
+    this._currentPage = 1;
   }
 
-  onActionFromTable(updateData: IUpdateUserStatus) {
+  onActionFromTable(updateData: any) {
     const role = this._userManagementService.currentRole;
-    const { action, ...rest } = updateData;
-    const payload = { ...rest, role };
+    const { action, userId, status } = updateData;
+    const payload = { userId, status, role };
 
     if (action === 'status') {
       this._userManagementService.updateStatus(payload).subscribe({
         next: (success) => {
           if (success) {
-            const action = updateData.status ? 'blocked' : 'unblocked';
-            this._toastr.success(`User ${action}`);
+            const statusAction = status ? 'blocked' : 'unblocked';
+            this._toastr.success(`User ${statusAction}`);
+            this._refresh$.next();
           }
         },
         error: (err) => {
@@ -70,33 +81,26 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         }
       });
     } else if (action === 'delete') {
-      this._userManagementService.removeUser(payload).subscribe({
+      this._userManagementService.removeUser({ userId, role }).subscribe({
         next: (success) => {
           if (success) {
-            const filtered = (this._userManagementService.users ?? []).filter(user => user.id !== rest.userId);
-            this._userManagementService.setUserData(filtered);
             this._toastr.success('User Removed');
+            this._refresh$.next();
           }
         },
         error: (err) => {
           this._toastr.error('Oops, ', err);
         }
-      })
+      });
+    } else if (action === 'view') {
+      // Handle view action if needed
+      console.log('Viewing user:', userId);
     }
   }
 
   onPageChange(newPage: number) {
-    this._loadTableData(this.lastFilterUsed, newPage);
-  }
-
-  private _loadTableData(filter: IFilter, page: number = 1): void {
-    this.lastFilterUsed = filter;
-
-    this._userManagementService.role$.pipe(
-      takeUntil(this.destroy$),
-      switchMap(role => this._userManagementService.getUsers(role, filter, page)),
-      tap(userData => this.pagination = userData.pagination)
-    ).subscribe();
+    this._currentPage = newPage;
+    this._refresh$.next();
   }
 
   ngOnDestroy() {
