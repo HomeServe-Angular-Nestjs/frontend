@@ -101,7 +101,7 @@ export class ProviderHomepageComponent implements OnInit, OnDestroy {
             title: 'Total Bookings',
             icon: 'fa-calendar-alt',
             iconColorClass: 'text-green-700',
-            value: data.bookings.totalBookings,
+            value: data.bookings?.totalBookings || 0,
             valueColorClass: 'text-gray-800',
             bgColorClass: 'bg-green-50',
             borderColorClass: 'border-green-100',

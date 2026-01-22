@@ -28,6 +28,7 @@ export interface ICustomerTransactionDataWithPagination {
 
 export interface IProviderTransactionData {
     createdAt: string;
+    transactionId: string;
     paymentId: string | null;
     amount: number;
     method: PaymentDirection;
