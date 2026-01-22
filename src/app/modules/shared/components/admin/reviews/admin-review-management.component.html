@@ -1,0 +1,131 @@
+<div class="review-management-container">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="title-info">
+            <h1>Review Management</h1>
+            <!-- <p>Monitor and moderate service reviews across the platform</p> -->
+        </div>
+        <div class="stats-grid" *ngIf="stats">
+            <app-admin-overview-card title="Total Reviews" [value]="stats.totalReviews" icon="fa-solid fa-star"
+                iconBg="bg-blue-50 text-blue-600"></app-admin-overview-card>
+            <app-admin-overview-card title="Active" [value]="stats.activeReviews" icon="fa-solid fa-check-circle"
+                iconBg="bg-green-50 text-green-600"></app-admin-overview-card>
+            <app-admin-overview-card title="Reported" [value]="stats.reportedReviews" icon="fa-solid fa-flag"
+                iconBg="bg-red-50 text-red-600"></app-admin-overview-card>
+            <app-admin-overview-card title="Avg. Rating" [value]="stats.averageRating + ' / 5'"
+                icon="fa-solid fa-chart-line" iconBg="bg-amber-50 text-amber-600"></app-admin-overview-card>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-container">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" [(ngModel)]="filters.search" (keyup.enter)="onFilterChange()"
+                placeholder="Search reviews...">
+        </div>
+        <div class="filter-actions">
+            <select [(ngModel)]="filters.searchBy" (change)="onFilterChange()">
+                <option value="content">Search in Content</option>
+                <option value="provider">Search Provider</option>
+                <option value="customer">Search Customer</option>
+                <option value="review id">Review ID</option>
+            </select>
+            <select [(ngModel)]="filters.sortBy" (change)="onFilterChange()">
+                <option value="latest">Latest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="highest">Highest Rated</option>
+                <option value="lowest">Lowest Rated</option>
+            </select>
+            <select [(ngModel)]="filters.minRating" (change)="onFilterChange()">
+                <option value="">All Ratings</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="2">2+ Stars</option>
+                <option value="1">1+ Stars</option>
+            </select>
+            <button class="btn-refresh" (click)="onFilterChange()">
+                <i class="fa-solid fa-rotate"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-card">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Review Info</th>
+                    <th>Customer</th>
+                    <th>Provider</th>
+                    <th>Rating</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let review of reviews">
+                    <td class="review-text-cell">
+                        <div class="review-id">ID: #{{ review.reviewId }}</div>
+                        <p class="review-desc">{{ review.desc }}</p>
+                    </td>
+                    <td>
+                        <div class="user-info">
+                            <img [src]="review.reviewedBy.customerAvatar || 'assets/default-avatar.png'" alt="">
+                            <div class="details">
+                                <span class="name">{{ review.reviewedBy.customerName }}</span>
+                                <span class="email">{{ review.reviewedBy.customerEmail }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="user-info">
+                            <img [src]="review.providerAvatar || 'assets/default-avatar.png'" alt="">
+                            <div class="details">
+                                <span class="name">{{ review.providerName }}</span>
+                                <span class="email">{{ review.providerEmail }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="rating-stars">
+                            <i class="fa-solid fa-star filled" *ngFor="let s of getStarArray(review.rating)"></i>
+                            <i class="fa-regular fa-star" *ngFor="let s of getEmptyStarArray(review.rating)"></i>
+                            <span class="num">({{ review.rating }})</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="date">{{ review.writtenAt | date:'mediumDate' }}</span>
+                    </td>
+                    <td>
+                        <span class="badge" [ngClass]="review.isActive ? 'active' : 'inactive'">
+                            {{ review.isActive ? 'Active' : 'Hidden' }}
+                        </span>
+                        <div *ngIf="review.isReported" class="reported-badge">
+                            <i class="fa-solid fa-circle-exclamation"></i> Reported
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button [class]="review.isActive ? 'btn-hide' : 'btn-show'"
+                                (click)="toggleReviewStatus(review)"
+                                [title]="review.isActive ? 'Hide Review' : 'Show Review'">
+                                <i class="fa-solid" [ngClass]="review.isActive ? 'fa-eye-slash' : 'fa-eye'"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="reviews.length === 0">
+                    <td colspan="7" class="empty-state">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>No reviews found matching your filters.</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <app-admin-pagination [pagination]="pagination" (pageChange)="onPageChange($event)"></app-admin-pagination>
+    </div>
+</div>

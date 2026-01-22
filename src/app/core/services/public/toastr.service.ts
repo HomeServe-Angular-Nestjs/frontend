@@ -13,8 +13,8 @@ export class ToastNotificationService {
     }
 
     private _defaultConfig: Partial<IndividualConfig> = {
-        positionClass: 'toast-top-offset',
-        timeOut: 3000,
+        positionClass: 'toast-bottom-right',
+        timeOut: 4000,
         progressBar: true,
     };
 

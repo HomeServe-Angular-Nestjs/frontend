@@ -20,7 +20,7 @@ export const createAdminTableUI = (columns: string[], users: IUserData[]): Table
                     value: user.isActive,
                     toolTip: user.isActive ? 'Block' : 'Unblock',
                     action: 'status',
-                    icon: user.isActive ? 'fa-user-slash' : 'fa-user-check',
+                    icon: user.isActive ? 'fas fa-user-slash' : 'fas fa-user-check',
                     styles: `${user.isActive ? 'text-red-400' : 'text-green-400'}`
                 },
                 {
@@ -28,17 +28,17 @@ export const createAdminTableUI = (columns: string[], users: IUserData[]): Table
                     value: user.isDeleted,
                     toolTip: 'Delete',
                     action: 'delete',
-                    icon: 'fa-trash',
+                    icon: 'fas fa-trash',
                     styles: 'text-red-500'
                 },
-                {
-                    id: user.id,
-                    value: user.id,
-                    toolTip: 'View',
-                    action: 'view',
-                    icon: 'fa-eye',
-                    styles: 'text-blue-500'
-                }
+                // {
+                //     id: user.id,
+                //     value: user.id,
+                //     toolTip: 'View',
+                //     action: 'view',
+                //     icon: 'fas fa-eye',
+                //     styles: 'text-blue-500'
+                // }
             ]
         }))
     };

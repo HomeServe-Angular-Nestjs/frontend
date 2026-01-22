@@ -1,149 +1,143 @@
-<section class="mb-10">
-    <h2 class="text-xl font-bold text-gray-900 mb-6">
-        Summary Overview
-    </h2>
+<div class="transactions-container">
+    <div class="header-top">
+        <div class="title-info">
+            <h1>Transaction Management</h1>
+            <p>Monitor platform revenue, payouts, and detailed fee breakdowns.</p>
+        </div>
+    </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
         <app-admin-overview-card *ngFor="let stat of stats()" [icon]="stat.icon" [iconBg]="stat.iconBg"
             [title]="stat.title" [value]="stat.value" [subtext]="stat.subtext">
         </app-admin-overview-card>
     </div>
-</section>
 
-<section class="mb-8">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">Transaction Table</h2>
-
-    <div class="flex justify-end w-full mb-5">
-        <div class="flex flex-wrap items-center gap-3">
-
+    <!-- Filters Bar -->
+    <div class="filters-bar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
             <input [ngModel]="filters().search" (ngModelChange)="onSearch($event)" type="text"
-                placeholder="Search transactions..." class="border rounded-lg px-3 py-2 text-sm focus:ring-blue-200" />
+                placeholder="Search by ID, email or reference..." />
+        </div>
 
-            <select [ngModel]="filters().sort" (ngModelChange)="onSort($event)"
-                class="border rounded-lg px-3 py-2 text-sm">
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-                <option value="high">High</option>
-                <option value="low">Low</option>
+        <div class="filter-group">
+            <select [ngModel]="filters().sort" (ngModelChange)="onSort($event)" class="filter-select">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="high">Amount: High to Low</option>
+                <option value="low">Amount: Low to High</option>
             </select>
 
-            <select [ngModel]="filters().type" (ngModelChange)="onTypeChange($event)"
-                class="border rounded-lg px-3 py-2 text-sm">
+            <select [ngModel]="filters().type" (ngModelChange)="onTypeChange($event)" class="filter-select">
                 <option value="all">All Types</option>
-                <option value="booking">Booking</option>
-                <option value="subscription">Subscription</option>
-                <option value="refund">Refund</option>
+                <option value="booking">Booking Related</option>
+                <option value="subscription">Subscriptions</option>
+                <option value="refund">Refunds</option>
             </select>
 
-            <select [ngModel]="filters().method" (ngModelChange)="onMethodChange($event)"
-                class="border rounded-lg px-3 py-2 text-sm">
-                <option value="all">All Methods</option>
-                <option value="credit">Credit</option>
-                <option value="debit">Debit</option>
+            <select [ngModel]="filters().method" (ngModelChange)="onMethodChange($event)" class="filter-select">
+                <option value="all">All Directions</option>
+                <option value="credit">Credits (Income)</option>
+                <option value="debit">Debits (Payouts)</option>
             </select>
 
-            <select [ngModel]="filters().date" (ngModelChange)="onDateChange($event)"
-                class="border rounded-lg px-3 py-2 text-sm">
+            <select [ngModel]="filters().date" (ngModelChange)="onDateChange($event)" class="filter-select">
                 <option value="all">All Time</option>
-                <option value="last_six_months">Last Six Months</option>
+                <option value="last_six_months">Last 6 Months</option>
                 <option value="last_year">Last Year</option>
             </select>
-
         </div>
     </div>
 
-    <div class="border border-b-0 rounded-lg overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="transaction-table-card">
+        <table class="modern-table">
+            <thead>
                 <tr>
-                    <th class="px-4 py-2 text-left text-sm text-gray-500">Date & Time</th>
-                    <th class="px-4 py-2 text-left text-sm text-gray-500">Counterparty</th>
-                    <th class="px-4 py-2 text-left text-sm text-gray-500">Type</th>
-                    <th class="px-4 py-2 text-left text-sm text-gray-500">Method</th>
-                    <th class="px-4 py-2 text-left text-sm text-gray-500">Amount</th>
-                    <th class="px-4 py-2 text-left text-sm text-gray-500">Reference Type</th>
-                    <th class="px-4 py-2 text-left text-sm text-gray-500">Reference ID</th>
-                    <th class="px-4 py-2 text-left text-sm text-gray-500">Source</th>
+                    <th>SL No</th>
+                    <th>Date & Time</th>
+                    <th>Counterparty</th>
+                    <th>Type</th>
+                    <th>Method</th>
+                    <th>Amount</th>
+                    <th>Reference</th>
+                    <th>Source</th>
                 </tr>
             </thead>
 
-            <tbody class="divide-y divide-gray-200 bg-white">
-                <ng-container *ngIf="transactions().length; else noData">
-                    <tr *ngFor="let tx of transactions()" class="hover:bg-gray-50 transition-colors">
+            <tbody>
+                <tr *ngFor="let tx of transactions(); let i = index" class="hover:bg-gray-50/50 transition-colors">
+                    <td class="sl-no">
+                        {{ (pagination().page - 1) * pagination().limit + i + 1 }}
+                    </td>
+                    <td class="date-cell">
+                        <div class="date">{{ tx.dateTime | date:'MMM d, y' }}</div>
+                        <div class="time">{{ tx.dateTime | date:'h:mm a' }}</div>
+                    </td>
 
-                        <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                            {{ tx.dateTime | date:'medium' }}
-                        </td>
-
-                        <td class="px-4 py-3 text-sm text-gray-900">
-                            <ng-container *ngIf="tx.counterparty.role !== 'admin'; else admin">
-                                <div class="font-medium capitalize">
-                                    {{ tx.counterparty.role }}
+                    <td class="counterparty-cell">
+                        <ng-container *ngIf="tx.counterparty.email !== 'Internal'; else internal">
+                            <div class="user-info">
+                                <div class="details">
+                                    <span class="role-badge" [ngClass]="tx.counterparty.role">
+                                        {{ tx.counterparty.role }}
+                                    </span>
+                                    <span class="email">{{ tx.counterparty.email }}</span>
                                 </div>
-                                <div class="text-xs text-gray-500 truncate max-w-[180px]">
-                                    {{ tx.counterparty.email }}
-                                </div>
-                            </ng-container>
-
-                            <ng-template #admin>
-                                <span class="text-gray-500 italic">Myself</span>
-                            </ng-template>
-                        </td>
-
-                        <td class="px-4 py-3 text-sm text-gray-800">
-                            {{ displayType(tx.type) }}
-                        </td>
-
-                        <td class="px-4 py-3 text-sm font-medium" [class.text-green-600]="tx.direction === 'credit'"
-                            [class.text-red-600]="tx.direction === 'debit'">
-                            {{ tx.direction === 'credit' ? 'Credited' : 'Debited' }}
-                        </td>
-
-                        <td class="px-4 py-3 text-sm font-semibold text-gray-900">
-                            {{ formatINR(tx.amount) }}
-                        </td>
-
-                        <td class="px-4 py-3 text-sm text-gray-600 capitalize">
-                            {{ tx.referenceType }}
-                        </td>
-
-                        <td class="px-4 py-3 text-xs text-blue-600 font-mono max-w-[180px] cursor-pointer select-none group"
-                            (click)="copyToClipboard(tx.referenceId)">
-                            <div class="flex items-center gap-1">
-                                #{{ tx.referenceId | slice:0:8 }}…
-
-                                <i
-                                    class="fas fa-copy text-gray-400 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
                             </div>
-                        </td>
+                        </ng-container>
+                        <ng-template #internal>
+                            <span class="internal-label">
+                                <i class="fa-solid fa-building-shield"></i> System Internal
+                            </span>
+                        </ng-template>
+                    </td>
 
-                        <td class="px-4 py-3 text-sm text-gray-600 capitalize">
+                    <td class="type-cell">
+                        <span class="type-text">{{ displayType(tx.type) }}</span>
+                    </td>
+
+                    <td class="method-cell">
+                        <span class="direction-badge" [ngClass]="tx.direction">
+                            <i class="fa-solid"
+                                [ngClass]="tx.direction === 'credit' ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+                            {{ tx.direction === 'credit' ? 'Credit' : 'Debit' }}
+                        </span>
+                    </td>
+
+                    <td class="amount-cell">
+                        <span class="amount" [ngClass]="tx.direction">
+                            {{ tx.direction === 'credit' ? '+' : '-' }}{{ formatINR(tx.amount) }}
+                        </span>
+                    </td>
+
+                    <td class="reference-cell">
+                        <div class="ref-box" (click)="copyToClipboard(tx.referenceId)" [title]="'Copy Reference ID'">
+                            <span class="ref-type">{{ tx.referenceType }}</span>
+                            <span class="ref-id">#{{ tx.referenceId.slice(10) }}</span>
+                            <i class="fa-solid fa-copy copy-icon"></i>
+                        </div>
+                    </td>
+
+                    <td class="source-cell">
+                        <span class="source-badge">
                             {{ tx.source }}
-                        </td>
+                        </span>
+                    </td>
+                </tr>
 
-                    </tr>
-                </ng-container>
-                <ng-template #noData>
-                    <tr>
-                        <td colspan="8" class="px-4 py-10 text-center">
-                            <div
-                                class="flex flex-col items-center justify-center min-h-[280px] text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300 p-8">
-
-                                <svg class="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor"
-                                    stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M9.75 9.75h4.5m-4.5 4.5h4.5M4.5 6.75h15M6.75 6.75v10.5A2.25 2.25 0 009 19.5h6a2.25 2.25 0 002.25-2.25V6.75" />
-                                </svg>
-
-                                <p class="text-xl font-semibold">No transactions found</p>
-                            </div>
-                        </td>
-                    </tr>
-                </ng-template>
+                <tr *ngIf="transactions().length === 0">
+                    <td colspan="7" class="empty-state">
+                        <i class="fa-solid fa-receipt"></i>
+                        <p>No transactions found matching your filters.</p>
+                    </td>
+                </tr>
             </tbody>
-
         </table>
     </div>
 
-    <app-admin-pagination [pagination]="pagination()" (pageChange)="pageChange($event)"></app-admin-pagination>
-</section>
+    <!-- Pagination -->
+    <div>
+        <app-admin-pagination [pagination]="pagination()" (pageChange)="pageChange($event)"></app-admin-pagination>
+    </div>
+</div>

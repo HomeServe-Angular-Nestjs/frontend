@@ -15,6 +15,7 @@ import { ToastNotificationService } from "../../../../../core/services/public/to
 @Component({
   selector: 'app-admin-transactions',
   templateUrl: './admin-transactions.component.html',
+  styleUrl: './admin-transactions.component.css',
   imports: [
     CommonModule,
     FormsModule,
@@ -38,7 +39,7 @@ export class AdminTransactionsComponent implements OnInit, OnDestroy {
     date: 'all',
     method: 'all',
     page: 1,
-    limit: 10,
+    limit: 8,
   });
 
   adminTable = toSignal(
@@ -59,7 +60,7 @@ export class AdminTransactionsComponent implements OnInit, OnDestroy {
   pagination = computed(() =>
     this.adminTable()?.data?.pagination ?? {
       page: 1,
-      limit: 10,
+      limit: 8,
       total: 0,
     }
   );
@@ -133,7 +134,7 @@ export class AdminTransactionsComponent implements OnInit, OnDestroy {
         icon: 'fa-solid fa-arrow-rotate-left',
         iconBg: 'bg-rose-50 text-rose-600',
         title: 'Refund Issued',
-        value: this.formatINR(data.refundIssued), 
+        value: this.formatINR(data.refundIssued),
       },
       {
         icon: 'fa-solid fa-sack-dollar',
@@ -198,6 +199,8 @@ export class AdminTransactionsComponent implements OnInit, OnDestroy {
         return 'GST';
       case TransactionType.PROVIDER_COMMISSION:
         return 'Provider Commission';
+      case TransactionType.CUSTOMER_COMMISSION:
+        return 'Customer Commission';
       default:
         return '-';
     }
