@@ -1,96 +1,103 @@
-<div class="fixed z-[99999] bg-[#28282B] overflow-hidden transition-all duration-300 ease-in-out"
+<div
+  class="fixed z-[99999] bg-gradient-to-br from-gray-900 to-black overflow-hidden shadow-2xl transition-all duration-300 ease-in-out ring-1 ring-white/10"
   [class.flex]="!isMinimized" [class.flex-col]="!isMinimized" [class.w-80]="isMinimized" [class.h-48]="isMinimized"
-  [class.rounded-xl]="isMinimized" [class.shadow-2xl]="isMinimized" [class.cursor-move]="isMinimized"
-  [class.inset-0]="!isMinimized" [style.transform]="isMinimized ? transform : 'none'"
-  (mousedown)="isMinimized && startDrag($event)">
-  <!-- Shared remote video -->
-  <video #remoteVideo autoplay playsinline muted disablePictureInPicture
-    class="absolute inset-0 w-full h-full object-cover pointer-events-none"></video>
+  [class.rounded-2xl]="isMinimized" [class.cursor-move]="isMinimized" [class.inset-0]="!isMinimized"
+  [style.transform]="isMinimized ? transform : 'none'" (mousedown)="isMinimized && startDrag($event)">
 
+  <!-- Shared remote video -->
+  <video #remoteVideo autoplay playsinline disablePictureInPicture 
+    class="absolute inset-0 w-full h-full object-cover pointer-events-none bg-black"></video>
+
+  <!-- Gradient Overlay for readability -->
+  <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none"
+    [class.hidden]="isMinimized"></div>
+
+  <!-- Autoplay Fallback -->
+  <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/50" *ngIf="showRemotePlayButton">
+    <button (click)="playRemoteVideo()"
+      class="bg-blue-600 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition">
+      <i class="fa-solid fa-play mr-2"></i> Click to View Video
+    </button>
+  </div>
 
   <!-- Local preview -->
-  <div class="absolute bottom-6 right-6 w-48 h-32 rounded-lg overflow-hidden shadow-lg border-2 border-white z-10"
+  <div
+    class="absolute bottom-24 right-6 w-36 h-48 md:w-56 md:h-72 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 z-10 transition-transform hover:scale-105"
     [class.hidden]="isMinimized">
     <video #localVideo autoplay playsinline muted disablePictureInPicture
-      class="w-full h-full object-cover pointer-events-none"></video>
+      class="w-full h-full object-cover pointer-events-none bg-gray-800"></video>
   </div>
 
   <!-- FULLSCREEN HEADER -->
-  <div class="absolute top-0 left-0 w-full flex justify-between items-center bg-[#0066DA]/60 text-white px-6 py-3 z-20"
+  <div class="absolute top-0 left-0 w-full flex justify-between items-start p-6 z-20 text-white"
     [class.hidden]="isMinimized">
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-4 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
       <div
-        class="w-10 h-10 rounded-full bg-white overflow-hidden flex items-center justify-center text-[#2684FC] font-bold">
-        C
+        class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg">
+        <i class="fa-solid fa-user"></i>
       </div>
-      <span class="font-medium text-lg">Customer Support Call</span>
+      <div>
+        <h3 class="font-semibold text-sm leading-tight">Connected</h3>
+        <span class="text-xs text-green-400 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+          04:23
+        </span>
+      </div>
     </div>
 
-    <div class="flex items-center gap-3">
-      <p class="text-sm opacity-80">Live • 12:45</p>
-      <button (click)="toggleMinimize()" class="hover:text-gray-200 transition">
-        <i class="fa-solid fa-down-left-and-up-right-to-center"></i>
-      </button>
-    </div>
+    <button (click)="toggleMinimize()"
+      class="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-white/10 transition text-white/80 hover:text-white">
+      <i class="fa-solid fa-compress"></i>
+    </button>
   </div>
 
   <!-- FULLSCREEN CONTROL BAR -->
   <div
-    class="absolute bottom-0 left-0 w-full h-20 bg-gray-900 bg-opacity-50 flex justify-center items-center gap-6 px-4 z-20"
+    class="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 bg-black/40 backdrop-blur-xl rounded-full border border-white/10 z-20 shadow-2xl"
     [class.hidden]="isMinimized">
+
     <button (click)="toggleAudioEnabling()"
-      class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center shadow-md transition">
-      <i class="fas" [ngClass]="{
-          'fa-microphone text-white': isAudioEnabled,
-          'fa-microphone-slash text-gray-500': !isAudioEnabled
-        }"></i>
+      class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200"
+      [ngClass]="isAudioEnabled ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-red-500/90 hover:bg-red-600 text-white shadow-red-500/30 shadow-lg'">
+      <i class="fas text-xl" [ngClass]="isAudioEnabled ? 'fa-microphone' : 'fa-microphone-slash'"></i>
     </button>
 
     <button (click)="toggleVideoEnabling()"
-      class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center shadow-md transition">
-      <i class="fas" [ngClass]="{
-          'fa-video text-white': isVideoEnabled,
-          'fa-video-slash text-gray-500': !isVideoEnabled
-        }"></i>
+      class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200"
+      [ngClass]="isVideoEnabled ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-red-500/90 hover:bg-red-600 text-white shadow-red-500/30 shadow-lg'">
+      <i class="fas text-xl" [ngClass]="isVideoEnabled ? 'fa-video' : 'fa-video-slash'"></i>
     </button>
 
-    <button class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center shadow-md transition">
-      <i class="fa-solid fa-display text-gray-500"></i>
-    </button>
+    <div class="w-px h-8 bg-white/20 mx-2"></div>
 
     <button (click)="endCall()"
-      class="bg-[#E94235] rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-red-700 transition">
-      <i class="fas fa-phone text-white"></i>
+      class="w-16 h-16 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center shadow-lg shadow-red-600/30 transition-transform hover:scale-105 active:scale-95">
+      <i class="fas fa-phone-slash text-white text-2xl"></i>
     </button>
   </div>
 
   <!-- MINIMIZED BAR -->
-  <div class="absolute bottom-2 left-0 right-0 flex justify-center items-center gap-3 px-3 z-20"
+  <div
+    class="absolute bottom-0 left-0 right-0 h-12 bg-black/60 backdrop-blur-md flex justify-between items-center px-4 z-20 border-t border-white/10"
     [class.hidden]="!isMinimized">
-    <button (click)="toggleAudioEnabling()"
-      class="bg-white/30 rounded-full w-8 h-8 flex items-center justify-center text-sm">
-      <i class="fas" [ngClass]="{
-          'fa-microphone': isAudioEnabled,
-          'fa-microphone-slash text-gray-300': !isAudioEnabled
-        }"></i>
-    </button>
 
-    <button (click)="toggleVideoEnabling()"
-      class="bg-white/30 rounded-full w-8 h-8 flex items-center justify-center text-sm">
-      <i class="fas" [ngClass]="{
-          'fa-video': isVideoEnabled,
-          'fa-video-slash text-gray-300': !isVideoEnabled
-        }"></i>
-    </button>
+    <div class="flex items-center gap-3">
+      <button (click)="toggleAudioEnabling()" class="text-white/80 hover:text-white transition">
+        <i class="fas text-sm" [ngClass]="isAudioEnabled ? 'fa-microphone' : 'fa-microphone-slash text-red-400'"></i>
+      </button>
+      <button (click)="toggleVideoEnabling()" class="text-white/80 hover:text-white transition">
+        <i class="fas text-sm" [ngClass]="isVideoEnabled ? 'fa-video' : 'fa-video-slash text-red-400'"></i>
+      </button>
+    </div>
 
-    <button (click)="endCall()"
-      class="bg-[#E94235] rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-red-700 transition">
-      <i class="fas fa-phone text-white text-sm"></i>
-    </button>
-
-    <button (click)="toggleMinimize()"
-      class="bg-white/30 rounded-full w-8 h-8 flex items-center justify-center text-sm">
-      <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-    </button>
+    <div class="flex items-center gap-3">
+      <button (click)="endCall()"
+        class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center hover:bg-red-700 transition">
+        <i class="fas fa-phone-slash text-white text-xs"></i>
+      </button>
+      <button (click)="toggleMinimize()" class="text-white/80 hover:text-white transition">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+    </div>
   </div>
 </div>
