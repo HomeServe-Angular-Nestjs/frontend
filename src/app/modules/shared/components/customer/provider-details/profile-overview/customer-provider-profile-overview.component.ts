@@ -1,12 +1,11 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IProvider } from '../../../../../../core/models/user.model';
+import { ICustomerProviderDetails } from '../../../../../../core/models/user.model';
 import { Subscription } from 'rxjs';
 import { ProviderService } from '../../../../../../core/services/provider.service';
 import { getColorFromChar } from '../../../../../../core/utils/style.utils';
 import { Store } from '@ngrx/store';
 import { customerActions } from '../../../../../../store/customer/customer.actions';
-import { IsSavedPipe } from '../../../../../../core/pipes/is-saved-provider.pipe';
 import { ChatSocketService } from '../../../../../../core/services/socket-service/chat.service';
 import { Router } from '@angular/router';
 import { chatActions } from '../../../../../../store/chat/chat.action';
@@ -16,7 +15,7 @@ import { IReportSubmit, ReportService } from '../../../../../../core/services/re
 
 @Component({
   selector: 'app-customer-provider-profile-overview',
-  imports: [CommonModule, IsSavedPipe, ReportModalComponent],
+  imports: [CommonModule, ReportModalComponent],
   providers: [ReportService],
   templateUrl: './customer-provider-profile-overview.component.html',
 })
@@ -30,13 +29,18 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
 
   private providerDataSub!: Subscription;
 
-  providerData!: IProvider | null;
+  providerData!: ICustomerProviderDetails | null;
   fallbackChar: string = '';
   openReportModal = false;
 
   ngOnInit(): void {
     this.providerDataSub = this._providerService.providerData$.subscribe(data => {
-      this.providerData = data;
+      if (data) {
+        this.providerData = data as ICustomerProviderDetails;
+        if (data?.username) {
+          this.fallbackChar = data.username[0].toUpperCase();
+        }
+      }
     });
   }
 
@@ -46,10 +50,9 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
     }
   }
 
-  fallbackColor(text: string | undefined): string {
-    if (text) {
-      this.fallbackChar = text[0].toUpperCase();
-      return getColorFromChar(this.fallbackChar);
+  get fallbackColorStyle(): string {
+    if (this.providerData?.username) {
+      return getColorFromChar(this.providerData.username[0].toUpperCase());
     }
     return '#dbeafe';
   }
