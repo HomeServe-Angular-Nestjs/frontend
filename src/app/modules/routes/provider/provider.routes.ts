@@ -159,6 +159,13 @@ export const providerRoutes: Routes = [
         loadComponent: () => import('../../pages/provider/settings/settings.component')
           .then(c => c.ProviderSettingsComponent),
         data: { breadcrumb: 'Settings' }
+      },
+      {
+        path: 'notifications',
+        canActivate: [AuthGuard],
+        loadComponent: () => import('../../pages/provider/notifications/notification.component')
+          .then(c => c.ProviderNotificationComponent),
+        data: { breadcrumb: 'Notifications' }
       }
     ],
   },

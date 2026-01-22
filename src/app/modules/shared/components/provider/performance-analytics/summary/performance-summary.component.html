@@ -9,8 +9,8 @@
                 </svg>
             </div>
             <span class="text-xs font-semibold px-2.5 py-1 rounded-full"
-                [ngClass]="(performanceOverviewStats.completionRate | metricPerformanceBadge:card.valueKey).classes">
-                {{ (performanceOverviewStats.completionRate | metricPerformanceBadge: card.valueKey).label }}
+                [ngClass]="(performanceOverviewStats[card.valueKey] | metricPerformanceBadge:card.valueKey).classes">
+                {{ (performanceOverviewStats[card.valueKey] | metricPerformanceBadge: card.valueKey).label }}
             </span>
         </div>
 

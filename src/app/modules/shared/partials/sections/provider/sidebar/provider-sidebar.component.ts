@@ -1,8 +1,10 @@
-import { Component, EventEmitter, HostListener, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { authActions } from '../../../../../../store/auth/auth.actions';
+import { ProviderService } from '../../../../../../core/services/provider.service';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-provider-sidebar',
@@ -10,9 +12,12 @@ import { authActions } from '../../../../../../store/auth/auth.actions';
   templateUrl: './provider-sidebar.component.html',
 })
 export class ProviderSidebarComponent implements OnInit {
+  private readonly _providerService = inject(ProviderService);
   constructor(private store: Store) { }
 
   @Output() collapsedChange = new EventEmitter<'expanded' | 'collapsed' | 'hidden'>();
+
+  providerInfo$ = this._providerService.getOneProvider().pipe(map(res => res.data));
 
   sidebarMode: 'expanded' | 'collapsed' | 'hidden' = 'expanded';
   isMobileOpen = false;
@@ -132,7 +137,7 @@ export class ProviderSidebarComponent implements OnInit {
         {
           name: 'Notifications',
           icon: 'fas fa-bell',
-          route: '',
+          route: 'notifications',
           active: false
         }
       ]

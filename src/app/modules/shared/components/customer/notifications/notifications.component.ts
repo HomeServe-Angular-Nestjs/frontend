@@ -109,6 +109,10 @@ export class CustomerNotificationComponent implements OnInit {
             this._router.navigate(['/customer/profile/bookings', notification.entityId]);
         }
 
+        if (notification.templateId === NotificationTemplateId.SUBSCRIPTION_SUCCESS) {
+            this._router.navigate(['/customer/subscription']);
+        }
+
         if (!notification.isRead) {
             this.markAsRead(notification.id);
         }

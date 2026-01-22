@@ -111,6 +111,22 @@ export class NotificationSocketService extends BaseSocketService {
         return this._http.get<IResponse<INotification[]>>(`${this._notificationApi}`);
     }
 
+    markAsReadApi(id: string): Observable<IResponse<INotification>> {
+        return this._http.patch<IResponse<INotification>>(`${this._notificationApi}/mark-read/${id}`, {});
+    }
+
+    markAllAsReadApi(): Observable<IResponse<void>> {
+        return this._http.patch<IResponse<void>>(`${this._notificationApi}/mark-all-read`, {});
+    }
+
+    deleteNotificationApi(id: string): Observable<IResponse<void>> {
+        return this._http.delete<IResponse<void>>(`${this._notificationApi}/${id}`);
+    }
+
+    clearAllApi(): Observable<IResponse<void>> {
+        return this._http.delete<IResponse<void>>(`${this._notificationApi}/clear-all`);
+    }
+
     sendNotification(type: NotificationType) {
         return this._http.post(`${this._notificationApi}/send_notification`, { type });
     }
