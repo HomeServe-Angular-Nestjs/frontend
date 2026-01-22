@@ -67,7 +67,7 @@ export class ProviderHomepageComponent implements OnInit, OnDestroy {
             title: 'Total Earnings',
             icon: 'fa-dollar-sign',
             iconColorClass: 'text-green-600',
-            value: data.revenue.totalEarnings,
+            value: `₹${data.revenue.totalEarnings.toFixed(2)}`,
             valueColorClass: 'text-gray-800',
             bgColorClass: 'bg-green-50',
             borderColorClass: 'border-green-100',
@@ -157,7 +157,7 @@ export class ProviderHomepageComponent implements OnInit, OnDestroy {
         heading: 'Availability Overview',
         boxes: [
           {
-            title: 'Next Available Slot',
+            title: 'Next Booking',
             icon: 'fa-bell',
             iconColorClass: 'text-purple-600',
             value: this._formatNextSlot(data.nextAvailableSlot),
@@ -169,7 +169,7 @@ export class ProviderHomepageComponent implements OnInit, OnDestroy {
             title: 'Working Hours',
             icon: 'fa-clock',
             iconColorClass: 'text-green-600',
-            value: `${data.availability?.time?.from || 0} - ${data.availability?.time?.to || 0}`,
+            value: data.workingHours ? `${data.workingHours?.time?.from || 0} - ${data.workingHours?.time?.to || 0}` : 'N/A',
             valueColorClass: 'text-gray-800',
             bgColorClass: 'bg-green-50',
             borderColorClass: 'border-green-100',
@@ -191,21 +191,26 @@ export class ProviderHomepageComponent implements OnInit, OnDestroy {
     ];
   }
 
-  private _formatNextSlot(slot: { from: string; to: string }): string {
-    if (!slot?.from || !slot?.to) return 'No upcoming slot';
-    const from = new Date(slot.from);
-    const to = new Date(slot.to);
+  private _formatNextSlot(slot: { from: string; to: string, date: string }): string {
+    if (!slot?.from || !slot?.to || !slot?.date) return 'No upcoming slot';
 
-    const isToday = new Date().toDateString() === from.toDateString();
-    const dayLabel = isToday
-      ? 'Today'
-      : from.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const baseDate = new Date(slot.date);
 
-    const fromTime = from.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const toTime = to.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    // Extract LOCAL date parts
+    const year = baseDate.getFullYear();
+    const month = String(baseDate.getMonth() + 1).padStart(2, '0');
+    const day = String(baseDate.getDate()).padStart(2, '0');
 
-    return `${dayLabel}, ${fromTime} - ${toTime}`;
+    const from = new Date(`${year}-${month}-${day}T${slot.from}`);
+    const to = new Date(`${year}-${month}-${day}T${slot.to}`);
+
+    if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+      return 'Invalid slot time';
+    }
+
+    return `${baseDate.toDateString()}, 7${from.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
   }
+
 
   ngOnDestroy(): void {
     this._destroy$.next();

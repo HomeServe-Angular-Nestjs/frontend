@@ -26,21 +26,18 @@ export class ProviderServiceFilterComponent implements OnInit, OnDestroy {
         { value: 'false', label: 'Inactive' }
     ];
 
-    serviceIsVerifiedOptions: { value: StatusToggleType, label: string }[] = [
-        { value: 'all', label: 'All' },
-        { value: 'true', label: 'Verified' },
-        { value: 'false', label: 'Unverified' }
-    ];
+
 
     SortEnumOptions: { value: SortEnum, label: string }[] = [
         { value: SortEnum.LATEST, label: 'Latest' },
         { value: SortEnum.OLDEST, label: 'Oldest' },
         { value: SortEnum.A_Z, label: 'A-Z' },
         { value: SortEnum.Z_A, label: 'Z-A' },
+        { value: SortEnum.PRICE_HIGH_TO_LOW, label: 'Price: High to Low' },
+        { value: SortEnum.PRICE_LOW_TO_HIGH, label: 'Price: Low to High' },
     ];
 
     selectedServiceStatus: StatusToggleType = 'all';
-    selectedVerification: StatusToggleType = 'all';
     selectedSortOption: SortEnum = SortEnum.LATEST;
     searchText: string = '';
 
@@ -67,9 +64,7 @@ export class ProviderServiceFilterComponent implements OnInit, OnDestroy {
         this._emitChanges();
     }
 
-    onVerificationChange() {
-        this._emitChanges();
-    }
+
 
     onSortChange() {
         this._emitChanges();
@@ -77,7 +72,6 @@ export class ProviderServiceFilterComponent implements OnInit, OnDestroy {
 
     resetServiceFilters() {
         this.selectedServiceStatus = 'all';
-        this.selectedVerification = 'all';
         this.selectedSortOption = SortEnum.LATEST;
         this.searchText = '';
         this._emitChanges();
@@ -87,7 +81,6 @@ export class ProviderServiceFilterComponent implements OnInit, OnDestroy {
         this.filtersChanged.emit({
             search: this.searchText,
             sort: this.selectedSortOption,
-            isVerified: this.selectedVerification,
             status: this.selectedServiceStatus
         });
     }

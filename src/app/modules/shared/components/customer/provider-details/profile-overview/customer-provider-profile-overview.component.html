@@ -1,94 +1,111 @@
 <!-- Profile Overview Section -->
-<div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-  <div class="flex flex-col md:flex-row gap-6">
-    <!-- Profile Image -->
-    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+  <div class="p-6 md:p-8 flex flex-col md:flex-row gap-8">
 
+    <!-- Profile Image -->
+    <div class="shrink-0 flex justify-center">
+      <div
+        class="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 ring-4 ring-gray-50/50">
         <!-- Avatar image if exists -->
-      <img *ngIf="providerData?.avatar; else fallbackAvatar" [src]="providerData?.avatar" alt="User profile"
-        class="w-full h-full object-cover rounded-full" />
+        <img *ngIf="providerData?.avatar; else fallbackAvatar" [src]="providerData?.avatar" alt="User profile"
+          class="w-full h-full object-cover" />
 
         <!-- Fallback avatar -->
         <ng-template #fallbackAvatar>
-        <div class="w-full h-full flex items-center justify-center rounded-full text-white text-6xl font-medium"
-            [style.background-color]="fallbackColor(providerData?.username)">
+          <div class="w-full h-full flex items-center justify-center text-white text-5xl font-bold"
+            [style.background-color]="fallbackColorStyle">
             {{ fallbackChar }}
           </div>
         </ng-template>
-
+      </div>
     </div>
 
-    <!-- Profile Info -->
-    <div class="flex-1">
-      <div class="flex items-center gap-4 mb-4">
-        <h1 class="text-2xl font-bold text-gray-800">{{providerData?.fullname || providerData?.username}}
-          </h1>
-        <span *ngIf="providerData?.isCertified"
-          class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Verified</span>
+    <!-- Profile Content -->
+    <div class="flex-1 flex flex-col">
+      <!-- Top Section: Info & Actions -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-2">
+        <div class="space-y-2 text-center md:text-left">
+          <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+              {{providerData?.fullname || providerData?.username}}
+            </h1>
+            <span *ngIf="providerData?.isCertified"
+              class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase tracking-widest">
+              <i class="fas fa-check-circle mr-1.5"></i>
+              Verified
+            </span>
           </div>
-      <div class="flex items-center gap-2 mb-2">
-        <span class="text-yellow-400">⭐</span>
-        <span class="text-gray-500">(21 reviews)</span><!--todo-->
-        </div>
-      <div class="flex flex-wrap gap-2 mb-4">
-        <ng-container *ngIf="providerData?.profession">
-          <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-            {{providerData?.profession}}
-          </span>
-        </ng-container>
 
-        <ng-container *ngIf="providerData?.experience; else noExperience">
-          <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-            {{ providerData?.experience }} + Years Experience
-          </span>
-        </ng-container>
+          <div
+            class="flex items-center justify-center md:justify-start text-indigo-600 font-bold text-sm tracking-wide">
+            <i class="fas fa-briefcase mr-2 opacity-60"></i>
+            {{providerData?.profession | titlecase}}
+          </div>
+        </div>
 
-        <ng-template #noExperience>
-          <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-            No Experience
-          </span>
-        </ng-template>
-
-        <!-- <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Top
-                    Rated</span> -->
-      </div>
-      <!-- Track Records -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 py-4 border-t border-b">
-        <div class="text-center">
-          <div class="text-2xl font-bold text-blue-600">500+</div>
-          <div class="text-sm text-gray-600">Jobs Completed</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold text-green-600">98%</div>
-          <div class="text-sm text-gray-600">Success Rate</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold text-purple-600">4.8</div>
-          <div class="text-sm text-gray-600">Avg. Rating</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold text-orange-600">{{providerData?.experience || 0}}</div>
-          <div class="text-sm text-gray-600">Years Experience</div>
-        </div>
-      </div>
-      <div class="flex justify-between">
-        <div class="flex gap-4">
-          <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-            Book Now
-          </button>
+        <div class="flex items-center justify-center gap-3">
           <button (click)="chat()"
-            class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+            class="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 active:scale-[0.98] text-sm">
             Message
           </button>
-          <button class="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-            (click)="addToSaved(providerData?.id)">
-            <span [class.text-red-500]="(providerData?.id | isSaved | async)">❤</span> Favorite
+          <button (click)="addToSaved(providerData?.id)"
+            class="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 font-bold hover:bg-gray-50 transition-all text-sm flex items-center gap-2 group/fav">
+            <i class="fas fa-heart transition-colors" [class.text-red-500]="providerData?.isSaved"
+              [class.text-gray-200]="!(providerData?.isSaved)" [ngClass]="{
+                }"></i>Favorite
           </button>
         </div>
+      </div>
+
+      <!-- Center Section: Stats Grid -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-gray-50/50 rounded-2xl border border-gray-100/50">
+        <div class="flex flex-col">
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Jobs Completed</span>
+          <span class="text-xl font-black text-gray-900">{{providerData?.jobsCompleted || 0}}+</span>
+        </div>
+
+        <div class="flex flex-col border-l border-gray-200/50 pl-6 md:pl-0 md:border-l-0 lg:border-l lg:pl-6">
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Success Rate</span>
+          <span class="text-xl font-black text-gray-900">{{providerData?.successRate || 0}}%</span>
+        </div>
+
+        <div class="flex flex-col border-t pt-6 md:border-t-0 md:pt-0 lg:border-l lg:pl-6 border-gray-200/50">
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Avg Rating</span>
+          <div class="flex items-center gap-2 text-xl font-black text-gray-900">
+            <span>{{providerData?.avgRating || 0}}</span>
+            <i class="fas fa-star text-yellow-400 text-base"></i>
+          </div>
+        </div>
+
+        <div
+          class="flex flex-col border-t pt-6 border-l border-gray-200/50 pl-6 md:border-t-0 md:pt-0 lg:border-l lg:pl-6">
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Experience</span>
+          <span class="text-xl font-black text-gray-900">{{providerData?.experience || 0}} yrs</span>
+        </div>
+      </div>
+
+      <!-- Bottom Section: Footer -->
+      <div class="mt-8 flex flex-wrap items-center justify-between gap-6">
+        <div class="flex items-center gap-5">
+          <div class="flex items-center px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
+            <span class="relative flex h-2 w-2 mr-2.5">
+              <span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Available Now</span>
+          </div>
+          <div *ngIf="providerData?.isActive"
+            class="flex items-center text-xs font-semibold text-gray-400 uppercase tracking-wide">
+            <i class="far fa-clock mr-2 opacity-60"></i>
+            Responds within 1h
+          </div>
+        </div>
+
         <button type="button" (click)="reportProvider(providerData?.id)"
-          class="flex items-center gap-1 text-xs text-red-700 hover:text-red-800 rounded transition">
-          <i class="fas fa-info-circle"></i>
-          <span>Report</span>
+          class="text-[10px] font-bold text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors flex items-center gap-2 py-2 px-3 hover:bg-red-50 rounded-lg">
+          <i class="fas fa-flag"></i>
+          Report misconduct
         </button>
       </div>
     </div>

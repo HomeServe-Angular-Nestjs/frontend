@@ -1,8 +1,8 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { Observable } from "rxjs";
-import { IProviderService } from "../models/provider-service.model";
+import { IProviderService, IProviderServiceFilter } from "../models/provider-service.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 
 @Injectable({ providedIn: 'root' })
@@ -26,9 +26,20 @@ export class ServiceManagementService {
     return this._http.patch<IResponse<IProviderService>>(`${this._apiUrl}/${serviceId}/toggle-status`, {});
   }
 
-  getServices(): Observable<IResponse<IProviderService[]>> {
-    return this._http.get<IResponse<IProviderService[]>>(`${this._apiUrl}/my-services`);
+  getServices(params?: IProviderServiceFilter): Observable<IResponse<IProviderService[]>> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          httpParams = httpParams.set(key, String(value));
+        }
+      });
+    }
+
+    return this._http.get<IResponse<IProviderService[]>>(`${this._apiUrl}/my-services`, { params: httpParams });
   }
+
 
   getServicesByProviderId(providerId: string): Observable<IResponse<IProviderService[]>> {
     return this._http.get<IResponse<IProviderService[]>>(`${this._apiUrl}/${providerId}`);

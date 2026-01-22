@@ -30,7 +30,7 @@ export class CustomerProviderProfileLayoutComponent implements OnInit {
                 switchMap((id) => this._providerService.getOneProvider(id))
             )
             .subscribe({
-                next: (provider) => this._providerService.setProviderData(provider),
+                next: (provider) => this._providerService.setProviderData(provider.data!),
                 error: () => {
                     this._router.navigate(['not_found'], {
                         state: { type: 'data' }

@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -12,6 +12,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../partials/shared/confirm-dialog-box/confirm-dialog.component';
 import { LoadingCircleAnimationComponent } from "../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { SharedDataService } from '../../../../../core/services/public/shared-data.service';
+import { ProviderServiceFilterComponent } from './service-filter/service-filter.component';
+import { IServiceFilter } from '../../../../../core/models/offeredService.model';
+import { SortEnum } from '../../../../../core/enums/enums';
+import { IPagination } from '../../../../../core/models/booking.model';
+import { ProviderPaginationComponent } from "../../../partials/sections/provider/pagination/provider-pagination.component";
 
 @Component({
   selector: 'app-provider-manage-service',
@@ -19,7 +24,9 @@ import { SharedDataService } from '../../../../../core/services/public/shared-da
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    LoadingCircleAnimationComponent
+    LoadingCircleAnimationComponent,
+    ProviderServiceFilterComponent,
+    ProviderPaginationComponent
   ],
   templateUrl: './manage-service.component.html',
   styles: [`
@@ -47,6 +54,19 @@ import { SharedDataService } from '../../../../../core/services/public/shared-da
       max-height: 200px;
       overflow-y: auto;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    @keyframes fadeInSlideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-in {
+      animation: fadeInSlideDown 0.3s ease-out forwards;
     }
   `]
 })
@@ -80,6 +100,21 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     active: 0,
     inactive: 0
   });
+
+  activeFilters = signal<IServiceFilter>({
+    sort: SortEnum.LATEST,
+    status: 'all',
+    isVerified: 'all',
+    search: ''
+  });
+
+  pagination = signal<IPagination>({
+    page: 1,
+    limit: 10,
+    total: 0
+  });
+
+
 
   constructor() {
     effect(() => {
@@ -171,11 +206,19 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe({
         next: () => {
-          service.isActive = !service.isActive;
+          this.services.update(prev => prev.map(s =>
+            s.id === service.id ? { ...s, isActive: !s.isActive } : s
+          ));
           this._updateStats();
-          this._toastr.info(`Service ${service.isActive ? 'activated' : 'deactivated'}`);
+          this._toastr.info(`Service ${!service.isActive ? 'activated' : 'deactivated'}`);
         }
       });
+  }
+
+  onFiltersChanged(filters: IServiceFilter) {
+    this.activeFilters.set(filters);
+    this.pagination.update(prev => ({ ...prev, page: 1 }));
+    this._loadServices();
   }
 
   onSubmit() {
@@ -217,19 +260,34 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     });
   }
 
+  changePage(newPage: number) {
+    this.pagination.update(prev => ({ ...prev, page: newPage }));
+    this._loadServices();
+  }
+
   private _loadServices() {
     this.loading.set(true);
-    this._providerServiceManagementService.getServices()
-      .pipe(takeUntil(this._destroy$))
+    const filters = this.activeFilters();
+    const pag = this.pagination();
+
+    this._providerServiceManagementService.getServices({
+      search: filters.search,
+      status: filters.status,
+      sort: filters.sort,
+      page: pag.page,
+      limit: pag.limit
+    })
+      .pipe(
+        finalize(() => this.loading.set(false)),
+        takeUntil(this._destroy$))
       .subscribe({
         next: (res) => {
           if (res.data) {
             this.services.set(res.data);
+            this.pagination.update(prev => ({ ...prev, total: res.data?.length || 0 }));
             this._updateStats();
           }
-          this.loading.set(false);
         },
-        error: () => this.loading.set(false)
       });
   }
 

@@ -1,100 +1,207 @@
-<div class="bg-gray-50 py-8">
-  <div class="max-w-5xl mx-auto px-4 space-y-5">
+<div class="min-h-screen bg-gray-50/50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- Search + Filters -->
-    <div
-      class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-
-      <!-- Filters -->
-      <div class="flex flex-wrap items-center gap-3">
-
-        <!-- Rating Filter -->
-        <select [ngModel]="filter().rating" (ngModelChange)="updateRating($event)"
-          class="rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm px-3 py-1.5">
-          <option value="all">All Ratings</option>
-          <option *ngFor="let r of [5,4,3,2,1]" [value]="r">{{r}} ★</option>
-        </select>
-
-        <!-- Time Filter -->
-        <select [ngModel]="filter().time" (ngModelChange)="updateTime($event)"
-          class="rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm px-3 py-1.5">
-          <option value="all">All Time</option>
-          <option value="last_6_months">Last 6 Months</option>
-          <option value="last_year">Last Year</option>
-        </select>
-
-        <!-- Sort Filter -->
-        <select [ngModel]="filter().sort" (ngModelChange)="updateSort($event)"
-          class="rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm px-3 py-1.5">
-          <option value="desc">Newest First</option>
-          <option value="asc">Oldest First</option>
-        </select>
-      </div>
-
-      <!-- Search -->
-      <div class="relative w-full sm:w-72">
-        <input type="text" placeholder="Search by email" [ngModel]="filter().search" (ngModelChange)="onSearch($event)"
-          class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
-      </div>
-    </div>
-
-    <!-- Review Cards -->
-    <div class="space-y-4">
-      <div *ngFor="let review of reviews()"
-        class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition duration-200">
-
-        <div class="flex items-start gap-4">
-          <img [src]="review.avatar" alt="User Avatar"
-            class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border border-gray-200 shadow-sm" />
-
-          <div class="flex-1">
-
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 class="text-base font-semibold text-gray-900">{{ review.username || 'Anonymous User' }}</h3>
-                <p class="text-sm text-gray-500">{{ review.email }}</p>
-              </div>
-              <p class="text-xs sm:text-sm text-gray-400 mt-1 sm:mt-0">
-                {{ review.writtenAt | date: 'mediumDate' }}
-              </p>
-            </div>
-
-            <!-- Rating -->
-            <div class="flex items-center mt-1.5">
-              <div class="flex text-yellow-400 text-base">
-                <ng-container *ngFor="let star of [1,2,3,4,5]">
-                  <i class="fas" [ngClass]="{
-                      'fa-star': review.rating >= star,
-                      'fa-star-half-alt': review.rating >= star - 0.5 && review.rating < star,
-                      'fa-star-o': review.rating < star - 0.5
-                    }"></i>
-                </ng-container>
-              </div>
-              <span class="ml-2 text-gray-700 font-semibold text-sm">{{ review.rating.toFixed(1) }}</span>
-            </div>
-
-            <p class="text-gray-700 text-sm mt-2 leading-relaxed">
-              “{{ review.desc }}”
-            </p>
-
-            <div *ngIf="review.serviceTitles.length" class="mt-2 text-xs sm:text-sm text-gray-600">
-              <span class="font-medium text-gray-700 mr-1">Booked Services:</span>
-              <span *ngFor="let title of review.serviceTitles; let i = index">
-                {{ title }}<span *ngIf="i < review.serviceTitles.length - 1">, </span>
-              </span>
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Customer Reviews</h1>
+          <p class="text-gray-600">Monitor and manage your customer feedback</p>
+        </div>
+        <div class="hidden md:flex items-center gap-3">
+          <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-star text-green-600"></i>
+              <span class="text-sm font-medium text-gray-700">Total: {{ pagination().total }} Reviews</span>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div *ngIf="!reviews().length" class="text-center py-10 text-gray-500 italic text-sm">
-        No reviews available.
+    <!-- Filters Section -->
+    <div class="mb-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-filter text-green-600 text-sm"></i>
+          </div>
+          <h2 class="text-base font-bold text-gray-900">Search & Filters</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Search -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-gray-700">Search Feedbacks</label>
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+              <input type="text" [ngModel]="filter().search" (ngModelChange)="onSearch($event)"
+                placeholder="Username or email..."
+                class="w-full pl-9 pr-4 py-2 text-xs bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-500 transition-all outline-none">
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-gray-700">Rating Level</label>
+            <div class="relative">
+              <select [ngModel]="filter().rating" (ngModelChange)="updateRating($event)"
+                class="w-full px-3 py-2 text-xs bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-500 transition-all outline-none cursor-pointer appearance-none">
+                <option value="all">All Ratings</option>
+                <option value="5">5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="2">2 Stars</option>
+                <option value="1">1 Star</option>
+              </select>
+              <i
+                class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- Time Period -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-gray-700">Time Range</label>
+            <div class="relative">
+              <select [ngModel]="filter().time" (ngModelChange)="updateTime($event)"
+                class="w-full px-3 py-2 text-xs bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-500 transition-all outline-none cursor-pointer appearance-none">
+                <option value="all">Lifetime</option>
+                <option value="last_6_months">Last 6 Months</option>
+                <option value="last_year">Last Year</option>
+              </select>
+              <i
+                class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- Sort Order -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-gray-700">Sort By</label>
+            <div class="relative">
+              <select [ngModel]="filter().sort" (ngModelChange)="updateSort($event)"
+                class="w-full px-3 py-2 text-xs bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-500 transition-all outline-none cursor-pointer appearance-none">
+                <option value="desc">Newest First</option>
+                <option value="asc">Oldest First</option>
+              </select>
+              <i
+                class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] pointer-events-none"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="flex items-center justify-end mt-4 pt-4 border-t border-gray-50">
+          <button (click)="filter.set({ rating: 'all', search: '', sort: 'desc', time: 'all' }); page.set(1)"
+            class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-all active:scale-95">
+            <i class="fas fa-redo-alt text-[10px]"></i>
+            Reset Filters
+          </button>
+        </div>
       </div>
     </div>
 
-    <app-provider-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)">
-    </app-provider-pagination>
+    <!-- Table Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                Customer</th>
+              <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                Rating</th>
+              <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                Review Content</th>
+              <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                Booking ID</th>
+              <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Date
+              </th>
+              <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                Action</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let review of reviews()" class="hover:bg-green-50/20 transition-colors group">
+              <!-- Customer -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-100 group-hover:border-green-200 transition-colors">
+                    <img [src]="review.customer.avatar || 'assets/default-avatar.png'" alt="avatar"
+                      class="w-full h-full object-cover">
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-gray-900">{{ review.customer.username || 'Anonymous' }}</div>
+                    <div class="text-xs text-gray-500">{{ review.customer.email }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Rating -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-1.5">
+                  <div class="flex text-amber-400 text-xs">
+                    <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                      [class.text-gray-200]="star > review.rating"></i>
+                  </div>
+                  <span class="text-sm font-bold text-gray-700">{{ review.rating }}.0</span>
+                </div>
+              </td>
+
+              <!-- Content -->
+              <td class="px-6 py-4">
+                <div class="max-w-xs xl:max-w-md">
+                  <p class="text-sm text-gray-600 font-medium truncate" [title]="review.desc">
+                    "{{ review.desc }}"
+                  </p>
+                </div>
+              </td>
+
+              <!-- Booking -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="px-2 py-1 bg-gray-100 rounded text-xs font-medium text-gray-600 border border-gray-200">
+                  #{{ review.bookingId | slice:-8 | uppercase }}
+                </span>
+              </td>
+
+              <!-- Date -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="font-medium">{{ review.writtenAt | date:'mediumDate' }}</span>
+              </td>
+
+              <!-- Action -->
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button (click)="viewDetails(review.bookingId)"
+                    class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="View Details">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="!reviews().length">
+              <td colspan="6" class="px-6 py-16 text-center">
+                <div class="flex flex-col items-center justify-center">
+                  <div class="w-16 h-16 bg-green-50 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-comment-slash text-green-300 text-2xl"></i>
+                  </div>
+                  <h3 class="text-lg font-bold text-gray-900 mb-1">No Reviews Found</h3>
+                  <p class="text-sm text-gray-500">Try adjusting your filters to see more results.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer / Pagination -->
+      <div class="bg-gray-50 px-6 border-t border-gray-200">
+        <app-provider-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)">
+        </app-provider-pagination>
+      </div>
+    </div>
 
   </div>
 </div>

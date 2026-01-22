@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, shareReplay } from "rxjs";
-import { IDisplayReviews, IFilterFetchProviders, IProvider, IProviderCardWithPagination, IProviderUpdateBio } from "../models/user.model";
+import { ICustomerProviderDetails, IDisplayReviews, IFilterFetchProviders, IProvider, IProviderCardWithPagination, IProviderUpdateBio } from "../models/user.model";
 import { API_ENV } from "../../../environments/env";
 import { SlotType } from "../models/schedules.model";
 import { IResponse } from "../../modules/shared/models/response.model";
@@ -11,14 +11,14 @@ export class ProviderService {
   private _http = inject(HttpClient);
   private readonly _apiUrl = API_ENV.provider;
 
-  private providerDataSource = new BehaviorSubject<IProvider | null>(null);
+  private providerDataSource = new BehaviorSubject<ICustomerProviderDetails | IProvider | null>(null);
   providerData$ = this.providerDataSource.asObservable();
 
-  setProviderData(data: IProvider) {
+  setProviderData(data: ICustomerProviderDetails | IProvider) {
     this.providerDataSource.next(data);
   }
 
-  getProviders(filter: IFilterFetchProviders): Observable<IResponse<IProviderCardWithPagination>> {
+  getProviders(filter: IFilterFetchProviders | IProvider): Observable<IResponse<IProviderCardWithPagination>> {
     let params = new HttpParams();
 
     Object.entries(filter).forEach(([key, value]) => {
@@ -30,8 +30,8 @@ export class ProviderService {
     return this._http.get<IResponse<IProviderCardWithPagination>>(`${this._apiUrl}/fetch_providers`, { params });
   }
 
-  getOneProvider(id: string | null = null): Observable<IProvider> {
-    return this._http.get<IProvider>(`${this._apiUrl}/fetch_one_provider?providerId=${id}`).pipe(shareReplay(1));
+  getOneProvider(id: string | null = null): Observable<IResponse<ICustomerProviderDetails>> {
+    return this._http.get<IResponse<ICustomerProviderDetails>>(`${this._apiUrl}/fetch_one_provider?providerId=${id}`).pipe(shareReplay(1));
   }
 
   bulkUpdate(formData: FormData | Partial<IProvider>): Observable<IProvider> {

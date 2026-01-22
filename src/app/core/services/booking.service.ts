@@ -58,9 +58,9 @@ export class BookingService {
     );
   }
 
-  fetchBookingDetails(bookingId: string): Observable<IBookingDetailCustomer> {
+  fetchBookingDetails(bookingId: string): Observable<IResponse<IBookingDetailCustomer>> {
     const params = new HttpParams().set('bookingId', bookingId);
-    return this._http.get<IBookingDetailCustomer>(`${this._customerApi}/booking/view_details`, { params })
+    return this._http.get<IResponse<IBookingDetailCustomer>>(`${this._customerApi}/booking/view_details`, { params })
   }
 
   addReview(bookingId: string, reviewData: ISubmitReview): Observable<IResponse> {
@@ -82,7 +82,7 @@ export class BookingService {
     let params = new HttpParams().set('page', page.toString());
 
     Object.entries(filter).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (value && value !== undefined && value !== null) {
         params = params.set(key, value);
       }
     });
@@ -104,7 +104,7 @@ export class BookingService {
     let params = new HttpParams().set('page', page);
 
     Object.entries(filter).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (value && value !== undefined && value !== null) {
         params = params.set(key, value);
       }
     });

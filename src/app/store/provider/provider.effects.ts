@@ -18,7 +18,7 @@ export const providerEffects = {
             ofType(providerActions.fetchOneProvider),
             switchMap(() =>
                 providerService.getOneProvider().pipe(
-                    map((provider) => providerActions.successAction({ provider })),
+                    map((provider) => providerActions.successAction({ provider: provider.data! })),
                     catchError((error: HttpErrorResponse) => {
                         return handleApiError(error, providerActions.failureAction, toastr
                         );

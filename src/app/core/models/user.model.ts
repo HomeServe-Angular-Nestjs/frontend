@@ -93,7 +93,14 @@ export interface IProvider extends IBaseUser {
     servicesOffered: string[];
     defaultSlots: SlotType[];
     verificationStatus: VerificationStatusType;
+}
+
+export interface ICustomerProviderDetails extends IProvider {
     avgRating: number;
+    totalReviews: number;
+    isSaved: boolean;
+    successRate: number;
+    jobsCompleted: number;
 }
 
 export interface IUserState {
