@@ -89,7 +89,9 @@ export enum SortEnum {
     LATEST = 'latest',
     OLDEST = 'oldest',
     A_Z = 'a-z',
-    Z_A = 'z-a'
+    Z_A = 'z-a',
+    PRICE_HIGH_TO_LOW = 'price_high_to_low',
+    PRICE_LOW_TO_HIGH = 'price_low_to_high'
 }
 
 export enum Language {

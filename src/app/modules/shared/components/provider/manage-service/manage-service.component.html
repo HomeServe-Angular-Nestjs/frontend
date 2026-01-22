@@ -51,104 +51,108 @@
         </div>
 
         <!-- ================= LIST VIEW ================= -->
-        <div *ngIf="viewMode() === 'list'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div *ngIf="viewMode() === 'list'" class="space-y-6">
+            <app-provider-service-filter (filtersChanged)="onFiltersChanged($event)"></app-provider-service-filter>
 
-            <!-- Loading State -->
-            <div *ngIf="loading()" class="col-span-full py-20 text-center">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-                <p class="mt-4 text-gray-500 font-medium">Loading services...</p>
-            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            <!-- Service Card -->
-            <div *ngFor="let service of services()" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm
-            flex flex-col sm:flex-row gap-6 hover:shadow-md transition-shadow">
-
-                <!-- Image -->
-                <div class="flex-shrink-0">
-                    <img [src]="service.image" [alt]="service.category.name"
-                        class="w-full sm:w-32 h-32 object-cover rounded-xl border border-gray-100">
+                <!-- Loading State -->
+                <div *ngIf="loading()" class="col-span-full py-20 text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+                    <p class="mt-4 text-gray-500 font-medium">Loading services...</p>
                 </div>
 
-                <!-- Content -->
-                <div class="flex-grow space-y-3">
+                <!-- Service Card -->
+                <div *ngFor="let service of filteredServices()" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm
+            flex flex-col sm:flex-row gap-6 hover:shadow-md transition-shadow">
 
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600
+                    <!-- Image -->
+                    <div class="flex-shrink-0">
+                        <img [src]="service.image" [alt]="service.category.name"
+                            class="w-full sm:w-32 h-32 object-cover rounded-xl border border-gray-100">
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-grow space-y-3">
+
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600
                                  text-[10px] uppercase font-bold rounded">
-                                    {{ service.profession.name }}
-                                </span>
+                                        {{ service.profession.name }}
+                                    </span>
 
-                                <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded" [ngClass]="service.isActive 
+                                    <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded" [ngClass]="service.isActive 
                         ? 'bg-green-100 text-green-700'
                         : 'bg-gray-100 text-gray-500'">
-                                    {{ service.isActive ? 'Active' : 'Hidden' }}
+                                        {{ service.isActive ? 'Active' : 'Hidden' }}
+                                    </span>
+                                </div>
+
+                                <h3 class="text-lg font-bold text-gray-900">
+                                    {{ service.category.name }}
+                                </h3>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center gap-1">
+                                <button (click)="toggleView('form', service)"
+                                    class="p-2 text-gray-400 hover:text-green-600 transition" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+
+                                <button (click)="deleteService(service.id)"
+                                    class="p-2 text-gray-400 hover:text-red-500 transition" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <p class="text-sm text-gray-500 line-clamp-2 break-words">
+                            {{ service.description }}
+                        </p>
+
+                        <div class="flex items-center justify-between pt-2">
+                            <div class="flex items-center gap-4 text-sm font-medium">
+                                <span class="text-green-600 font-bold">
+                                    ${{ service.price }}/{{ service.pricingUnit }}
+                                </span>
+
+                                <span class="text-gray-400 flex items-center gap-1">
+                                    <i class="far fa-clock"></i>
+                                    {{ service.estimatedTimeInMinutes }} min
                                 </span>
                             </div>
 
-                            <h3 class="text-lg font-bold text-gray-900">
-                                {{ service.category.name }}
-                            </h3>
-                        </div>
+                            <!-- Toggle -->
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" [checked]="service.isActive"
+                                    (change)="toggleStatus(service, $event)" class="sr-only peer">
 
-                        <!-- Actions -->
-                        <div class="flex items-center gap-1">
-                            <button (click)="toggleView('form', service)"
-                                class="p-2 text-gray-400 hover:text-green-600 transition" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-
-                            <button (click)="deleteService(service.id)"
-                                class="p-2 text-gray-400 hover:text-red-500 transition" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Description -->
-                    <p class="text-sm text-gray-500 line-clamp-2 break-words">
-                        {{ service.description }}
-                    </p>
-
-                    <div class="flex items-center justify-between pt-2">
-                        <div class="flex items-center gap-4 text-sm font-medium">
-                            <span class="text-green-600 font-bold">
-                                ${{ service.price }}/{{ service.pricingUnit }}
-                            </span>
-
-                            <span class="text-gray-400 flex items-center gap-1">
-                                <i class="far fa-clock"></i>
-                                {{ service.estimatedTimeInMinutes }} min
-                            </span>
-                        </div>
-
-                        <!-- Toggle -->
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" [checked]="service.isActive" (change)="toggleStatus(service, $event)"
-                                class="sr-only peer">
-
-                            <div class="w-9 h-5 bg-gray-200 rounded-full peer
+                                <div class="w-9 h-5 bg-gray-200 rounded-full peer
                             peer-checked:bg-green-600
                             after:content-[''] after:absolute after:top-[2px] after:left-[2px]
                             after:h-4 after:w-4 after:bg-white after:rounded-full after:transition
                             peer-checked:after:translate-x-full">
-                            </div>
-                        </label>
+                                </div>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Empty State -->
-            <div *ngIf="services().length === 0 && !loading()" class="col-span-full flex flex-col items-center justify-center text-center py-16
+                <!-- Empty State -->
+                <div *ngIf="filteredServices().length === 0 && !loading()" class="col-span-full flex flex-col items-center justify-center text-center py-16
             bg-gray-50 border border-dashed border-gray-300 rounded-2xl">
 
-                <div class="text-gray-300 text-5xl mb-4">
-                    <i class="fas fa-clipboard-list"></i>
-                </div>
+                    <div class="text-gray-300 text-5xl mb-4">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
 
-                <h3 class="text-lg font-semibold text-gray-700">No Services Found</h3>
-                <p class="text-gray-500 text-sm mt-1 mb-4">Add your first service to get started.</p>
+                    <h3 class="text-lg font-semibold text-gray-700">No Services Found</h3>
+                    <p class="text-gray-500 text-sm mt-1 mb-4">Add your first service to get started.</p>
+                </div>
             </div>
         </div>
 

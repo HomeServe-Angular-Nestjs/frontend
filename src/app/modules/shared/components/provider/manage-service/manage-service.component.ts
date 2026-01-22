@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -12,6 +12,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../partials/shared/confirm-dialog-box/confirm-dialog.component';
 import { LoadingCircleAnimationComponent } from "../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { SharedDataService } from '../../../../../core/services/public/shared-data.service';
+import { ProviderServiceFilterComponent } from './service-filter/service-filter.component';
+import { IServiceFilter } from '../../../../../core/models/offeredService.model';
+import { SortEnum } from '../../../../../core/enums/enums';
 
 @Component({
   selector: 'app-provider-manage-service',
@@ -19,7 +22,8 @@ import { SharedDataService } from '../../../../../core/services/public/shared-da
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    LoadingCircleAnimationComponent
+    LoadingCircleAnimationComponent,
+    ProviderServiceFilterComponent
   ],
   templateUrl: './manage-service.component.html',
   styles: [`
@@ -47,6 +51,19 @@ import { SharedDataService } from '../../../../../core/services/public/shared-da
       max-height: 200px;
       overflow-y: auto;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    @keyframes fadeInSlideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-in {
+      animation: fadeInSlideDown 0.3s ease-out forwards;
     }
   `]
 })
@@ -79,6 +96,55 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     total: 0,
     active: 0,
     inactive: 0
+  });
+
+  activeFilters = signal<IServiceFilter>({
+    sort: SortEnum.LATEST,
+    status: 'all',
+    isVerified: 'all',
+    search: ''
+  });
+
+  filteredServices = computed(() => {
+    let list = this.services();
+    const filters = this.activeFilters();
+
+    if (filters.search) {
+      const search = filters.search.toLowerCase();
+      list = list.filter(s =>
+        s.category.name.toLowerCase().includes(search) ||
+        s.profession.name.toLowerCase().includes(search) ||
+        s.description.toLowerCase().includes(search)
+      );
+    }
+
+    if (filters.status && filters.status !== 'all') {
+      const isActive = filters.status === 'true';
+      list = list.filter(s => s.isActive === isActive);
+    }
+
+    if (filters.sort) {
+      list = [...list].sort((a, b) => {
+        switch (filters.sort) {
+          case SortEnum.LATEST:
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          case SortEnum.OLDEST:
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          case SortEnum.A_Z:
+            return a.category.name.localeCompare(b.category.name);
+          case SortEnum.Z_A:
+            return b.category.name.localeCompare(a.category.name);
+          case SortEnum.PRICE_HIGH_TO_LOW:
+            return b.price - a.price;
+          case SortEnum.PRICE_LOW_TO_HIGH:
+            return a.price - b.price;
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return list;
   });
 
   constructor() {
@@ -171,11 +237,17 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe({
         next: () => {
-          service.isActive = !service.isActive;
+          this.services.update(prev => prev.map(s =>
+            s.id === service.id ? { ...s, isActive: !s.isActive } : s
+          ));
           this._updateStats();
-          this._toastr.info(`Service ${service.isActive ? 'activated' : 'deactivated'}`);
+          this._toastr.info(`Service ${!service.isActive ? 'activated' : 'deactivated'}`);
         }
       });
+  }
+
+  onFiltersChanged(filters: IServiceFilter) {
+    this.activeFilters.set(filters);
   }
 
   onSubmit() {
