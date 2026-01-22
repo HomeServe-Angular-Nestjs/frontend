@@ -72,9 +72,6 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
 
       (window as any)._pc = this._pc;
 
-      // this._pc.addTransceiver("video", { direction: "sendrecv" });
-      // this._pc.addTransceiver("audio", { direction: "sendrecv" });
-
       this._pc.onconnectionstatechange = () => {
         console.log('[VideoCall] Connection State:', this._pc.connectionState);
         if (this._pc.connectionState === 'disconnected' || this._pc.connectionState === 'failed') {
