@@ -93,7 +93,7 @@ export const customerRoutes: Routes = [
           },
           {
             path: 'overview',
-            loadComponent: () => import('../../shared/components/customer/profile/overview/profile-overview.component')
+            loadComponent: () => import('../../shared/components/customer/profile/profile-overview.component')
               .then(c => c.CustomerProfileOverviewComponent),
             data: { breadcrumb: 'Overview' }
           },
