@@ -47,14 +47,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     }
 
                     if (error.status === 403) {
-                        if (errorCode === ErrorCodes.NO_ACTIVE_SUBSCRIPTION) {
+                        // if (errorCode === ErrorCodes.NO_ACTIVE_SUBSCRIPTION) {
                             router.navigate(['provider', 'plans']);
-                            toastr.error(userMessage);
+                            toastr.warning(userMessage);
                             return throwError(() => new Error(userMessage));
-                        }
-                        return of();
+                        // }   
+                        // return of();
                     }
-
                     toastr.error(userMessage);
                     return throwError(() => new Error(userMessage));
                 })
