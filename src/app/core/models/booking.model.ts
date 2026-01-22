@@ -32,6 +32,7 @@ export interface IBookingDetailsBase {
   paymentStatus: PaymentStatus;
   createdAt: string;
   expectedArrivalTime: string;
+  actualArrivalTime: string;
   cancelStatus: CancelStatus | null;
   cancelReason: string | null;
   cancelledAt: Date | null;
@@ -124,11 +125,13 @@ export interface IBookingWithPagination {
 
 export interface IBookingDetailCustomer extends IBookingDetailsBase {
   provider: {
+    id: string;
     name: string;
     email: string;
     phone: string;
     location: string;
   };
+  breakup: IPriceBreakupData;
 }
 
 export interface IBookingFilter {

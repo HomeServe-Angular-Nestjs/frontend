@@ -4,7 +4,7 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div class="flex items-center gap-4">
-                <button routerLink=".."
+                <button routerLink="/profile/bookings"
                     class="p-2.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:text-indigo-600 hover:border-indigo-100 transition-all">
                     <i class="fas fa-chevron-left"></i>
                 </button>
@@ -53,13 +53,29 @@
                                     </p>
                                 </div>
                             </div>
-                            <p class="text-sm font-bold text-gray-900">₹{{service.price}}</p>
+                            <p class="text-sm font-bold text-gray-900">₹{{service.price | number:'1.2-2'}}</p>
                         </div>
                     </div>
 
-                    <div class="px-6 py-5 bg-gray-50/50 flex justify-between items-center border-t border-gray-100">
-                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Charge</span>
-                        <span class="text-xl font-bold text-gray-900">₹{{bookingDetails.totalAmount}}</span>
+                    <div class="px-6 py-5 bg-gray-50/50 border-t border-gray-100 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sub Total</span>
+                            <span class="text-sm font-bold text-gray-900">
+                                ₹{{bookingDetails.breakup.subTotal | number:'1.2-2'}}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tax (GST)</span>
+                            <span class="text-sm font-bold text-gray-900">
+                                ₹{{bookingDetails.breakup.tax | number:'1.2-2'}}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+                            <span class="text-xs font-black text-gray-900 uppercase tracking-widest">Total Charge</span>
+                            <span class="text-2xl font-black text-indigo-600">
+                                ₹{{bookingDetails.breakup.total | number:'1.2-2'}}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -87,6 +103,11 @@
                                     <span
                                         class="text-xs font-bold text-indigo-600">{{formatDate(bookingDetails.expectedArrivalTime)}}</span>
                                 </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500">Actual Arrival:</span>
+                                    <span class="text-xs font-bold text-indigo-600">{{bookingDetails.actualArrivalTime ?
+                                        formatDate(bookingDetails.actualArrivalTime) : 'N/A'}}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -99,30 +120,27 @@
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Service Professional
                     </p>
-                    <div class="flex items-center gap-4 mb-5">
+                    <div class="flex items-start gap-4 mb-6">
                         <div
-                            class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+                            class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shrink-0 shadow-sm shadow-indigo-100">
                             {{bookingDetails.provider.name.charAt(0)}}
                         </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-900 leading-tight">{{bookingDetails.provider.name}}
+                        <div class="min-w-0 flex-1 pt-0.5">
+                            <p class="text-sm font-bold text-gray-900 mb-2 truncate">{{bookingDetails.provider.name}}
                             </p>
-                            <p class="text-[11px] text-emerald-500 font-bold mt-0.5 flex items-center gap-1">
-                                <!-- <i class="fas fa-check-circle text-[10px]"></i> Verified -->
-                            </p>
+                            <div class="space-y-1.5">
+                                <div class="flex items-center gap-2.5 text-[11px] text-gray-500">
+                                    <i class="far fa-envelope w-3 text-indigo-400 opacity-70"></i>
+                                    <span class="truncate">{{bookingDetails.provider.email}}</span>
+                                </div>
+                                <div class="flex items-center gap-2.5 text-[11px] text-gray-500">
+                                    <i class="fas fa-phone-alt rotate-90 w-3 text-indigo-400 opacity-70"></i>
+                                    <span>{{bookingDetails.provider.phone || 'N/A'}}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6">
-                        <div class="flex items-center gap-3 text-xs text-gray-500">
-                            <i class="far fa-envelope w-4"></i>
-                            <span class="truncate">{{bookingDetails.provider.email}}</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-xs text-gray-500">
-                            <i class="fas fa-phone-alt rotate-90 w-4 text-[11px]"></i>
-                            <span>{{bookingDetails.provider.phone || 'N/A'}}</span>
-                        </div>
-                    </div>
-                    <app-button
+                    <app-button (clicked)="chat(bookingDetails.provider.id)"
                         buttonClass="w-full py-2.5 bg-indigo-50 text-indigo-600 font-bold rounded-lg hover:bg-indigo-100 transition-colors text-xs"
                         text="Chat Now"></app-button>
                 </div>
