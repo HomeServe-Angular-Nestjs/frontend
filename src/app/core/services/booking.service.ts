@@ -82,7 +82,7 @@ export class BookingService {
     let params = new HttpParams().set('page', page.toString());
 
     Object.entries(filter).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (value && value !== undefined && value !== null) {
         params = params.set(key, value);
       }
     });
@@ -104,7 +104,7 @@ export class BookingService {
     let params = new HttpParams().set('page', page);
 
     Object.entries(filter).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (value && value !== undefined && value !== null) {
         params = params.set(key, value);
       }
     });

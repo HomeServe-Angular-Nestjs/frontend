@@ -138,7 +138,7 @@ export interface IBookingFilter {
   search?: string;
   bookingStatus?: BookingStatus | '';
   paymentStatus?: PaymentStatus | '';
-  date?: string;
+  date?: Date | '';
   sort?: string;
 }
 

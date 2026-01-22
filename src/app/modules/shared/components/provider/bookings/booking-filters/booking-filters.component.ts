@@ -27,12 +27,7 @@ export class ProviderBookingFilterComponent {
         { value: BookingStatus.CANCELLED, label: 'Cancelled' },
     ];
 
-    dateRangeSelectOption: { value: DateRange; label: string; }[] = [
-        { value: DateRange.TODAY, label: 'Today' },
-        { value: DateRange.THIS_WEEK, label: 'This Week' },
-        { value: DateRange.THIS_MONTH, label: 'This Month' },
-        { value: DateRange.THIS_YEAR, label: 'This Year' },
-    ];
+
 
     sortSelectOption: { value: SortBy; label: string; }[] = [
         { value: SortBy.NEWEST, label: 'Newest First' },
@@ -44,7 +39,7 @@ export class ProviderBookingFilterComponent {
 
     selectedBookingStatus: BookingStatus | '' = '';
     selectedPaymentStatus: PaymentStatus | '' = '';
-    selectedDateRange: DateRange = DateRange.TODAY;
+    selectedDateRange: Date | '' = '';
     selectedSortBy: SortBy = SortBy.NEWEST;
 
 
@@ -58,8 +53,8 @@ export class ProviderBookingFilterComponent {
         this._emitChanges();
     }
 
-    changeDateRange(range: DateRange) {
-        this.selectedDateRange = range;
+    changeDateRange(date: string) {
+        this.selectedDateRange = date ? new Date(date) : '';
         this._emitChanges();
     }
 
@@ -71,7 +66,7 @@ export class ProviderBookingFilterComponent {
     resetFilters() {
         this.selectedBookingStatus = '';
         this.selectedPaymentStatus = '';
-        this.selectedDateRange = DateRange.TODAY;
+        this.selectedDateRange = '';
         this.selectedSortBy = SortBy.NEWEST;
         this._emitChanges();
     }
