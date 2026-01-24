@@ -9,7 +9,7 @@
       <div class="flex items-start gap-4 mb-6">
         <!-- Avatar image if exists -->
         <div class="relative">
-          <img *ngIf="provider.avatar; else fallbackAvatar" [src]="provider.avatar" alt="User profile"
+          <img *ngIf="provider.avatar; else fallbackAvatar" [src]="provider.avatar" alt="User profile" referrerpolicy="no-referrer"
             class="h-16 w-16 rounded-xl object-cover ring-2 ring-neutral-50 shadow-sm transition-transform duration-300 group-hover:scale-105" />
 
           <ng-template #fallbackAvatar>
