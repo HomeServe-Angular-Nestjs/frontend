@@ -48,15 +48,6 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     total: 0.00,
   };
 
-  get getServiceIds(): SelectedServiceIdsType[] {
-    return this.selectedServiceData.map((item: SelectedServiceType) => {
-      return {
-        id: item.id,
-        selectedIds: item.services.map((s) => s.id)
-      }
-    });
-  }
-
   constructor() {
     effect(() => {
       const slot = this._bookingService.selectedSlot();
