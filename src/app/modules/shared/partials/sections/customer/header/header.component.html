@@ -145,7 +145,7 @@
               <button class="flex items-center gap-2 focus:outline-none">
                 <div class="relative">
                   <ng-container *ngIf="avatar() as avatar; else fallbackAvatar">
-                    <img [src]="avatar"
+                    <img [src]="avatar" referrerpolicy="no-referrer" alt="User Avatar"
                       class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md group-hover:shadow-lg transition-transform group-hover:scale-105 duration-200">
                   </ng-container>
                   <ng-template #fallbackAvatar>
