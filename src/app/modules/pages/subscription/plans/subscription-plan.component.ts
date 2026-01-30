@@ -17,296 +17,296 @@ import { SharedDataService } from "../../../../core/services/public/shared-data.
 import { KeyValuePipe } from "@angular/common";
 
 @Component({
-    selector: 'app-subscription-plan-page',
-    templateUrl: './subscription-plan.component.html',
-    imports: [CommonModule, KeyValuePipe],
-    providers: [PaymentService, RazorpayWrapperService]
+  selector: 'app-subscription-plan-page',
+  templateUrl: './subscription-plan.component.html',
+  imports: [CommonModule, KeyValuePipe],
+  providers: [PaymentService, RazorpayWrapperService]
 })
 export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
-    private readonly _store = inject(Store);
-    private readonly _router = inject(Router);
-    private readonly _planService = inject(PlanService);
-    private readonly _sharedService = inject(SharedDataService);
-    private readonly _toastr = inject(ToastNotificationService);
-    private readonly _razorpayWrapper = inject(RazorpayWrapperService);
-    private readonly _subscriptionService = inject(SubscriptionService);
-    private readonly _paymentService = inject(PaymentService);
+  private readonly _store = inject(Store);
+  private readonly _router = inject(Router);
+  private readonly _planService = inject(PlanService);
+  private readonly _sharedService = inject(SharedDataService);
+  private readonly _toastr = inject(ToastNotificationService);
+  private readonly _razorpayWrapper = inject(RazorpayWrapperService);
+  private readonly _subscriptionService = inject(SubscriptionService);
+  private readonly _paymentService = inject(PaymentService);
 
-    readonly featureRegistry = FEATURE_REGISTRY;
+  readonly featureRegistry = FEATURE_REGISTRY;
 
-    getFeatureLabel(key: string): string {
-        const feature = Object.values(this.featureRegistry).find(f => f.key === key);
-        return feature ? feature.label : key;
-    }
+  getFeatureLabel(key: string): string {
+    const feature = Object.values(this.featureRegistry).find(f => f.key === key);
+    return feature ? feature.label : key;
+  }
 
-    private _destroy$ = new Subject<void>();
+  private _destroy$ = new Subject<void>();
 
-    @Output() proceedSubEvent = new EventEmitter<IPlan>();
+  @Output() proceedSubEvent = new EventEmitter<IPlan>();
 
-    userType = 'customer';
-    plans$!: Observable<IPlan[]>;
-    currentPlanId: string | null = null;
-    previousPage: string | null = null;
-    currentPlanDuration: string = '';
-    currentSubscription$: Observable<ISubscription | null> = of(null);
+  userType = 'customer';
+  plans$!: Observable<IPlan[]>;
+  currentPlanId: string | null = null;
+  previousPage: string | null = null;
+  currentPlanDuration: string = '';
+  currentSubscription$: Observable<ISubscription | null> = of(null);
 
-    ngOnInit(): void {
-        this._sharedService.setProviderHeader('Plans');
+  ngOnInit(): void {
+    this._sharedService.setProviderHeader('Plans');
 
-        this.currentSubscription$ = this._subscriptionService.fetchSubscription().pipe(
-            map(res => res.data ?? null),
-            shareReplay(1)
-        );
+    this.currentSubscription$ = this._subscriptionService.fetchSubscription().pipe(
+      map(res => res.data ?? null),
+      shareReplay(1)
+    );
 
-        const allPlans$ = this._planService.fetchPlans().pipe(
-            map(res => res.data ?? []),
-            shareReplay(1)
-        );
+    const allPlans$ = this._planService.fetchPlans().pipe(
+      map(res => res.data ?? []),
+      shareReplay(1)
+    );
 
-        const userType$ = this._store.select(selectAuthUserType);
+    const userType$ = this._store.select(selectAuthUserType);
 
-        this.plans$ = combineLatest([userType$, allPlans$, this.currentSubscription$]).pipe(
-            takeUntil(this._destroy$),
-            map(([userType, plans, subscription]) => {
-                this.userType = userType ?? 'customer';
-                this.currentPlanId = subscription?.planId ?? null;
-                this.currentPlanDuration = subscription?.duration ?? '';
+    this.plans$ = combineLatest([userType$, allPlans$, this.currentSubscription$]).pipe(
+      takeUntil(this._destroy$),
+      map(([userType, plans, subscription]) => {
+        this.userType = userType ?? 'customer';
+        this.currentPlanId = subscription?.planId ?? null;
+        this.currentPlanDuration = subscription?.duration ?? '';
 
-                return plans.filter(plan => {
-                    const isRoleMatched = plan.role.toLowerCase() === this.userType.toLowerCase();
-                    const isLifetimeConflict = !!this.currentPlanId && plan.duration.toLowerCase() === PlanDuration.LIFETIME;
-                    return isRoleMatched && !isLifetimeConflict;
-                });
-            }),
-            shareReplay(1)
-        );
-
-        this._sharedService.providerHeader$
-            .pipe(pairwise(), takeUntil(this._destroy$))
-            .subscribe(([previous]) => {
-                this.previousPage = previous;
-            });
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
-
-    private _verifyPaymentAndConfirmSubscription(
-        response: RazorpayPaymentResponse,
-        order: RazorpayOrder,
-        subscriptionId: string
-    ) {
-        const orderData: ISubscriptionOrder = {
-            id: order.id,
-            subscriptionId,
-            transactionType: TransactionType.SUBSCRIPTION_PAYMENT,
-            amount: order.amount,
-            status: TransactionStatus.SUCCESS,
-            direction: PaymentDirection.DEBIT,
-            source: PaymentSource.RAZORPAY,
-            receipt: order.receipt,
-        };
-
-        return this._paymentService.verifySubscriptionPayment(response, orderData).pipe(
-            switchMap((verificationResponse) => {
-                const { verified, subscriptionId, transaction } = verificationResponse;
-
-                if (!transaction || !subscriptionId || !transaction.id || !verified) {
-                    this._toastr.error('Payment verification failed or transaction missing.');
-                    return throwError(() => new Error('Payment verification failed'));
-                }
-                return this._subscriptionService.updatePaymentStatus({
-                    transactionId: transaction.id,
-                    subscriptionId,
-                    paymentStatus: PaymentStatus.PAID
-                })
-            }),
-            map(() => void 0)
-        );
-    }
-
-    private _openRazorPayCheckout(order: RazorpayOrder, subscriptionId: string): Observable<'success' | 'dismissed'> {
-        return new Observable<'success' | 'dismissed'>(observer => {
-            this._razorpayWrapper.openCheckout(
-                order,
-                (paymentResponse: RazorpayPaymentResponse) => {
-                    this._verifyPaymentAndConfirmSubscription(paymentResponse, order, subscriptionId)
-                        .subscribe({
-                            next: () => {
-                                observer.next('success');
-                                observer.complete();
-                            },
-                            error: (err) => {
-                                observer.error(err)
-                            }
-                        });
-                },
-                () => {
-                    this._subscriptionService.removeSubscription(subscriptionId)
-                        .pipe(
-                            catchError(err => {
-                                console.error('Failed to remove subscription after dismissal', err);
-                                return of(null);
-                            })
-                        )
-                        .subscribe(() => {
-                            observer.next('dismissed');
-                            observer.complete();
-                        })
-                }
-            )
+        return plans.filter(plan => {
+          const isRoleMatched = plan.role.toLowerCase() === this.userType.toLowerCase();
+          const isLifetimeConflict = !!this.currentPlanId && plan.duration.toLowerCase() === PlanDuration.LIFETIME;
+          return isRoleMatched && !isLifetimeConflict;
         });
-    }
+      }),
+      shareReplay(1)
+    );
 
-    private _afterSuccessfulSubscription() {
-        this._toastr.success('Payment verified. Subscription completed.');
-        let url = this.userType == 'customer'
-            ? '/subscriptions'
-            : '/provider/subscriptions'
-        this._router.navigate([url]);
-    }
+    this._sharedService.providerHeader$
+      .pipe(pairwise(), takeUntil(this._destroy$))
+      .subscribe(([previous]) => {
+        this.previousPage = previous;
+      });
+  }
 
-    private _initializePayment(plan: IPlan) {
-        const subscriptionData: ICreateSubscription = {
-            planId: plan.id,
-            duration: plan.duration,
-        };
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
+  }
 
-        return this._subscriptionService.createSubscription(subscriptionData).pipe(
-            takeUntil(this._destroy$),
-            switchMap((subscriptionResponse) => {
-                const sub = subscriptionResponse?.data;
-                if (!sub?.id) throw new Error('Failed to purchase subscription.');
+  private _verifyPaymentAndConfirmSubscription(
+    response: RazorpayPaymentResponse,
+    order: RazorpayOrder,
+    subscriptionId: string
+  ) {
+    const orderData: ISubscriptionOrder = {
+      id: order.id,
+      subscriptionId,
+      transactionType: TransactionType.SUBSCRIPTION_PAYMENT,
+      amount: order.amount,
+      status: TransactionStatus.SUCCESS,
+      direction: PaymentDirection.DEBIT,
+      source: PaymentSource.RAZORPAY,
+      receipt: order.receipt,
+    };
 
-                return this._paymentService.createRazorpayOrder(Number(plan.price)).pipe(
-                    switchMap(order => this._openRazorPayCheckout(order, sub.id))
-                );
-            }),
-            catchError(err => {
-                return throwError(() => err);
-            })
-        );
-    }
+    return this._paymentService.verifySubscriptionPayment(response, orderData).pipe(
+      switchMap((verificationResponse) => {
+        const { verified, subscriptionId, transaction } = verificationResponse;
 
-    private _initializeUpgrade(amount: number, plan: IPlan) {
-        const subscriptionData: ICreateSubscription = {
-            planId: plan.id,
-            duration: plan.duration,
-        };
+        if (!transaction || !subscriptionId || !transaction.id || !verified) {
+          this._toastr.error('Payment verification failed or transaction missing.');
+          return throwError(() => new Error('Payment verification failed'));
+        }
+        return this._subscriptionService.updatePaymentStatus({
+          transactionId: transaction.id,
+          subscriptionId,
+          paymentStatus: PaymentStatus.PAID
+        })
+      }),
+      map(() => void 0)
+    );
+  }
 
-        return this._subscriptionService.upgradeSubscription(subscriptionData).pipe(
-            takeUntil(this._destroy$),
-            switchMap(res => {
-                let sub = res.data;
-                if (!sub || !sub.id) throw new Error('Failed to upgrade subscription.');
-
-                return this._paymentService.createRazorpayOrder(amount).pipe(
-                    switchMap(order => this._openRazorPayCheckout(order, sub.id))
-                )
-            }),
-            catchError(err => {
-                this._toastr.error('Something went wrong during upgrade.');
-                return throwError(() => err);
-            })
-        );
-    }
-
-    private _handleFreePlan() {
-        this._router.navigate(['provider', 'dashboard']);
-    }
-
-    private _handleUpgrade(plan: IPlan): Observable<void> {
-        return this.currentSubscription$
+  private _openRazorPayCheckout(order: RazorpayOrder, subscriptionId: string): Observable<'success' | 'dismissed'> {
+    return new Observable<'success' | 'dismissed'>(observer => {
+      this._razorpayWrapper.openCheckout(
+        order,
+        (paymentResponse: RazorpayPaymentResponse) => {
+          this._verifyPaymentAndConfirmSubscription(paymentResponse, order, subscriptionId)
+            .subscribe({
+              next: () => {
+                observer.next('success');
+                observer.complete();
+              },
+              error: (err) => {
+                observer.error(err)
+              }
+            });
+        },
+        () => {
+          this._subscriptionService.removeSubscription(subscriptionId)
             .pipe(
-                takeUntil(this._destroy$),
-                filter(Boolean),
-                switchMap(subscription => this._subscriptionService.getUpgradeAmount(subscription.id)),
-                map(res => res.data),
-                filter(Boolean),
-                switchMap((amount) => this._initializeUpgrade(amount, plan).pipe(
-                    map(() => void 0)
-                )),
-                catchError(err => {
-                    this._toastr.error('Upgrade failed.');
-                    return throwError(() => err);
-                })
-            );
-    }
-
-    proceedSub(plan: IPlan): void {
-        if (plan.duration === PlanDuration.LIFETIME) {
-            this._handleFreePlan();
-            return;
+              catchError(err => {
+                console.error('Failed to remove subscription after dismissal', err);
+                return of(null);
+              })
+            )
+            .subscribe(() => {
+              observer.next('dismissed');
+              observer.complete();
+            })
         }
+      )
+    });
+  }
 
-        const isUpgrade = this.currentPlanDuration === PlanDuration.MONTHLY;
-        if (isUpgrade) {
-            this._toastr.warning('You are already in subscription.');
-            return;
-        };
+  private _afterSuccessfulSubscription() {
+    this._toastr.success('Payment verified. Subscription completed.');
+    let url = this.userType == 'customer'
+      ? '/subscriptions'
+      : '/provider/subscriptions'
+    this._router.navigate([url]);
+  }
 
-        const flow$ = this._initializePayment(plan);
+  private _initializePayment(plan: IPlan) {
+    const subscriptionData: ICreateSubscription = {
+      planId: plan.id,
+      duration: plan.duration,
+    };
 
-        flow$.pipe(takeUntil(this._destroy$)).subscribe({
-            next: (status) => {
-                if (status === "success") {
-                    this._afterSuccessfulSubscription();
-                } else if (status === "dismissed") {
-                    this._toastr.info('Payment dismissed.');
-                }
-            },
-        }); 
+    return this._subscriptionService.createSubscription(subscriptionData).pipe(
+      takeUntil(this._destroy$),
+      switchMap((subscriptionResponse) => {
+        const sub = subscriptionResponse?.data;
+        if (!sub?.id) throw new Error('Failed to purchase subscription.');
+
+        return this._paymentService.createRazorpayOrder(Number(plan.price)).pipe(
+          switchMap(order => this._openRazorPayCheckout(order, sub.id))
+        );
+      }),
+      catchError(err => {
+        return throwError(() => err);
+      })
+    );
+  }
+
+  private _initializeUpgrade(amount: number, plan: IPlan) {
+    const subscriptionData: ICreateSubscription = {
+      planId: plan.id,
+      duration: plan.duration,
+    };
+
+    return this._subscriptionService.upgradeSubscription(subscriptionData).pipe(
+      takeUntil(this._destroy$),
+      switchMap(res => {
+        let sub = res.data;
+        if (!sub || !sub.id) throw new Error('Failed to upgrade subscription.');
+
+        return this._paymentService.createRazorpayOrder(amount).pipe(
+          switchMap(order => this._openRazorPayCheckout(order, sub.id))
+        )
+      }),
+      catchError(err => {
+        this._toastr.error('Something went wrong during upgrade.');
+        return throwError(() => err);
+      })
+    );
+  }
+
+  private _handleFreePlan() {
+    this._router.navigate(['provider', 'dashboard']);
+  }
+
+  private _handleUpgrade(plan: IPlan): Observable<void> {
+    return this.currentSubscription$
+      .pipe(
+        takeUntil(this._destroy$),
+        filter(Boolean),
+        switchMap(subscription => this._subscriptionService.getUpgradeAmount(subscription.id)),
+        map(res => res.data),
+        filter(Boolean),
+        switchMap((amount) => this._initializeUpgrade(amount, plan).pipe(
+          map(() => void 0)
+        )),
+        catchError(err => {
+          this._toastr.error('Upgrade failed.');
+          return throwError(() => err);
+        })
+      );
+  }
+
+  proceedSub(plan: IPlan): void {
+    if (plan.duration === PlanDuration.LIFETIME) {
+      this._handleFreePlan();
+      return;
     }
 
-    getPlanButtonClass(plan: any): string {
-        const planName = plan.name?.toLowerCase();
-        const isCurrent = this.currentPlanId === plan.id;
+    const isUpgrade = this.currentPlanDuration === PlanDuration.MONTHLY;
+    if (isUpgrade) {
+      this._toastr.warning('You are already in subscription.');
+      return;
+    };
 
-        if (isCurrent) {
-            return 'bg-gray-300 text-gray-600 border border-gray-400 cursor-not-allowed';
+    const flow$ = this._initializePayment(plan);
+
+    flow$.pipe(takeUntil(this._destroy$)).subscribe({
+      next: (status) => {
+        if (status === "success") {
+          this._afterSuccessfulSubscription();
+        } else if (status === "dismissed") {
+          this._toastr.info('Payment dismissed.');
         }
+      },
+    });
+  }
 
-        switch (planName) {
-            case 'free':
-                return 'bg-primary-50 text-primary-700 border border-primary-200 font-semibold';
-            case 'premium':
-                return 'bg-green-100 text-green-800 border border-green-400 hover:bg-green-200';
-            default:
-                return 'bg-gray-200 text-black border border-gray-300';
-        }
+  getPlanButtonClass(plan: any): string {
+    const planName = plan.name?.toLowerCase();
+    const isCurrent = this.currentPlanId === plan.id;
+
+    if (isCurrent) {
+      return 'bg-gray-300 text-gray-600 border border-gray-400 cursor-not-allowed';
     }
 
-    goBack() {
-        if (this.previousPage === 'Subscription') {
-            this._router.navigate(['/provider/subscriptions']);
-        } else {
-            this._router.navigate(['/provider/dashboard']);
-        }
+    switch (planName) {
+      case 'free':
+        return 'bg-primary-50 text-primary-700 border border-primary-200 font-semibold';
+      case 'premium':
+        return 'bg-green-100 text-green-800 border border-green-400 hover:bg-green-200';
+      default:
+        return 'bg-gray-200 text-black border border-gray-300';
+    }
+  }
+
+  goBack() {
+    if (this.previousPage === 'Subscription') {
+      this._router.navigate(['/provider/subscriptions']);
+    } else {
+      this._router.navigate(['/provider/dashboard']);
+    }
+  }
+
+  isCurrentPlan(plan: any): boolean {
+    return this.currentPlanId === plan.id;
+  }
+
+  isYearly(): boolean {
+    return this.currentPlanDuration === 'yearly';
+  }
+
+  // Get the appropriate plan button text based on conditions
+  getPlanButtonText(plan: any): string {
+    const planDuration = plan.duration?.toLowerCase();
+
+    if (this.currentPlanDuration === PlanDuration.MONTHLY && planDuration === PlanDuration.YEARLY) {
+      return 'Upgrade to Yearly';
     }
 
-    isCurrentPlan(plan: any): boolean {
-        return this.currentPlanId === plan.id;
+    if (planDuration === PlanDuration.LIFETIME) {
+      return 'Get Started';
     }
 
-    isYearly(): boolean {
-        return this.currentPlanDuration === 'yearly';
-    }
-
-    // Get the appropriate plan button text based on conditions
-    getPlanButtonText(plan: any): string {
-        const planDuration = plan.duration?.toLowerCase();
-
-        if (this.currentPlanDuration === PlanDuration.MONTHLY && planDuration === PlanDuration.YEARLY) {
-            return 'Upgrade to Yearly';
-        }
-
-        if (planDuration === PlanDuration.LIFETIME) {
-            return 'Get Started';
-        }
-
-        return 'Upgrade to ' + (plan.duration || '').toString();
-    }
+    return 'Upgrade to ' + (plan.duration || '').toString();
+  }
 
 }

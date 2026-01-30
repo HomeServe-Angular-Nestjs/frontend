@@ -75,6 +75,21 @@ export class ProviderPerformanceComparisonOverviewComponent implements OnInit {
   ngOnInit(): void {
     this._analyticService.getComparisonOverviewData()
       .pipe(takeUntil(this._destroy$))
-      .subscribe(res => this.overViewData = res.data || this.overViewData)
+      .subscribe(res => {
+        if(!res.data) return;
+        const data = {
+          growthRate: res.data.growthRate ?? 0,
+          monthlyTrend: {
+            previousMonth: res.data.monthlyTrend?.previousMonth ?? 0,
+            currentMonth: res.data.monthlyTrend?.currentMonth ?? 0,
+            previousRevenue: res.data.monthlyTrend?.previousRevenue ?? 0,
+            currentRevenue: res.data.monthlyTrend?.currentRevenue ?? 0,
+            growthPercentage:res.data.monthlyTrend?.growthPercentage ?? 0,
+          },
+          providerRank: res.data.providerRank ?? 0, 
+        };
+
+        this.overViewData = data;
+      })
   }
 }
