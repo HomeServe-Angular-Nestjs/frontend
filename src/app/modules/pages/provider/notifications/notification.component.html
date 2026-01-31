@@ -4,84 +4,100 @@
             <h1>Notifications</h1>
             <p>Stay updated with your latest activities and system alerts</p>
         </div>
+
         <div class="header-actions">
             <button class="btn-outline" (click)="markAllAsRead()" [disabled]="notifications().length === 0">
                 <i class="fas fa-check-double"></i> Mark all as read
             </button>
+
             <button class="btn-danger-outline" (click)="clearAll()" [disabled]="notifications().length === 0">
                 <i class="fas fa-trash-alt"></i> Clear all
             </button>
         </div>
     </header>
 
+    <!-- Filters -->
     <div class="notification-filters">
         <button [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
             All <span>{{ notifications().length }}</span>
         </button>
+
         <button [class.active]="activeFilter() === NotificationType.SYSTEM"
             (click)="setFilter(NotificationType.SYSTEM)">
             System <span>{{ getUnreadCount(NotificationType.SYSTEM) }}</span>
         </button>
+
         <button [class.active]="activeFilter() === NotificationType.EVENT" (click)="setFilter(NotificationType.EVENT)">
             Events <span>{{ getUnreadCount(NotificationType.EVENT) }}</span>
         </button>
-        <!-- <button [class.active]="activeFilter() === NotificationType.REMINDER"
-            (click)="setFilter(NotificationType.REMINDER)">
-            Reminders <span>{{ getUnreadCount(NotificationType.REMINDER) }}</span>
-        </button> -->
-        <!-- <button [class.active]="activeFilter() === NotificationType.CUSTOM"
-            (click)="setFilter(NotificationType.CUSTOM)">
-            Other <span>{{ getUnreadCount(NotificationType.CUSTOM) }}</span>
-        </button> -->
     </div>
 
-    <div class="notification-list" [class.loading]="loading()">
-        @if (loading()) {
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Fetching notifications...</p>
-        </div>
-        } @else if (filteredNotifications.length > 0) {
-        @for (notification of filteredNotifications; track notification.id) {
-        <div class="notification-item" [class.unread]="!notification.isRead"
-            (click)="handleNotificationClick(notification)">
-            <div class="notification-icon" [ngClass]="notification.type">
-                @switch (notification.type) {
-                @case (NotificationType.SYSTEM) { <i class="fas fa-cog"></i> }
-                @case (NotificationType.EVENT) { <i class="fas fa-calendar-alt"></i> }
-                @case (NotificationType.REMINDER) { <i class="fas fa-clock"></i> }
-                @default { <i class="fas fa-bell"></i> }
-                }
+    <!-- List -->
+    <div class="notification-list" [class.loading]="loading$ | async">
+
+        <!-- Loading -->
+        <ng-container *ngIf="loading$ | async; else content">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Fetching notifications...</p>
             </div>
-            <div class="notification-content">
-                <div class="notification-meta">
-                    <span class="type-badge">{{ notification.type }}</span>
-                    <span class="time">{{ notification.createdAt | date:'short' }}</span>
+        </ng-container>
+
+        <!-- Content -->
+        <ng-template #content>
+
+            <ng-container *ngIf="filteredNotifications.length > 0; else empty">
+
+                <div *ngFor="let notification of filteredNotifications; trackBy: trackById" class="notification-item"
+                    [class.unread]="!notification.isRead" (click)="handleNotificationClick(notification)">
+
+                    <div class="notification-icon" [ngClass]="notification.type">
+                        <ng-container [ngSwitch]="notification.type">
+                            <i *ngSwitchCase="NotificationType.SYSTEM" class="fas fa-cog"></i>
+                            <i *ngSwitchCase="NotificationType.EVENT" class="fas fa-calendar-alt"></i>
+                            <i *ngSwitchCase="NotificationType.REMINDER" class="fas fa-clock"></i>
+                            <i *ngSwitchDefault class="fas fa-bell"></i>
+                        </ng-container>
+                    </div>
+
+                    <div class="notification-content">
+                        <div class="notification-meta">
+                            <span class="type-badge">{{ notification.type }}</span>
+                            <span class="time">{{ notification.createdAt | date:'short' }}</span>
+                        </div>
+
+                        <h3 class="notification-title">{{ notification.title }}</h3>
+                        <p class="notification-message">{{ notification.message }}</p>
+
+                        <div class="notification-item-actions">
+                            <button *ngIf="!notification.isRead" class="btn-text"
+                                (click)="markAsRead(notification.id); $event.stopPropagation()">
+                                Mark as read
+                            </button>
+
+                            <button class="btn-text-danger"
+                                (click)="deleteNotification(notification.id); $event.stopPropagation()">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="unread-dot" *ngIf="!notification.isRead"></div>
                 </div>
-                <h3 class="notification-title">{{ notification.title }}</h3>
-                <p class="notification-message">{{ notification.message }}</p>
-                <div class="notification-item-actions">
-                    @if (!notification.isRead) {
-                    <button class="btn-text" (click)="markAsRead(notification.id)">
-                        Mark as read
-                    </button>
-                    }
-                    <button class="btn-text-danger" (click)="deleteNotification(notification.id)">
-                        Delete
-                    </button>
+
+            </ng-container>
+
+            <!-- Empty -->
+            <ng-template #empty>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-bell-slash"></i>
+                    </div>
+                    <h3>No notifications found</h3>
+                    <p>When you receive alerts or updates, they will appear here.</p>
                 </div>
-            </div>
-            <div class="unread-dot" *ngIf="!notification.isRead"></div>
-        </div>
-        }
-        } @else {
-        <div class="empty-state">
-            <div class="empty-icon">
-                <i class="fas fa-bell-slash"></i>
-            </div>
-            <h3>No notifications found</h3>
-            <p>When you receive alerts or updates, they will appear here.</p>
-        </div>
-        }
+            </ng-template>
+
+        </ng-template>
     </div>
 </div>

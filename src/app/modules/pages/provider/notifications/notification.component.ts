@@ -1,11 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationSocketService } from '../../../../core/services/socket-service/notification.service';
 import { INotification } from '../../../../core/models/notification.model';
 import { NotificationType, NotificationTemplateId } from '../../../../core/enums/enums';
 import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { isNotificationLoading, selectAllNotifications } from '../../../../store/notification/notification.selector';
+import { notificationAction } from '../../../../store/notification/notification.action';
 
 @Component({
     selector: 'app-provider-notification',
@@ -14,36 +17,22 @@ import { Router } from '@angular/router';
     templateUrl: './notification.component.html',
     styleUrls: ['./notification.component.css']
 })
-export class ProviderNotificationComponent implements OnInit {
+export class ProviderNotificationComponent implements OnInit, OnDestroy {
     private readonly _notificationService = inject(NotificationSocketService);
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _router = inject(Router);
+    private readonly _store = inject(Store);
+    private _destroy$ = new Subject<void>();
 
     notifications = signal<INotification[]>([]);
-    loading = signal<boolean>(false);
     activeFilter = signal<NotificationType | 'all'>('all');
 
     readonly NotificationType = NotificationType;
+    readonly loading$ = this._store.select(isNotificationLoading)
+        .pipe(takeUntil(this._destroy$));
 
     ngOnInit(): void {
-        this.fetchNotifications();
-    }
-
-    fetchNotifications(): void {
-        this.loading.set(true);
-        this._notificationService.fetchAllNotifications()
-            .pipe(finalize(() => this.loading.set(false)))
-            .subscribe({
-                next: (res) => {
-                    if (res.success) {
-                        this.notifications.set(res.data || []);
-                    }
-                },
-                error: (err) => {
-                    this._toastr.error('Failed to fetch notifications');
-                    console.error(err);
-                }
-            });
+        this._fetchNotifications();
     }
 
     get filteredNotifications() {
@@ -57,56 +46,24 @@ export class ProviderNotificationComponent implements OnInit {
         this.activeFilter.set(filter);
     }
 
-    markAsRead(id: string): void {
-        this._notificationService.markAsReadApi(id).subscribe({
-            next: (res) => {
-                if (res.success) {
-                    this.notifications.update(prev =>
-                        prev.map(n => n.id === id ? { ...n, isRead: true } : n)
-                    );
-                }
-            }
-        });
+    markAsRead(notificationId: string): void {
+        this._store.dispatch(notificationAction.markAsRead({ notificationId }));
     }
 
     markAllAsRead(): void {
         if (this.notifications().every(n => n.isRead)) return;
-
-        this._notificationService.markAllAsReadApi().subscribe({
-            next: (res) => {
-                if (res.success) {
-                    this.notifications.update(prev =>
-                        prev.map(n => ({ ...n, isRead: true }))
-                    );
-                    this._toastr.success('All notifications marked as read');
-                }
-            }
-        });
+        this._store.dispatch(notificationAction.markAllAsRead());
     }
 
     deleteNotification(id: string): void {
-        this._notificationService.deleteNotificationApi(id).subscribe({
-            next: (res) => {
-                if (res.success) {
-                    this.notifications.update(prev => prev.filter(n => n.id !== id));
-                    this._toastr.success('Notification deleted');
-                }
-            }
-        });
+        this._store.dispatch(notificationAction.removeNotification({ id }));
     }
 
     clearAll(): void {
         if (this.notifications().length === 0) return;
 
         if (confirm('Are you sure you want to clear all notifications?')) {
-            this._notificationService.clearAllApi().subscribe({
-                next: (res) => {
-                    if (res.success) {
-                        this.notifications.set([]);
-                        this._toastr.success('All notifications cleared');
-                    }
-                }
-            });
+            this._store.dispatch(notificationAction.clearAllNotification())
         }
     }
 
@@ -122,5 +79,22 @@ export class ProviderNotificationComponent implements OnInit {
         if (notification.templateId === NotificationTemplateId.SUBSCRIPTION_SUCCESS) {
             this._router.navigate(['/provider/subscriptions']);
         }
+    }
+
+    trackById(index: number, notification: INotification): string {
+        return notification.id;
+    }
+
+    private _fetchNotifications(): void {
+        this._store.select(selectAllNotifications)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe((notifications) => {
+                this.notifications.set(notifications);
+            });
+    }
+
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
     }
 }
