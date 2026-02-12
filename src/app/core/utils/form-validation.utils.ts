@@ -13,7 +13,7 @@ export const FORM_VALIDATION_ERROR_MESSAGES: { [key: string]: string } = {
     max: '$FIELD must be at most $MAX.',
     passwordMismatch: 'Password not match.',
     invalidTime: `$FIELD is invalid.`,
-    pastDate: '$FIELD is invalid. Past dates are not allowed',
+    minDate: '$FIELD must be today or a future date.',
     invalidDates: '$FIELD has invalid dates.',
     negativeNumber: 'Negative number in $FIELD is not allowed.',
     invalidTimeRange: 'Invalid time range.',
@@ -92,15 +92,18 @@ export function timeValidator(): ValidatorFn {
     };
 }
 
-export function pastDateValidator(): ValidatorFn {
+export function minDateValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-        const inputDate = new Date(control.value);
-        const today = new Date();
+        if (!control.value) return null;
 
+        const inputDate = new Date(control.value);
+        if (isNaN(inputDate.getTime())) return { invalidDates: true }
+
+        const today = new Date();
         inputDate.setHours(0, 0, 0, 0);
         today.setHours(0, 0, 0, 0);
 
-        return inputDate < today ? { pastDate: true } : null
+        return inputDate < today ? { minDate: true } : null
     };
 }
 
@@ -211,5 +214,3 @@ export function isPasswordMatches(firstPasswordKey: string, secondPasswordKey: s
         }
     };
 }
-
-

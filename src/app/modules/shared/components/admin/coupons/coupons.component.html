@@ -1,0 +1,224 @@
+<section class="relative min-h-screen bg-gray-50/50 ">
+
+  <div
+    class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-gray-100 pb-6">
+    <div class="space-y-1">
+      <h2 class="text-xl font-semibold text-gray-800 tracking-tight">
+        Discounts & Promotions
+      </h2>
+      <div class="flex items-center gap-2">
+        <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+          {{ coupons().length }} Active Campaigns
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button (click)="toggleModal()" class="group relative inline-flex items-center justify-center px-6 py-2.5 
+             bg-indigo-600 text-white text-sm font-bold rounded-xl
+             hover:bg-blue-700 transition-all duration-300 
+             shadow-sm hover:shadow-indigo-200 active:scale-95">
+        <i class="fas fa-plus mr-2 text-xs transition-transform group-hover:rotate-90"></i>
+        Create Coupon
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="relative">
+        <input [(ngModel)]="couponFilter().search" type="text" placeholder="Search code..." (ngModelChange)="onSearch()"
+          class="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all" />
+      </div>
+
+      <select [(ngModel)]="couponFilter().isActive" (ngModelChange)="onFilterChange()"
+        class="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500/10 outline-none cursor-pointer">
+        <option value="all">All Statuses</option>
+        <option value="true">Active</option>
+        <option value="false">Inactive</option>
+      </select>
+
+      <select [(ngModel)]="couponFilter().discountType" (ngModelChange)="onFilterChange()"
+        class="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500/10 outline-none cursor-pointer">
+        <option value='all'>All Discounts</option>
+        <option *ngFor="let option of discountTypes" [value]="option">{{option | titlecase}}</option>
+      </select>
+
+      <select [(ngModel)]="couponFilter().usageType" (ngModelChange)="onFilterChange()"
+        class="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500/10 outline-none cursor-pointer">
+        <option value='all'>All Usage</option>
+        <option *ngFor="let option of usageTypes" [value]="option">{{option | titlecase}}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="bg-gray-50/50 border-b border-gray-100">
+            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Coupon Details</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Discount</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Validity & Usage</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Status</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-50" *ngIf="!loading(); else loadingData">
+          <tr *ngFor="let coupon of coupons(); trackBy: trackByCouponId"
+            class="hover:bg-indigo-50/30 transition-colors group">
+            <td class="px-6 py-4">
+              <div class="flex flex-col">
+                <span class="font-bold text-orange-600 tracking-wide">{{coupon.couponCode | uppercase}}</span>
+                <span class="text-sm text-gray-600">{{coupon.couponName | titlecase}}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-100 text-green-800">
+                {{ coupon.discountType | discountSymbol: coupon.discountValue }}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <div class="text-sm text-gray-700">
+                <p class="font-medium">{{coupon.usageValue}} total uses</p>
+                <p class="text-xs text-gray-400">{{coupon.usageType | couponValidity:coupon.validFrom:coupon.validTo}}
+                </p>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span [class]="coupon.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'"
+                class="px-3 py-1 text-xs font-bold rounded-full uppercase tracking-tighter">
+                {{ coupon.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex justify-end gap-2">
+                <button (click)="editCoupon(coupon)"
+                  class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button (click)="deleteCoupon(coupon.id)"
+                  class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loadingData>
+      <div class="p-20 flex flex-col items-center justify-center">
+        <app-loading-spinner color="blue"></app-loading-spinner>
+        <p class="mt-4 text-gray-400 animate-pulse">Fetching your coupons...</p>
+      </div>
+    </ng-template>
+
+    <div class="p-4 border-t border-gray-50 bg-gray-50/30">
+      <app-admin-pagination [pagination]="pagination()" (pageChange)="changePage($event)"></app-admin-pagination>
+    </div>
+  </div>
+
+  <div *ngIf="isModalOpen()"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md">
+
+    <div class="w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden transform transition-all">
+      <div class="bg-indigo-600 p-6 text-white">
+        <h2 class="text-xl font-bold">{{ isEditing() ? 'Update' : 'Create' }} Coupon</h2>
+        <p class="text-indigo-100 text-sm opacity-80">Define discount rules and usage limitations</p>
+      </div>
+
+      <form [formGroup]="couponForm" (ngSubmit)="submitCouponForm()" class="p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Coupon Code</label>
+            <div class="relative group">
+              <input formControlName="couponCode" placeholder="E.g. SUMMER50"
+                class="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none uppercase font-mono tracking-widest transition-all" />
+              <button type="button" (click)="generateCouponCode()" [disabled]="isGeneratingCode()"
+                class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors">
+                <i class="fas fa-sync-alt" [class.fa-spin]="isGeneratingCode()"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Display Name</label>
+            <input formControlName="couponName" placeholder="Holiday Sale"
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none" />
+          </div>
+
+          <div class="p-4 bg-gray-50 rounded-2xl md:col-span-2 grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Type</label>
+              <select formControlName="discountType"
+                class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none">
+                <option value="">Select Type</option>
+                <option *ngFor="let option of discountTypes" [value]="option">{{option | titlecase}}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Value</label>
+              <input formControlName="discountValue" type="number"
+                class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Usage Rule</label>
+            <select formControlName="usageType"
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+              <option value="">Select Rule</option>
+              <option *ngFor="let option of usageTypes" [value]="option">{{option | titlecase}}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Usage Limit</label>
+            <input formControlName="usageValue" type="number"
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
+          </div>
+
+          <ng-container *ngIf="isValidityVisible()">
+            <div class="animate-in fade-in duration-300">
+              <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Valid From</label>
+              <input formControlName="validFrom" type="date" [min]="today"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
+            </div>
+            <div class="animate-in fade-in duration-300">
+              <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Valid To</label>
+              <input formControlName="validTo" type="date" [min]="today"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
+            </div>
+          </ng-container>
+
+          <div
+            class="md:col-span-2 flex items-center justify-between p-4 border border-dashed border-gray-200 rounded-2xl">
+            <div>
+              <p class="text-sm font-bold text-gray-700">Activate Coupon</p>
+              <p class="text-xs text-gray-400">Make this coupon available for use immediately</p>
+            </div>
+            <input formControlName="isActive" type="checkbox"
+              class="w-6 h-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+          </div>
+        </div>
+
+        <div class="mt-10 flex items-center justify-end gap-4">
+          <button type="button" (click)="toggleModal()"
+            class="px-6 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors">
+            Discard
+          </button>
+          <button type="submit"
+            class="px-8 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 active:scale-95 transition-all">
+            {{ isEditing() ? 'Update Coupon' : 'Create Coupon' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

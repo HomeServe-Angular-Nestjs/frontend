@@ -27,6 +27,7 @@ export const API_ENV = {
   category: `${domainName}/category`,
   providerService: `${domainName}/provider-service`,
   cart: `${domainName}/cart`,
+  coupon: `${domainName}/coupon`,
 };
 
 export const API_KEY = {
