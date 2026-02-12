@@ -30,12 +30,12 @@ export class NotificationSocketService extends BaseSocketService {
         console.log('[NotificationSocket] Connected');
         this._setupAuthErrorHandler();
 
-        this.onNewNotification((newNotification: INotification) =>
-            this._store.dispatch(notificationAction.addNotification({ notification: newNotification }))
-        );
+        // this.onNewNotification((newNotification: INotification) =>
+        //     this._store.dispatch(notificationAction.addNotification({ notification: newNotification }))
+        // );
 
-        this.onMarkAsRead((notification: INotification) =>
-            this._store.dispatch(notificationAction.markAsRead({ notification }))
+        this.onMarkAsRead((notificationId: string) =>
+            this._store.dispatch(notificationAction.markAsRead({ notificationId }))
         );
 
         this.onRemoveNotification((id: string) =>
@@ -73,9 +73,9 @@ export class NotificationSocketService extends BaseSocketService {
         this.listen<INotification>(this.NEW_NOTIFICATION, (notification: INotification) => callback(notification));
     }
 
-    onMarkAsRead(callback: (notification: INotification) => void): void {
+    onMarkAsRead(callback: (notificationId: string) => void): void {
         this.removeListener(this.MARK_AS_READ);
-        this.listen(this.MARK_AS_READ, (notification: INotification) => callback(notification));
+        this.listen(this.MARK_AS_READ, (notificationId: string) => callback(notificationId));
     }
 
     onRemoveNotification(callback: (notificationId: string) => void) {

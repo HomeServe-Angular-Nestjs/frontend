@@ -31,8 +31,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
             return next(modifiedRequest).pipe(
                 catchError((error: HttpErrorResponse) => {
-                    console.error(error)
-                    const errorCode = error?.error?.code;
+                    const errorCode = error?.error?.code ?? error?.error?.error ?? '';
                     const backendMessage = error?.error?.message;
 
                     const userMessage = errorHandler.getErrorMessage(
@@ -47,12 +46,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     }
 
                     if (error.status === 403) {
-                        // if (errorCode === ErrorCodes.NO_ACTIVE_SUBSCRIPTION) {
+                        if (errorCode === ErrorCodes.NO_ACTIVE_SUBSCRIPTION) {
                             router.navigate(['provider', 'plans']);
                             toastr.warning(userMessage);
                             return throwError(() => new Error(userMessage));
-                        // }   
-                        // return of();
+                        }
+
+                        if (errorCode === ErrorCodes.FORBIDDEN) {
+                            store.dispatch(authActions.logout({ fromInterceptor: true, message: userMessage }));
+                            return of();
+                        }
+
+                        return throwError(() => new Error(userMessage));
                     }
                     toastr.error(userMessage);
                     return throwError(() => new Error(userMessage));

@@ -25,6 +25,7 @@ import { metaReducers } from './store/auth/meta.reducer';
 import { ErrorHandlerService } from './core/services/public/error-handler.service';
 import { notificationFeature } from './store/notification/notification.feature';
 import { notificationEffects } from './store/notification/notification.effects';
+import { DatePipe } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -68,5 +69,6 @@ export const appConfig: ApplicationConfig = {
       chatEffects,
     ),
     provideStoreDevtools({ maxAge: 25, logOnly: true, autoPause: true }),
+    DatePipe
   ]
 };

@@ -40,6 +40,11 @@ export class AdminSidebarComponent {
       route: 'admin/bookings'
     },
     {
+      name: 'Coupon Management',
+      icon: 'fa-tags',
+      route: 'admin/coupons'
+    },
+    {
       name: 'Subscriptions & Plans',
       icon: 'fa-id-card',
       subItems: [

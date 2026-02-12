@@ -25,3 +25,18 @@ export const selectAllUnReadNotifications = createSelector(
     selectAllNotifications,
     (notifications) => notifications.filter(n => !n.isRead)
 );
+
+export const isNotificationLoading = createSelector(
+    notificationFeature.selectLoading,
+    (loading) => loading
+);
+
+export const showNotificationError = createSelector(
+    notificationFeature.selectError,
+    (error) => error
+)
+
+export const hasAnyUnread = createSelector(
+    selectAllNotifications,
+    (notifications) => notifications.some(n => !n.isRead)
+) 

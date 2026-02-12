@@ -23,6 +23,7 @@ export const notificationFeature = createFeature({
 
         on(notificationAction.notificationFailure, (state, { error }) => ({
             ...state,
+            loading: false,
             error
         })),
 
@@ -32,23 +33,35 @@ export const notificationFeature = createFeature({
             error: null
         })),
 
-        on(notificationAction.addNotification, (state, { notification }) => ({
+        on(notificationAction.markAllAsRead, (state) => ({
             ...state,
-            notifications: notificationAdaptor.addOne(notification, state.notifications),
-            loading: false,
+            loading: true,
+            error: null,
+        })),
+
+        on(notificationAction.removeNotification, (state) => ({
+            ...state,
+            loading: true,
             error: null
         })),
 
-        on(notificationAction.removeNotification, (state, { id }) => ({
+        on(notificationAction.removeNotificationSuccess, (state, { id }) => ({
             ...state,
             notifications: notificationAdaptor.removeOne(id, state.notifications),
             loading: false,
             error: null
         })),
 
-        on(notificationAction.markAsRead, (state, { notification }) => ({
+        on(notificationAction.markAsReadSuccess, (state, { notification }) => ({
             ...state,
             notifications: notificationAdaptor.upsertOne(notification, state.notifications),
+            loading: false,
+            error: null
+        })),
+
+        on(notificationAction.clearAllNotificationSuccess, (state) => ({
+            ...state,
+            notifications: notificationAdaptor.removeAll(state.notifications),
             loading: false,
             error: null
         }))
