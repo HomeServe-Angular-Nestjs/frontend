@@ -43,4 +43,8 @@ export class CouponService {
   toggleCouponStatus(couponId: string): Observable<IResponse> {
     return this._http.patch<IResponse>(`${this._couponApi}/${couponId}/status`, {});
   }
+
+  getAvailableCoupons(): Observable<IResponse<ICoupon[]>> {
+    return this._http.get<IResponse<ICoupon[]>>(`${this._couponApi}/available`);
+  }
 }

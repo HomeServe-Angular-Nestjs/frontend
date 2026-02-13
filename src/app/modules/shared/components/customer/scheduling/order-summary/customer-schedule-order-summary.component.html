@@ -2,7 +2,8 @@
     <ng-container *ngIf="!isLoading; else loading">
 
         <!-- Simplified Service List -->
-        <div *ngIf="selectedServiceData.length" class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+        <div *ngIf="selectedServiceData.length"
+            class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-3">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Selected Services</h3>
             <div class="space-y-3">
                 <ng-container *ngFor="let category of selectedServiceData">
@@ -16,6 +17,15 @@
             </div>
         </div>
 
+        <div class="flex justify-end pb-4">
+            <button type="button" (click)="openCouponModal()"
+                class="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline">
+                Apply Coupon
+                <span class="text-xs">›</span>
+            </button>
+        </div>
+
+
         <!-- Order Summary Section -->
         <app-customer-order-summary-section [priceBreakup]="priceBreakup" [buttonText]="'Confirm Booking'"
             [processing]="isProcessing" [showBadges]="true" (actionClick)="initiatePayment()">
@@ -26,4 +36,59 @@
     <ng-template #loading>
         <app-loading-circle-animation></app-loading-circle-animation>
     </ng-template>
+</div>
+
+<!-- Backdrop -->
+<div *ngIf="isCouponModalOpen" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+    <!-- Modal -->
+    <div class="bg-white w-full max-w-md max-h-[80vh] rounded-lg shadow-lg flex flex-col">
+
+        <!-- Header -->
+        <div class="p-5 border-b">
+            <h2 class="text-lg font-semibold">Available Coupons</h2>
+        </div>
+
+        <ng-container *ngIf="isCouponLoading; else afterCouponFetched">
+            <app-loading-circle-animation></app-loading-circle-animation>
+        </ng-container>
+
+        <ng-template #afterCouponFetched>
+            <!-- Scrollable Content -->
+            <div class="p-5 overflow-y-auto flex-1">
+
+                <!-- Coupon Card -->
+                <div *ngFor="let coupon of availableCoupons" class="border rounded-lg p-4 mb-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-semibold text-gray-800 uppercase">{{coupon.couponCode}}</p>
+                            <p class="text-sm text-gray-600">
+                                {{coupon.couponName}}
+                            </p>
+                        </div>
+                        <button class="text-sm text-blue-600 font-medium hover:underline">
+                            Apply
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">
+                        {{ coupon.discountType | discountSymbol: coupon.discountValue }}
+                        <ng-container *ngIf="isUsageTypeOneTime(coupon.usageType); else isTypeExpiry">
+                            One time use only.
+                        </ng-container>
+                        <ng-template #isTypeExpiry>
+                            · Valid till {{ coupon.validTo | date:'dd-mm-yyyy' }}
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+
+        <!-- Footer -->
+        <div class="p-4 border-t">
+            <button type="button" (click)="closeCouponModal()" class="w-full text-sm text-gray-600 hover:text-gray-800">
+                Close
+            </button>
+        </div>
+
+    </div>
 </div>
