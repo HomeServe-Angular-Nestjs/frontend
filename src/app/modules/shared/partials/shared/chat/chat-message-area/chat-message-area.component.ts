@@ -5,7 +5,7 @@ import { FormsModule } from "@angular/forms";
 import { delay, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
 import { Store } from "@ngrx/store";
 import { IChat, IMessage, ISendMessage } from "../../../../../../core/models/chat.model";
-import { selectIsAllMessagesFetched, selectSelectedChat, selectSelectedChatsMessage } from "../../../../../../store/chat/chat.selector";
+import { selectChatError, selectIsAllMessagesFetched, selectIsLoadingMessages, selectSelectedChat, selectSelectedChatsMessage } from "../../../../../../store/chat/chat.selector";
 import { UserType } from "../../../../models/user.model";
 import { selectAuthUserId } from "../../../../../../store/auth/auth.selector";
 import { chatActions } from "../../../../../../store/chat/chat.action";
@@ -48,6 +48,8 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   messages$!: Observable<IMessage[]>;
   chat$!: Observable<IChat>;
+  isLoadingMessages$!: Observable<boolean>;
+  chatError$!: Observable<any>;
   currentUserId!: string;
   receiverId!: string;
   receiverType: UserType = 'customer';
@@ -55,6 +57,9 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
   isAllMessagesFetched = false;
 
   ngOnInit(): void {
+    this.isLoadingMessages$ = this._store.select(selectIsLoadingMessages);
+    this.chatError$ = this._store.select(selectChatError);
+
     this.messages$ = this._store.select(selectSelectedChatsMessage).pipe(
       delay(800),
       map(messages => (messages ?? []).filter(msg => !!msg)),
@@ -179,6 +184,7 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.chat$.pipe(take(1)).subscribe(chat => {
           this._store.dispatch(chatActions.fetchMessages({
             chatId: chat.id,
+            receiverId: this.receiverId,
             beforeMessageId: firstMessageId
           }));
         });
@@ -238,5 +244,16 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
     }
+  }
+
+  tryAgain() {
+    this.chat$.pipe(take(1)).subscribe(chat => {
+      if (chat?.id) {
+        this._store.dispatch(chatActions.fetchMessages({
+          chatId: chat.id,
+          receiverId: this.receiverId
+        }));
+      }
+    });
   }
 }

@@ -46,5 +46,10 @@ export const selectIsAllMessagesFetched = createSelector(
     (state) => state.isAllMessagesFetched
 );
 
+export const selectChatError = createSelector(
+    chatFeature.selectChatState,
+    (state) => state.error
+);
+
 
 

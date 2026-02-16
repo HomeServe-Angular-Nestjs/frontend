@@ -39,8 +39,8 @@ export const chatEffects = {
 
         return actions$.pipe(
             ofType(chatActions.fetchMessages),
-            switchMap(({ chatId, beforeMessageId }) =>
-                chatService.fetchAllMessages(chatId, beforeMessageId).pipe(
+            switchMap(({ chatId, receiverId, beforeMessageId }) =>
+                chatService.fetchAllMessages(chatId, receiverId, beforeMessageId).pipe(
                     map((response) => {
                         if (response.success && response.data) {
                             return chatActions.fetchMessagesSuccess({ messages: response.data, beforeMessageId });
