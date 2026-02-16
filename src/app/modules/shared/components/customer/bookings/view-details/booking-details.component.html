@@ -23,7 +23,7 @@
                 }" class="px-3 py-1.5 rounded-full text-xs font-bold capitalize">
                     {{bookingDetails.bookingStatus.replace('_', ' ')}}
                 </div>
-                <button (click)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
+                <button *ngIf="isCompleted(bookingDetails.bookingStatus)" (click)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
                     class="px-4 py-2 text-xs font-bold bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all">
                     Download
                 </button>
