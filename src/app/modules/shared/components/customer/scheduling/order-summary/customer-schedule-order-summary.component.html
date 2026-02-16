@@ -18,11 +18,22 @@
         </div>
 
         <div class="flex justify-end pb-4">
-            <button type="button" (click)="openCouponModal()"
+            <button *ngIf="!priceBreakup.discount" type="button" (click)="openCouponModal()"
                 class="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline">
                 Apply Coupon
                 <span class="text-xs">›</span>
             </button>
+
+            <div *ngIf="priceBreakup.discount" class="flex items-center gap-3">
+                <span
+                    class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider border border-emerald-100">
+                    Coupon Applied
+                </span>
+                <button type="button" (click)="removeCoupon()"
+                    class="text-xs text-rose-500 hover:text-rose-700 font-medium hover:underline">
+                    Remove
+                </button>
+            </div>
         </div>
 
 
@@ -34,7 +45,9 @@
     </ng-container>
 
     <ng-template #loading>
-        <app-loading-circle-animation></app-loading-circle-animation>
+        <div class="min-h-[300px] flex items-center justify-center">
+            <app-loading-circle-animation></app-loading-circle-animation>
+        </div>
     </ng-template>
 </div>
 
@@ -50,7 +63,9 @@
         </div>
 
         <ng-container *ngIf="isCouponLoading; else afterCouponFetched">
-            <app-loading-circle-animation></app-loading-circle-animation>
+            <div class="min-h-[300px] flex items-center justify-center">
+                <app-loading-circle-animation></app-loading-circle-animation>
+            </div>
         </ng-container>
 
         <ng-template #afterCouponFetched>
@@ -66,7 +81,8 @@
                                 {{coupon.couponName}}
                             </p>
                         </div>
-                        <button class="text-sm text-blue-600 font-medium hover:underline">
+                        <button (click)="applyCoupon(coupon.id, priceBreakup.total)"
+                            class="text-sm text-blue-600 font-medium hover:underline">
                             Apply
                         </button>
                     </div>

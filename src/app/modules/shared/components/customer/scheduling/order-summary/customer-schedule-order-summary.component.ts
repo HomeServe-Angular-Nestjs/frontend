@@ -48,6 +48,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   selectedSlot = signal<ISelectedSlot | null>(null);
   selectedPaymentSource!: PaymentSource;
   availableCoupons: ICoupon[] = [];
+  selectedCouponId: string | null = null;
 
   isLoading = false;
   isProcessing = false;
@@ -183,6 +184,43 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     return type === UsageTypeEnum.OneTime;
   }
 
+  applyCoupon(couponId: string, total: number) {
+    this.isCouponLoading = true;
+    const payload = { couponId, total };
+    this.selectedCouponId = couponId ?? null;
+
+    this._couponService.applyCoupon(payload)
+      .pipe(
+        takeUntil(this._destroy$),
+        finalize(() => this.isCouponLoading = false)
+      )
+      .subscribe({
+        next: (res) => {
+          const appliedDetails = res.data;
+          if (!appliedDetails) return;
+
+          this.priceBreakup = {
+            ...this.priceBreakup,
+            total: appliedDetails.finalAmount,
+            discount: appliedDetails.deductedValue,
+            originalTotal: appliedDetails.originalAmount
+          };
+
+          this.isCouponModalOpen = false;
+          this._toastr.success('Coupon applied successfully!');
+        },
+        error: (err) => {
+          this._toastr.error(err.error?.message || 'Failed to apply coupon');
+        }
+      });
+  }
+
+  removeCoupon() {
+    this._fetchPriceBreakup();
+    this.selectedCouponId = null;
+    this._toastr.info('Coupon removed');
+  }
+
   private _fetchPriceBreakup(): void {
     this.isLoading = true;
 
@@ -220,7 +258,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private _saveBooking() {
     const { isAvailable, ...slotData } = this.selectedSlot()!;
 
-    return this._bookingService.saveBooking(slotData, this.providerId!).pipe(
+    return this._bookingService.saveBooking(slotData, this.providerId!, this.selectedCouponId).pipe(
       finalize(() => this.isProcessing = false)
     );
   }

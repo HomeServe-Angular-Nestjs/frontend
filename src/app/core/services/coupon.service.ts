@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
-import { ICoupon, ICouponFilter, ICouponWithPagination, IUpsertCoupon } from "../models/coupon.model";
+import { IApplyCouponPayload, ICoupon, ICouponAppliedResponse, ICouponFilter, ICouponWithPagination, IUpsertCoupon } from "../models/coupon.model";
 import { Observable } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 
@@ -46,5 +46,9 @@ export class CouponService {
 
   getAvailableCoupons(): Observable<IResponse<ICoupon[]>> {
     return this._http.get<IResponse<ICoupon[]>>(`${this._couponApi}/available`);
+  }
+
+  applyCoupon(payload: IApplyCouponPayload): Observable<IResponse<ICouponAppliedResponse>> {
+    return this._http.post<IResponse<ICouponAppliedResponse>>(`${this._couponApi}/apply/`, payload);
   }
 }

@@ -43,8 +43,8 @@ export class BookingService {
     return this._http.get<IResponse<IPriceBreakupData>>(`${this._customerApi}/booking/price_breakup`);
   }
 
-  saveBooking(slotData: ISaveBooking, providerId: string): Observable<IResponse<IBooking>> {
-    return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, { ...slotData, providerId });
+  saveBooking(slotData: ISaveBooking, providerId: string, couponId: string | null): Observable<IResponse<IBooking>> {
+    return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, { ...slotData, providerId, couponId });
   }
 
   updateBooking(data: { transactionId: string | null, bookingId: string }): Observable<IResponse> {
