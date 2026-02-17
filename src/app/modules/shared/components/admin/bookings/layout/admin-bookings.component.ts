@@ -4,18 +4,23 @@ import { AdminService } from "../../../../../../core/services/admin.service";
 import { AdminBookingTableComponent } from "../booking-table/admin-bookings-table.component";
 import { IAdminBookingFilter, IAdminBookingForTable, IBookingStats, IPagination } from "../../../../../../core/models/booking.model";
 import { map, Observable, of, shareReplay } from "rxjs";
-import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 import { AdminBookingFilterComponent } from "../booking-filter/booking-filter.component";
 import { IAdminOverViewCard, OverviewCardComponent } from "../../../../partials/sections/admin/overview-card/admin-overview-card.component";
 import { AdminPaginationComponent } from "../../../../partials/sections/admin/pagination/pagination.component";
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
+import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 
 @Component({
     selector: 'app-admin-bookings',
     templateUrl: './admin-bookings.component.html',
-    imports: [CommonModule, AdminBookingTableComponent, AdminBookingFilterComponent, OverviewCardComponent, AdminPaginationComponent, LoadingCircleAnimationComponent]
+    imports: [CommonModule, 
+    AdminBookingTableComponent, 
+    AdminBookingFilterComponent, 
+    OverviewCardComponent, 
+    AdminPaginationComponent, 
+    LoadingCircleAnimationComponent]
 })
-export class AdminBookingLayoutComponent implements OnInit {
+export class AdminBookingManagementComponent implements OnInit {
     private readonly _adminService = inject(AdminService);
     private readonly _sharedData = inject(SharedDataService);
 

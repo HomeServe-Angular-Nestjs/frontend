@@ -2,9 +2,11 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
+import { Store } from "@ngrx/store";
+import { selectProvider } from "../../../../../../store/provider/provider.selector";
 import { BehaviorSubject, Subject, filter, finalize, map, switchMap, takeUntil } from "rxjs";
 
-import { IBookingDetailProvider, IOrderedServiceUI } from "../../../../../../core/models/booking.model";
+import { IBookingDetailProvider, IOrderedServiceUI, IRescheduleData } from "../../../../../../core/models/booking.model";
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { BookingStatus, CancelStatus, PaymentStatus } from "../../../../../../core/enums/enums";
@@ -16,11 +18,14 @@ import { SubmitCancellationComponent } from "../../../../partials/shared/submit-
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
 import { IProviderService } from "../../../../../../core/models/provider-service.model";
+import { RescheduleBookingModalComponent } from "../reschedule-booking/reschedule-booking.component";
+import { ISelectedSlot } from "../../../../../../core/models/availability.model";
 
 @Component({
   selector: 'app-provider-view-booking-details',
+  standalone: true,
   templateUrl: './booking-details.component.html',
-  imports: [CommonModule, FormsModule, ReportModalComponent, SubmitCancellationComponent],
+  imports: [CommonModule, FormsModule, ReportModalComponent, SubmitCancellationComponent, RescheduleBookingModalComponent],
   providers: [ReportService]
 })
 export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
@@ -30,6 +35,7 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   private readonly _reportService = inject(ReportService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _dialog = inject(MatDialog);
+  private readonly _store = inject(Store);
 
   private _destroy$ = new Subject<void>();
   private bookingDataSource = new BehaviorSubject<IBookingDetailProvider | null>(null);
@@ -57,8 +63,10 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
     [BookingStatus.CANCELLED]: 'cancel',
   };
 
+  providerId = signal<string | null>(null);
   showReportModal = signal(false);
   showCancelBookingModal = signal(false);
+  showRescheduleModal = signal(false);
   get cancelled(): BookingStatus { return BookingStatus.CANCELLED };
 
   ngOnInit(): void {
@@ -70,6 +78,11 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
       filter((id): id is string => !!id),
       switchMap(id => this._bookingService.getBookingDetails(id))
     ).subscribe(bookingData => this.bookingDataSource.next(bookingData));
+
+    this._store.select(selectProvider).pipe(
+      takeUntil(this._destroy$),
+      filter(p => !!p)
+    ).subscribe(provider => this.providerId.set(provider?.id ?? null));
   }
 
   private _openConfirmationDialog(message: string, title: string) {
@@ -298,6 +311,33 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
           a.download = 'booking-invoice.pdf';
           a.click();
           URL.revokeObjectURL(url);
+        }
+      });
+  }
+
+  canBeRescheduled(bookingStatus: BookingStatus) {
+    return !(bookingStatus === BookingStatus.COMPLETED ||
+      bookingStatus === BookingStatus.CANCELLED);
+  }
+
+  toggleRescheduleModal() {
+    this.showRescheduleModal.update(v => !v);
+  }
+
+  handleReschedule(rescheduleData: IRescheduleData) {
+    const { selectedSlot, bookingId } = rescheduleData;
+
+    this._bookingService.rescheduleBooking(bookingId, selectedSlot)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.bookingDataSource.next(res.data);
+            this._toastr.success(res.message || 'Booking rescheduled successfully');
+            this.toggleRescheduleModal();
+          } else {
+            this._toastr.error(res.message || 'Failed to reschedule');
+          }
         }
       });
   }

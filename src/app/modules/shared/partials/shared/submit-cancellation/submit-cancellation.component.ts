@@ -5,6 +5,7 @@ import { ToastNotificationService } from '../../../../../core/services/public/to
 
 @Component({
   selector: 'app-submit-cancellation',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './submit-cancellation.component.html',
 })

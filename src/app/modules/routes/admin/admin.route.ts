@@ -54,8 +54,8 @@ export const adminRoute: Routes = [
           },
           {
             path: 'bookings',
-            loadComponent: () => import('../../shared/components/admin/bookings/layout/admin-bookings.component')
-              .then(c => c.AdminBookingLayoutComponent),
+            loadComponent: () => import('../../shared/components/admin/bookings/layout/admin-bookings.component') 
+              .then(c => c.AdminBookingManagementComponent),
             data: { breadcrumb: 'Bookings' }
           },
           {

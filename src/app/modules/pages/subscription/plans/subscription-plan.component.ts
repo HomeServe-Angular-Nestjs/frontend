@@ -130,7 +130,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   private _openRazorPayCheckout(order: RazorpayOrder, subscriptionId: string): Observable<'success' | 'dismissed'> {
     return new Observable<'success' | 'dismissed'>(observer => {
       this._razorpayWrapper.openCheckout(
-        order,
+        order,"","","",
         (paymentResponse: RazorpayPaymentResponse) => {
           this._verifyPaymentAndConfirmSubscription(paymentResponse, order, subscriptionId)
             .subscribe({

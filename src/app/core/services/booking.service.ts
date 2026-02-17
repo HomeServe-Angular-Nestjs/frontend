@@ -133,4 +133,8 @@ export class BookingService {
   canProviderStartCall(customerId: string): Observable<IResponse> {
     return this._http.post<IResponse>(`${this._providerApi}/bookings/call`, { customerId });
   }
+
+  rescheduleBooking(bookingId: string, slotData: { date: string; from: string; to: string;}): Observable<IResponse<IBookingDetailProvider>> {
+    return this._http.patch<IResponse<IBookingDetailProvider>>(`${this._providerApi}/bookings/reschedule/${bookingId}`, slotData);
+  }
 }

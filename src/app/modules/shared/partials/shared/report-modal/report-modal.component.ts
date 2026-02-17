@@ -10,6 +10,7 @@ import { ComplaintReason } from "../../../../../core/enums/enums";
 
 @Component({
     selector: 'app-report-modal',
+    standalone: true,
     templateUrl: 'report-modal.component.html',
     imports: [CommonModule, FormsModule]
 })
@@ -26,9 +27,9 @@ export class ReportModalComponent implements OnDestroy {
     text = '';
     reportReasons = [
         { value: ComplaintReason.SPAM, label: 'Spam' },
-        { value:  ComplaintReason.INAPPROPRIATE, label: 'Inappropriate Service' },
+        { value: ComplaintReason.INAPPROPRIATE, label: 'Inappropriate Service' },
         { value: ComplaintReason.HARASSMENT, label: 'Harassment' },
-        { value:  ComplaintReason.OTHER, label: 'Other' }
+        { value: ComplaintReason.OTHER, label: 'Other' }
     ];
 
     ngOnDestroy(): void {

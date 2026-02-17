@@ -5,6 +5,7 @@ import { ICustomerProviderDetails, IDisplayReviews, IFilterFetchProviders, IProv
 import { API_ENV } from "../../../environments/env";
 import { SlotType } from "../models/schedules.model";
 import { IResponse } from "../../modules/shared/models/response.model";
+import { ISlotUI } from "../models/availability.model";
 
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
@@ -88,6 +89,13 @@ export class ProviderService {
   fetchAvailableSlots(providerId: string, selectedDate: string): Observable<IResponse> {
     const params = new HttpParams().set('date', selectedDate);
     return this._http.get<IResponse>(`${this._apiUrl}/available-slots/${providerId}`, { params });
+  }
+
+  fetchRescheduleSlots(providerId: string, selectedDate: string, totalDurationInMinutes: number): Observable<IResponse<ISlotUI[]>> {
+    const params = new HttpParams()
+      .set('selectedDate', selectedDate)
+      .set('totalDurationInMinutes', totalDurationInMinutes);
+    return this._http.get<IResponse<ISlotUI[]>>(`${this._apiUrl}/reschedule-slots`, { params });
   }
 
   updateBufferTime(bufferTime: number): Observable<IResponse<IProvider>> {

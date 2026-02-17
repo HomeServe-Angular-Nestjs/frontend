@@ -133,6 +133,9 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
         new Observable<void>((observer) => {
           this._razorpayWrapper.openCheckout(
             order,
+            "",
+            "",
+            "",
             (paymentResponse: RazorpayPaymentResponse) => {
               this._verifyPaymentAndConfirmBooking(paymentResponse, order, bookingId)
                 .pipe(takeUntil(this._destroy$))
