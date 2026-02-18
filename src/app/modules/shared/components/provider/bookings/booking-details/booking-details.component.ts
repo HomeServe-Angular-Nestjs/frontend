@@ -184,23 +184,8 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   }
 
   isStatusDisabled(optionStatus: BookingStatus, bookingStatus: BookingStatus, cancelStatus: CancelStatus | null): boolean {
-    if (bookingStatus === BookingStatus.CANCELLED) {
-      return true;
-    }
-
-    // If cancellation request is in progress → lock everything
     if (cancelStatus === CancelStatus.IN_PROGRESS) {
       return true;
-    }
-
-    // Cannot change anything after completed
-    if (bookingStatus === BookingStatus.COMPLETED) {
-      return true;
-    }
-
-    // Allow current step to appear active (but not disabled)
-    if (optionStatus === bookingStatus) {
-      return false;
     }
 
     // Workflow: pending → confirmed → in_progress → completed
@@ -341,6 +326,18 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
         }
       });
   }
+
+  isCancelDisabled(bookingStatus: BookingStatus, cancelStatus: CancelStatus | null): boolean {
+
+    if (bookingStatus === BookingStatus.COMPLETED) return true;
+
+    if (bookingStatus === BookingStatus.CANCELLED) return true;
+
+    if (cancelStatus === CancelStatus.CANCELLED) return true;
+
+    return false;
+  }
+
 
   ngOnDestroy(): void {
     this._destroy$.next();
