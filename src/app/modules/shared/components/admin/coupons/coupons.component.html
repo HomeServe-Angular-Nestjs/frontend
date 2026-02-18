@@ -60,6 +60,7 @@
           <tr class="bg-gray-50/50 border-b border-gray-100">
             <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Coupon Details</th>
             <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Discount</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Applicable Services</th>
             <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Validity & Usage</th>
             <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Status</th>
             <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
@@ -82,6 +83,16 @@
               </span>
             </td>
             <td class="px-6 py-4">
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-bold text-gray-700 capitalize">
+                  {{ coupon.professionName || 'All Professions' }}
+                </span>
+                <span *ngIf="coupon.categoryServiceName" class="text-[10px] text-gray-400 font-medium">
+                  → {{ coupon.categoryServiceName }}
+                </span>
+              </div>
+            </td>
+            <td class="px-6 py-4">
               <div class="text-sm text-gray-700">
                 <p class="font-medium">{{coupon.usageValue}} total uses</p>
                 <p class="text-xs text-gray-400">{{coupon.usageType | couponValidity:coupon.validFrom:coupon.validTo}}
@@ -89,8 +100,9 @@
               </div>
             </td>
             <td class="px-6 py-4 text-center">
-              <span [class]="coupon.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'"
-                class="px-3 py-1 text-xs font-bold rounded-full uppercase tracking-tighter">
+              <span (click)="toggleCouponStatus(coupon.id)"
+                [class]="coupon.isActive ? 'bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-200' : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'"
+                class="px-3 py-1 text-xs font-bold rounded-full uppercase tracking-tighter cursor-pointer transition-all border shadow-sm">
                 {{ coupon.isActive ? 'Active' : 'Inactive' }}
               </span>
             </td>
@@ -113,8 +125,7 @@
 
     <ng-template #loadingData>
       <div class="p-20 flex flex-col items-center justify-center">
-        <app-loading-spinner color="blue"></app-loading-spinner>
-        <p class="mt-4 text-gray-400 animate-pulse">Fetching your coupons...</p>
+        <app-loading-circle-animation text="fetching coupons... please wait..."></app-loading-circle-animation>
       </div>
     </ng-template>
 
@@ -126,99 +137,173 @@
   <div *ngIf="isModalOpen()"
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md">
 
-    <div class="w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden transform transition-all">
-      <div class="bg-indigo-600 p-6 text-white">
-        <h2 class="text-xl font-bold">{{ isEditing() ? 'Update' : 'Create' }} Coupon</h2>
-        <p class="text-indigo-100 text-sm opacity-80">Define discount rules and usage limitations</p>
+    <!-- Modal -->
+    <div class="w-full max-w-xl max-h-[85vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+
+      <!-- Header (fixed) -->
+      <div class="bg-indigo-600 px-6 py-4 text-white shrink-0">
+        <h2 class="text-lg font-bold">
+          {{ isEditing() ? 'Update' : 'Create' }} Coupon
+        </h2>
+        <p class="text-indigo-100 text-xs opacity-80">
+          Define discount rules and usage limitations
+        </p>
       </div>
 
-      <form [formGroup]="couponForm" (ngSubmit)="submitCouponForm()" class="p-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form [formGroup]="couponForm" (ngSubmit)="submitCouponForm()" class="flex-1 overflow-y-auto px-6 py-5">
 
-          <div class="md:col-span-1">
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Coupon Code</label>
-            <div class="relative group">
-              <input formControlName="couponCode" placeholder="E.g. SUMMER50"
-                class="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none uppercase font-mono tracking-widest transition-all" />
-              <button type="button" (click)="generateCouponCode()" [disabled]="isGeneratingCode()"
-                class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+          <!-- Coupon Code -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
+              Coupon Code
+            </label>
+            <div class="relative">
+              <input formControlName="couponCode" placeholder="E.g. SUMMER50" class="w-full pl-4 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl
+                       focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500
+                       outline-none uppercase font-mono tracking-widest placeholder:text-sm" />
+
+              <button type="button" (click)="generateCouponCode()" [disabled]="isGeneratingCode()" class="absolute right-2 top-1/2 -translate-y-1/2 p-2
+                       text-indigo-600 hover:bg-indigo-100 rounded-lg">
                 <i class="fas fa-sync-alt" [class.fa-spin]="isGeneratingCode()"></i>
               </button>
             </div>
           </div>
 
-          <div class="md:col-span-1">
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Display Name</label>
-            <input formControlName="couponName" placeholder="Holiday Sale"
-              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none" />
+          <!-- Display Name -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
+              Display Name
+            </label>
+            <input formControlName="couponName" placeholder="E.g. ₹50 OFF on your first booking" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl
+                     focus:ring-2 focus:ring-indigo-500/20 outline-none placeholder:text-sm" />
           </div>
 
-          <div class="p-4 bg-gray-50 rounded-2xl md:col-span-2 grid grid-cols-2 gap-4">
+          <!-- Discount Type & Value -->
+          <div class="md:col-span-2 bg-gray-50 p-4 rounded-2xl grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Type</label>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-1">
+                Type
+              </label>
               <select formControlName="discountType"
-                class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none">
+                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg outline-none">
                 <option value="">Select Type</option>
-                <option *ngFor="let option of discountTypes" [value]="option">{{option | titlecase}}</option>
+                <option *ngFor="let option of discountTypes" [value]="option">
+                  {{ option | titlecase }}
+                </option>
               </select>
             </div>
+
             <div>
-              <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Value</label>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-1">
+                Value
+              </label>
               <input formControlName="discountValue" type="number"
-                class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none" />
+                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg outline-none" />
             </div>
           </div>
 
+          <!-- Usage Rule -->
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Usage Rule</label>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
+              Usage Rule
+            </label>
             <select formControlName="usageType"
-              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
-              <option value="">Select Rule</option>
-              <option *ngFor="let option of usageTypes" [value]="option">{{option | titlecase}}</option>
+              class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+              <option value="">Select Type</option>
+              <option *ngFor="let option of usageTypes" [value]="option">
+                {{ option | titlecase }}
+              </option>
             </select>
           </div>
 
+          <!-- Usage Limit -->
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Usage Limit</label>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
+              Usage Limit
+            </label>
             <input formControlName="usageValue" type="number"
-              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
+              class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
           </div>
 
+          <!-- Validity -->
           <ng-container *ngIf="isValidityVisible()">
-            <div class="animate-in fade-in duration-300">
-              <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Valid From</label>
+            <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
+                Valid From
+              </label>
               <input formControlName="validFrom" type="date" [min]="today"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
+                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
             </div>
-            <div class="animate-in fade-in duration-300">
-              <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Valid To</label>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
+                Valid To
+              </label>
               <input formControlName="validTo" type="date" [min]="today"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
+                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
             </div>
           </ng-container>
 
-          <div
-            class="md:col-span-2 flex items-center justify-between p-4 border border-dashed border-gray-200 rounded-2xl">
+          <!-- Profession -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
+              Applicable Profession
+            </label>
+            <select formControlName="professionId"
+              class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+              <option value="">All Professions</option>
+              <ng-container *ngIf="professions$ | async as professions">
+                <option *ngFor="let profession of professions" [value]="profession.id">
+                  {{ profession.name | titlecase}}
+                </option>
+              </ng-container>
+            </select>
+          </div>
+
+          <!-- Service -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
+              Applicable Service
+            </label>
+            <select formControlName="serviceCategoryId"
+              class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+              <option value="">All Services</option>
+              <option *ngFor="let service of serviceCategories()" [value]="service.id">
+                {{ service.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Active Toggle -->
+          <div class="md:col-span-2 flex items-center justify-between p-4
+                   border border-dashed border-gray-200 rounded-2xl">
             <div>
               <p class="text-sm font-bold text-gray-700">Activate Coupon</p>
-              <p class="text-xs text-gray-400">Make this coupon available for use immediately</p>
+              <p class="text-xs text-gray-400">
+                Make this coupon available for use immediately
+              </p>
             </div>
             <input formControlName="isActive" type="checkbox"
               class="w-6 h-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
           </div>
+
         </div>
 
-        <div class="mt-10 flex items-center justify-end gap-4">
-          <button type="button" (click)="toggleModal()"
-            class="px-6 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors">
+        <!-- Footer (fixed inside form) -->
+        <div class="border-t px-6 py-4 bg-white shrink-0 flex justify-end gap-4">
+          <button type="button" (click)="toggleModal()" class="text-sm font-semibold text-gray-500 hover:text-gray-700">
             Discard
           </button>
-          <button type="submit"
-            class="px-8 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 active:scale-95 transition-all">
+
+          <button type="submit" class="px-7 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl
+                 shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all">
             {{ isEditing() ? 'Update Coupon' : 'Create Coupon' }}
           </button>
         </div>
       </form>
     </div>
   </div>
+
 </section>

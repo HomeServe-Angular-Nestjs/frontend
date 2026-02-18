@@ -17,6 +17,9 @@ import { LoadingSpinnerComponent } from '../../../../../UI/spinner/spinner.compo
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../partials/shared/confirm-dialog-box/confirm-dialog.component';
 import { SharedDataService } from '../../../../../core/services/public/shared-data.service';
+import { IProfession, IServiceCategory } from '../../../../../core/models/category.model';
+import { LoadingCircleAnimationComponent } from "../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
+import { CategoryService } from '../../../../../core/services/category.service';
 
 @Component({
   selector: 'app-admin-coupons',
@@ -27,25 +30,29 @@ import { SharedDataService } from '../../../../../core/services/public/shared-da
     DiscountSymbolPipe,
     CouponValidityPipe,
     AdminPaginationComponent,
-    LoadingSpinnerComponent,
+    LoadingCircleAnimationComponent
   ],
   templateUrl: './coupons.component.html',
   providers: [DebounceService],
 })
 export class AdminCouponsComponent implements OnInit, OnDestroy {
 
-  private readonly _couponService = inject(CouponService);
-  private readonly _toastr = inject(ToastNotificationService);
-  private readonly _fb = inject(FormBuilder);
-  private readonly _debounceService = inject(DebounceService);
-  private readonly _dialog = inject(MatDialog);
   private readonly _sharedService = inject(SharedDataService);
+  private readonly _toastr = inject(ToastNotificationService);
+  private readonly _debounceService = inject(DebounceService);
+  private readonly _categoryService = inject(CategoryService);
+  private readonly _couponService = inject(CouponService);
+  private readonly _dialog = inject(MatDialog);
+  private readonly _fb = inject(FormBuilder);
 
   private _destroy$ = new Subject<void>();
 
   readonly discountTypes = Object.values(DiscountTypeEnum);
   readonly usageTypes = Object.values(UsageTypeEnum);
   readonly today = getToday();
+
+  professions$ = this._categoryService.professions$;
+  serviceCategories = signal<IServiceCategory[]>([]);
 
   coupons = signal<ICoupon[]>([]);
   loading = signal(false);
@@ -77,6 +84,8 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
     usageValue: [1, [Validators.required, Validators.min(1)]],
     validFrom: [this.today, [minDateValidator()]],
     validTo: ['', [minDateValidator()]],
+    professionId: [''],
+    serviceCategoryId: [{ value: '', disabled: true }],
     isActive: [true]
   });
 
@@ -84,6 +93,10 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
     this._sharedService.setAdminHeader('Coupon Management');
 
     this._fetchCoupons();
+
+    this._categoryService.getProfessions()
+      .pipe(takeUntil(this._destroy$))
+      .subscribe();
 
     this._debounceService.onSearch(700)
       .pipe(takeUntil(this._destroy$))
@@ -104,6 +117,30 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
     this.couponForm.get('discountType')?.valueChanges
       .pipe(takeUntil(this._destroy$))
       .subscribe(type => this._updateDiscountValidators(type));
+
+    this.couponForm.get('professionId')?.valueChanges
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(professionId => {
+        const categoryCtrl = this.couponForm.get('serviceCategoryId');
+        if (!professionId) {
+          categoryCtrl?.disable();
+          categoryCtrl?.setValue('');
+          this.serviceCategories.set([]);
+        } else {
+          // clearing only if the new profession is different from what might have been loaded
+          if (!this.isEditing() || categoryCtrl?.value === '') {
+             categoryCtrl?.setValue('');
+          }
+          categoryCtrl?.enable();
+          this._categoryService.fetchAvailableServiceByProfessionId(professionId)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe(res => {
+              if (res.data) {
+                this.serviceCategories.set(res.data);
+              }
+            });
+        }
+      });
   }
 
   changePage(page: number) {
@@ -145,10 +182,13 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
 
     if (!this.couponForm.valid) {
       for (const key of Object.keys(this.couponForm.controls)) {
-        const msg = getValidationMessage(this.couponForm.get(key), key);
-        if (msg) {
-          this._toastr.error(msg);
-          return;
+        const control = this.couponForm.get(key);
+        if (control?.invalid) {
+          const msg = getValidationMessage(control, key);
+          if (msg) {
+            this._toastr.error(msg);
+            return;
+          }
         }
       }
       return;
@@ -158,6 +198,7 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
 
     const payload: ICoupon = {
       ...raw,
+      serviceCategoryId: raw.serviceCategoryId || undefined,
       validFrom: raw.usageType === UsageTypeEnum.Expiry ? toIso(raw.validFrom) : null,
       validTo: raw.usageType === UsageTypeEnum.Expiry ? toIso(raw.validTo) : null
     };
@@ -166,7 +207,6 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
       const couponId = this.editCouponId();
       if (!couponId) {
         this._toastr.error('Failed to edit coupon.');
-        console.log('Coupon Id is missing in the form.');
         return;
       }
 
@@ -184,6 +224,7 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
             this.isModalOpen.set(false);
             this.isEditing.set(false);
             this.editCouponId.set(null);
+            this._toastr.success('Coupon updated successfully');
           }
         });
       return;
@@ -197,6 +238,7 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
           if (!coupon) return;
           this.coupons.update(c => [coupon, ...c]);
           this.isModalOpen.set(false);
+          this._toastr.success('Coupon created successfully');
         }
       });
   }
@@ -218,7 +260,9 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
       this._disableValidityDates();
     }
 
+    // First patch the profession to trigger service categories load
     this.couponForm.patchValue({
+      professionId: coupon.professionId || '',
       couponCode: coupon.couponCode,
       couponName: coupon.couponName,
       discountType: coupon.discountType,
@@ -229,6 +273,22 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
       validTo,
       isActive: coupon.isActive
     });
+
+    // If there's a category, we need to wait for categories to load or just patch it if they are already there
+    // Since _categoryService might take time, we can subscribe to the call once
+    if (coupon.professionId) {
+      this._categoryService.fetchAvailableServiceByProfessionId(coupon.professionId)
+        .pipe(takeUntil(this._destroy$))
+        .subscribe(res => {
+          if (res.data) {
+            this.serviceCategories.set(res.data);
+            this.couponForm.get('serviceCategoryId')?.enable();
+            this.couponForm.patchValue({
+              serviceCategoryId: coupon.serviceCategoryId || ''
+            });
+          }
+        });
+    }
 
     this.isModalOpen.set(true);
   }
@@ -254,13 +314,28 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
               }
 
               this.coupons.update(coup => coup.filter(c => c.id !== couponId));
+              this._toastr.success('Coupon deleted successfully');
             }
           });
       });
   }
 
   toggleCouponStatus(couponId: string) {
-
+    this._couponService.toggleCouponStatus(couponId)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.coupons.update(coup => coup.map(c => {
+              if (c.id === couponId) {
+                return { ...c, isActive: !c.isActive };
+              }
+              return c;
+            }));
+            this._toastr.success('Status updated successfully');
+          }
+        }
+      });
   }
 
   private _disableValidityDates() {
@@ -309,11 +384,17 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
       usageValue: 1,
       validFrom: this.today,
       validTo: '',
+      professionId: '',
+      serviceCategoryId: '',
       isActive: true
     });
 
+    this.serviceCategories.set([]);
+    this.couponForm.get('serviceCategoryId')?.disable();
     this._enableUsageLimit();
     this._enableValidityDates();
+    this.isEditing.set(false);
+    this.editCouponId.set(null);
   }
 
   private _fetchCoupons(page: number = 1) {

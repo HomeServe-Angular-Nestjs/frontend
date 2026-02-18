@@ -22,6 +22,8 @@ export interface IPriceBreakupData {
   subTotal: number;
   tax: number;
   total: number;
+  discount?: number;
+  originalTotal?: number;
 }
 
 export type CustomerLocationType = Omit<ILocation, 'type'> & { phone: string };
@@ -43,6 +45,7 @@ export interface IBookingDetailsBase {
     paymentMethod: string;
     paymentDate: Date
   } | null;
+  previousSchedules: string[]; // "2026-02-23T06:30:00.000Z"
 }
 
 export interface IOrderedServiceUI {
@@ -285,4 +288,9 @@ export interface IAdminBookingDetails {
     commissionEarned: number;
     gst: number;
   }
+}
+
+export interface IRescheduleData {
+  selectedSlot: ISelectedSlot;
+  bookingId: string;
 }

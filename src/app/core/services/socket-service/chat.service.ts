@@ -97,8 +97,11 @@ export class ChatSocketService extends BaseSocketService {
     // **************************************************[API For Messages]*******************************************************
     // ------------------------------------------------------------------------------------------------------------------------------
 
-    fetchAllMessages(chatId: string, beforeMessageId?: string): Observable<IResponse<IMessage[]>> {
-        let params = new HttpParams().set('chatId', chatId);
+    fetchAllMessages(chatId: string, receiverId: string, beforeMessageId?: string): Observable<IResponse<IMessage[]>> {
+        let params = new HttpParams()
+            .set('chatId', chatId)
+            .set('receiverId', receiverId);
+
 
         if (beforeMessageId) {
             params = params.set('beforeMessageId', beforeMessageId);

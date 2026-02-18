@@ -6,7 +6,7 @@ import { API_KEY } from "../../../../environments/env";
 export class RazorpayWrapperService {
     private readonly _razorpayKey: string = API_KEY.razorpay;
 
-    openCheckout(order: RazorpayOrder, onSuccess: (response: any) => void, onFailure?: () => void): void {
+    openCheckout(order: RazorpayOrder, email: string, contact: string, name: string, onSuccess: (response: any) => void, onFailure?: () => void): void {
         const options = {
             key: this._razorpayKey,
             amount: order.amount,
@@ -19,9 +19,9 @@ export class RazorpayWrapperService {
                 ondismiss: () => onFailure?.()
             },
             prefill: {
-                name: 'User',
-                email: 'user@example.com',
-                contact: '9999999999'
+                name,
+                email,
+                contact,
             },
             theme: {
                 color: '#556B2F' // Your theme color

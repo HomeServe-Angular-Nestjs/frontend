@@ -2,7 +2,7 @@ import { Component, effect, inject, Input, OnDestroy, OnInit, signal } from '@an
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { finalize, first, map, Observable, of, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
-import { SelectedServiceIdsType, SelectedServiceType } from '../../../../../../core/models/cart.model';
+import { SelectedServiceType } from '../../../../../../core/models/cart.model';
 import { IBooking, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
@@ -10,16 +10,24 @@ import { PaymentService } from '../../../../../../core/services/payment.service'
 import { IBookingOrder, RazorpayOrder, RazorpayPaymentResponse } from '../../../../../../core/models/payment.model';
 import { RazorpayWrapperService } from '../../../../../../core/services/public/razorpay-wrapper.service';
 import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
-import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType } from '../../../../../../core/enums/enums';
+import { PaymentDirection, PaymentSource, TransactionStatus, TransactionType, UsageTypeEnum } from '../../../../../../core/enums/enums';
 import { ReservationSocketService } from '../../../../../../core/services/socket-service/reservation-socket.service';
 import { CartService } from '../../../../../../core/services/cart.service';
 import { OrderSummarySectionComponent } from '../../../../partials/sections/customer/order-summary-section/order-summary-section.component';
 import { ISelectedSlot } from '../../../../../../core/models/availability.model';
+import { CouponService } from '../../../../../../core/services/coupon.service';
+import { ICoupon } from '../../../../../../core/models/coupon.model';
+import { DiscountSymbolPipe } from '../../../../../../core/pipes/discount-symbol.pipe';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
   templateUrl: './customer-schedule-order-summary.component.html',
-  imports: [CommonModule, LoadingCircleAnimationComponent, OrderSummarySectionComponent],
+  imports: [
+    CommonModule,
+    LoadingCircleAnimationComponent,
+    OrderSummarySectionComponent,
+    DiscountSymbolPipe,
+  ],
   providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy {
@@ -28,6 +36,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _bookingService = inject(BookingService);
   private readonly _paymentService = inject(PaymentService);
+  private readonly _couponService = inject(CouponService);
   private readonly _cartService = inject(CartService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
@@ -38,9 +47,13 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   providerId: string | null = null;
   selectedSlot = signal<ISelectedSlot | null>(null);
   selectedPaymentSource!: PaymentSource;
+  availableCoupons: ICoupon[] = [];
+  selectedCouponId: string | null = null;
 
   isLoading = false;
   isProcessing = false;
+  isCouponModalOpen = false;
+  isCouponLoading = false;
 
   priceBreakup: IPriceBreakupData = {
     subTotal: 0.00,
@@ -120,6 +133,9 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
         new Observable<void>((observer) => {
           this._razorpayWrapper.openCheckout(
             order,
+            "",
+            "",
+            "",
             (paymentResponse: RazorpayPaymentResponse) => {
               this._verifyPaymentAndConfirmBooking(paymentResponse, order, bookingId)
                 .pipe(takeUntil(this._destroy$))
@@ -148,6 +164,64 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
         this.isProcessing = false;
       }
     });
+  }
+
+  openCouponModal() {
+    this.isCouponModalOpen = true;
+    this.isCouponLoading = true;
+
+    this._fetchCoupons()
+      .subscribe({
+        next: (coupons) => {
+          this.availableCoupons = coupons;
+        }
+      });
+  }
+
+  closeCouponModal() {
+    this.isCouponModalOpen = false;
+    this.isCouponLoading = false;
+  }
+
+  isUsageTypeOneTime(type: UsageTypeEnum): boolean {
+    return type === UsageTypeEnum.OneTime;
+  }
+
+  applyCoupon(couponId: string, total: number) {
+    this.isCouponLoading = true;
+    const payload = { couponId, total };
+    this.selectedCouponId = couponId ?? null;
+
+    this._couponService.applyCoupon(payload)
+      .pipe(
+        takeUntil(this._destroy$),
+        finalize(() => this.isCouponLoading = false)
+      )
+      .subscribe({
+        next: (res) => {
+          const appliedDetails = res.data;
+          if (!appliedDetails) return;
+
+          this.priceBreakup = {
+            ...this.priceBreakup,
+            total: appliedDetails.finalAmount,
+            discount: appliedDetails.deductedValue,
+            originalTotal: appliedDetails.originalAmount
+          };
+
+          this.isCouponModalOpen = false;
+          this._toastr.success('Coupon applied successfully!');
+        },
+        error: (err) => {
+          this._toastr.error(err.error?.message || 'Failed to apply coupon');
+        }
+      });
+  }
+
+  removeCoupon() {
+    this._fetchPriceBreakup();
+    this.selectedCouponId = null;
+    this._toastr.info('Coupon removed');
   }
 
   private _fetchPriceBreakup(): void {
@@ -187,9 +261,18 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private _saveBooking() {
     const { isAvailable, ...slotData } = this.selectedSlot()!;
 
-    return this._bookingService.saveBooking(slotData, this.providerId!).pipe(
+    return this._bookingService.saveBooking(slotData, this.providerId!, this.selectedCouponId).pipe(
       finalize(() => this.isProcessing = false)
     );
+  }
+
+  private _fetchCoupons(): Observable<ICoupon[]> {
+    return this._couponService.getAvailableCoupons()
+      .pipe(
+        takeUntil(this._destroy$),
+        finalize(() => this.isCouponLoading = false),
+        map(res => res.data ?? [])
+      );
   }
 
   ngOnDestroy(): void {

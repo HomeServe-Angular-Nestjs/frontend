@@ -43,8 +43,8 @@ export class BookingService {
     return this._http.get<IResponse<IPriceBreakupData>>(`${this._customerApi}/booking/price_breakup`);
   }
 
-  saveBooking(slotData: ISaveBooking, providerId: string): Observable<IResponse<IBooking>> {
-    return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, { ...slotData, providerId });
+  saveBooking(slotData: ISaveBooking, providerId: string, couponId: string | null): Observable<IResponse<IBooking>> {
+    return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, { ...slotData, providerId, couponId });
   }
 
   updateBooking(data: { transactionId: string | null, bookingId: string }): Observable<IResponse> {
@@ -132,5 +132,9 @@ export class BookingService {
 
   canProviderStartCall(customerId: string): Observable<IResponse> {
     return this._http.post<IResponse>(`${this._providerApi}/bookings/call`, { customerId });
+  }
+
+  rescheduleBooking(bookingId: string, slotData: { date: string; from: string; to: string;}): Observable<IResponse<IBookingDetailProvider>> {
+    return this._http.patch<IResponse<IBookingDetailProvider>>(`${this._providerApi}/bookings/reschedule/${bookingId}`, slotData);
   }
 }

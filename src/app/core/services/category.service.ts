@@ -76,9 +76,9 @@ export class CategoryService {
         );
     }
 
-    getServiceCategoriesByProfessionId(professionId: string): Observable<IResponse<IServiceCategory[]>> {
-        return this._http.get<IResponse<IServiceCategory[]>>(`${this._categoryUrl}/service/${professionId}`);
-    }
+    // getServiceCategoriesByProfessionId(professionId: string): Observable<IResponse<IServiceCategory[]>> {
+    //     return this._http.get<IResponse<IServiceCategory[]>>(`${this._categoryUrl}/service/${professionId}`);
+    // }
 
     createServiceCategory(service: Partial<IServiceCategory>): Observable<IResponse<IServiceCategory>> {
         return this._http.post<IResponse<IServiceCategory>>(`${this._categoryUrl}/service`, service);
@@ -99,5 +99,9 @@ export class CategoryService {
     searchCategories(search: string): Observable<IResponse<ICustomerSearchCategories[]>> {
         const params = new HttpParams().set('search', search);
         return this._http.get<IResponse<ICustomerSearchCategories[]>>(`${this._categoryUrl}/search`, { params });
+    }
+
+    fetchAvailableServiceByProfessionId(professionId: string): Observable<IResponse<IServiceCategory[]>> {
+        return this._http.get<IResponse<IServiceCategory[]>>(`${this._categoryUrl}/profession/${professionId}/available-services`);
     }
 }

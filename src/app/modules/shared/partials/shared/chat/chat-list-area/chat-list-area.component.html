@@ -11,7 +11,7 @@
         <div *ngIf="chats.length > 0; else noChats" class="overflow-y-auto flex-1">
 
             <ul>
-                <li *ngFor="let chat of chats" (click)="viewMessages(chat.id)" class="px-3 py-2.5 flex items-center gap-3 cursor-pointer
+                <li *ngFor="let chat of chats" (click)="viewMessages(chat.id,chat.receiver.id)" class="px-3 py-2.5 flex items-center gap-3 cursor-pointer
                  border-b hover:bg-gray-100 transition">
 
                     <!-- Avatar -->

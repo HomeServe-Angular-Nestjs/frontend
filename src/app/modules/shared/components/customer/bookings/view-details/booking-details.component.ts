@@ -43,6 +43,10 @@ export class CustomerViewBookingDetailsComponent implements OnInit {
         return formatFullDateWithTimeHelper(date);
     }
 
+    isCompleted(bookingStatus: BookingStatus): boolean {
+        return bookingStatus === BookingStatus.COMPLETED;
+    }
+
     downloadInvoice(bookingId: string, bookingStatus: BookingStatus) {
         if (bookingStatus !== BookingStatus.COMPLETED) {
             this._toastr.error('You can only download invoice for completed bookings.');

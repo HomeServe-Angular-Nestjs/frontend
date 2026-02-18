@@ -122,7 +122,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (order) => {
           this._razorpayWrapperService.openCheckout(
-            order,
+            order,"","","",
             (paymentResponse: RazorpayPaymentResponse) =>
               this._verifyPaymentAndUpdateBooking(paymentResponse, order, bookingId),
           );

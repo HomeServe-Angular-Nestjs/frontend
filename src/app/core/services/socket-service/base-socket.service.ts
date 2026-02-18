@@ -46,9 +46,13 @@ export abstract class BaseSocketService {
     this.socket.connect();
     this.socket?.on('error', (error) => {
       console.error('Received socket error:', error);
-      if (error.type === 'validation') {
-        // Display in UI or handle accordingly
-      }
+      this._toastr.error(error?.message || 'A socket connection error occurred');
+    });
+
+    this.socket?.on('exception', (error: any) => {
+      console.error('WS Exception:', error);
+      const message = error?.message || error?.error?.message || 'An unexpected error occurred';
+      this._toastr.error(message);
     });
   }
 

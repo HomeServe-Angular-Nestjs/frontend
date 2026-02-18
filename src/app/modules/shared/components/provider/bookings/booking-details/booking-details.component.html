@@ -40,6 +40,13 @@
               <span class="hidden sm:inline">Report</span>
             </button>
 
+            <button *ngIf="canBeRescheduled(bookingDetails.bookingStatus)" (click)="toggleRescheduleModal()"
+              title="Reschedule Booking"
+              class="px-4 py-2 bg-white border border-blue-300 rounded-lg hover:bg-blue-50 transition flex items-center gap-2 text-sm font-medium text-blue-600">
+              <i class="fas fa-clock"></i>
+              <span class="hidden sm:inline">Reschedule</span>
+            </button>
+
             <button *ngIf="bookingDetails?.transaction?.id && bookingDetails.bookingStatus === 'completed'"
               (click)="downloadInvoice(bookingDetails.bookingId, bookingDetails.bookingStatus)"
               class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 text-sm font-medium shadow-sm">
@@ -105,14 +112,14 @@
             <div class="flex items-center flex-shrink-0 min-w-[140px]">
               <div class="flex flex-col items-center">
                 <button
-                  [disabled]="isStatusDisabled(cancelled, bookingDetails.bookingStatus, bookingDetails.cancelStatus)"
+                  [disabled]="isCancelDisabled(bookingDetails.bookingStatus, bookingDetails.cancelStatus)"
                   (click)="onCancelButtonClick(bookingDetails.bookingId, bookingDetails.cancelStatus)"
                   class="relative flex items-center justify-center w-12 h-12 rounded-full border-3 font-bold transition-all duration-300 shadow-md"
                   [ngClass]="{
                     'bg-gradient-to-br from-red-500 to-red-600 border-red-600 text-white shadow-red-200': bookingDetails.bookingStatus === cancelled,
-                    'bg-white border-red-300 text-red-500 hover:border-red-400': bookingDetails.bookingStatus !== cancelled && !isStatusDisabled(cancelled, bookingDetails.bookingStatus, bookingDetails.cancelStatus),
-                    'opacity-40 cursor-not-allowed': isStatusDisabled(cancelled, bookingDetails.bookingStatus, bookingDetails.cancelStatus)
-                  }">
+                    'bg-white border-red-300 text-red-500 hover:border-red-400': bookingDetails.bookingStatus !== cancelled && !isCancelDisabled(bookingDetails.bookingStatus, bookingDetails.cancelStatus),
+                    'opacity-40 cursor-not-allowed': isCancelDisabled(bookingDetails.bookingStatus, bookingDetails.cancelStatus)
+                  }"> 
                   <i class="fas fa-times-circle"></i>
                 </button>
                 <span class="mt-2 text-xs font-semibold text-center whitespace-nowrap" [ngClass]="{
@@ -178,7 +185,15 @@
             </div>
             <div class="flex justify-between items-center py-2 border-b border-gray-100">
               <span class="text-gray-600 font-medium">Expected Arrival</span>
-              <span class="text-gray-900">{{ formateData(bookingDetails.expectedArrivalTime) }}</span>
+              <div class="text-right">
+                <span class="text-gray-900 block font-semibold">{{ formateData(bookingDetails.expectedArrivalTime)
+                  }}</span>
+                <span *ngIf="bookingDetails.previousSchedules.length"
+                  class="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full mt-1 border border-amber-100 transition-all hover:bg-amber-100">
+                  <i class="fas fa-history text-[10px]"></i>
+                  Rescheduled {{ bookingDetails.previousSchedules.length }}x
+                </span>
+              </div>
             </div>
             <div class="flex justify-between items-center py-2">
               <span class="text-gray-600 font-medium">Total Amount</span>
@@ -244,6 +259,58 @@
             <div class="flex justify-between items-center py-2">
               <span class="text-gray-600 font-medium">Amount Paid</span>
               <span class="text-lg font-bold text-green-600">₹{{ bookingDetails.totalAmount }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule History (Timeline View) -->
+      <div *ngIf="bookingDetails.previousSchedules.length"
+        class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-calendar-alt text-amber-600"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Schedule History</h2>
+            <p class="text-xs text-gray-500">History of all reschedules for this booking</p>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div
+            class="relative pl-8 space-y-8 before:content-[''] before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-green-200 before:via-amber-200 before:to-gray-100">
+
+            <!-- Current Active Schedule -->
+            <div class="relative group">
+              <div
+                class="absolute -left-[25px] top-1 w-4 h-4 rounded-full bg-green-500 border-4 border-white shadow-[0_0_0_4px_rgba(34,197,94,0.1)] z-10 transition-transform group-hover:scale-125">
+              </div>
+              <div
+                class="bg-green-50/50 rounded-xl p-4 border border-green-100 transition-all hover:shadow-md hover:bg-green-50">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-green-700 uppercase tracking-wider">Current Schedule</span>
+                  <span
+                    class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">Active</span>
+                </div>
+                <p class="text-base font-bold text-gray-900">{{ formateData(bookingDetails.expectedArrivalTime) }}</p>
+              </div>
+            </div>
+
+            <!-- Previous Schedules -->
+            <div *ngFor="let schedule of bookingDetails.previousSchedules; let i = index; let last = last"
+              class="relative group">
+              <div
+                class="absolute -left-[25px] top-1 w-4 h-4 rounded-full bg-amber-400 border-4 border-white shadow-sm z-10 transition-transform group-hover:scale-125">
+              </div>
+              <div
+                class="bg-white rounded-xl p-4 border border-gray-100 transition-all hover:shadow-md hover:bg-gray-50/50">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Previously Scheduled</span>
+                </div>
+                <p class="text-sm font-semibold text-gray-700">{{ formateData(schedule) }}</p>
+                <p class="text-[11px] text-gray-400 mt-1 italic">Booking was rescheduled from this date</p>
+              </div>
             </div>
           </div>
         </div>
@@ -334,6 +401,13 @@
       <app-submit-cancellation (close)="toggleCancelBookingModal()"
         (submitCancel)="handleCancellation(bookingDetails.bookingId, $event)">
       </app-submit-cancellation>
+    </ng-container>
+
+    <ng-container *ngIf="showRescheduleModal()">
+      <app-reschedule-booking [bookingId]="bookingDetails.bookingId"
+        [totalDurationInMinutes]="totalEstimatedTime(bookingDetails.orderedServices)" (close)="toggleRescheduleModal()"
+        (submitReschedule)="handleReschedule($event)">
+      </app-reschedule-booking>
     </ng-container>
   </section>
 </div>
