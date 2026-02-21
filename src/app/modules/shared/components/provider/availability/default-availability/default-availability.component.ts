@@ -56,7 +56,7 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
 
   addFirstSlot(day: IAvailabilityListView) {
     day.active = true;
-    day.timeRanges = [this.defaultTimeRange]
+    day.timeRanges = [{ ...this.defaultTimeRange }]
     this.markDirty();
   }
 
