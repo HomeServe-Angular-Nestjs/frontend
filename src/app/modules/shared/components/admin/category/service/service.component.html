@@ -41,7 +41,7 @@
         </app-admin-simple-table>
 
         <ng-template #professionTpl let-row>
-            <span class="text-gray-500">{{ getProfessionName(row.professionId) }}</span>
+            <span class="text-gray-500">{{ getProfessionName(row.professionId) | titlecase}}</span>
         </ng-template>
 
         <ng-template #actionsTpl let-row>
@@ -116,7 +116,7 @@
                             <select formControlName="professionId"
                                 class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="" disabled>Select Profession</option>
-                                <option *ngFor="let prof of professions()" [value]="prof.id">{{ prof.name }}</option>
+                                <option *ngFor="let prof of professions()" [value]="prof.id">{{ prof.name | titlecase}}</option>
                             </select>
                             <div *ngIf="serviceForm.get('professionId')?.touched && serviceForm.get('professionId')?.invalid"
                                 class="text-red-500 text-xs mt-1">

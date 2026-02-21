@@ -162,6 +162,10 @@ export class AdminCategoryProfessionComponent implements OnInit, OnDestroy {
       });
   }
 
+  trackByProfessionId(index: number, profession: IProfession): string {
+    return profession.id;
+  }
+
   private _loadProfessions() {
     const filter: IProfessionFilter = {
       isActive: this.statusFilter(),

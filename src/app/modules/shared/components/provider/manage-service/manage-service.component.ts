@@ -340,18 +340,18 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   }
 
   private _attemptCreateForm(): void {
-    this._providerServiceManagementService
-      .canCreateService()
-      .subscribe({
-        next: (res) => {
-          if (!res.success) {
-            return;
-          }
-
-          this._openCreateForm();
-        }
-      });
-  }
+    // this._providerServiceManagementService // todo
+    //   .canCreateService()
+    //   .subscribe({
+    //     next: (res) => {
+    //       if (!res.success) {
+    //         return;
+    //       }
+          
+    //     }
+    //   });
+      this._openCreateForm();
+    }
 
   private _openCreateForm(): void {
     this.viewMode.set('form');
