@@ -114,8 +114,6 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     total: 0
   });
 
-
-
   constructor() {
     effect(() => {
       if (this.viewMode() === 'form') {
@@ -253,8 +251,14 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
       finalize(() => this.isCreating.set(false))
     ).subscribe({
       next: (res) => {
+        const newService = res?.data;
+        if (!newService) {
+          this._toastr.error(res.message);
+          return;
+        }
+
+        this.services.update(services => [newService, ...services]);
         this._toastr.success(this.isEditing() ? 'Service updated' : 'Service created');
-        this._loadServices();
         this.viewMode.set('list');
       }
     });
@@ -347,7 +351,6 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     //       if (!res.success) {
     //         return;
     //       }
-          
     //     }
     //   });
       this._openCreateForm();
