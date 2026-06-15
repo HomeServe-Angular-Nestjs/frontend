@@ -24,12 +24,14 @@
   </div>
 
   <!-- Dark Readability Overlay -->
-  <div class="absolute inset-0 bg-slate-950/70 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-transparent z-10"></div>
+  <div class="absolute inset-0 bg-slate-950/70 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-transparent z-10">
+  </div>
 
   <!-- Foreground Content -->
   <div class="relative z-20 h-full flex items-center px-6 sm:px-12 md:px-20 max-w-7xl mx-auto">
     <div class="max-w-2xl text-left">
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15] text-wrap-balance">
+      <h1
+        class="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15] text-wrap-balance">
         Your Trusted Partner for <br>
         <span class="text-blue-400">Home Services</span>
       </h1>
@@ -38,15 +40,43 @@
         Connect with elite, background-verified professionals for all your home service, repair, and cleaning needs.
       </p>
 
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl">
+        <div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur-sm px-4 py-3">
+          <div class="flex items-center gap-1 text-yellow-300 text-xs">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half-alt"></i>
+          </div>
+          <p class="mt-2 text-sm font-semibold text-white">"Booked in minutes, spotless result."</p>
+          <p class="mt-1 text-xs text-slate-300">Alicia M., verified customer</p>
+        </div>
+        <div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur-sm px-4 py-3">
+          <div class="flex items-center gap-2 text-blue-200 text-xs font-bold uppercase tracking-wider">
+            <i class="fas fa-shield-halved"></i>
+            Background Checked
+          </div>
+          <p class="mt-2 text-sm text-slate-200">ID checks and provider reviews before approval.</p>
+        </div>
+        <div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur-sm px-4 py-3">
+          <div class="flex items-center gap-2 text-blue-200 text-xs font-bold uppercase tracking-wider">
+            <i class="fas fa-certificate"></i>
+            Trusted Network
+          </div>
+          <p class="mt-2 text-sm text-slate-200">4.8 average rating across local home jobs.</p>
+        </div>
+      </div>
+
       <!-- CTAs conforming to rounded-md (8px) and Flat-by-Default -->
       <div class="flex flex-col sm:flex-row gap-4 mt-8">
-        <a routerLink="/signup" [queryParams]="{role: 'customer'}"
+        <a routerLink="/login" [queryParams]="{role: 'customer'}"
           class="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-all duration-200 flex items-center justify-center gap-2.5 focus:outline-none focus:ring-4 focus:ring-blue-500/10 shadow-sm active:translate-y-0.5">
           <span>Find Services</span>
           <i class="fa-solid fa-magnifying-glass text-xs"></i>
         </a>
 
-        <a routerLink="/provider/signup"
+        <a routerLink="/provider/login"
           class="px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/40 font-semibold rounded-md transition-all duration-200 flex items-center justify-center gap-2.5 focus:outline-none focus:ring-4 focus:ring-white/10 shadow-sm active:translate-y-0.5 backdrop-blur-sm">
           <span>Become a Provider</span>
           <i class="fa-solid fa-handshake text-xs"></i>

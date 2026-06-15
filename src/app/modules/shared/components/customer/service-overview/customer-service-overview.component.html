@@ -1,11 +1,9 @@
-<section id="services" class="py-24 bg-slate-50 relative overflow-hidden">
+<section id="services" class="py-20 bg-slate-50 relative overflow-hidden">
   <!-- Subtle Mesh Background -->
   <div class="absolute inset-0 pointer-events-none overflow-hidden">
-    <div
-      class="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-50/40 rounded-full blur-[120px]">
+    <div class="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-50/40 rounded-full blur-[120px]">
     </div>
-    <div
-      class="absolute top-[40%] -right-[10%] w-[50%] h-[50%] bg-indigo-50/40 rounded-full blur-[120px]">
+    <div class="absolute top-[40%] -right-[10%] w-[50%] h-[50%] bg-indigo-50/40 rounded-full blur-[120px]">
     </div>
   </div>
 
@@ -13,7 +11,8 @@
     <!-- Section Header (Asymmetric & Clean Layout) -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
       <div class="max-w-2xl space-y-4">
-        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight text-wrap-balance">
+        <h2
+          class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight text-wrap-balance">
           Tailored Solutions for <br>
           <span class="text-blue-600">Every Corner of Your Home</span>
         </h2>
@@ -35,13 +34,12 @@
     <!-- Service Cards Grid (Tactile & Restrained, rounded-lg, flat at rest) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <div *ngFor="let service of services; let i = index"
-        class="group relative bg-white rounded-lg border border-slate-200 p-3 transition-all duration-300 hover:shadow-lg hover:-translate-y-2 hover:border-slate-300"
+        class="group relative bg-white rounded-lg border border-slate-200 p-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-lg hover:-translate-y-2 hover:border-slate-300"
         [style.animation-delay]="i * 100 + 'ms'">
 
         <!-- Image Container (No hover image scale animation) -->
         <div class="relative aspect-[4/5] rounded-md overflow-hidden bg-slate-100">
-          <img [src]="service.image" [alt]="service.title"
-            class="w-full h-full object-cover">
+          <img [src]="service.image" [alt]="service.title" class="w-full h-full object-cover">
 
           <!-- Glass Overlay for Icon -->
           <div class="absolute top-4 left-4 z-20">
@@ -69,8 +67,7 @@
             {{ service.description }}
           </p>
 
-          <div
-            class="flex items-center justify-between pt-3 border-t border-slate-100">
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100">
             <a [routerLink]="['/view_providers']" [queryParams]="{category: service.title}"
               class="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1.5 focus:outline-none focus:underline">
               Book Appointment <i
