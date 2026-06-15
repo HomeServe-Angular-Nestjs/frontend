@@ -13,9 +13,9 @@ export class CustomerHeroSectionComponent {
   intervalId: any;
 
   images = [
-    { url: 'assets/images/hero_image1.jpg', alt: 'Home construction' },
-    { url: 'assets/images/hero_image2.jpg', alt: 'Cleaning service' },
-    { url: 'assets/images/hero_image3.jpg', alt: 'Electrical work' }
+    { url: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1600&q=80', alt: 'Cozy living room' },
+    { url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1600&q=80', alt: 'Warm clean kitchen' },
+    { url: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1600&q=80', alt: 'Home maintenance' }
   ];
 
   ngOnInit() {

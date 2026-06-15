@@ -37,6 +37,9 @@ yarn-error.log
 testem.log
 /typings
 /test
+DESIGN.md
+PRODUCT.md
+.impeccable/*
 
 # System files
 .DS_Store
