@@ -1,34 +1,23 @@
-<section id="services" class="py-24 bg-[#fafbfc] relative overflow-hidden">
-  <!-- Modern Mesh Gradient Background -->
+<section id="services" class="py-24 bg-slate-50 relative overflow-hidden">
+  <!-- Subtle Mesh Background -->
   <div class="absolute inset-0 pointer-events-none overflow-hidden">
     <div
-      class="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-indigo-100/30 rounded-full blur-[120px] animate-blob">
+      class="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-50/40 rounded-full blur-[120px]">
     </div>
     <div
-      class="absolute top-[40%] -right-[10%] w-[50%] h-[50%] bg-purple-100/30 rounded-full blur-[120px] animate-blob animation-delay-2000">
-    </div>
-    <div
-      class="absolute -bottom-[10%] left-[20%] w-[40%] h-[40%] bg-pink-100/20 rounded-full blur-[120px] animate-blob animation-delay-4000">
+      class="absolute top-[40%] -right-[10%] w-[50%] h-[50%] bg-indigo-50/40 rounded-full blur-[120px]">
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-    <!-- Section Header -->
+  <div class="max-w-7xl mx-auto px-6 sm:px-8 relative z-10">
+    <!-- Section Header (Asymmetric & Clean Layout) -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
       <div class="max-w-2xl space-y-4">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
-          </span>
-          <span class="text-xs font-black uppercase tracking-widest text-indigo-700">Service Excellence</span>
-        </div>
-        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.1]">
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight text-wrap-balance">
           Tailored Solutions for <br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Every Corner of
-            Your Home</span>
+          <span class="text-blue-600">Every Corner of Your Home</span>
         </h2>
-        <p class="text-slate-500 text-lg max-w-xl">
+        <p class="text-slate-600 text-base md:text-lg max-w-xl leading-relaxed">
           More than just maintenance—we provide peace of mind with our network of elite, background-verified
           professionals ready to serve you.
         </p>
@@ -36,62 +25,60 @@
 
       <div class="hidden md:block">
         <a routerLink="/view_providers"
-          class="group flex items-center gap-3 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-slate-700 font-bold hover:border-indigo-600 hover:text-indigo-600 transition-all duration-300 shadow-sm hover:shadow-md">
+          class="group flex items-center gap-3 px-5 py-2.5 bg-white border border-slate-200 rounded-md text-slate-700 font-semibold hover:border-blue-600 hover:text-blue-600 hover:bg-slate-50 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500/10 shadow-sm active:translate-y-0.5">
           Explore All Categories
           <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
         </a>
       </div>
     </div>
 
-    <!-- Service Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <!-- Service Cards Grid (Tactile & Restrained, rounded-lg, flat at rest) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <div *ngFor="let service of services; let i = index"
-        class="group relative bg-white rounded-[2.5rem] border border-slate-100 p-2 shadow-sm hover:shadow-[0_40px_80px_-24px_rgba(79,70,229,0.12)] transition-all duration-500 hover:-translate-y-3"
+        class="group relative bg-white rounded-lg border border-slate-200 p-3 transition-all duration-300 hover:shadow-lg hover:-translate-y-2 hover:border-slate-300"
         [style.animation-delay]="i * 100 + 'ms'">
 
-        <!-- Image Container -->
-        <div class="relative aspect-[4/5] rounded-[2rem] overflow-hidden">
+        <!-- Image Container (No hover image scale animation) -->
+        <div class="relative aspect-[4/5] rounded-md overflow-hidden bg-slate-100">
           <img [src]="service.image" [alt]="service.title"
-            class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110">
+            class="w-full h-full object-cover">
 
           <!-- Glass Overlay for Icon -->
           <div class="absolute top-4 left-4 z-20">
             <div
-              class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-xl shadow-xl transition-transform group-hover:rotate-6">
+              class="w-10 h-10 rounded-md bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-base shadow-sm">
               <i [class]="'fas ' + service.icon"></i>
             </div>
           </div>
 
-          <!-- Subtle Gradient Overlay -->
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+          <!-- Subtle Gradient Overlay for Text Readability -->
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
 
           <!-- Bottom Floating Content -->
-          <div class="absolute bottom-6 left-6 right-6">
+          <div class="absolute bottom-4 left-4 right-4">
             <div class="text-white space-y-1">
-              <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-300">{{ service.price }}</span>
-              <h3 class="text-xl font-black tracking-tight">{{ service.title }}</h3>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-blue-300">{{ service.price }}</span>
+              <h3 class="text-lg font-bold tracking-tight">{{ service.title }}</h3>
             </div>
           </div>
         </div>
 
-        <!-- Hover Reveal Content -->
-        <div class="p-6 space-y-4">
-          <p
-            class="text-slate-500 text-sm leading-relaxed opacity-0 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-20 transition-all duration-500">
+        <!-- Card Content -->
+        <div class="p-3 pt-4 space-y-3">
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
             {{ service.description }}
           </p>
 
           <div
-            class="flex items-center justify-between pt-2 border-t border-slate-50 group-hover:border-slate-100 transition-colors">
+            class="flex items-center justify-between pt-3 border-t border-slate-100">
             <a [routerLink]="['/view_providers']" [queryParams]="{category: service.title}"
-              class="text-sm font-black text-slate-900 group-hover:text-indigo-600 transition-colors flex items-center gap-2">
+              class="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1.5 focus:outline-none focus:underline">
               Book Appointment <i
-                class="fas fa-calendar-check opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                class="fas fa-calendar-check text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
             </a>
-            <div class="flex -space-x-2">
-              <div
-                class="w-6 h-6 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center text-[8px] font-bold text-indigo-600">
-                4.9</div>
+            <div class="flex items-center gap-1">
+              <i class="fas fa-star text-yellow-400 text-[10px]"></i>
+              <span class="text-[10px] font-bold text-slate-500">4.9</span>
             </div>
           </div>
         </div>
@@ -101,7 +88,7 @@
     <!-- Mobile CTA -->
     <div class="md:hidden mt-12">
       <a routerLink="/view_providers"
-        class="w-full flex items-center justify-center gap-3 py-4 bg-indigo-600 rounded-2xl text-white font-bold shadow-lg shadow-indigo-200">
+        class="w-full flex items-center justify-center gap-3 py-3.5 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-semibold shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-colors duration-200">
         Explore All Services
         <i class="fas fa-arrow-right text-xs"></i>
       </a>
