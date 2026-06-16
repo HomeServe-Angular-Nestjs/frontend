@@ -43,7 +43,8 @@ export interface IBookingDetailsBase {
   transaction: {
     id: string;
     paymentMethod: string;
-    paymentDate: Date
+    paymentDate: Date,
+    gst: number,
   } | null;
   previousSchedules: string[]; // "2026-02-23T06:30:00.000Z"
 }

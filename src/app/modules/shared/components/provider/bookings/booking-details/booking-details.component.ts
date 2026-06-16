@@ -4,7 +4,7 @@ import { ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { Store } from "@ngrx/store";
 import { selectProvider } from "../../../../../../store/provider/provider.selector";
-import { BehaviorSubject, Subject, filter, finalize, map, switchMap, takeUntil } from "rxjs";
+import { BehaviorSubject, Subject, combineLatest, filter, finalize, map, switchMap, takeUntil } from "rxjs";
 
 import { IBookingDetailProvider, IOrderedServiceUI, IRescheduleData } from "../../../../../../core/models/booking.model";
 import { BookingService } from "../../../../../../core/services/booking.service";
@@ -17,9 +17,7 @@ import { SharedDataService } from "../../../../../../core/services/public/shared
 import { SubmitCancellationComponent } from "../../../../partials/shared/submit-cancellation/submit-cancellation.component";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
-import { IProviderService } from "../../../../../../core/models/provider-service.model";
 import { RescheduleBookingModalComponent } from "../reschedule-booking/reschedule-booking.component";
-import { ISelectedSlot } from "../../../../../../core/models/availability.model";
 
 @Component({
   selector: 'app-provider-view-booking-details',
@@ -69,6 +67,24 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   showRescheduleModal = signal(false);
   get cancelled(): BookingStatus { return BookingStatus.CANCELLED };
 
+  subServiceCharge$ = this.bookingData$.pipe(
+    map(data => {
+      if (!data || !data.orderedServices) return 0;
+
+      return data.orderedServices.reduce((acc, item) => item.price + acc, 0);
+    })
+  );
+
+  totalServiceCharge$ = combineLatest([this.subServiceCharge$, this.bookingData$]).pipe(
+    map(([subServiceCharge, bookingData]) => {
+      if (!bookingData) return 0;
+
+      const gst = bookingData.transaction?.gst ?? 0;
+      const totalService = subServiceCharge;
+
+      return totalService + gst;
+    })
+  );
   ngOnInit(): void {
     this._sharedData.setProviderHeader('Bookings');
 
@@ -337,7 +353,6 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
 
     return false;
   }
-
 
   ngOnDestroy(): void {
     this._destroy$.next();
