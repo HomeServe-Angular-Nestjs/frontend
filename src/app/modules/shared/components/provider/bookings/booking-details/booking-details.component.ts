@@ -85,6 +85,7 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
       return totalService + gst;
     })
   );
+
   ngOnInit(): void {
     this._sharedData.setProviderHeader('Bookings');
 
