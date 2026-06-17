@@ -53,6 +53,7 @@ export interface IProviderTransactionOverview {
 export interface ITransactionAdminList {
     dateTime: string;
     counterparty: {
+        username: string;
         email: string;
         role: UserType;
     };

@@ -67,6 +67,16 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   showRescheduleModal = signal(false);
   get cancelled(): BookingStatus { return BookingStatus.CANCELLED };
 
+  get totalServiceCharge(): number {
+    const bookingData = this.bookingDataSource.getValue();
+    if (!bookingData) return 0;
+
+    const providerCommission = bookingData.transaction?.providerCommission ?? 0;
+    const subServiceCharge = bookingData.orderedServices.reduce((acc, item) => item.price + acc, 0);
+
+    return subServiceCharge - providerCommission;
+  }
+
   subServiceCharge$ = this.bookingData$.pipe(
     map(data => {
       if (!data || !data.orderedServices) return 0;
@@ -78,11 +88,8 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   totalServiceCharge$ = combineLatest([this.subServiceCharge$, this.bookingData$]).pipe(
     map(([subServiceCharge, bookingData]) => {
       if (!bookingData) return 0;
-
-      const gst = bookingData.transaction?.gst ?? 0;
-      const totalService = subServiceCharge;
-
-      return totalService + gst;
+      const providerCommission = bookingData.transaction?.providerCommission ?? 0;
+      return subServiceCharge - providerCommission;
     })
   );
 
@@ -118,6 +125,9 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
         next: (data) => {
           if (!data) throw new Error('Failed to update booking status');
           this.bookingDataSource.next(data);
+          const bookingData = this.bookingDataSource.getValue() as IBookingDetailProvider;
+          bookingData.bookingStatus = BookingStatus.COMPLETED;
+          this.bookingDataSource.next(bookingData);
           this._toastr.success('Booking status updated successfully');
         },
         error: (error) => {

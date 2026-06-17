@@ -79,8 +79,8 @@
                         <ng-container *ngIf="tx.counterparty.email !== 'Internal'; else internal">
                             <div class="user-info">
                                 <div class="details">
-                                    <span class="role-badge" [ngClass]="tx.counterparty.role">
-                                        {{ tx.counterparty.role }}
+                                    <span class="role-badge" [ngClass]="tx.counterparty.username">
+                                        {{ tx.counterparty.username }} {{tx.counterparty.role}}
                                     </span>
                                     <span class="email">{{ tx.counterparty.email }}</span>
                                 </div>

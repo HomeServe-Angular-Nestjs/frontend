@@ -27,7 +27,7 @@
             <div>
                 <p class="text-xs text-gray-500 uppercase">Total Amount</p>
                 <p class="text-xl font-semibold text-gray-900">
-                    ₹{{ bookingDetails.totalAmount }}
+                    {{ bookingDetails.totalAmount | currency:"INR":'symbol':'1.2-2'}}
                 </p>
             </div>
         </div>
@@ -82,20 +82,28 @@
     </div>
 
     <!-- PAYMENT BREAKDOWN -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+    <div class="grid grid-cols-1 sm:grid-cols-4  gap-6 mt-6">
         <div class="kpi kpi-indigo shadow-sm border border-indigo-100/50">
             <p class="label">Customer Paid</p>
-            <p class="kpi-value text-2xl">₹{{ bookingDetails.breakdown.customerPaid }}</p>
+            <p class="kpi-value text-2xl">{{ bookingDetails.breakdown.customerPaid | currency:'INR':'symbol':'1.2-2'}}
+            </p>
         </div>
 
         <div class="kpi kpi-green shadow-sm border border-green-100/50">
             <p class="label">Provider Amount</p>
-            <p class="kpi-value text-2xl">₹{{ bookingDetails.breakdown.providerAmount }}</p>
+            <p class="kpi-value text-2xl">{{ (bookingDetails.breakdown.providerAmount -
+                bookingDetails.breakdown.commissionEarned) | currency:'INR':'symbol':'1.2-2' }}</p>
+        </div>
+
+        <div class="kpi kpi-green shadow-sm border border-green-100/50">
+            <p class="label">Provider Commission Amount</p>
+            <p class="kpi-value text-2xl">{{ bookingDetails.breakdown.commissionEarned |
+                currency:'INR':'symbol':'1.2-2'}}</p>
         </div>
 
         <div class="kpi kpi-gray shadow-sm border border-gray-100/50">
-            <p class="label">GST</p>
-            <p class="kpi-value text-2xl">₹{{ bookingDetails.breakdown.gst }}</p>
+            <p class="label">GST Amount</p>
+            <p class="kpi-value text-2xl">{{ bookingDetails.breakdown.gst | currency:'INR':'symbol':'1.2-2' }}</p>
         </div>
     </div>
 
@@ -140,7 +148,7 @@
                         </td>
 
                         <td class="px-3 font-semibold whitespace-nowrap">
-                            ₹{{ tnx.amount }}
+                            {{ tnx.amount | currency:'INR':'symbol':'1.2-2' }}
                         </td>
 
                         <td class="px-3">
