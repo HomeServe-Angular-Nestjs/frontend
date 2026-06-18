@@ -79,8 +79,8 @@
                         <ng-container *ngIf="tx.counterparty.email !== 'Internal'; else internal">
                             <div class="user-info">
                                 <div class="details">
-                                    <span class="role-badge" [ngClass]="tx.counterparty.username">
-                                        {{ tx.counterparty.username }} {{tx.counterparty.role}}
+                                    <span class="role-badge" [ngClass]="tx.counterparty.role">
+                                        {{tx.counterparty.role}}
                                     </span>
                                     <span class="email">{{ tx.counterparty.email }}</span>
                                 </div>
@@ -127,7 +127,7 @@
                 </tr>
 
                 <tr *ngIf="transactions().length === 0">
-                    <td colspan="7" class="empty-state">
+                    <td colspan="8" class="empty-state">
                         <i class="fa-solid fa-receipt"></i>
                         <p>No transactions found matching your filters.</p>
                     </td>
