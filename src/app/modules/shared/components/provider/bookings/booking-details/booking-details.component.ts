@@ -17,7 +17,7 @@ import { SharedDataService } from "../../../../../../core/services/public/shared
 import { SubmitCancellationComponent } from "../../../../partials/shared/submit-cancellation/submit-cancellation.component";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
-import { RescheduleBookingModalComponent } from "../reschedule-booking/reschedule-booking.component";
+import { RescheduleBookingModalComponent } from "../../../../partials/shared/reschedule-booking/reschedule-booking.component";
 
 @Component({
   selector: 'app-provider-view-booking-details',

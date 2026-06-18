@@ -84,4 +84,8 @@ export class CustomerViewBookingDetailsComponent implements OnInit {
                 }
             });
     }
+
+    openRescheduleModal() {
+
+    }
 }

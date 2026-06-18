@@ -36,8 +36,13 @@
             <!-- Main Content: Services -->
             <div class="lg:col-span-2 space-y-6">
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-50">
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-50 w-full">
                         <h2 class="text-sm font-bold text-gray-800">Services Scheduled</h2>
+                        <button (click)="openRescheduleModal()"
+                            class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-blue-400 hover:text-blue-900 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                            <i class="fa-regular fa-calendar-days text-sm"></i>
+                            Reschedule
+                        </button>
                     </div>
 
                     <div class="divide-y divide-gray-50">
@@ -224,4 +229,8 @@
         <p class="mt-4 text-gray-400 font-bold text-[10px] uppercase tracking-widest animate-pulse">Syncing Details...
         </p>
     </div>
+</ng-template>
+
+<ng-template #rescheduleModal>
+
 </ng-template>

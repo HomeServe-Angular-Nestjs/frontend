@@ -2,14 +2,14 @@ import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { map, tap, finalize, switchMap, EMPTY, take } from 'rxjs';
-import { MeridiemPipe } from '../../../../../../core/pipes/meridiem-time.pipe';
-import { ProviderService } from '../../../../../../core/services/provider.service';
-import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
-import { ISelectedSlot, ISlotUI } from '../../../../../../core/models/availability.model';
-import { getToday } from '../../../../../../core/utils/date.util';
+import { MeridiemPipe } from '../../../../../core/pipes/meridiem-time.pipe';
+import { ProviderService } from '../../../../../core/services/provider.service';
+import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
+import { ISelectedSlot, ISlotUI } from '../../../../../core/models/availability.model';
+import { getToday } from '../../../../../core/utils/date.util';
 import { Store } from '@ngrx/store';
-import { selectAuthUserId } from '../../../../../../store/auth/auth.selector';
-import { IRescheduleData } from '../../../../../../core/models/booking.model';
+import { selectAuthUserId } from '../../../../../store/auth/auth.selector';
+import { IRescheduleData } from '../../../../../core/models/booking.model';
 
 @Component({
     selector: 'app-reschedule-booking',
