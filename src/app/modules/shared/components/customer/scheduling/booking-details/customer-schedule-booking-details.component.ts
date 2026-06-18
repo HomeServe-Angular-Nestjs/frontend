@@ -73,7 +73,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
             isAvailable: s.isAvailable 
           }));
         }),
-        tap(slots => this.availableSlots = slots)
+        tap(slots => this.availableSlots = this._sortSlotsByStartTime(slots))
       ).subscribe();
   }
 
@@ -167,5 +167,14 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
+  }
+
+  private _sortSlotsByStartTime(slots: ISlotUI[]): ISlotUI[] {
+    return [...slots].sort((a, b) => this._toMinutes(a.from) - this._toMinutes(b.from));
+  }
+
+  private _toMinutes(time: string): number {
+    const [hours, minutes] = time.split(':').map(Number);
+    return (hours * 60) + minutes;
   }
 }

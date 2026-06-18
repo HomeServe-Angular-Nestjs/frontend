@@ -70,6 +70,11 @@ export class BookingService {
   markBookingCancelledByCustomer(bookingId: string, reason: string,): Observable<IResponse<IBookingResponse>> {
     return this._http.patch<IResponse<IBookingResponse>>(`${this._customerApi}/booking/cancel`, { bookingId, reason });
   }
+
+  rescheduleCustomerBooking(bookingId: string, slotData: { date: string; from: string; to: string; }): Observable<IResponse<IBookingDetailCustomer>> {
+    return this._http.patch<IResponse<IBookingDetailCustomer>>(`${this._customerApi}/booking/reschedule/${bookingId}`, slotData);
+  }
+
   canCustomerStartCall(providerId: string): Observable<IResponse> {
     return this._http.post<IResponse>(`${this._customerApi}/booking/call`, { providerId });
   }

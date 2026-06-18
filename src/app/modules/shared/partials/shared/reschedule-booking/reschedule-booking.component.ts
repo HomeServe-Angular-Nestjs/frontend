@@ -28,6 +28,7 @@ export class RescheduleBookingModalComponent implements OnInit {
 
     @Input() bookingId!: string;
     @Input() totalDurationInMinutes!: number;
+    @Input() providerId: string | null = null;
 
     @Output() close = new EventEmitter<void>();
     @Output() submitReschedule = new EventEmitter<IRescheduleData>();
@@ -54,7 +55,9 @@ export class RescheduleBookingModalComponent implements OnInit {
                     this.selectedSlot = null;
                     this.availableSlots = [];
                 }),
-                switchMap((providerId) => {
+                switchMap((authProviderId) => {
+                    const providerId = this.providerId || authProviderId;
+
                     if (!providerId) {
                         this._toastr.error('Something went wrong!');
                         console.error('Failed to get provider id for the reschedule modal.');
@@ -69,7 +72,7 @@ export class RescheduleBookingModalComponent implements OnInit {
                 }),
                 map((res) => Array.isArray(res) ? res : (res?.data || [])),
                 tap((slots) => {
-                    this.availableSlots = slots;
+                    this.availableSlots = this._sortSlotsByStartTime(slots);
                 }),
                 finalize(() => this.loadingSlots.set(false))
             )
@@ -100,5 +103,14 @@ export class RescheduleBookingModalComponent implements OnInit {
 
     onClose() {
         this.close.emit();
+    }
+
+    private _sortSlotsByStartTime(slots: ISlotUI[]): ISlotUI[] {
+        return [...slots].sort((a, b) => this._toMinutes(a.from) - this._toMinutes(b.from));
+    }
+
+    private _toMinutes(time: string): number {
+        const [hours, minutes] = time.split(':').map(Number);
+        return (hours * 60) + minutes;
     }
 }

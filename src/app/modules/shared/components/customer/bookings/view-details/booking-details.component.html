@@ -38,7 +38,8 @@
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                     <div class="flex items-center justify-between px-6 py-4 border-b border-gray-50 w-full">
                         <h2 class="text-sm font-bold text-gray-800">Services Scheduled</h2>
-                        <button (click)="openRescheduleModal()"
+                        <button *ngIf="canBeRescheduled(bookingDetails.bookingStatus)"
+                            (click)="openRescheduleModal(bookingDetails.bookingStatus)"
                             class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-blue-400 hover:text-blue-900 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                             <i class="fa-regular fa-calendar-days text-sm"></i>
                             Reschedule
@@ -231,6 +232,10 @@
     </div>
 </ng-template>
 
-<ng-template #rescheduleModal>
-
-</ng-template>
+<ng-container *ngIf="(bookingDetails$ | async) as bookingDetails">
+    <app-reschedule-booking *ngIf="showRescheduleModal()" [bookingId]="bookingDetails.bookingId"
+        [providerId]="bookingDetails.provider.id"
+        [totalDurationInMinutes]="totalEstimatedTime(bookingDetails.orderedServices)" (close)="toggleRescheduleModal()"
+        (submitReschedule)="handleReschedule($event)">
+    </app-reschedule-booking>
+</ng-container>
