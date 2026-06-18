@@ -39,7 +39,7 @@ export class AdminTransactionsComponent implements OnInit, OnDestroy {
     date: 'all',
     method: 'all',
     page: 1,
-    limit: 8,
+    limit: 10,
   });
 
   adminTable = toSignal(
@@ -60,7 +60,7 @@ export class AdminTransactionsComponent implements OnInit, OnDestroy {
   pagination = computed(() =>
     this.adminTable()?.data?.pagination ?? {
       page: 1,
-      limit: 8,
+      limit: 10,
       total: 0,
     }
   );
