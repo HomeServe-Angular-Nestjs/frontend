@@ -26,7 +26,6 @@ import { IOpenCageLocation, LocationService } from '../../../../../../core/servi
 })
 export class CustomerHeaderComponent implements OnInit {
   private readonly _debounceService = inject(DebounceService);
-  private readonly _customerService = inject(CustomerService);
   private readonly _categoryService = inject(CategoryService);
   private readonly _locationService = inject(LocationService);
   public readonly _cartService = inject(CartService);
@@ -68,6 +67,7 @@ export class CustomerHeaderComponent implements OnInit {
   locationSearch = '';
   locationData = signal<IOpenCageLocation[]>([]);
   isLocationSearchLoading = false;
+  protected cartCount = this._cartService.cartItemCount;
 
   ngOnInit(): void {
     this._store.dispatch(customerActions.fetchOneCustomer());
@@ -85,8 +85,6 @@ export class CustomerHeaderComponent implements OnInit {
         }
       });
 
-    this._cartService.getCart().subscribe();
-
     this.checkHomepage();
 
     this._router.events.pipe(
@@ -95,15 +93,13 @@ export class CustomerHeaderComponent implements OnInit {
     ).subscribe(() => {
       this.checkHomepage();
     });
+
+    this._cartService.getCart().subscribe();
   }
 
   private checkHomepage() {
     const url = this._router.url;
     this.isHomepage = url === '/homepage' || url.split('?')[0] === '/';
-  }
-
-  get cartCount(): number {
-    return this._cartService.cartItemCount();
   }
 
   searchLocations(): void {

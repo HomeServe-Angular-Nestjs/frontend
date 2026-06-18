@@ -101,7 +101,7 @@
     background: white;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+    overflow-x: auto;
     border: 1px solid #e2e8f0;
 }
 
@@ -202,6 +202,39 @@
     font-size: 0.875rem;
     color: #334155;
     font-weight: 500;
+}
+
+.destination-role {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.destination-role.customer {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #bbf7d0;
+}
+
+.destination-role.provider {
+    background: #eef2ff;
+    color: #4338ca;
+    border-color: #c7d2fe;
+}
+
+.destination-role.admin,
+.destination-role.internal {
+    background: #fffbeb;
+    color: #b45309;
+    border-color: #fde68a;
 }
 
 /* Direction/Method Badge */

@@ -71,7 +71,8 @@
             <div class="flex items-center self-stretch md:self-auto border-t md:border-t-0 pt-4 md:pt-0">
               <div class="text-right">
                 <p class="text-[10px] text-gray-400 font-bold uppercase mb-0.5">Total</p>
-                <p class="text-lg font-semibold text-gray-900">₹{{ list.totalAmount }}</p>
+                <p class="text-lg font-semibold text-gray-900">{{ list.totalAmount | currency:'INR':'symbol':'1.2-2' }}
+                </p>
               </div>
             </div>
           </div>
