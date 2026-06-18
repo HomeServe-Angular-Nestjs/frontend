@@ -51,7 +51,8 @@
                                         <p
                                             class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">
                                             Price</p>
-                                        <span class="text-xl font-black text-black">₹{{ service.price }}</span>
+                                        <span class="text-xl font-black text-black">{{ service.price | currency:
+                                            'INR':'symbol':'1.2-2' }}</span>
                                     </div>
                                     <button id="remove-item-{{service.id}}" (click)="removeFromList(service.id)"
                                         class="w-10 h-10 rounded-xl hover:bg-rose-50 text-slate-300 hover:text-rose-500 transition-all flex items-center justify-center">
