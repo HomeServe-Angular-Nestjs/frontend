@@ -81,10 +81,7 @@ export class CustomerNotificationComponent implements OnInit {
     }
 
     markAllAsRead() {
-        // Implement logic to mark all as read
-        // Ideally this should send a request to backend or loop through unread ones
-        // For now, let's just assume individual marking available or we need a service method for 'markAll'
-        // this._notificationService.markAllAsRead(); // Assuming this exists or similar
+        this._store.dispatch(notificationAction.markAllAsRead());
     }
 
     setCurrentSelect(select: NotificationCrumb) {
@@ -100,13 +97,18 @@ export class CustomerNotificationComponent implements OnInit {
     }
 
     handleNotificationClick(notification: INotification) {
-        if (!notification.entityId) return;
+        const bookingId = notification.metadata?.['bookingId'] ?? notification.entityId;
 
         if ([
             NotificationTemplateId.BOOKING_CONFIRMED,
-            NotificationTemplateId.BOOKING_CANCELLED
-        ].includes(notification.templateId as NotificationTemplateId)) {
-            this._router.navigate(['/customer/profile/bookings', notification.entityId]);
+            NotificationTemplateId.BOOKING_CANCELLED,
+            NotificationTemplateId.BOOKING_STATUS_UPDATED,
+            NotificationTemplateId.BOOKING_COMPLETED,
+            NotificationTemplateId.BOOKING_RESCHEDULED,
+            NotificationTemplateId.PAYMENT_SUCCESS,
+            NotificationTemplateId.ORDER_SUCCESS,
+        ].includes(notification.templateId as NotificationTemplateId) && bookingId) {
+            this._router.navigate(['/customer/profile/bookings', bookingId]);
         }
 
         if (notification.templateId === NotificationTemplateId.SUBSCRIPTION_SUCCESS) {

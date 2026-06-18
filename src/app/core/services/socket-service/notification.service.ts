@@ -30,22 +30,23 @@ export class NotificationSocketService extends BaseSocketService {
         console.log('[NotificationSocket] Connected');
         this._setupAuthErrorHandler();
 
-        // this.onNewNotification((newNotification: INotification) =>
-        //     this._store.dispatch(notificationAction.addNotification({ notification: newNotification }))
-        // );
+        this.onNewNotification((newNotification: INotification) =>
+            this._store.dispatch(notificationAction.addNotification({ notification: newNotification }))
+        );
 
-        this.onMarkAsRead((notificationId: string) =>
-            this._store.dispatch(notificationAction.markAsRead({ notificationId }))
+        this.onMarkAsRead((notification: INotification) =>
+            this._store.dispatch(notificationAction.markAsReadSuccess({ notification }))
         );
 
         this.onRemoveNotification((id: string) =>
-            this._store.dispatch(notificationAction.removeNotification({ id }))
+            this._store.dispatch(notificationAction.removeNotificationSuccess({ id }))
         );
     }
 
     protected override onDisconnect(): void {
         this.stopListeningNotifications();
         this.removeListener(this.MARK_AS_READ);
+        this.removeListener(this.REMOVE_NOTIFICATION);
     }
 
     private async _refreshTokensAndReconnect(): Promise<void> {
@@ -73,13 +74,13 @@ export class NotificationSocketService extends BaseSocketService {
         this.listen<INotification>(this.NEW_NOTIFICATION, (notification: INotification) => callback(notification));
     }
 
-    onMarkAsRead(callback: (notificationId: string) => void): void {
+    onMarkAsRead(callback: (notification: INotification) => void): void {
         this.removeListener(this.MARK_AS_READ);
-        this.listen(this.MARK_AS_READ, (notificationId: string) => callback(notificationId));
+        this.listen<INotification>(this.MARK_AS_READ, (notification: INotification) => callback(notification));
     }
 
     onRemoveNotification(callback: (notificationId: string) => void) {
-        this.stopListeningNotifications();
+        this.removeListener(this.REMOVE_NOTIFICATION);
         this.listen(this.REMOVE_NOTIFICATION, (id: string) => callback(id));
     }
 
@@ -115,8 +116,8 @@ export class NotificationSocketService extends BaseSocketService {
         return this._http.patch<IResponse<INotification>>(`${this._notificationApi}/mark-read/${id}`, {});
     }
 
-    markAllAsReadApi(): Observable<IResponse<void>> {
-        return this._http.patch<IResponse<void>>(`${this._notificationApi}/mark-all-read`, {});
+    markAllAsReadApi(): Observable<IResponse<INotification[]>> {
+        return this._http.patch<IResponse<INotification[]>>(`${this._notificationApi}/mark-all-read`, {});
     }
 
     deleteNotificationApi(id: string): Observable<IResponse<void>> {

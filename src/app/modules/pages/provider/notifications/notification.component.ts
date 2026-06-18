@@ -76,8 +76,20 @@ export class ProviderNotificationComponent implements OnInit, OnDestroy {
             this.markAsRead(notification.id);
         }
 
+        const bookingId = notification.metadata?.['bookingId'] ?? notification.entityId;
+
         if (notification.templateId === NotificationTemplateId.SUBSCRIPTION_SUCCESS) {
             this._router.navigate(['/provider/subscriptions']);
+        }
+
+        if ([
+            NotificationTemplateId.ORDER_SUCCESS,
+            NotificationTemplateId.BOOKING_CANCELLED,
+            NotificationTemplateId.BOOKING_STATUS_UPDATED,
+            NotificationTemplateId.BOOKING_COMPLETED,
+            NotificationTemplateId.BOOKING_RESCHEDULED,
+        ].includes(notification.templateId as NotificationTemplateId) && bookingId) {
+            this._router.navigate(['/provider/bookings', bookingId]);
         }
     }
 

@@ -25,6 +25,8 @@ export interface ISendNewNotification {
     message: string;
     title: string;
     templateId: NotificationTemplateId,
+    entityId?: string;
+    metadata?: Record<string, any>;
 }
 
 export interface IReadNotification {

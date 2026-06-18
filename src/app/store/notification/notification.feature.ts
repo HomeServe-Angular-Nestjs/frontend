@@ -33,6 +33,13 @@ export const notificationFeature = createFeature({
             error: null
         })),
 
+        on(notificationAction.addNotification, (state, { notification }) => ({
+            ...state,
+            notifications: notificationAdaptor.upsertOne(notification, state.notifications),
+            loading: false,
+            error: null
+        })),
+
         on(notificationAction.markAllAsRead, (state) => ({
             ...state,
             loading: true,
