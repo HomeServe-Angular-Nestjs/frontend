@@ -37,9 +37,23 @@
         <i class="fa-solid fa-user"></i>
       </div>
       <div>
-        <h3 class="font-semibold text-sm leading-tight">{{ callStatus === 'calling' ? 'Calling...' : 'Connected' }}</h3>
-        <span class="text-xs flex items-center gap-1" [ngClass]="callStatus === 'calling' ? 'text-yellow-400' : 'text-green-400'">
-          @if (callStatus === 'calling') {
+        <h3 class="font-semibold text-sm leading-tight">
+          @if (callStatus === 'connecting') {
+            Connecting...
+          } @else if (callStatus === 'calling') {
+            Calling...
+          } @else if (callStatus === 'connected') {
+            Connected
+          } @else {
+            Ended
+          }
+        </h3>
+        <span class="text-xs flex items-center gap-1"
+          [ngClass]="callStatus === 'connecting' ? 'text-blue-400' : callStatus === 'calling' ? 'text-yellow-400' : 'text-green-400'">
+          @if (callStatus === 'connecting') {
+            <span class="w-3 h-3 rounded-full border-2 border-blue-400 border-t-transparent animate-spin"></span>
+            Acquiring media...
+          } @else if (callStatus === 'calling') {
             <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
             Ringing
           } @else {
