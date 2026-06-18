@@ -39,6 +39,11 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   isAudioEnabled = true;
   isVideoEnabled = true;
   role!: VideoRoleType;
+  partnerId!: string;
+
+  callStatus: 'calling' | 'connected' | 'ended' = 'calling';
+  callDuration = 0;
+  private _timerInterval?: ReturnType<typeof setInterval>;
 
   // drag state
   private target = { x: 0, y: 0 };
@@ -137,6 +142,9 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
       this._videoSocketService.onAccept(async () => {
         console.log('[VideoCall] Call Accepted (Caller view)');
         if (this.role !== "caller") return;
+
+        this.callStatus = 'connected';
+        this._startTimer();
 
         await this.ensureLocalStream();
         this._maybeAddLocalTracks();
@@ -254,6 +262,9 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   private _registerSignalHandlers() {
     this._videoSocketService.onSignal("offer", async (data) => {
       console.log('[VideoCall] Received OFFER (Callee)');
+
+      this.callStatus = 'connected';
+      this._startTimer();
 
       // 1️⃣ Apply remote offer FIRST (mandatory)
       await this._pc.setRemoteDescription(
@@ -382,8 +393,30 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  get formattedDuration(): string {
+    const mins = Math.floor(this.callDuration / 60);
+    const secs = this.callDuration % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+
+  private _startTimer() {
+    this.callDuration = 0;
+    this._timerInterval = setInterval(() => {
+      this.callDuration++;
+    }, 1000);
+  }
+
+  private _stopTimer() {
+    if (this._timerInterval) {
+      clearInterval(this._timerInterval);
+      this._timerInterval = undefined;
+    }
+  }
+
   endCall() {
     console.log('[VideoCall] Ending Call - Cleanup started');
+    this.callStatus = 'ended';
+    this._stopTimer();
 
     // Stop all local tracks
     if (this.localStream) {
@@ -408,8 +441,8 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
+    this._videoSocketService.endCall(this.partnerId);
     this._videoCallService.endCall();
-    this._videoSocketService.disconnect();
   }
 
   // Smooth Dragging
@@ -472,6 +505,7 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     console.log('[VideoCall] Component Destroyed');
+    this._stopTimer();
     this.endCall();
   }
 }

@@ -8,7 +8,7 @@ import { ICoupon, ICouponFilter } from '../../../../../core/models/coupon.model'
 import { IPagination } from '../../../../../core/models/booking.model';
 import { DiscountTypeEnum, UsageTypeEnum } from '../../../../../core/enums/enums';
 import { getToday, toDateInputValue, toIso } from '../../../../../core/utils/date.util';
-import { getValidationMessage, minDateValidator } from '../../../../../core/utils/form-validation.utils';
+import { getValidationMessage, minDateValidator, dateRangeValidator } from '../../../../../core/utils/form-validation.utils';
 import { DiscountSymbolPipe } from '../../../../../core/pipes/discount-symbol.pipe';
 import { CouponValidityPipe } from '../../../../../core/pipes/coupon-validity.pipe';
 import { AdminPaginationComponent } from '../../../partials/sections/admin/pagination/pagination.component';
@@ -82,12 +82,12 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
     discountValue: [1, [Validators.required, Validators.min(1)]],
     usageType: ['', Validators.required],
     usageValue: [1, [Validators.required, Validators.min(1)]],
-    validFrom: [this.today, [minDateValidator()]],
-    validTo: ['', [minDateValidator()]],
+    validFrom: [this.today, [Validators.required, minDateValidator()]],
+    validTo: ['', [Validators.required, minDateValidator()]],
     professionId: [''],
     serviceCategoryId: [{ value: '', disabled: true }],
     isActive: [true]
-  });
+  }, { validators: [dateRangeValidator('validFrom', 'validTo')] });
 
   ngOnInit(): void {
     this._sharedService.setAdminHeader('Coupon Management');
@@ -339,15 +339,31 @@ export class AdminCouponsComponent implements OnInit, OnDestroy {
   }
 
   private _disableValidityDates() {
-    this.couponForm.get('validFrom')?.disable();
-    this.couponForm.get('validTo')?.disable();
+    const validFromCtrl = this.couponForm.get('validFrom');
+    const validToCtrl = this.couponForm.get('validTo');
+
+    validFromCtrl?.disable();
+    validToCtrl?.disable();
+    validFromCtrl?.clearValidators();
+    validToCtrl?.clearValidators();
+    validFromCtrl?.updateValueAndValidity({ emitEvent: false });
+    validToCtrl?.updateValueAndValidity({ emitEvent: false });
+
     this.couponForm.patchValue({ validFrom: null, validTo: null });
     this.isValidityVisible.set(false);
   }
 
   private _enableValidityDates() {
-    this.couponForm.get('validFrom')?.enable();
-    this.couponForm.get('validTo')?.enable();
+    const validFromCtrl = this.couponForm.get('validFrom');
+    const validToCtrl = this.couponForm.get('validTo');
+
+    validFromCtrl?.enable();
+    validToCtrl?.enable();
+    validFromCtrl?.setValidators([Validators.required, minDateValidator()]);
+    validToCtrl?.setValidators([Validators.required, minDateValidator()]);
+    validFromCtrl?.updateValueAndValidity({ emitEvent: false });
+    validToCtrl?.updateValueAndValidity({ emitEvent: false });
+
     this.couponForm.patchValue({ validFrom: this.today, validTo: '' });
     this.isValidityVisible.set(true);
   }

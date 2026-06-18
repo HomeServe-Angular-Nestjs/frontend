@@ -213,7 +213,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
           this._toastr.success('Coupon applied successfully!');
         },
         error: (err) => {
-          this._toastr.error(err.error?.message || 'Failed to apply coupon');
+          this._toastr.error(err.message || 'Failed to apply coupon');
         }
       });
   }

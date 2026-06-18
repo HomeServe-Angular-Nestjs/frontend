@@ -37,10 +37,15 @@
         <i class="fa-solid fa-user"></i>
       </div>
       <div>
-        <h3 class="font-semibold text-sm leading-tight">Connected</h3>
-        <span class="text-xs text-green-400 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-          04:23
+        <h3 class="font-semibold text-sm leading-tight">{{ callStatus === 'calling' ? 'Calling...' : 'Connected' }}</h3>
+        <span class="text-xs flex items-center gap-1" [ngClass]="callStatus === 'calling' ? 'text-yellow-400' : 'text-green-400'">
+          @if (callStatus === 'calling') {
+            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
+            Ringing
+          } @else {
+            <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+            {{ formattedDuration }}
+          }
         </span>
       </div>
     </div>
