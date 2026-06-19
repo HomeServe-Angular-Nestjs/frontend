@@ -11,7 +11,7 @@ import { CapitalizeFirstPipe } from "../../../../../../core/pipes/capitalize-fir
 @Component({
     selector: 'app-performance-disputes',
     imports: [CommonModule, NgxEchartsModule],
-    providers: [AnalyticService, CapitalizeFirstPipe],
+    providers: [CapitalizeFirstPipe],
     template: `
         <div class="bg-white rounded-lg shadow-md p-6 border border-slate-100">
             <div class="flex items-center justify-between mb-6">

@@ -12,6 +12,7 @@ import { PaymentService } from '../../../../core/services/payment.service';
 import { RazorpayWrapperService } from '../../../../core/services/public/razorpay-wrapper.service';
 import { VideoCallSocketService } from '../../../../core/services/socket-service/video-socket.service';
 import { VideoCallService } from '../../../../core/services/video-call.service';
+import { NotificationSocketService } from '../../../../core/services/socket-service/notification.service';
 
 @Component({
   selector: 'app-provider-layout',
@@ -26,6 +27,7 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
   private readonly _store = inject(Store);
   private readonly _videoSocketService = inject(VideoCallSocketService);
   private readonly _chatSocket = inject(ChatSocketService);
+  private readonly _notificationSocket = inject(NotificationSocketService);
   private readonly _videoCallService = inject(VideoCallService); //? initiated the instance
 
   private _destroy$ = new Subject<void>();
@@ -40,9 +42,11 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
       if (status === 'authenticated') {
         this._chatSocket.stopListeningMessages();
         this._chatSocket.connect();
+        this._notificationSocket.connect();
         this._videoSocketService.connect();
       } else {
         this._chatSocket.disconnect();
+        this._notificationSocket.disconnect();
         this._videoSocketService.disconnect();
       }
     });
@@ -55,6 +59,7 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
+    this._notificationSocket.stopListeningNotifications();
   }
 
 

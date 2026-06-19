@@ -29,6 +29,11 @@ export class ChatSocketService extends BaseSocketService {
 
         this.onNewMessage((message: IMessage) => {
             this._store.dispatch(chatActions.addMessage({ message }));
+            this._store.dispatch(chatActions.updateChatLastMessage({
+                chatId: message.chatId,
+                lastMessage: message.content,
+                lastSeenAt: message.createdAt,
+            }));
         });
     }
 
@@ -67,6 +72,10 @@ export class ChatSocketService extends BaseSocketService {
         this.listen<IMessage>('newMessage', (msg: IMessage) => {
             callback(msg);
         });
+    }
+
+    markMessagesRead(chatId: string): void {
+        this.emit('markMessagesRead', { chatId });
     }
 
     stopListeningMessages(): void {

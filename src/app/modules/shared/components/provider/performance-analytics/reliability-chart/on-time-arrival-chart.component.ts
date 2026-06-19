@@ -8,7 +8,6 @@ import { IOnTimeArrivalChartData } from "../../../../../../core/models/analytics
 @Component({
     selector: 'app-performance-on-time-arrival',
     imports: [NgxEchartsModule],
-    providers: [AnalyticService],
     template: `
            <div class="bg-white rounded-lg shadow-md p-6 border border-slate-100">
                 <div class="flex items-center justify-between mb-6">

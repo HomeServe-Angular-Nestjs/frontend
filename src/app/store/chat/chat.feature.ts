@@ -91,6 +91,14 @@ export const chatFeature = createFeature({
             messages: messageAdaptor.addOne(message, state.messages)
         })),
 
+        on(chatActions.updateChatLastMessage, (state, { chatId, lastMessage, lastSeenAt }) => ({
+            ...state,
+            chats: chatAdaptor.updateOne(
+                { id: chatId, changes: { lastMessage, lastSeenAt } },
+                state.chats
+            )
+        })),
+
         on(chatActions.clearMessages, (state) => ({
             ...state,
             messages: messageAdaptor.removeAll(state.messages),

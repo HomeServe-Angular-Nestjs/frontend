@@ -9,7 +9,6 @@ import { IReviewChartData } from "../../../../../../core/models/analytics.model"
 @Component({
   selector: 'app-performance-ratings',
   imports: [CommonModule, NgxEchartsModule],
-  providers: [AnalyticService],
   styles: [`
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;

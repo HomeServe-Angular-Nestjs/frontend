@@ -14,5 +14,9 @@ export const chatActions = {
 
     addMessage: createAction('[Chat] Add new message', props<{ message: IMessage }>()),
 
+    updateChatLastMessage: createAction('[Chat] Update chat last message', props<{ chatId: string, lastMessage: string, lastSeenAt: Date }>()),
+
+    markMessagesRead: createAction('[Chat] Mark messages read', props<{ chatId: string }>()),
+
     clearMessages: createAction('[Chat] Clear messages'),
 }

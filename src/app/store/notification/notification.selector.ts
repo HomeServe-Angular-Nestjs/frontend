@@ -8,11 +8,10 @@ export const selectAllNotifications = notificationSelectors.selectAll;
 
 export const hasInCompleteProfileNotification = createSelector(
     selectAllNotifications,
-    (notifications) => {
+    (notifications) =>
         notifications.some(
-            (n) => n.type === NotificationType.REMINDER && !n.isRead
+            (n) => n.templateId === NotificationTemplateId.INCOMPLETE_PROFILE && !n.isRead
         )
-    }
 );
 
 export const selectTotalUnReadNotificationCount = createSelector(

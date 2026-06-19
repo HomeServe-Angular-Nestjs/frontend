@@ -96,7 +96,22 @@ export class VideoCallSocketService extends BaseSocketService {
       this.role.set(event.role);
     });
 
-    this.listen(this.VIDEO_CALL_UNAVAILABLE, () => { });
+    this.listen(this.VIDEO_CALL_LEAVE, () => {
+      this.callService ??= this.injector.get(VideoCallService);
+      this.callService.endCall();
+      this.partnerId = undefined as any;
+      this.role.set(null);
+      this._pendingSignals = [];
+    });
+
+    this.listen(this.VIDEO_CALL_UNAVAILABLE, (event: { message: string }) => {
+      this._toastr.error(event?.message || 'Call unavailable');
+      this.callService ??= this.injector.get(VideoCallService);
+      this.callService.endCall();
+      this.partnerId = undefined as any;
+      this.role.set(null);
+      this._pendingSignals = [];
+    });
 
     this.listen(this.VIDEO_CALL_RINGING, (event: any) => {
       if (this._ringingListener) this._ringingListener(event);

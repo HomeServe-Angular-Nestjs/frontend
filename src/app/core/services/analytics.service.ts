@@ -5,7 +5,7 @@ import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
 import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary, IServiceDemandData, ILocationRevenue, ITopAreaRevenue, IUnderperformingArea, IPeakServiceTime } from "../models/analytics.model";
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AnalyticService {
     private readonly _http = inject(HttpClient);
     private readonly _apiUrl = API_ENV.analytics;

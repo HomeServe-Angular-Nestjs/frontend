@@ -3,7 +3,7 @@ import { ChatListComponent } from "../../../shared/partials/shared/chat/chat-lis
 import { ChatMessageComponent } from "../../../shared/partials/shared/chat/chat-message-area/chat-message-area.component";
 import { Store } from "@ngrx/store";
 import { chatActions } from "../../../../store/chat/chat.action";
-import { VideoCallService } from "../../../../core/services/video-call.service";
+import { VideoCallSocketService } from "../../../../core/services/socket-service/video-socket.service";
 
 @Component({
   selector: 'app-provider-chat',
@@ -12,8 +12,10 @@ import { VideoCallService } from "../../../../core/services/video-call.service";
 })
 export class ProviderChatComponent implements OnInit {
   private readonly _store = inject(Store);
+  private readonly _videoSocketService = inject(VideoCallSocketService);
 
   ngOnInit(): void {
+    this._videoSocketService.connect();
     this._store.dispatch(chatActions.fetchAllChat());
   }
 }

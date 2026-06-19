@@ -41,6 +41,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     );
 
                     if (error.status === 401) {
+                        // Don't treat 401 from third-party APIs as auth failures
+                        if (!req.context.get(USE_CREDENTIALS)) {
+                            return throwError(() => error);
+                        }
                         store.dispatch(authActions.logout({ fromInterceptor: true, message: userMessage }));
                         return of();
                     }

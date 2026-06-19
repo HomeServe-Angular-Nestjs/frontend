@@ -72,7 +72,7 @@ export const notificationEffects = {
             switchMap(({ id }) =>
                 notificationService.deleteNotificationApi(id).pipe(
                     map((response) => {
-                        if (!response?.data) {
+                        if (!response?.success) {
                             toastr.error(response.message);
                             return notificationAction.notificationFailure({ error: response.message });
                         }

@@ -2,14 +2,14 @@ import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { map, tap, finalize, switchMap, EMPTY, take } from 'rxjs';
-import { MeridiemPipe } from '../../../../../../core/pipes/meridiem-time.pipe';
-import { ProviderService } from '../../../../../../core/services/provider.service';
-import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
-import { ISelectedSlot, ISlotUI } from '../../../../../../core/models/availability.model';
-import { getToday } from '../../../../../../core/utils/date.util';
+import { MeridiemPipe } from '../../../../../core/pipes/meridiem-time.pipe';
+import { ProviderService } from '../../../../../core/services/provider.service';
+import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
+import { ISelectedSlot, ISlotUI } from '../../../../../core/models/availability.model';
+import { getToday } from '../../../../../core/utils/date.util';
 import { Store } from '@ngrx/store';
-import { selectAuthUserId } from '../../../../../../store/auth/auth.selector';
-import { IRescheduleData } from '../../../../../../core/models/booking.model';
+import { selectAuthUserId } from '../../../../../store/auth/auth.selector';
+import { IRescheduleData } from '../../../../../core/models/booking.model';
 
 @Component({
     selector: 'app-reschedule-booking',
@@ -28,6 +28,7 @@ export class RescheduleBookingModalComponent implements OnInit {
 
     @Input() bookingId!: string;
     @Input() totalDurationInMinutes!: number;
+    @Input() providerId: string | null = null;
 
     @Output() close = new EventEmitter<void>();
     @Output() submitReschedule = new EventEmitter<IRescheduleData>();
@@ -54,7 +55,9 @@ export class RescheduleBookingModalComponent implements OnInit {
                     this.selectedSlot = null;
                     this.availableSlots = [];
                 }),
-                switchMap((providerId) => {
+                switchMap((authProviderId) => {
+                    const providerId = this.providerId || authProviderId;
+
                     if (!providerId) {
                         this._toastr.error('Something went wrong!');
                         console.error('Failed to get provider id for the reschedule modal.');
@@ -69,7 +72,7 @@ export class RescheduleBookingModalComponent implements OnInit {
                 }),
                 map((res) => Array.isArray(res) ? res : (res?.data || [])),
                 tap((slots) => {
-                    this.availableSlots = slots;
+                    this.availableSlots = this._sortSlotsByStartTime(slots);
                 }),
                 finalize(() => this.loadingSlots.set(false))
             )
@@ -100,5 +103,14 @@ export class RescheduleBookingModalComponent implements OnInit {
 
     onClose() {
         this.close.emit();
+    }
+
+    private _sortSlotsByStartTime(slots: ISlotUI[]): ISlotUI[] {
+        return [...slots].sort((a, b) => this._toMinutes(a.from) - this._toMinutes(b.from));
+    }
+
+    private _toMinutes(time: string): number {
+        const [hours, minutes] = time.split(':').map(Number);
+        return (hours * 60) + minutes;
     }
 }

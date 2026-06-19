@@ -94,7 +94,8 @@ export class ProviderService {
   fetchRescheduleSlots(providerId: string, selectedDate: string, totalDurationInMinutes: number): Observable<IResponse<ISlotUI[]>> {
     const params = new HttpParams()
       .set('selectedDate', selectedDate)
-      .set('totalDurationInMinutes', totalDurationInMinutes);
+      .set('totalDurationInMinutes', totalDurationInMinutes)
+      .set('providerId', providerId);
     return this._http.get<IResponse<ISlotUI[]>>(`${this._apiUrl}/reschedule-slots`, { params });
   }
 

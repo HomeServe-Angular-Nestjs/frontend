@@ -9,7 +9,6 @@ import { IResponseTimeChartData } from '../../../../../../core/models/analytics.
     selector: 'app-performance-response-time',
     standalone: true,
     imports: [NgxEchartsModule],
-    providers: [AnalyticService],
     template: `
            <div class="bg-white rounded-lg shadow-md p-6 border border-slate-100 ">
                 <div class="flex items-center justify-between mb-6">

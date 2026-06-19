@@ -6,6 +6,7 @@ export const notificationAction = {
     notificationFailure: createAction('[Notification] fetch notifications failure.', props<{ error: string }>()),
 
     fetchAllNotifications: createAction('[Notification] fetch notification'),
+    addNotification: createAction('[Notification] Add notification', props<{ notification: INotification }>()),
     removeNotification: createAction('[Notification] Remove notification', props<{ id: string }>()),
     removeNotificationSuccess: createAction('[Notification] Remove notification success', props<{ id: string }>()),
     markAsRead: createAction('[Notification] mark as read', props<{ notificationId: string }>()),

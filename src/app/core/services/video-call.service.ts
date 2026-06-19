@@ -50,6 +50,7 @@ export class VideoCallService {
 
       componentRef.instance.decline.subscribe(() => {
         console.log('❌ Call declined by user');
+        this._videoCallSocketService.endCall(callerId);
         this._floatingPortal?.detach();
       });
     });

@@ -39,6 +39,14 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   isAudioEnabled = true;
   isVideoEnabled = true;
   role!: VideoRoleType;
+  partnerId!: string;
+
+  callStatus: 'connecting' | 'calling' | 'connected' | 'ended' = 'calling';
+  callDuration = 0;
+  private _timerInterval?: ReturnType<typeof setInterval>;
+
+  private readonly MEDIA_TIMEOUT_MS = 20000;
+  private _mediaAcquisitionAborted = false;
 
   // drag state
   private target = { x: 0, y: 0 };
@@ -62,6 +70,8 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async ngOnInit() {
     console.log(`[VideoCall] Init. Role: ${this.role}`);
+    this._mediaAcquisitionAborted = false;
+    this._callEnded = false;
 
     try {
       this._pc = new RTCPeerConnection({
@@ -138,7 +148,17 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log('[VideoCall] Call Accepted (Caller view)');
         if (this.role !== "caller") return;
 
-        await this.ensureLocalStream();
+        this.callStatus = 'connecting';
+        this._startTimer();
+
+        const stream = await this.ensureLocalStream();
+        if (!stream) {
+          console.error('[VideoCall] Caller media unavailable — ending call');
+          this._videoSocketService.sendSignal({ type: "media-error" });
+          this.endCall();
+          return;
+        }
+        this.callStatus = 'connected';
         this._maybeAddLocalTracks();
         await this._startOffer();
       });
@@ -213,16 +233,39 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   private async _acquireStream(): Promise<MediaStream | null> {
     try {
       console.log('[VideoCall] Opening Camera/Mic...');
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
-      });
+      const stream = await this._withTimeout(
+        navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true,
+        }),
+        this.MEDIA_TIMEOUT_MS,
+        'Media acquisition timed out (camera may be in use)'
+      );
+      if (this._mediaAcquisitionAborted) {
+        stream.getTracks().forEach(t => t.stop());
+        console.log('[VideoCall] Media released (call ended during acquisition)');
+        return null;
+      }
       console.log('[VideoCall] Media Access Granted:', stream.id);
       return stream;
-    } catch (err) {
+    } catch (err: any) {
+      if (this._mediaAcquisitionAborted) {
+        console.log('[VideoCall] Media acquisition aborted by user');
+        return null;
+      }
       console.error('[VideoCall] Media Access Denied/Failed:', err);
       return null;
     }
+  }
+
+  private _withTimeout<T>(promise: Promise<T>, ms: number, errorMsg: string): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(errorMsg)), ms);
+      promise.then(
+        val => { clearTimeout(timer); resolve(val); },
+        err => { clearTimeout(timer); reject(err); }
+      );
+    });
   }
 
   private _stopAllTracks() {
@@ -255,35 +298,38 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     this._videoSocketService.onSignal("offer", async (data) => {
       console.log('[VideoCall] Received OFFER (Callee)');
 
+      this.callStatus = 'connecting';
+      this._startTimer();
+
       // 1️⃣ Apply remote offer FIRST (mandatory)
       await this._pc.setRemoteDescription(
         new RTCSessionDescription(data.offer)
       );
       console.log('[VideoCall] Remote Description set (Offer)');
 
-      // 2️⃣ Acquire local media (single-shot, no retries, no lifecycle hooks)
-      const stream = await this.ensureLocalStream();
+      // 2️⃣ Acquire local media — use _acquireStream directly to avoid
+      //    _maybeAddLocalTracks which would create extra transceivers
+      //    not matching the offer's m= sections.
+      const stream = await this._acquireStream();
       if (!stream) {
-        console.error('[VideoCall] Local media unavailable');
+        console.error('[VideoCall] Local media unavailable — ending call');
+        this._videoSocketService.sendSignal({ type: "media-error" });
+        this.endCall();
         return;
       }
+      this.localStream = stream;
+      this._attachLocalStreamToVideo();
 
-      // 3️⃣ Add tracks EXACTLY ONCE before createAnswer
-      if (!this.tracksAdded && this.localStream) {
-        console.log('[VideoCall] Binding local tracks to transceivers (callee)');
-
-        const senders = this._pc.getSenders();
-
-        this.localStream.getTracks().forEach(track => {
-          const sender = senders.find(s => s.track?.kind === track.kind);
-
-          if (sender) {
-            sender.replaceTrack(track);
-          }
-        });
-
-        this.tracksAdded = true;
+      // 3️⃣ Bind local tracks to the EXISTING transceivers created from the offer
+      const transceivers = this._pc.getTransceivers();
+      for (const track of this.localStream.getTracks()) {
+        const transceiver = transceivers.find(t => t.receiver.track?.kind === track.kind);
+        if (transceiver) {
+          transceiver.direction = 'sendrecv';
+          await transceiver.sender.replaceTrack(track);
+        }
       }
+      this.tracksAdded = true;
 
       // 4️⃣ Create SDP answer (safe now)
       const answer = await this._pc.createAnswer();
@@ -299,6 +345,7 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
         answer,
       });
       console.log('[VideoCall] ANSWER sent');
+      this.callStatus = 'connected';
 
       // 7️⃣ Process buffered ICE (unchanged)
       this._processPendingIce();
@@ -311,6 +358,11 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
       await this._pc.setRemoteDescription(new RTCSessionDescription(data.answer));
 
       this._processPendingIce();
+    });
+
+    this._videoSocketService.onSignal("media-error", () => {
+      console.error('[VideoCall] Peer failed to acquire media');
+      this.endCall();
     });
 
     this._videoSocketService.onSignal("ice-candidate", async (data) => {
@@ -382,8 +434,38 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  get formattedDuration(): string {
+    const mins = Math.floor(this.callDuration / 60);
+    const secs = this.callDuration % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+
+  private _startTimer() {
+    this.callDuration = 0;
+    this._timerInterval = setInterval(() => {
+      this.callDuration++;
+    }, 1000);
+  }
+
+  private _stopTimer() {
+    if (this._timerInterval) {
+      clearInterval(this._timerInterval);
+      this._timerInterval = undefined;
+    }
+  }
+
+  private _callEnded = false;
+
   endCall() {
+    if (this._callEnded) return;
+    this._callEnded = true;
+
     console.log('[VideoCall] Ending Call - Cleanup started');
+    this.callStatus = 'ended';
+    this._stopTimer();
+
+    // Signal that any in-flight media acquisition should be abandoned
+    this._mediaAcquisitionAborted = true;
 
     // Stop all local tracks
     if (this.localStream) {
@@ -391,7 +473,7 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log(`[VideoCall] Stopping local track: ${track.kind}`);
         track.stop();
       });
-      this.localStream = undefined; // Clear reference
+      this.localStream = undefined;
     }
 
     // Close PeerConnection
@@ -406,10 +488,11 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
       } catch (e) {
         console.warn('[VideoCall] Error closing PC', e);
       }
+      this._pc = undefined as any;
     }
 
+    this._videoSocketService.endCall(this.partnerId);
     this._videoCallService.endCall();
-    this._videoSocketService.disconnect();
   }
 
   // Smooth Dragging
@@ -472,6 +555,7 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     console.log('[VideoCall] Component Destroyed');
+    this._stopTimer();
     this.endCall();
   }
 }
