@@ -127,14 +127,14 @@ export const providerRoutes: Routes = [
       },
       {
         path: 'area-analytics',
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, SubscriptionGuard],
         loadComponent: () => import('../../pages/provider/analytics/area/area-page.component')
           .then(c => c.ProviderAreaAnalyticsComponent),
         data: { breadcrumb: 'Area Analytics' }
       },
       {
         path: 'revenue-analytics',
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, SubscriptionGuard],
         loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
           .then(c => c.ProviderRevenueAnalyticsComponent),
         data: { breadcrumb: 'Revenue Analytics' }

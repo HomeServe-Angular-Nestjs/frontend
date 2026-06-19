@@ -9,7 +9,6 @@ import { AnalyticService } from '../../../../../core/services/analytics.service'
     selector: 'app-area-by-revenue',
     standalone: true,
     imports: [CommonModule, NgxEchartsModule],
-    providers: [AnalyticService],
     template: `
     <section class="bg-white rounded-2xl shadow-lg p-6 w-full">
       <header class="flex items-center justify-between mb-6">

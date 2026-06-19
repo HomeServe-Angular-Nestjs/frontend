@@ -9,7 +9,6 @@ import { ITopServicesByRevenue } from '../../../../../core/models/analytics.mode
 @Component({
     selector: 'app-revenue-top-services-chart',
     imports: [CommonModule, NgxEchartsModule],
-    providers: [AnalyticService],
     template: `
     <div class="bg-white p-5 rounded-2xl shadow-md">
       <h2 class="text-lg font-semibold mb-3 text-gray-800">

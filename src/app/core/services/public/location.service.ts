@@ -38,7 +38,9 @@ export class LocationService {
 
     private _getAddressFromCoordinates(lat: number, lng: number): Observable<any> {
         const url = `${this._openCageApi}?q=${lat}+${lng}&key=${this._openCageToken}`;
-        return this._http.get(url);
+        return this._http.get(url, {
+            context: new HttpContext().set(USE_CREDENTIALS, false),
+        });
     }
 
     openCageReverseGeoCode(lat: number, lng: number) {

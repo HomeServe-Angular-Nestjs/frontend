@@ -6,7 +6,6 @@ import { IComparisonOverviewData } from "../../../../../../core/models/analytics
 @Component({
   selector: 'app-performance-comparison-overview',
   imports: [],
-  providers: [AnalyticService],
   template: `
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 my-6">
 

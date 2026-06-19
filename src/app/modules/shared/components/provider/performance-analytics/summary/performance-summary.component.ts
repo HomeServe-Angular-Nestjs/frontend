@@ -11,11 +11,12 @@ import { IOverviewCard, IProviderPerformanceOverview } from "../../../../../../c
     selector: 'app-performance-summary',
     templateUrl: './performance-summary.component.html',
     imports: [CommonModule, TimeFormatterPipe, MetricPerformanceBadgePipe],
-    providers: [AnalyticService]
 })
 export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
     private readonly _analyticService = inject(AnalyticService);
     private _destroy$ = new Subject<void>();
+
+    isLoading = true;
 
     performanceOverviewStats: IProviderPerformanceOverview = {
         avgRating: 0,
@@ -77,11 +78,15 @@ export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
     }
 
     private _getStats() {
+        this.isLoading = true;
         this._analyticService.getPerformanceSummary()
             .pipe(
                 takeUntil(this._destroy$),
                 filter((res): res is Required<IResponse<IProviderPerformanceOverview>> => !!res.data)
             )
-            .subscribe(res => this.performanceOverviewStats = res.data);
+            .subscribe(res => {
+                this.performanceOverviewStats = res.data;
+                this.isLoading = false;
+            });
     }
 }

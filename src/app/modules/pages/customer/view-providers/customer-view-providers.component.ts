@@ -85,10 +85,32 @@ export class CustomerViewProvidersComponent {
       const categoryId = params.get('categoryId');
       nextFilters.categoryId = categoryId || '';
 
+      // Decode base64 ls param from homepage full search
+      const ls = params.get('ls');
+      if (ls) {
+        try {
+          const decoded = JSON.parse(base64Decode(ls));
+          nextFilters.search = decoded.title || '';
+          nextFilters.lat = decoded.lat != null ? Number(decoded.lat) : null;
+          nextFilters.lng = decoded.lng != null ? Number(decoded.lng) : null;
+        } catch {
+          console.warn('Failed to decode ls param');
+        }
+      }
+
+      // Support category slug from popular services quick-links
+      const category = params.get('category');
+      if (category) {
+        nextFilters.search = category;
+      }
+
+      // Support direct query params (override any inferred values)
+      const search = params.get('search');
+      if (search) nextFilters.search = search;
       const lat = params.get('lat');
       const lng = params.get('lng');
-      nextFilters.lat = lat ? Number(lat) : null;
-      nextFilters.lng = lng ? Number(lng) : null;
+      if (lat) nextFilters.lat = Number(lat);
+      if (lng) nextFilters.lng = Number(lng);
 
       const merged = {
         ...current,

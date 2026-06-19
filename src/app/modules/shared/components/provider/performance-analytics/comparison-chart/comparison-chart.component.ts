@@ -8,7 +8,6 @@ import { IComparisonChartData } from '../../../../../../core/models/analytics.mo
 @Component({
   selector: 'app-performance-comparison',
   imports: [NgxEchartsModule],
-  providers: [AnalyticService],
   template: `
   <div class="pt-4 pb-6">
     <div class="bg-white shadow-md rounded-lg p-4 border border-slate-100">

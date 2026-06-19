@@ -8,7 +8,6 @@ import { IAreaSummary, IOverviewCard } from '../../../../../core/models/analytic
   selector: 'app-area-analytics-summary',
   standalone: true,
   imports: [CommonModule],
-  providers: [AnalyticService],
   template: `
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
       <div

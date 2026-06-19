@@ -8,7 +8,6 @@ import { INewOrReturningClientData } from '../../../../../core/models/analytics.
 @Component({
     selector: 'app-revenue-repeat-vs-new-customers-chart',
     imports: [NgxEchartsModule],
-    providers: [AnalyticService],
     template: `
      <div class="p-4 bg-white rounded-2xl shadow-md">
         <h2 class="text-lg font-semibold mb-3 text-gray-800">

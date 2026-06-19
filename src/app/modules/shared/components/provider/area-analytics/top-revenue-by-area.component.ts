@@ -9,7 +9,6 @@ import { ITopAreaRevenue } from '../../../../../core/models/analytics.model';
 @Component({
     selector: 'app-top-areas-revenue',
     imports: [CommonModule, NgxEchartsModule],
-    providers: [AnalyticService],
     template: `
     <section class="bg-white rounded-2xl shadow-lg p-6 w-full">
       <header class="flex items-center justify-between mb-6">

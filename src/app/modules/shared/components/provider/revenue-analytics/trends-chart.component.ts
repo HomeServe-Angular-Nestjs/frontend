@@ -9,7 +9,6 @@ import { Subject, takeUntil } from 'rxjs';
 @Component({
     selector: 'app-revenue-trend-chart',
     imports: [CommonModule, NgxEchartsModule],
-    providers: [AnalyticService],
     template: `
     <div class="p-4 bg-white rounded-2xl shadow-md">
         <div class="flex items-center justify-between mb-3">
