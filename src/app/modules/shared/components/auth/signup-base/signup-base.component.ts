@@ -9,8 +9,6 @@ import { OtpComponent } from "../../../partials/auth/otp/otp.component";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
 import { REGEXP_ENV } from "../../../../../../environments/env";
-import { delay, finalize, switchMap, timer } from "rxjs";
-import { LoadingService } from "../../../../../core/services/public/loading.service";
 
 @Component({
     selector: 'app-signup-base',
@@ -23,7 +21,6 @@ import { LoadingService } from "../../../../../core/services/public/loading.serv
 export class SignupBaseComponent {
     private readonly _signupAuthService = inject(SignupAuthService);
     private readonly _toastr = inject(ToastNotificationService);
-    private readonly _loadingService = inject(LoadingService);
     private readonly _fb = inject(FormBuilder);
     private readonly _router = inject(Router);
 
@@ -42,23 +39,19 @@ export class SignupBaseComponent {
     });
 
     private initializeSignup(email: string, type: UserType) {
-        this._loadingService.show('Sending OTP...');
-
-        timer(2000).pipe(
-            switchMap(() =>
-                this._signupAuthService.initiateSignup(email, type)
-            ),
-            finalize(() => this._loadingService.hide())
-        ).subscribe({
-            next: () => {
-                this.otpModal.set(true);
-            },
-            error: (err) => {
-                if (err?.message?.includes('exists')) {
-                    this.otpModal.set(false);
+        this._signupAuthService.initiateSignup(email, type)
+            .subscribe({
+                next: () => {
+                    this._toastr.success('OTP sent to your email.');
+                    this.otpModal.set(true);
+                },
+                error: (err) => {
+                    if (err?.message?.includes('exists')) {
+                        this.otpModal.set(false);
+                    }
+                    this._toastr.error(err?.message || 'Failed to send OTP. Please try again.');
                 }
-            }
-        });
+            });
     }
 
     submitForm(): void {
@@ -93,9 +86,7 @@ export class SignupBaseComponent {
 
     verifyOtp(code: string) {
         const data = { ...this.user, code };
-        this._loadingService.show('Verifying OTP...');
         this._signupAuthService.verifyOtp(data)
-            .pipe(finalize(() => this._loadingService.hide()))
             .subscribe({
                 next: () => {
                     this._toastr.success('Otp verified.');
@@ -108,6 +99,7 @@ export class SignupBaseComponent {
                     const isInvalid = err?.message?.toLowerCase()?.includes('invalid');
                     const isExpired = err?.message?.toLowerCase()?.includes('expired');
                     if (!isInvalid && !isExpired) this.otpModal.set(false);
+                    this._toastr.error(err?.message || 'OTP verification failed.');
                 }
             });
     }

@@ -12,8 +12,6 @@ import { getValidationMessage } from "../../../../../core/utils/form-validation.
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
 import { OtpComponent } from "../../../partials/auth/otp/otp.component";
 import { LoginAuthService } from "../../../../../core/services/login-auth.service";
-import { finalize, switchMap, timer } from "rxjs";
-import { LoadingService } from "../../../../../core/services/public/loading.service";
 import { ChangePasswordComponent } from "../../../partials/auth/change_password/change_password.component";
 
 @Component({
@@ -23,8 +21,7 @@ import { ChangePasswordComponent } from "../../../partials/auth/change_password/
     imports: [CommonModule, ReactiveFormsModule, EmailInputComponent, RouterLink, OtpComponent, ChangePasswordComponent],
 })
 export class LoginBaseComponent {
-    private readonly _loadingService = inject(LoadingService);
-    private _toastr = inject(ToastNotificationService);
+    private readonly _toastr = inject(ToastNotificationService);
     private _loginService = inject(LoginAuthService);
     private _fb = inject(FormBuilder);
     private _store = inject(Store);
@@ -46,17 +43,16 @@ export class LoginBaseComponent {
     });
 
     private _requestOtp(user: IUser, openOnSuccess = false) {
-        this._loadingService.show('Sending OTP...');
-        timer(2000).pipe(
-            switchMap(() =>
-                this._loginService.requestOtpForForgotPass(user)
-            ),
-            finalize(() => this._loadingService.hide())
-        ).subscribe({
-            next: () => {
-                if (openOnSuccess) this.otpModal = true;
-            }
-        });
+        this._loginService.requestOtpForForgotPass(user)
+            .subscribe({
+                next: () => {
+                    this._toastr.success('OTP sent to your email.');
+                    if (openOnSuccess) this.otpModal = true;
+                },
+                error: (err) => {
+                    this._toastr.error(err?.message || 'Failed to send OTP. Please try again.');
+                }
+            });
     }
 
     submitForm() {
@@ -103,9 +99,7 @@ export class LoginBaseComponent {
     }
 
     verifyOtp(code: string) {
-        this._loadingService.show('Verifying OTP...');
         this._loginService.verifyOtpForForgotPass(this.email, code)
-            .pipe(finalize(() => this._loadingService.hide()))
             .subscribe({
                 next: () => {
                     this._toastr.success('Otp verified.');
@@ -115,6 +109,7 @@ export class LoginBaseComponent {
                     const isInvalid = err?.message?.toLowerCase()?.includes('invalid');
                     const isExpired = err?.message?.toLowerCase()?.includes('expired');
                     if (!isInvalid && !isExpired) this.otpModal = false;
+                    this._toastr.error(err?.message || 'OTP verification failed.');
                 }
             });
     }
@@ -124,18 +119,16 @@ export class LoginBaseComponent {
     }
 
     changePassword(newPassword: string) {
-        this._loadingService.show('Please wait...')
-        timer(2000).pipe(
-            switchMap(() =>
-                this._loginService.changePassword(this.email, newPassword, this.config.type)
-            ),
-            finalize(() => this._loadingService.hide())
-        ).subscribe({
-            next: () => {
-                this.closeChangePasswordModal();
-                this._toastr.success('Password changed successfully');
-            }
-        });
+        this._loginService.changePassword(this.email, newPassword, this.config.type)
+            .subscribe({
+                next: () => {
+                    this.closeChangePasswordModal();
+                    this._toastr.success('Password changed successfully');
+                },
+                error: (err) => {
+                    this._toastr.error(err?.message || 'Failed to change password.');
+                }
+            });
     }
 
     getGoogleAuthUrl() {
