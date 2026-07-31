@@ -45,14 +45,18 @@ export class LoginBaseComponent {
         password: ['', [Validators.required, Validators.pattern(this.regexp.password)]]
     });
 
-    private _requestOtp(user: IUser) {
+    private _requestOtp(user: IUser, openOnSuccess = false) {
         this._loadingService.show('Sending OTP...');
         timer(2000).pipe(
             switchMap(() =>
                 this._loginService.requestOtpForForgotPass(user)
             ),
             finalize(() => this._loadingService.hide())
-        ).subscribe();
+        ).subscribe({
+            next: () => {
+                if (openOnSuccess) this.otpModal = true;
+            }
+        });
     }
 
     submitForm() {
@@ -95,12 +99,13 @@ export class LoginBaseComponent {
         this.closeEmailForm();
         this.emailForm = false;
         this.email = user.email;
-        this.otpModal = true;
-        this._requestOtp(user);
+        this._requestOtp(user, true);
     }
 
     verifyOtp(code: string) {
+        this._loadingService.show('Verifying OTP...');
         this._loginService.verifyOtpForForgotPass(this.email, code)
+            .pipe(finalize(() => this._loadingService.hide()))
             .subscribe({
                 next: () => {
                     this._toastr.success('Otp verified.');

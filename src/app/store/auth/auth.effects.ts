@@ -20,6 +20,7 @@ export const authEffects = {
         const loginService = inject(LoginAuthService);
         const router = inject(Router);
         const loadingService = inject(LoadingService);
+        const toastr = inject(ToastNotificationService);
 
         return actions$.pipe(
             ofType(authActions.login),
@@ -34,6 +35,9 @@ export const authEffects = {
                     tap(() => {
                         const url = navigationAfterLogin(user.type);
                         router.navigate([url]);
+                    }),
+                    catchError((error: HttpErrorResponse) => {
+                        return handleApiError(error, authActions.loginFailure, toastr);
                     }),
                 )
             )
