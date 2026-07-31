@@ -2,16 +2,13 @@ import { CommonModule } from "@angular/common";
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Subject, Subscription, takeUntil, timer } from "rxjs";
-import { LoadingSpinnerComponent } from "../../../../../UI/spinner/spinner.component";
-import { LoadingService } from "../../../../../core/services/public/loading.service";
 
 @Component({
     selector: 'app-otp',
     templateUrl: './otp.component.html',
-    imports: [CommonModule, FormsModule, LoadingSpinnerComponent]
+    imports: [CommonModule, FormsModule]
 })
 export class OtpComponent implements OnDestroy, OnInit {
-    private readonly _loadingService = inject(LoadingService);
     private destroy$ = new Subject<void>();
     private timerSubscription!: Subscription;
 
@@ -27,10 +24,6 @@ export class OtpComponent implements OnDestroy, OnInit {
     otpDigits: string[] = ['', '', '', ''];
     canResend = false;
     countdown = signal(this.RESEND_VALUE_IN_SEC);
-
-    get isLoading(): boolean {
-        return this._loadingService.loading;
-    }
 
     ngOnInit(): void {
         this.startTimer();

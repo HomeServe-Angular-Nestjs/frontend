@@ -1,12 +1,5 @@
 <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-inter">
-    <ng-container *ngIf="isLoading; else otpContent">
-        <div class="flex justify-center items-center h-full">
-            <app-loading-spinner></app-loading-spinner>
-        </div>
-    </ng-container>
-    <ng-template #otpContent>
-
-        <div class="bg-white rounded-lg p-6 w-full max-w-sm min-h-[20rem]">
+    <div class="bg-white rounded-lg p-6 w-full max-w-sm min-h-[20rem]">
             <!-- OTP UI -->
             <button type="button" class="text-gray-700 float-end" (click)="closeModal()">
                 <i class="fas fa-close"></i>
@@ -53,6 +46,5 @@
                 Verify
             </button>
         </div>
-    </ng-template>
 
 </div>

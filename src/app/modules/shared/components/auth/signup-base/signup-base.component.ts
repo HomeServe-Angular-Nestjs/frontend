@@ -93,7 +93,9 @@ export class SignupBaseComponent {
 
     verifyOtp(code: string) {
         const data = { ...this.user, code };
+        this._loadingService.show('Verifying OTP...');
         this._signupAuthService.verifyOtp(data)
+            .pipe(finalize(() => this._loadingService.hide()))
             .subscribe({
                 next: () => {
                     this._toastr.success('Otp verified.');
