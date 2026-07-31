@@ -5,8 +5,6 @@ import { LoginAuthService } from "../../../../../core/services/login-auth.servic
 import { IUser, UserType } from "../../../models/user.model";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
-import { LoadingService } from "../../../../../core/services/public/loading.service";
-import { finalize } from "rxjs";
 
 
 @Component({
