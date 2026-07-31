@@ -9,6 +9,8 @@ import { OtpComponent } from "../../../partials/auth/otp/otp.component";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
 import { REGEXP_ENV } from "../../../../../../environments/env";
+import { LoadingService } from "../../../../../core/services/public/loading.service";
+import { finalize } from "rxjs";
 
 @Component({
     selector: 'app-signup-base',
@@ -21,6 +23,7 @@ import { REGEXP_ENV } from "../../../../../../environments/env";
 export class SignupBaseComponent {
     private readonly _signupAuthService = inject(SignupAuthService);
     private readonly _toastr = inject(ToastNotificationService);
+    private readonly _loadingService = inject(LoadingService);
     private readonly _fb = inject(FormBuilder);
     private readonly _router = inject(Router);
 
@@ -39,7 +42,9 @@ export class SignupBaseComponent {
     });
 
     private initializeSignup(email: string, type: UserType) {
+        this._loadingService.show('Sending OTP...');
         this._signupAuthService.initiateSignup(email, type)
+            .pipe(finalize(() => this._loadingService.hide()))
             .subscribe({
                 next: () => {
                     this._toastr.success('OTP sent to your email.');
@@ -89,6 +94,7 @@ export class SignupBaseComponent {
         this._signupAuthService.verifyOtp(data)
             .subscribe({
                 next: () => {
+                    this.otpModal.set(false);
                     this._toastr.success('Otp verified.');
                     const url: string = this.user.type === 'customer'
                         ? 'login'
