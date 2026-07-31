@@ -103,6 +103,7 @@ export class LoginBaseComponent {
             .subscribe({
                 next: () => {
                     this._toastr.success('Otp verified.');
+                    this.otpModal = false;
                     this.changePasswordModal = true;
                 },
                 error: (err) => {
