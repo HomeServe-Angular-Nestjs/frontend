@@ -40,7 +40,7 @@
 
         <!-- Search Widget Card -->
         <div
-          class="bg-white/70 backdrop-blur-2xl border border-white/60 p-6 md:p-8 rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(79,70,229,0.1)] relative">
+          class="bg-white/70 backdrop-blur-2xl border border-white/60 p-6 md:p-8 rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(79,70,229,0.1)] relative z-20">
 
           <div class="grid md:grid-cols-2 gap-6 mb-6">
             <!-- Service Input Group -->
@@ -59,21 +59,23 @@
 
               <!-- Service Dropdown -->
               <div *ngIf="isServiceSearchDropdownOpen && serviceSearch"
-                class="absolute top-full left-0 w-full mt-3 bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden py-1.5 z-50 animate-fadeIn">
-                <ng-container *ngIf="(serviceTitles$ | async) as serviceTitles; else noTitlesFound">
-                  <ng-container *ngIf="serviceTitles.length; else noTitlesFound">
-                    <button *ngFor="let service of serviceTitles"
-                      (click)="serviceSearch = service; isServiceSearchDropdownOpen = false; selectedService = service"
-                      class="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors flex items-center gap-3">
-                      <div class="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500">
-                        <i class="fas fa-search text-xs"></i>
-                      </div>
-                      <span class="font-bold tracking-tight">{{ service }}</span>
-                    </button>
-                  </ng-container>
+                class="absolute top-full left-0 w-full mt-3 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden py-1.5 z-50 animate-fadeIn">
+                <ng-container *ngIf="serviceCategories.length; else noTitlesFound">
+                  <button *ngFor="let category of serviceCategories"
+                    (click)="serviceSearch = category.categoryName; isServiceSearchDropdownOpen = false; selectedService = category"
+                    class="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500">
+                      <i class="fas fa-search text-xs"></i>
+                    </div>
+                    <span class="font-bold tracking-tight">{{ category.categoryName }}</span>
+                  </button>
                 </ng-container>
                 <ng-template #noTitlesFound>
-                  <div class="px-4 py-6 text-sm text-slate-400 text-center font-bold">No services found</div>
+                  <div class="px-4 py-6 text-sm text-slate-400 text-center font-bold">
+                    <span *ngIf="isServiceSearchLoading"><i class="fas fa-spinner fa-spin mr-2"></i>Searching
+                      services...</span>
+                    <span *ngIf="!isServiceSearchLoading">No services found</span>
+                  </div>
                 </ng-template>
               </div>
             </div>
@@ -103,7 +105,7 @@
 
               <!-- Location Dropdown -->
               <div *ngIf="isLocationSearchDropdownOpen && locationSearch"
-                class="absolute top-full left-0 w-full mt-3 bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden py-1.5 z-50 animate-fadeIn">
+                class="absolute top-full left-0 w-full mt-3 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden py-1.5 z-50 animate-fadeIn">
                 <ng-container *ngIf="(locationData$ | async) as locationData; else searching">
                   <ng-container *ngIf="locationData.length; else searching">
                     <button *ngFor="let location of locationData"
