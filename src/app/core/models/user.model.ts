@@ -216,6 +216,7 @@ export interface IHomeSearch {
 
 export interface IFilterFetchProviders extends IHomeSearch {
     search?: string;
+    address?: string;
     isCertified?: boolean;
     status?: string;
     page?: number;

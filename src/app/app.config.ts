@@ -44,10 +44,10 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes,
       withViewTransitions(),
-      // withInMemoryScrolling({
-      //   scrollPositionRestoration: 'enabled',
-      //   anchorScrolling: 'enabled',
-      // }),
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'enabled',
+        anchorScrolling: 'enabled',
+      }),
       // withDebugTracing(), //todo
       withRouterConfig({ onSameUrlNavigation: 'reload' })
     ),

@@ -125,6 +125,7 @@ export class CustomerHeaderComponent implements OnInit {
       queryParams: {
         lat: locationSearch.coordinates.lat,
         lng: locationSearch.coordinates.lng,
+        address: locationSearch.name,
         categoryId: current['categoryId'] || ''
       },
     });
@@ -140,8 +141,8 @@ export class CustomerHeaderComponent implements OnInit {
     this._router.navigate(['/view_providers'], {
       queryParams: {
         categoryId,
-        lat: current['lng'] || '',
-        lng: current['lat'] || '',
+        lat: current['lat'] || '',
+        lng: current['lng'] || '',
       },
     });
   }

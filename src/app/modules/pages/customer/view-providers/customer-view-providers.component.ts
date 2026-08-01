@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, signal, ViewChild } from '@angular
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { switchMap } from 'rxjs';
+import { catchError, of, switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { decode as base64Decode } from 'js-base64';
 import { IFilterFetchProviders } from '../../../../core/models/user.model';
@@ -29,6 +29,7 @@ export class CustomerViewProvidersComponent {
 
   filters = signal<IFilterFetchProviders>({
     search: '',
+    address: '',
     page: 1,
     limit: 10,
     status: 'all',
@@ -48,7 +49,20 @@ export class CustomerViewProvidersComponent {
   private providersResponse = toSignal(
     toObservable(this.filters).pipe(
       switchMap(filters =>
-        this._providerService.getProviders(filters)
+        this._providerService.getProviders(filters).pipe(
+          catchError((error) => {
+            console.error('[Search, Header] failed to get providers:', error);
+            this._toastr.error('Failed to fetch providers. Please try again.');
+            return of({
+              success: false,
+              message: '',
+              data: {
+                providerCards: [],
+                pagination: { total: 0, page: 1, limit: 10 },
+              },
+            });
+          })
+        )
       )
     ),
     { initialValue: null }
@@ -84,6 +98,9 @@ export class CustomerViewProvidersComponent {
 
       const categoryId = params.get('categoryId');
       nextFilters.categoryId = categoryId || '';
+
+      const address = params.get('address');
+      nextFilters.address = address || '';
 
       // Decode base64 ls param from homepage full search
       const ls = params.get('ls');
