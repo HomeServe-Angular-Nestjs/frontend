@@ -34,6 +34,14 @@ export interface ICreateSubscription {
     duration: PlanDuration;
 }
 
+export interface ISubscriptionUpgradeAmount {
+    upgradeAmount: number;
+    creditAmount: number;
+    monthlyPrice: number;
+    yearlyPrice: number;
+    daysUsed: number;
+}
+
 export interface ISubscriptionState {
     selectedSubscription: ISubscription | null;
     error: string | null;

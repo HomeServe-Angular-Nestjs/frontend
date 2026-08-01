@@ -10,9 +10,24 @@ export const SubscriptionGuard: CanActivateFn = (): Observable<boolean | UrlTree
   const router = inject(Router);
   const store = inject(Store);
 
+  const redirectToPlans = () =>
+    store.select(selectAuthUserType).pipe(
+      take(1),
+      map(role =>
+        router.createUrlTree([
+          role === 'provider' ? '/provider/plans' : '/homepage'
+        ])
+      )
+    );
+
   const cached = subscriptionService.getSubscription;
   if (cached?.isActive) {
     return of(true);
+  }
+
+  // Cached subscription exists but is no longer active (expired/blocked) —
+  if (cached && !cached.isActive) {
+    return redirectToPlans();
   }
 
   if (subscriptionService.isAlreadyCheckedForSubscription) {
@@ -30,17 +45,8 @@ export const SubscriptionGuard: CanActivateFn = (): Observable<boolean | UrlTree
         return of(true);
       }
 
-      return store.select(selectAuthUserType).pipe(
-        take(1),
-        map(role =>
-          router.createUrlTree([
-            role === 'provider' ? '/provider/plans' : '/homepage'
-          ])
-        )
-      );
+      return redirectToPlans();
     }),
-    catchError(() =>
-      of(router.createUrlTree(['/plans']))
-    )
+    catchError(() => redirectToPlans())
   );
 };

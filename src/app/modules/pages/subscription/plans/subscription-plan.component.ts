@@ -12,7 +12,7 @@ import { ToastNotificationService } from "../../../../core/services/public/toast
 import { SubscriptionService } from "../../../../core/services/subscription.service";
 import { ISubscriptionOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../core/models/payment.model";
 import { ICreateSubscription, ISubscription } from "../../../../core/models/subscription.model";
-import { PaymentDirection, PaymentSource, PaymentStatus, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
+import { PaymentDirection, PaymentSource, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
 import { SharedDataService } from "../../../../core/services/public/shared-data.service";
 import { KeyValuePipe } from "@angular/common";
 
@@ -111,19 +111,14 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
     return this._paymentService.verifySubscriptionPayment(response, orderData).pipe(
       switchMap((verificationResponse) => {
-        const { verified, subscriptionId, transaction } = verificationResponse;
+        const { verified, transaction } = verificationResponse;
 
-        if (!transaction || !subscriptionId || !transaction.id || !verified) {
+        if (!transaction || !transaction.id || !verified) {
           this._toastr.error('Payment verification failed or transaction missing.');
           return throwError(() => new Error('Payment verification failed'));
         }
-        return this._subscriptionService.updatePaymentStatus({
-          transactionId: transaction.id,
-          subscriptionId,
-          paymentStatus: PaymentStatus.PAID
-        })
-      }),
-      map(() => void 0)
+        return of(void 0);
+      })
     );
   }
 
@@ -152,6 +147,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
               })
             )
             .subscribe(() => {
+              this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe();
               observer.next('dismissed');
               observer.complete();
             })
@@ -163,7 +159,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   private _afterSuccessfulSubscription() {
     this._toastr.success('Payment verified. Subscription completed.');
     let url = this.userType == 'customer'
-      ? '/subscriptions'
+      ? '/subscription'
       : '/provider/subscriptions'
     this._router.navigate([url]);
   }
@@ -190,7 +186,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     );
   }
 
-  private _initializeUpgrade(amount: number, plan: IPlan) {
+  private _initializeUpgrade(amount: number, plan: IPlan): Observable<'success' | 'dismissed'> {
     const subscriptionData: ICreateSubscription = {
       planId: plan.id,
       duration: plan.duration,
@@ -214,10 +210,11 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   }
 
   private _handleFreePlan() {
-    this._router.navigate(['provider', 'dashboard']);
+    const url = this.userType === 'provider' ? ['provider', 'dashboard'] : ['homepage'];
+    this._router.navigate(url);
   }
 
-  private _handleUpgrade(plan: IPlan): Observable<void> {
+  private _handleUpgrade(plan: IPlan): Observable<'success' | 'dismissed'> {
     return this.currentSubscription$
       .pipe(
         takeUntil(this._destroy$),
@@ -225,9 +222,22 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
         switchMap(subscription => this._subscriptionService.getUpgradeAmount(subscription.id)),
         map(res => res.data),
         filter(Boolean),
-        switchMap((amount) => this._initializeUpgrade(amount, plan).pipe(
-          map(() => void 0)
-        )),
+        switchMap(({ upgradeAmount, creditAmount, monthlyPrice, yearlyPrice }) => {
+          const confirmed = confirm(
+            `Upgrade to Yearly Plan\n\n` +
+            `Yearly price: ₹${yearlyPrice}\n` +
+            `Monthly paid: ₹${monthlyPrice}\n` +
+            `Prorated credit: ₹${creditAmount.toFixed(2)}\n\n` +
+            `Amount due: ₹${upgradeAmount}\n\n` +
+            `Your current monthly plan stays active until the payment is confirmed.`
+          );
+
+          if (!confirmed) {
+            return of('dismissed' as const);
+          }
+
+          return this._initializeUpgrade(upgradeAmount, plan);
+        }),
         catchError(err => {
           this._toastr.error('Upgrade failed.');
           return throwError(() => err);
@@ -241,13 +251,15 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
       return;
     }
 
-    const isUpgrade = this.currentPlanDuration === PlanDuration.MONTHLY;
-    if (isUpgrade) {
-      this._toastr.warning('You are already in subscription.');
+    if (this.currentPlanDuration === PlanDuration.YEARLY) {
+      this._toastr.warning('You are a yearly subscriber. Transitions are locked until your current term expires.');
       return;
-    };
+    }
 
-    const flow$ = this._initializePayment(plan);
+    const isUpgrade = this.currentPlanDuration === PlanDuration.MONTHLY && plan.duration === PlanDuration.YEARLY;
+    const flow$ = isUpgrade
+      ? this._handleUpgrade(plan)
+      : this._initializePayment(plan);
 
     flow$.pipe(takeUntil(this._destroy$)).subscribe({
       next: (status) => {
@@ -256,6 +268,10 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
         } else if (status === "dismissed") {
           this._toastr.info('Payment dismissed.');
         }
+      },
+      error: (err) => {
+        console.error('Subscription payment flow failed', err);
+        this._toastr.error('Something went wrong. Please try again.');
       },
     });
   }
@@ -304,6 +320,10 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
     if (planDuration === PlanDuration.LIFETIME) {
       return 'Get Started';
+    }
+
+    if (!this.currentPlanId) {
+      return 'Choose ' + plan.duration;
     }
 
     return 'Upgrade to ' + (plan.duration || '').toString();
