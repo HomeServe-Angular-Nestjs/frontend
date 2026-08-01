@@ -108,9 +108,16 @@
                                 <i
                                     class="fas fa-arrows-left-right absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                                 <input formControlName="serviceRadius" type="number"
-                                    class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium"
+                                    class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all outline-none text-sm font-medium disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                                     placeholder="Radius">
                             </div>
+                            <label class="flex items-center gap-2 cursor-pointer pt-1 ml-1">
+                                <input type="checkbox" [checked]="noServiceRadiusLimit"
+                                    (change)="toggleServiceRadiusLimit($any($event.target).checked)"
+                                    class="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500">
+                                <span class="text-xs font-medium text-gray-500">No limit (serve anywhere within the
+                                    search area)</span>
+                            </label>
                         </div>
                     </div>
                 </div>

@@ -129,6 +129,11 @@ export class CustomerViewProvidersComponent {
       if (lat) nextFilters.lat = Number(lat);
       if (lng) nextFilters.lng = Number(lng);
 
+      if (!ls && !lat && !lng) {
+        nextFilters.lat = null;
+        nextFilters.lng = null;
+      }
+
       const merged = {
         ...current,
         ...nextFilters,

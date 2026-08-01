@@ -84,7 +84,7 @@ export interface IProvider extends IBaseUser {
     schedules: string[];
     subscriptionID: string;
     profession: string;
-    serviceRadius?: number;
+    serviceRadius?: number | null;
     enableSR: boolean;
     bookingLimit: number | null;
     bufferTime: number | null;

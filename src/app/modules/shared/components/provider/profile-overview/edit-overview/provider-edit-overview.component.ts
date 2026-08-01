@@ -53,6 +53,8 @@ export class ProviderEditOverviewComponent implements OnInit, OnDestroy {
     workingHoursEnd: ['', Validators.required],
   });
 
+  noServiceRadiusLimit = false;
+
   constructor(private store: Store) {
     this.provider$ = this.store.select(selectProvider)
       .pipe(takeUntil(this._destroy$));
@@ -91,6 +93,26 @@ export class ProviderEditOverviewComponent implements OnInit, OnDestroy {
     if (location && location.coordinates.length) {
       this.onMapLocationChanged(location.coordinates);
     }
+
+    if (this.provider && !this.provider.serviceRadius) {
+      this.toggleServiceRadiusLimit(true);
+    }
+  }
+
+  toggleServiceRadiusLimit(enabled: boolean): void {
+    this.noServiceRadiusLimit = enabled;
+    const control = this.profileForm.get('serviceRadius');
+
+    if (enabled) {
+      control?.setValue(null);
+      control?.disable();
+      control?.clearValidators();
+    } else {
+      control?.setValidators([Validators.min(1), Validators.max(100)]);
+      control?.enable();
+    }
+
+    control?.updateValueAndValidity();
   }
 
   handleImageUpload(event: any) {
@@ -121,11 +143,16 @@ export class ProviderEditOverviewComponent implements OnInit, OnDestroy {
 
 
     if (this.profileForm.valid) {
+      const rawServiceRadius = controls.serviceRadius?.value;
+      const serviceRadius = (rawServiceRadius === '' || rawServiceRadius === null || rawServiceRadius === undefined)
+        ? null
+        : Number(rawServiceRadius);
+
       const provider: Partial<IProvider> = {
         fullname: controls.fullname?.value,
         profession: controls.profession?.value,
         experience: controls.experience?.value,
-        serviceRadius: controls.serviceRadius?.value,
+        serviceRadius,
         availability: {
           day: {
             from: controls.workingDaysStart?.value,

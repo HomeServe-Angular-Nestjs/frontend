@@ -33,10 +33,9 @@ export const API_ENV = {
 export const API_KEY = {
   mapbox: 'pk.eyJ1Ijoic2FqaWRtdWhhbW1lZCIsImEiOiJjbTl3b25hZDMxMHB0Mmlwc3ZlcnV3MmMwIn0.zMhfdAfDTgodZvIu0tbglw',
   razorpay: 'rzp_test_OZVJGxiPWQgDaM',
-  openCageApi: '891b320be91d49d0861fc8b1592cc0b5',
 }
 
-export const OPEN_CAGE_URL = 'https://api.opencagedata.com/geocode/v1/json';
+export const MAPBOX_GEOCODING_URL = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
 
 export const SOCKET_URL = 'http://localhost:5000';
 
@@ -73,32 +72,7 @@ export const ICE_SERVERS = [
   },
 ];
 
-export const OPEN_CAGE_LOCATION_TYPE = [
-  // admin / areas
-  'city',
-  'town',
-  'municipality',
-  'village',
-  'suburb',
-  'neighbourhood',
-  'district',
-  'state_district',
-  'county',
-
-  // locality-style
-  'locality',
-  'hamlet',
-  'quarter',
-  'borough',
-
-  // important named places
-  'building',
-  'industrial',
-  'commercial',
-  'residential',
-]
-
-export const OPEN_CAGE_LOCATION_BOUNDS = '74.86,8.17,77.70,12.97'; // Kerala
+export const MAPBOX_LOCATION_BOUNDS = '74.86,8.17,77.70,12.97'; // Kerala
 
 export const ICONS = {
   razorpay: `<?xml version="1.0" encoding="utf-8"?>

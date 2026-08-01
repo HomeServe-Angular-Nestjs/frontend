@@ -151,11 +151,12 @@ export class CustomerExploreSectionComponent {
       const position = await this._getCurrentLocation();
       const { latitude, longitude } = position.coords;
 
-      this._locationService.openCageReverseGeoCode(latitude, longitude).subscribe(location => {
-        const data = location.results[0];
-        const currentLocation: ISearchedLocation = { address: data.formatted, coordinates: data.geometry };
-        this.locationSearch = currentLocation.address;
-        this.selectedLocation = currentLocation;
+      this._locationService.reverseGeocode(latitude, longitude).subscribe(location => {
+        if (location) {
+          const currentLocation: ISearchedLocation = { address: location.address, coordinates: location.coordinates };
+          this.locationSearch = currentLocation.address;
+          this.selectedLocation = currentLocation;
+        }
       });
 
     } catch (err) {

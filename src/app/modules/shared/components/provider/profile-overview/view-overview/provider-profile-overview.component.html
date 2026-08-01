@@ -102,15 +102,25 @@
                                     <div class="flex items-center justify-between mb-4">
                                         <span class="text-white/80 font-bold text-xs uppercase tracking-widest">Service
                                             Radius</span>
-                                        <span class="text-2xl font-black">{{provider.serviceRadius || '0'}}<span
-                                                class="text-sm font-bold ml-1">KM</span></span>
+                                        <ng-container *ngIf="provider.serviceRadius; else noLimit">
+                                            <span class="text-2xl font-black">{{provider.serviceRadius}}<span
+                                                    class="text-sm font-bold ml-1">KM</span></span>
+                                        </ng-container>
+                                        <ng-template #noLimit>
+                                            <span class="text-xl font-black">No limit</span>
+                                        </ng-template>
                                     </div>
-                                    <div class="w-full bg-white/20 rounded-full h-2 shadow-inner overflow-hidden mb-2">
-                                        <div class="bg-white h-full rounded-full transition-all duration-1000"
-                                            [style.width.%]="((provider.serviceRadius || 0) / 100) * 100"></div>
-                                    </div>
-                                    <p class="text-[10px] text-white/60 font-medium italic">Supports travel within this
-                                        distance from base location</p>
+                                    <ng-container *ngIf="provider.serviceRadius">
+                                        <div class="w-full bg-white/20 rounded-full h-2 shadow-inner overflow-hidden mb-2">
+                                            <div class="bg-white h-full rounded-full transition-all duration-1000"
+                                                [style.width.%]="((provider.serviceRadius || 0) / 100) * 100"></div>
+                                        </div>
+                                        <p class="text-[10px] text-white/60 font-medium italic">Supports travel within this
+                                            distance from base location</p>
+                                    </ng-container>
+                                    <p *ngIf="!provider.serviceRadius"
+                                        class="text-[10px] text-white/60 font-medium italic">Serves customers anywhere within the
+                                        search area</p>
                                 </div>
                             </div>
                         </div>
