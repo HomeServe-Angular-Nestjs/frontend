@@ -1,9 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
-import { Subject, take, takeUntil } from 'rxjs';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
+import { IServiceDemandData } from '../../../../../core/models/analytics.model';
 
 @Component({
     selector: 'app-area-service-demand-chart',
@@ -28,23 +27,16 @@ import { AnalyticService } from '../../../../../core/services/analytics.service'
     </section>
   `
 })
-export class ServiceDemandHeatmapComponent implements OnInit {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class ServiceDemandHeatmapComponent {
+    @Input()
+    set data(value: IServiceDemandData[]) {
+        this.setupChart(value ?? []);
+    }
 
     chartOption!: EChartsOption;
 
     private readonly days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     private readonly hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`); // 6 AM to 11 PM
-
-    ngOnInit() {
-        this._analyticService.getServiceDemandHeatmapData()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe({
-                next: (res) => this.setupChart(res.data ?? []),
-                error: () => console.error('Failed to load heatmap data.')
-            });
-    }
 
     private setupChart(rawData: { day: string; hour: string; count: number }[]) {
         const data = rawData.map(d => [

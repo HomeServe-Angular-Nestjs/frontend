@@ -1,9 +1,7 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { EChartsOption } from "echarts";
 import { NgxEchartsModule } from 'ngx-echarts';
-import { Subject, takeUntil } from "rxjs";
-import { AnalyticService } from "../../../../../../core/services/analytics.service";
 import { IReviewChartData } from "../../../../../../core/models/analytics.model";
 
 @Component({
@@ -57,31 +55,18 @@ import { IReviewChartData } from "../../../../../../core/models/analytics.model"
     </div>
   `
 })
-export class ProviderPerformanceRatingChartComponent implements OnInit, OnDestroy {
-  private readonly _analyticService = inject(AnalyticService);
-  private _destroy$ = new Subject<void>();
+export class ProviderPerformanceRatingChartComponent {
+  @Input()
+  set data(value: IReviewChartData) {
+    this.ratingStats = value ?? this.ratingStats;
+    this._setChartOption();
+  }
 
   barChartOptions: EChartsOption = {};
   ratingStats: IReviewChartData = {
     distributions: [],
     reviews: []
   };
-
-  ngOnInit(): void {
-    this._analyticService.getPerformanceRatingTrends()
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(res => {
-        if (res.data) {
-          this.ratingStats = res.data;
-          this._setChartOption();
-        }
-      });
-  }
-
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
-  }
 
   private _setChartOption() {
     const yAxisRatings = [5, 4, 3, 2, 1];

@@ -1,6 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
-import { AnalyticService } from "../../../../../../core/services/analytics.service";
-import { Subject, takeUntil } from "rxjs";
+import { Component, Input } from "@angular/core";
 import { IComparisonOverviewData } from "../../../../../../core/models/analytics.model";
 
 @Component({
@@ -50,16 +48,13 @@ import { IComparisonOverviewData } from "../../../../../../core/models/analytics
     </div>
     `
 })
-export class ProviderPerformanceComparisonOverviewComponent implements OnInit {
-  private readonly _analyticService = inject(AnalyticService);
-  private _destroy$ = new Subject<void>();
-
+export class ProviderPerformanceComparisonOverviewComponent {
   monthNames = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
 
-  overViewData: IComparisonOverviewData = {
+  @Input() overViewData: IComparisonOverviewData = {
     growthRate: 0,
     monthlyTrend: {
       previousMonth: 0,
@@ -69,26 +64,5 @@ export class ProviderPerformanceComparisonOverviewComponent implements OnInit {
       growthPercentage: 0,
     },
     providerRank: 0,
-  }
-
-  ngOnInit(): void {
-    this._analyticService.getComparisonOverviewData()
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(res => {
-        if(!res.data) return;
-        const data = {
-          growthRate: res.data.growthRate ?? 0,
-          monthlyTrend: {
-            previousMonth: res.data.monthlyTrend?.previousMonth ?? 0,
-            currentMonth: res.data.monthlyTrend?.currentMonth ?? 0,
-            previousRevenue: res.data.monthlyTrend?.previousRevenue ?? 0,
-            currentRevenue: res.data.monthlyTrend?.currentRevenue ?? 0,
-            growthPercentage:res.data.monthlyTrend?.growthPercentage ?? 0,
-          },
-          providerRank: res.data.providerRank ?? 0, 
-        };
-
-        this.overViewData = data;
-      })
   }
 }

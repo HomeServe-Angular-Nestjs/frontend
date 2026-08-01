@@ -56,6 +56,10 @@ export class SubscriptionService {
         return this._http.get<IResponse<ISubscription[]>>(`${this._apiUrl}/history`);
     }
 
+    fetchLatestSubscription(): Observable<IResponse<ISubscription | null>> {
+        return this._http.get<IResponse<ISubscription | null>>(`${this._apiUrl}/latest`);
+    }
+
     fetchSubscriptionLists(filters: ISubscriptionFilters = {}): Observable<IResponse<IAdminFilteredSubscriptionListWithPagination>> {
         let params = new HttpParams();
 

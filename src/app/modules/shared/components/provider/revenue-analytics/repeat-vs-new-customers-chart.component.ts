@@ -1,7 +1,5 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
-import { Subject, takeUntil } from 'rxjs';
 import { EChartsOption } from 'echarts';
 import { INewOrReturningClientData } from '../../../../../core/models/analytics.model';
 
@@ -17,26 +15,15 @@ import { INewOrReturningClientData } from '../../../../../core/models/analytics.
       </div>
     `
 })
-export class RevenueRepeatVsNewCustomersChartComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class RevenueRepeatVsNewCustomersChartComponent {
+    @Input()
+    set data(value: INewOrReturningClientData[]) {
+        this.chartData = value ?? [];
+        this._setChartOptions();
+    }
 
     chartOption: EChartsOption = {};
     chartData: INewOrReturningClientData[] = [];
-
-    ngOnInit(): void {
-        this._analyticService.getNewAndReturningClientData()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => {
-                this.chartData = res.data ?? [];
-                this._setChartOptions();
-            });
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     private _setChartOptions() {
         const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

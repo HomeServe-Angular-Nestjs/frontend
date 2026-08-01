@@ -12,6 +12,9 @@ import { RevenueTopServicesChartComponent } from "../../../../shared/components/
 import { RevenueRepeatVsNewCustomersChartComponent } from "../../../../shared/components/provider/revenue-analytics/repeat-vs-new-customers-chart.component";
 import { RevenueEarningsForecastChartComponent } from "../../../../shared/components/provider/revenue-analytics/monthly-growth-rate-chart.component";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
+import { AnalyticService } from "../../../../../core/services/analytics.service";
+import { IRevenueAnalyticsBundle, RevenueChartView } from "../../../../../core/models/analytics.model";
+import { map, shareReplay } from "rxjs";
 
 echarts.use([
     TooltipComponent,
@@ -42,9 +45,22 @@ echarts.use([
     providers: [provideEchartsCore({ echarts })]
 })
 export class ProviderRevenueAnalyticsComponent implements OnInit {
-    private readonly _sharedService = inject(SharedDataService); 
+    private readonly _sharedService = inject(SharedDataService);
+    private readonly _analyticService = inject(AnalyticService);
 
-    ngOnInit(): void { 
+    bundle$ = this._analyticService.getRevenueBundle().pipe(
+        map(res => res?.data ?? null),
+        shareReplay(1)
+    );
+
+    ngOnInit(): void {
         this._sharedService.setProviderHeader('Revenue Analytics');
+    }
+
+    onViewChange(view: RevenueChartView) {
+        this.bundle$ = this._analyticService.getRevenueBundle(view).pipe(
+            map(res => res?.data ?? null),
+            shareReplay(1)
+        );
     }
 }

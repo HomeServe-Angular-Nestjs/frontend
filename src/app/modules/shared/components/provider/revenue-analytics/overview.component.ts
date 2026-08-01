@@ -1,8 +1,6 @@
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { IOverviewCard, IProviderRevenueOverview } from "../../../../../core/models/analytics.model";
-import { Subject, takeUntil } from "rxjs";
-import { AnalyticService } from "../../../../../core/services/analytics.service";
 
 @Component({
     selector: 'app-revenue-overview',
@@ -65,11 +63,8 @@ import { AnalyticService } from "../../../../../core/services/analytics.service"
   </div>
   `,
 })
-export class RevenueOverviewComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
-
-    revenueStats: IProviderRevenueOverview = {
+export class RevenueOverviewComponent {
+    @Input() revenueStats: IProviderRevenueOverview = {
         totalRevenue: 0,
         revenueGrowth: 0,
         completedTransactions: 0,
@@ -117,20 +112,6 @@ export class RevenueOverviewComponent implements OnInit, OnDestroy {
             description: "Average value per transaction",
         },
     ];
-
-    ngOnInit(): void {
-        this._analyticService
-            .getRevenueOverview()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(
-                (res) => (this.revenueStats = res.data || this.revenueStats)
-            );
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     getCardValue(card: IOverviewCard<IProviderRevenueOverview>): number | string {
         return this.revenueStats[card.valueKey];

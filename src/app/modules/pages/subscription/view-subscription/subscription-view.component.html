@@ -232,26 +232,54 @@
 
         <!-- Empty State -->
         <ng-template #emptyState>
-            <div
-                class="bg-white rounded-[2.5rem] shadow-sm border-2 border-dashed border-gray-100 p-12 text-center max-w-2xl mx-auto">
+            <ng-container *ngIf="latest$ | async as latest; else neverSubscribed">
+                <ng-container *ngIf="isExpired(latest)">
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border-2 border-dashed border-orange-200 p-12 text-center max-w-2xl mx-auto">
+                        <div
+                            class="w-20 h-20 bg-orange-50 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-8 text-orange-400">
+                            <i class="fas fa-hourglass-end font-black"></i>
+                        </div>
+                        <h2 class="text-2xl font-black text-gray-900 italic mb-4">Your Subscription Has Expired</h2>
+                        <p class="text-gray-500 font-medium max-w-sm mx-auto mb-2 leading-relaxed">
+                            Your <span class="font-bold capitalize text-gray-700">{{ latest.name }} Plan</span> expired on
+                            <span class="font-bold text-gray-700">{{ latest.endDate | date:'mediumDate' }}</span>.
+                        </p>
+                        <p class="text-gray-400 text-sm font-medium max-w-sm mx-auto mb-10 leading-relaxed">
+                            Renew your plan to restore all premium features and continue without interruption.
+                        </p>
+                        <button (click)="navigateToPlans()"
+                            class="px-10 py-4 rounded-2xl font-black text-sm text-white shadow-xl transition-all active:scale-95"
+                            [ngClass]="{
+                                'bg-indigo-600 hover:bg-indigo-700': userType === 'customer',
+                                'bg-emerald-600 hover:bg-emerald-700': userType === 'provider'
+                            }">
+                            RENEW YOUR PLAN
+                        </button>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #neverSubscribed>
                 <div
-                    class="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-8 text-gray-300">
-                    <i class="fas fa-box-open font-black"></i>
+                    class="bg-white rounded-[2.5rem] shadow-sm border-2 border-dashed border-gray-100 p-12 text-center max-w-2xl mx-auto">
+                    <div
+                        class="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-8 text-gray-300">
+                        <i class="fas fa-box-open font-black"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-gray-900 italic mb-4">No Active Premium Plan</h2>
+                    <p class="text-gray-500 font-medium max-w-sm mx-auto mb-10 leading-relaxed">
+                        You're currently using the basic features. Unlock growth with a premium plan tailored for your
+                        success.
+                    </p>
+                    <button (click)="navigateToPlans()"
+                        class="px-10 py-4 rounded-2xl font-black text-sm text-white shadow-xl shadow-gray-200 transition-all active:scale-95"
+                        [ngClass]="{
+                            'bg-indigo-600 hover:bg-indigo-700': userType === 'customer',
+                            'bg-emerald-600 hover:bg-emerald-700': userType === 'provider'
+                        }">
+                        EXPLORE PREMIUM PLANS
+                    </button>
                 </div>
-                <h2 class="text-2xl font-black text-gray-900 italic mb-4">No Active Premium Plan</h2>
-                <p class="text-gray-500 font-medium max-w-sm mx-auto mb-10 leading-relaxed">
-                    You're currently using the basic features. Unlock growth with a premium plan tailored for your
-                    success.
-                </p>
-                <button (click)="navigateToPlans()"
-                    class="px-10 py-4 rounded-2xl font-black text-sm text-white shadow-xl shadow-gray-200 transition-all active:scale-95"
-                    [ngClass]="{
-                        'bg-indigo-600 hover:bg-indigo-700': userType === 'customer',
-                        'bg-emerald-600 hover:bg-emerald-700': userType === 'provider'
-                    }">
-                    EXPLORE PREMIUM PLANS
-                </button>
-            </div>
+            </ng-template>
         </ng-template>
 
     </div>

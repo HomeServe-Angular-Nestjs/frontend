@@ -1,8 +1,6 @@
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { EChartsOption } from "echarts";
 import { NgxEchartsModule } from "ngx-echarts";
-import { Subject, takeUntil } from "rxjs";
-import { AnalyticService } from "../../../../../../core/services/analytics.service";
 import { IOnTimeArrivalChartData } from "../../../../../../core/models/analytics.model";
 
 @Component({
@@ -20,26 +18,15 @@ import { IOnTimeArrivalChartData } from "../../../../../../core/models/analytics
             </div>
     `
 })
-export class ProviderPerformanceOnTimeArrivalChartComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class ProviderPerformanceOnTimeArrivalChartComponent {
+    @Input()
+    set data(value: IOnTimeArrivalChartData[]) {
+        this.onTimeArrivalOptionsData = value ?? [];
+        this._setOnTimeArrivalOptions();
+    }
 
     onTimeArrivalOptions: EChartsOption = {};
     onTimeArrivalOptionsData: IOnTimeArrivalChartData[] = [];
-
-    ngOnInit(): void {
-        this._analyticService.getOnTimeArrivalData()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => {
-                this.onTimeArrivalOptionsData = res.data ?? [];
-                this._setOnTimeArrivalOptions();
-            });
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     private _setOnTimeArrivalOptions() {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

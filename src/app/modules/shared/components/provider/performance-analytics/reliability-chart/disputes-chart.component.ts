@@ -1,9 +1,7 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { Component, inject, Input } from "@angular/core";
 import { EChartsOption } from "echarts";
 import { NgxEchartsModule } from 'ngx-echarts';
-import { Subject, takeUntil } from "rxjs";
-import { AnalyticService } from "../../../../../../core/services/analytics.service";
 import { IDisputeAnalyticsChartData } from "../../../../../../core/models/analytics.model";
 import { ComplaintReason } from "../../../../../../core/enums/enums";
 import { CapitalizeFirstPipe } from "../../../../../../core/pipes/capitalize-first.pipe";
@@ -24,27 +22,17 @@ import { CapitalizeFirstPipe } from "../../../../../../core/pipes/capitalize-fir
         </div>
     `
 })
-export class ProviderPerformanceDisputesChartComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
+export class ProviderPerformanceDisputesChartComponent {
     private readonly _capitalizeFirstPipe = inject(CapitalizeFirstPipe);
-    private _destroy$ = new Subject<void>();
+
+    @Input()
+    set data(value: IDisputeAnalyticsChartData[]) {
+        this.disputesOptionsData = value ?? [];
+        this._setDisputesOptions();
+    }
 
     disputesOptions: EChartsOption = {};
     disputesOptionsData: IDisputeAnalyticsChartData[] = [];
-
-    ngOnInit(): void {
-        this._analyticService.getMonthlyDisputeStats()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => {
-                this.disputesOptionsData = res.data ?? [];
-                this._setDisputesOptions();
-            });
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     private _setDisputesOptions() {
         const months: string[] = [

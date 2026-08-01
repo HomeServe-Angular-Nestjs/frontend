@@ -1,9 +1,7 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
-import { Subject, takeUntil } from 'rxjs';
 import { IUnderperformingArea } from '../../../../../core/models/analytics.model';
 
 @Component({
@@ -29,22 +27,13 @@ import { IUnderperformingArea } from '../../../../../core/models/analytics.model
     </section>
   `
 })
-export class UnderperformingAreasComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class UnderperformingAreasComponent {
+    @Input()
+    set data(value: IUnderperformingArea[]) {
+        this.chartOption = this._getChartOption(value ?? []);
+    }
 
     chartOption!: EChartsOption;
-
-    ngOnInit(): void {
-        this._analyticService.getUnderperformingAreas()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => this.chartOption = this._getChartOption(res.data ?? []));
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     private _getChartOption(data: IUnderperformingArea[]): EChartsOption {
         const locations = data.map(d => d.locationName);

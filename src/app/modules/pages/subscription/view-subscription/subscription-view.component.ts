@@ -24,6 +24,7 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
 
     subscription$!: Observable<ISubscription | null>;
     history$!: Observable<ISubscription[]>;
+    latest$!: Observable<ISubscription | null>;
     userType = 'customer';
     readonly featureRegistry = FEATURE_REGISTRY;
 
@@ -39,6 +40,9 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
         this.subscription$ = this._getSubscription();
         this.history$ = this._subscriptionService.fetchSubscriptionHistory().pipe(
             map(res => (res.data ?? []).filter(sub => !sub.isActive))
+        );
+        this.latest$ = this._subscriptionService.fetchLatestSubscription().pipe(
+            map(res => res.data ?? null)
         );
     }
 
@@ -68,6 +72,10 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
         if (sub.isActive) return 'active';
         if (sub.endDate && new Date(sub.endDate).getTime() < Date.now()) return 'expired';
         return 'cancelled';
+    }
+
+    isExpired(sub: ISubscription | null): boolean {
+        return !!sub && !!sub.endDate && new Date(sub.endDate).getTime() < Date.now();
     }
 
     getConversionInfo(sub: ISubscription) {

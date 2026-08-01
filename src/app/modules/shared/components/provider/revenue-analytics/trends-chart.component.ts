@@ -1,10 +1,8 @@
-import { Component, OnInit, inject, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
 import { IRevenueTrendData, RevenueChartView } from '../../../../../core/models/analytics.model';
-import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-revenue-trend-chart',
@@ -36,37 +34,23 @@ import { Subject, takeUntil } from 'rxjs';
     </div>
   `,
 })
-export class RevenueTrendChartComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
+export class RevenueTrendChartComponent {
+    @Input()
+    set data(value: IRevenueTrendData) {
+        this.revenueTrendData = value ?? this.revenueTrendData;
+        this.setChartOptions();
+    }
 
-    private _destroy$ = new Subject<void>();
+    @Output() viewChange = new EventEmitter<RevenueChartView>();
 
     chartOptions: EChartsOption = {};
     viewOptions: RevenueChartView[] = ['monthly', 'quarterly', 'yearly'];
     currentView: RevenueChartView = 'monthly';
     revenueTrendData: IRevenueTrendData = { providerRevenue: [], platformAvg: [], labels: [] };
 
-    ngOnInit() {
-        this.updateChartData();
-    }
-
-    ngOnDestroy() {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
-
     onViewChange(view: RevenueChartView) {
         this.currentView = view;
-        this.updateChartData();
-    }
-
-    private updateChartData() {
-        this._analyticService.getRevenueTrendOverTime(this.currentView)
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => {
-                this.revenueTrendData = res.data || this.revenueTrendData;
-                this.setChartOptions();
-            });
+        this.viewChange.emit(view);
     }
 
     private setChartOptions() {

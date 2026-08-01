@@ -1,9 +1,8 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
-import { Subject, takeUntil } from 'rxjs';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
+import { ILocationRevenue } from '../../../../../core/models/analytics.model';
 
 @Component({
     selector: 'app-area-by-revenue',
@@ -28,22 +27,17 @@ import { AnalyticService } from '../../../../../core/services/analytics.service'
     </section>
   `
 })
-export class RevenueByLocationComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
-    chartOption!: EChartsOption;
-
-    ngOnInit(): void {
-        this._analyticService.getServiceDemandByLocation()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe((res) => {
-                if (res?.data?.length) {
-                    this.chartOption = this.getChartOption(res.data);
-                }
-            });
+export class RevenueByLocationComponent {
+    @Input()
+    set data(value: ILocationRevenue[]) {
+        if (value?.length) {
+            this.chartOption = this.getChartOption(value);
+        }
     }
 
-    getChartOption(data: any[]): EChartsOption {
+    chartOption!: EChartsOption;
+
+    getChartOption(data: ILocationRevenue[]): EChartsOption {
         const sorted = [...data];
 
         const locations = sorted.map(d => d.locationName);
@@ -119,10 +113,5 @@ export class RevenueByLocationComponent implements OnInit, OnDestroy {
                 }
             ]
         };
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
     }
 }
