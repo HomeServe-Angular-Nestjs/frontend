@@ -3,7 +3,7 @@ import { inject, Injectable, signal } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, Observable, shareReplay } from "rxjs";
 import { IBooking, IBookingDetailCustomer, IBookingDetailProvider, IBookingFilter, IBookingOverviewData, IBookingResponse, IBookingWithPagination, IPriceBreakupData, IResponseProviderBookingLists, ISaveBooking } from "../models/booking.model";
-import { BookingStatus } from "../enums/enums";
+import { BookingStatus, PaymentSource } from "../enums/enums";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { ILocationData } from "../models/user.model";
 import { IReviewFilter, IReviewWithPagination, ISubmitReview } from "../models/reviews.model";
@@ -43,8 +43,8 @@ export class BookingService {
     return this._http.get<IResponse<IPriceBreakupData>>(`${this._customerApi}/booking/price_breakup`);
   }
 
-  saveBooking(slotData: ISaveBooking, providerId: string, couponId: string | null): Observable<IResponse<IBooking>> {
-    return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, { ...slotData, providerId, couponId });
+  saveBooking(slotData: ISaveBooking, providerId: string, couponId: string | null, paymentSource: PaymentSource = PaymentSource.RAZORPAY): Observable<IResponse<IBooking>> {
+    return this._http.post<IResponse<IBooking>>(`${this._customerApi}/booking/confirm`, { ...slotData, providerId, couponId, paymentSource });
   }
 
   updateBooking(data: { transactionId: string | null, bookingId: string }): Observable<IResponse> {

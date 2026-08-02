@@ -7,6 +7,7 @@ export enum ErrorCodes {
   DATABASE_OPERATION_FAILED = 'DATABASE_OPERATION_FAILED',
   BAD_REQUEST = 'BAD_REQUEST',
   CONFLICT = 'CONFLICT',
+  CART_ITEM_ALREADY_EXISTS = 'CART_ITEM_ALREADY_EXISTS',
   NOT_FOUND = 'NOT_FOUND',
   NO_ACTIVE_SUBSCRIPTION = 'NO_ACTIVE_SUBSCRIPTION',
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
@@ -95,6 +96,7 @@ export enum PaymentDirection {
 
 export enum PaymentSource {
   RAZORPAY = 'razorpay',
+  WALLET = 'wallet',
   INTERNAL = 'internal', // for wallet/commission transfers
 }
 

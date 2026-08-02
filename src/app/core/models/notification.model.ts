@@ -16,8 +16,16 @@ export interface INotification {
 
 export interface INotificationState {
     notifications: EntityState<INotification>;
+    cursor: string | null;
+    hasMore: boolean;
     loading: boolean;
     error: string | null;
+}
+
+export interface INotificationPage {
+    data: INotification[];
+    nextCursor: string | null;
+    hasMore: boolean;
 }
 
 export interface ISendNewNotification {

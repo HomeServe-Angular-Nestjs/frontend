@@ -403,6 +403,22 @@
           </div>
         </div>
       </div>
+
+      <!-- Transaction History -->
+      <div *ngIf="bookingDetails.transactionHistory?.length"
+        class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-receipt text-purple-600"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Transaction History</h2>
+            <p class="text-xs text-gray-500">All payment movements for this booking</p>
+          </div>
+        </div>
+
+        <app-transaction-history-timeline [transactions]="bookingDetails.transactionHistory"></app-transaction-history-timeline>
+      </div>
     </div>
 
     <!-- Modals -->

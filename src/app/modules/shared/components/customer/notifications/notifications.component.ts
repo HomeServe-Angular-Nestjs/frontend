@@ -4,7 +4,7 @@ import { Store } from "@ngrx/store";
 import { notificationAction } from "../../../../../store/notification/notification.action";
 import { BehaviorSubject, combineLatest, filter, map, Observable, of } from "rxjs";
 import { INotification } from "../../../../../core/models/notification.model";
-import { selectAllNotifications } from "../../../../../store/notification/notification.selector";
+import { selectAllNotifications, selectHasMoreNotifications } from "../../../../../store/notification/notification.selector";
 import { RelativeTimePipe } from "../../../../../core/pipes/relative-time.pipe";
 import { NotificationTemplateId, NotificationType } from "../../../../../core/enums/enums";
 import { NotificationSocketService } from "../../../../../core/services/socket-service/notification.service";
@@ -24,6 +24,7 @@ export class CustomerNotificationComponent implements OnInit {
 
     allNotifications$: Observable<INotification[]> = of([]);
     currentSelect$ = new BehaviorSubject<NotificationCrumb>('all');
+    hasMore$: Observable<boolean> = of(false);
 
     filteredNotifications$: Observable<INotification[]> = of([]);
 
@@ -52,6 +53,7 @@ export class CustomerNotificationComponent implements OnInit {
         this._store.dispatch(notificationAction.fetchAllNotifications());
 
         this.allNotifications$ = this._store.select(selectAllNotifications);
+        this.hasMore$ = this._store.select(selectHasMoreNotifications);
 
         this.filteredNotifications$ = combineLatest([
             this.allNotifications$,
@@ -88,6 +90,10 @@ export class CustomerNotificationComponent implements OnInit {
         this.currentSelect$.next(select);
     }
 
+    loadMore() {
+        this._store.dispatch(notificationAction.fetchNextNotifications());
+    }
+
     getIcon(type: NotificationType) {
         return this.notificationIcons[type] || 'fas fa-bell';
     }
@@ -108,11 +114,11 @@ export class CustomerNotificationComponent implements OnInit {
             NotificationTemplateId.PAYMENT_SUCCESS,
             NotificationTemplateId.ORDER_SUCCESS,
         ].includes(notification.templateId as NotificationTemplateId) && bookingId) {
-            this._router.navigate(['/customer/profile/bookings', bookingId]);
+            this._router.navigate(['/profile/bookings', bookingId]);
         }
 
         if (notification.templateId === NotificationTemplateId.SUBSCRIPTION_SUCCESS) {
-            this._router.navigate(['/customer/subscription']);
+            this._router.navigate(['/subscription']);
         }
 
         if (!notification.isRead) {

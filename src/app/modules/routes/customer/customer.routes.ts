@@ -37,7 +37,10 @@ export const customerRoutes: Routes = [
         path: 'provider_details/:id',
         component: CustomerProviderProfileLayoutComponent,
         canActivate: [AuthGuard],
-        data: { breadcrumb: 'Provider Details' },
+        data: {
+          breadcrumb: 'Provider Details',
+          breadcrumbParent: { label: 'Service Providers', path: '/view_providers' }
+        },
         children: [
           {
             path: '',
@@ -115,6 +118,12 @@ export const customerRoutes: Routes = [
             loadComponent: () => import('../../shared/components/customer/wallet/customer-wallet.component')
               .then(c => c.CustomerWalletComponent),
             data: { breadcrumb: 'My Wallet' }
+          },
+          {
+            path: 'saved',
+            loadComponent: () => import('../../pages/customer/saved-providers/customer-saved-providers.component')
+              .then(c => c.CustomerSavedProvidersComponent),
+            data: { breadcrumb: 'Saved Providers' }
           },
           {
             path: 'notifications',

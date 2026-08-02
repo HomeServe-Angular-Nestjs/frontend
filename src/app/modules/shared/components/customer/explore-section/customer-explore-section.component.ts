@@ -2,13 +2,13 @@ import { Component, inject, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { encode as base64Encode } from 'js-base64';
-import { OfferedServicesService } from '../../../../../core/services/service-management-test.service';
 import { LocationService } from '../../../../../core/services/public/location.service';
 import { DebounceService } from '../../../../../core/services/public/debounce.service';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
 import { ISearchedLocation } from '../../../../../core/models/user.model';
+import { ICustomerSearchCategories } from '../../../../../core/models/category.model';
 import { CategoryService } from '../../../../../core/services/category.service';
 
 @Component({
@@ -19,28 +19,26 @@ import { CategoryService } from '../../../../../core/services/category.service';
   providers: [LocationService, DebounceService],
 })
 export class CustomerExploreSectionComponent {
-  private readonly _servicesOfferedService = inject(OfferedServicesService);
   private readonly _locationService = inject(LocationService);
   private readonly _debounceService = inject(DebounceService);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _categoryService = inject(CategoryService);
   private readonly _router = inject(Router);
 
-  private _allServiceTitles$ = new BehaviorSubject<string[]>([]);
-  private _search$ = new BehaviorSubject<string>('');
   private _interval: any;
 
-  serviceTitles$!: Observable<string[]>;
   serviceSearch: string = '';
+  serviceCategories: ICustomerSearchCategories[] = [];
   isServiceSearchDropdownOpen = false;
-  selectedService!: string;
+  isServiceSearchLoading = false;
+  selectedService?: ICustomerSearchCategories;
 
   locationData$ = new BehaviorSubject<ISearchedLocation[]>([]);
   locationSearch: string = '';
   isLocationSearchDropdownOpen = false;
   isLocationSearchLoading = false;
   loadingCurrentLocation = false;
-  selectedLocation!: ISearchedLocation;
+  selectedLocation?: ISearchedLocation;
 
   currentSlide: number = 0;
 
@@ -80,29 +78,32 @@ export class CustomerExploreSectionComponent {
 
   ngOnInit() {
     this.startCarousel();
-    this._fetchAllServiceTitles();
 
     this._debounceService.onSearch(700).subscribe(value => {
-      this._fetchLocation(value);
-    })
+      if (value?.type === 'location') {
+        this._fetchLocation(value.search);
+      } else if (value?.type === 'service') {
+        this._fetchCategories(value.search);
+      }
+    });
   }
 
   ngOnDestroy() {
     clearInterval(this._interval);
   }
 
-  private _fetchAllServiceTitles() {
-    this._servicesOfferedService.getHomepageServiceTitles().pipe(
-      map(res => res.data ?? []
-      )
-    ).subscribe(data => this._allServiceTitles$.next(data));
-
-    this.serviceTitles$ = combineLatest([this._allServiceTitles$, this._search$]).pipe(
-      map(([services, search]) =>
-        search !== 'all' ? services.filter(service =>
-          service.toLowerCase().includes(search.toLowerCase())
-        ) : services)
-    );
+  private _fetchCategories(search: string) {
+    this.isServiceSearchLoading = true;
+    this._categoryService.searchCategories(search).subscribe({
+      next: (res) => {
+        this.serviceCategories = res.success && res.data ? res.data : [];
+        this.isServiceSearchLoading = false;
+      },
+      error: () => {
+        this.serviceCategories = [];
+        this.isServiceSearchLoading = false;
+      }
+    });
   }
 
   private _getCurrentLocation(): Promise<GeolocationPosition> {
@@ -135,14 +136,20 @@ export class CustomerExploreSectionComponent {
   filterTitle(value: string) {
     if (!value.trim()) return;
     this.isServiceSearchDropdownOpen = true;
-    this._search$.next(value);
+    if (value !== this.selectedService?.categoryName) {
+      this.selectedService = undefined;
+    }
+    this._debounceService.delay({ search: value, type: 'service' });
   }
 
   findLocation(value: string) {
     if (!value.trim()) return;
     this.isLocationSearchDropdownOpen = true;
     this.isLocationSearchLoading = true;
-    this._debounceService.delay(value);
+    if (value !== this.selectedLocation?.address) {
+      this.selectedLocation = undefined;
+    }
+    this._debounceService.delay({ search: value, type: 'location' });
   }
 
   async detectCurrentLocation() {
@@ -151,11 +158,12 @@ export class CustomerExploreSectionComponent {
       const position = await this._getCurrentLocation();
       const { latitude, longitude } = position.coords;
 
-      this._locationService.openCageReverseGeoCode(latitude, longitude).subscribe(location => {
-        const data = location.results[0];
-        const currentLocation: ISearchedLocation = { address: data.formatted, coordinates: data.geometry };
-        this.locationSearch = currentLocation.address;
-        this.selectedLocation = currentLocation;
+      this._locationService.reverseGeocode(latitude, longitude).subscribe(location => {
+        if (location) {
+          const currentLocation: ISearchedLocation = { address: location.address, coordinates: location.coordinates };
+          this.locationSearch = currentLocation.address;
+          this.selectedLocation = currentLocation;
+        }
       });
 
     } catch (err) {
@@ -166,9 +174,7 @@ export class CustomerExploreSectionComponent {
   }
 
   findProviders() {
-    const hasLocation = this.selectedLocation?.address && this.selectedLocation?.coordinates;
-
-    if (!hasLocation || !this.selectedService) {
+    if (!this.selectedService || !this.selectedLocation?.address || !this.selectedLocation.coordinates) {
       this._toastr.error('Please select a valid location and service.');
       return;
     }
@@ -176,7 +182,8 @@ export class CustomerExploreSectionComponent {
     const { coordinates } = this.selectedLocation;
 
     const data = {
-      title: this.selectedService,
+      categoryId: this.selectedService.categoryId,
+      title: this.selectedService.categoryName,
       ...coordinates
     };
 

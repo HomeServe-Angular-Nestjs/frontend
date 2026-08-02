@@ -1,7 +1,7 @@
 import { Component, effect, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { finalize, first, map, Observable, of, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
+import { finalize, first, map, Observable, of, Subject, switchMap, takeUntil, tap, throwError, timeout } from 'rxjs';
 import { SelectedServiceType } from '../../../../../../core/models/cart.model';
 import { IBooking, IPriceBreakupData } from '../../../../../../core/models/booking.model';
 import { BookingService } from '../../../../../../core/services/booking.service';
@@ -15,6 +15,7 @@ import { ReservationSocketService } from '../../../../../../core/services/socket
 import { CartService } from '../../../../../../core/services/cart.service';
 import { OrderSummarySectionComponent } from '../../../../partials/sections/customer/order-summary-section/order-summary-section.component';
 import { ISelectedSlot } from '../../../../../../core/models/availability.model';
+import { ISendReservation } from '../../../../../../core/models/reservation.model';
 import { CouponService } from '../../../../../../core/services/coupon.service';
 import { ICoupon } from '../../../../../../core/models/coupon.model';
 import { DiscountSymbolPipe } from '../../../../../../core/pipes/discount-symbol.pipe';
@@ -41,6 +42,8 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private _destroy$ = new Subject<void>();
+  private _bookingCreated = false;
+  private _reservationData: ISendReservation | null = null;
 
   @Input({ required: true }) selectedServiceData: SelectedServiceType[] = [];
 
@@ -80,6 +83,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   }
 
   initiatePayment() {
+    this._bookingCreated = false;
     this.isProcessing = true;
 
     const slotData = this.selectedSlot();
@@ -92,6 +96,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
 
     const totalAmount = this.priceBreakup.total;
     const reservationData = { ...slotData, providerId: this.providerId as string };
+    this._reservationData = reservationData;
 
     // Start reservation process via socket
     this._reservationService.createReservation(reservationData);
@@ -100,15 +105,19 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
     this._reservationService.reservationStatus$.pipe(
       takeUntil(this._destroy$),
       first(),
+      timeout(15000),
       switchMap((isReserved) => {
         if (!isReserved) {
-          this._toastr.error('Slot is already reserved. Please select another.');
-          this.isProcessing = false;
-          return throwError(() => new Error('Slot already reserved'));
+          return throwError(() => new Error('Slot is already reserved. Please select another.'));
         }
 
         // Proceed to save booking once reserved
         return this._saveBooking();
+      }),
+      tap((res) => {
+        if (res?.data?.id) {
+          this._bookingCreated = true;
+        }
       }),
       switchMap((res) => {
         if (!res?.data) {
@@ -151,7 +160,8 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
             },
             () => {
               this.isProcessing = false;
-              this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe();
+              this._abortPayment();
+              this._router.navigate(['profile', 'bookings']);
               observer.complete();
             }
           );
@@ -162,6 +172,14 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
       error: (err) => {
         console.error('Payment initiation failed:', err);
         this.isProcessing = false;
+
+        if (this._bookingCreated) {
+          this._abortPayment();
+          this._router.navigate(['profile', 'bookings']);
+        } else {
+          this._abortPayment(true, false);
+          this._toastr.error(err?.message || 'Payment initiation failed. Please try again.');
+        }
       }
     });
   }
@@ -261,9 +279,23 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private _saveBooking() {
     const { isAvailable, ...slotData } = this.selectedSlot()!;
 
-    return this._bookingService.saveBooking(slotData, this.providerId!, this.selectedCouponId).pipe(
+    return this._bookingService.saveBooking(slotData, this.providerId!, this.selectedCouponId, PaymentSource.RAZORPAY).pipe(
       finalize(() => this.isProcessing = false)
-    );
+    ); //!todo hardcode razorpay
+  }
+
+  private _abortPayment(releaseSlot = true, clearSlot = true): void {
+    this._reservationService.resetPaymentGate();
+
+    if (releaseSlot && this._reservationData) {
+      this._reservationService.releaseReservation(this._reservationData);
+    }
+
+    if (clearSlot) {
+      this._bookingService.selectedSlot.set(null);
+    }
+
+    this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe();
   }
 
   private _fetchCoupons(): Observable<ICoupon[]> {
@@ -278,5 +310,6 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
+    this._bookingService.selectedSlot.set(null);
   }
 }

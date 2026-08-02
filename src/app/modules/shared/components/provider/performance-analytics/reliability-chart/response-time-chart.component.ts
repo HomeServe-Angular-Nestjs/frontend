@@ -1,8 +1,6 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { EChartsOption } from 'echarts';
-import { AnalyticService } from '../../../../../../core/services/analytics.service';
-import { Subject, takeUntil } from 'rxjs';
 import { IResponseTimeChartData } from '../../../../../../core/models/analytics.model';
 
 @Component({
@@ -21,26 +19,15 @@ import { IResponseTimeChartData } from '../../../../../../core/models/analytics.
             </div>
   `
 })
-export class ProviderPerformanceResponseTimeChartComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class ProviderPerformanceResponseTimeChartComponent {
+    @Input()
+    set data(value: IResponseTimeChartData[]) {
+        this.responseTimeData = value ?? [];
+        this._setResponseTimeOptions();
+    }
 
     responseTimeOptions: EChartsOption = {};
     responseTimeData: IResponseTimeChartData[] = [];
-
-    ngOnInit(): void {
-        this._analyticService.getResponseTimeDistributionData()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => {
-                this.responseTimeData = res.data ?? []
-                this._setResponseTimeOptions();
-            });
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     private _setResponseTimeOptions() {
         const labels = ["< 1 min", "1–10 min", "10–60 min", "1–24 hrs", "> 1 day"];

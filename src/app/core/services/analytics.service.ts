@@ -3,12 +3,27 @@ import { Injectable, inject } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { API_ENV } from "../../../environments/env";
-import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary, IServiceDemandData, ILocationRevenue, ITopAreaRevenue, IUnderperformingArea, IPeakServiceTime } from "../models/analytics.model";
+import { IBookingPerformanceData, IComparisonChartData, IComparisonOverviewData, IRevenueCompositionData, IDisputeAnalyticsChartData, IOnTimeArrivalChartData, IProviderPerformanceOverview, IProviderRevenueOverview, IResponseTimeChartData, IRevenueMonthlyGrowthRateData, IRevenueTrendData, IReviewChartData, RevenueChartView, ITopServicesByRevenue, INewOrReturningClientData, IAreaSummary, IServiceDemandData, ILocationRevenue, ITopAreaRevenue, IUnderperformingArea, IPeakServiceTime, IPerformanceAnalyticsBundle, IRevenueAnalyticsBundle, IAreaAnalyticsBundle } from "../models/analytics.model";
 
 @Injectable({ providedIn: 'root' })
 export class AnalyticService {
     private readonly _http = inject(HttpClient);
     private readonly _apiUrl = API_ENV.analytics;
+
+    // ------------ Analytics Resource Bundles ------------
+
+    getPerformanceBundle(): Observable<IResponse<IPerformanceAnalyticsBundle>> {
+        return this._http.get<IResponse<IPerformanceAnalyticsBundle>>(`${this._apiUrl}/performance`)
+    }
+
+    getRevenueBundle(view: RevenueChartView = 'monthly'): Observable<IResponse<IRevenueAnalyticsBundle>> {
+        const params = new HttpParams().set('view', view);
+        return this._http.get<IResponse<IRevenueAnalyticsBundle>>(`${this._apiUrl}/revenue`, { params });
+    }
+
+    getAreaBundle(): Observable<IResponse<IAreaAnalyticsBundle>> {
+        return this._http.get<IResponse<IAreaAnalyticsBundle>>(`${this._apiUrl}/area`)
+    }
 
     // ------------ Performance Analytics APIs ------------
 

@@ -1,8 +1,6 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { Subject, takeUntil } from 'rxjs';
-import { AnalyticService } from '../../../../../../core/services/analytics.service';
 import { IComparisonChartData } from '../../../../../../core/models/analytics.model';
 
 @Component({
@@ -16,26 +14,15 @@ import { IComparisonChartData } from '../../../../../../core/models/analytics.mo
   </div>
   `
 })
-export class ProviderPerformanceComparisonChartComponent implements OnInit, OnDestroy {
-  private readonly _analyticService = inject(AnalyticService);
-  private readonly _destroy$ = new Subject<void>();
+export class ProviderPerformanceComparisonChartComponent {
+  @Input()
+  set data(value: IComparisonChartData[]) {
+    this.monthTrendLineData = value ?? [];
+    this._setMonthTrendLineData();
+  }
 
   monthTrendLineOptions: EChartsOption = {};
   monthTrendLineData: IComparisonChartData[] = [];
-
-  ngOnInit(): void {
-    this._analyticService.getComparisonStats()
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(res => {
-        this.monthTrendLineData = res.data ?? [];
-        this._setMonthTrendLineData();
-      });
-  }
-
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
-  }
 
   private _setMonthTrendLineData() {
     const months = this.monthTrendLineData.map(d => d.month);

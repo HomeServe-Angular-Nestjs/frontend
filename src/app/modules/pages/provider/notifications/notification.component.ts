@@ -7,7 +7,7 @@ import { ToastNotificationService } from '../../../../core/services/public/toast
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { isNotificationLoading, selectAllNotifications } from '../../../../store/notification/notification.selector';
+import { isNotificationLoading, selectAllNotifications, selectHasMoreNotifications } from '../../../../store/notification/notification.selector';
 import { notificationAction } from '../../../../store/notification/notification.action';
 
 @Component({
@@ -25,6 +25,7 @@ export class ProviderNotificationComponent implements OnInit, OnDestroy {
     private _destroy$ = new Subject<void>();
 
     notifications = signal<INotification[]>([]);
+    hasMore = signal(false);
     activeFilter = signal<NotificationType | 'all'>('all');
 
     readonly NotificationType = NotificationType;
@@ -53,6 +54,10 @@ export class ProviderNotificationComponent implements OnInit, OnDestroy {
     markAllAsRead(): void {
         if (this.notifications().every(n => n.isRead)) return;
         this._store.dispatch(notificationAction.markAllAsRead());
+    }
+
+    loadMore(): void {
+        this._store.dispatch(notificationAction.fetchNextNotifications());
     }
 
     deleteNotification(id: string): void {
@@ -102,6 +107,12 @@ export class ProviderNotificationComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this._destroy$))
             .subscribe((notifications) => {
                 this.notifications.set(notifications);
+            });
+
+        this._store.select(selectHasMoreNotifications)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe((hasMore) => {
+                this.hasMore.set(hasMore);
             });
     }
 

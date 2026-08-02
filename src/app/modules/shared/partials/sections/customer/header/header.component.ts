@@ -16,7 +16,7 @@ import { selectTotalUnReadNotificationCount } from '../../../../../../store/noti
 import { CartService } from '../../../../../../core/services/cart.service';
 import { ICustomerSearchCategories } from '../../../../../../core/models/category.model';
 import { CategoryService } from '../../../../../../core/services/category.service';
-import { IOpenCageLocation, LocationService } from '../../../../../../core/services/public/location.service';
+import { IGeoLocation, LocationService } from '../../../../../../core/services/public/location.service';
 
 @Component({
   selector: 'app-customer-header',
@@ -65,8 +65,9 @@ export class CustomerHeaderComponent implements OnInit {
 
   // location
   locationSearch = '';
-  locationData = signal<IOpenCageLocation[]>([]);
+  locationData = signal<IGeoLocation[]>([]);
   isLocationSearchLoading = false;
+  isLocationSearchFailed = false;
   protected cartCount = this._cartService.cartItemCount;
 
   ngOnInit(): void {
@@ -114,7 +115,7 @@ export class CustomerHeaderComponent implements OnInit {
     this._debounceService.delay({ search: this.categorySearch, type: 'category' });
   }
 
-  handleLocationClick(locationSearch: IOpenCageLocation): void {
+  handleLocationClick(locationSearch: IGeoLocation): void {
     this.locationSearch = '';
     this.locationData.set([]);
     this.isLocationSearchLoading = false;
@@ -125,6 +126,7 @@ export class CustomerHeaderComponent implements OnInit {
       queryParams: {
         lat: locationSearch.coordinates.lat,
         lng: locationSearch.coordinates.lng,
+        address: locationSearch.name,
         categoryId: current['categoryId'] || ''
       },
     });
@@ -140,8 +142,8 @@ export class CustomerHeaderComponent implements OnInit {
     this._router.navigate(['/view_providers'], {
       queryParams: {
         categoryId,
-        lat: current['lng'] || '',
-        lng: current['lat'] || '',
+        lat: current['lat'] || '',
+        lng: current['lng'] || '',
       },
     });
   }
@@ -166,6 +168,7 @@ export class CustomerHeaderComponent implements OnInit {
   }
 
   private fetchLocations(search: string): void {
+    this.isLocationSearchFailed = false;
     this._locationService.getCoordinatesFromText(search)
       .pipe(
         takeUntil(this._destroy$),
@@ -176,6 +179,7 @@ export class CustomerHeaderComponent implements OnInit {
           this.locationData.set(result);
         },
         error: () => {
+          this.isLocationSearchFailed = true;
           this.locationData.set([]);
         }
       });

@@ -3,7 +3,7 @@ import { inject, Injectable, signal } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { catchError, map, Observable, throwError } from "rxjs";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { IAdminFilteredSubscriptionListWithPagination, IAdminSubscriptionList, ICreateSubscription, ISubscription, ISubscriptionFilters, IUpdateSubscriptionPaymentStatus } from "../models/subscription.model";
+import { IAdminFilteredSubscriptionListWithPagination, IAdminSubscriptionList, ICreateSubscription, ISubscription, ISubscriptionFilters, ISubscriptionUpgradeAmount, IUpdateSubscriptionPaymentStatus } from "../models/subscription.model";
 import { Store } from "@ngrx/store";
 
 @Injectable({ providedIn: 'root' })
@@ -31,12 +31,17 @@ export class SubscriptionService {
         this.isAlreadyCheckedForSubs = value;
     }
 
+    reset(): void {
+        this.subscription.set(null);
+        this.isAlreadyCheckedForSubs = false;
+    }
+
     createSubscription(data: ICreateSubscription): Observable<IResponse<ISubscription>> {
         return this._http.post<IResponse<ISubscription>>(`${this._apiUrl}`, data);
     }
 
-    getUpgradeAmount(subscriptionId: string): Observable<IResponse<number>> {
-        return this._http.get<IResponse<number>>(`${this._apiUrl}/upgrade_amount/${subscriptionId}`);
+    getUpgradeAmount(subscriptionId: string): Observable<IResponse<ISubscriptionUpgradeAmount>> {
+        return this._http.get<IResponse<ISubscriptionUpgradeAmount>>(`${this._apiUrl}/upgrade_amount/${subscriptionId}`);
     }
 
     upgradeSubscription(data: ICreateSubscription): Observable<IResponse<ISubscription>> {
@@ -45,6 +50,14 @@ export class SubscriptionService {
 
     fetchSubscription(): Observable<IResponse<ISubscription | null>> {
         return this._http.get<IResponse<ISubscription>>(`${this._apiUrl}`);
+    }
+
+    fetchSubscriptionHistory(): Observable<IResponse<ISubscription[]>> {
+        return this._http.get<IResponse<ISubscription[]>>(`${this._apiUrl}/history`);
+    }
+
+    fetchLatestSubscription(): Observable<IResponse<ISubscription | null>> {
+        return this._http.get<IResponse<ISubscription | null>>(`${this._apiUrl}/latest`);
     }
 
     fetchSubscriptionLists(filters: ISubscriptionFilters = {}): Observable<IResponse<IAdminFilteredSubscriptionListWithPagination>> {

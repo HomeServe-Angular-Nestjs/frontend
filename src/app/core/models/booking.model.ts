@@ -2,6 +2,7 @@ import { SelectedServiceIdsType } from "./cart.model";
 import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../enums/enums";
 import { ILocation, ILocationData } from "./user.model";
 import { ISelectedSlot } from "./availability.model";
+import { ITransaction } from "./transaction.model";
 
 // --------------------
 // Shared Interfaces
@@ -47,6 +48,7 @@ export interface IBookingDetailsBase {
     gst: number;
     providerCommission: number;
   } | null;
+  transactionHistory: ITransaction[];
   previousSchedules: string[]; // "2026-02-23T06:30:00.000Z"
 }
 

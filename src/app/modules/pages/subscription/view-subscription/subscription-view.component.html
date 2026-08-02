@@ -89,6 +89,24 @@
                         </div>
                     </div>
 
+                    <!-- Conversion Banner -->
+                    <div *ngIf="getConversionInfo(sub) as conversion"
+                        class="bg-amber-50 border border-amber-200 rounded-3xl p-6 flex items-start gap-4">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-arrow-right-arrow-left text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-black text-amber-800">Converted from
+                                {{ conversion.fromDuration }} Plan</p>
+                            <p class="text-xs font-medium text-amber-700/80 mt-1">
+                                Prorated credit of <span class="font-black">₹{{ conversion.creditAmount }}</span> was
+                                applied on
+                                {{ conversion.convertedAt ? (conversion.convertedAt | date:'mediumDate') : 'your upgrade' }}.
+                            </p>
+                        </div>
+                    </div>
+
                     <!-- Features Card -->
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                         <div class="flex items-center justify-between mb-6">
@@ -147,6 +165,14 @@
                                             class="fas fa-check-circle ml-1"></i></p>
                                 </div>
                             </div>
+                            <div *ngIf="getConversionInfo(sub) as conversion" class="flex items-start gap-4">
+                                <i class="fas fa-wallet text-gray-400 mt-1"></i>
+                                <div>
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Prorated Credit
+                                    </p>
+                                    <p class="text-sm font-bold text-gray-700">₹{{ conversion.creditAmount }}</p>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mt-8 pt-6 border-t border-gray-50">
@@ -162,30 +188,98 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Subscription History -->
+            <ng-container *ngIf="history$ | async as history">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <h3 class="text-lg font-bold text-gray-900 italic mb-6">Subscription History</h3>
+                    <div *ngIf="history.length === 0" class="text-sm text-gray-500 text-center py-6">
+                        No previous subscriptions yet.
+                    </div>
+                    <div class="space-y-4" *ngIf="history.length">
+                        <div *ngFor="let item of history"
+                            class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 rounded-2xl border border-gray-50 hover:border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
+                                    <i class="fas fa-history text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-gray-900 capitalize">{{ item.name }} Plan
+                                        <span
+                                            class="text-[10px] font-bold uppercase tracking-wider ml-2 text-gray-400">{{ item.duration }}
+                                            Billing</span>
+                                    </p>
+                                    <p class="text-xs font-medium text-gray-500 mt-0.5">
+                                        {{ item.startTime | date:'mediumDate' }} —
+                                        {{ item.endDate ? (item.endDate | date:'mediumDate') : 'N/A' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-black text-gray-800">₹{{ item.price || 0 }}</span>
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                                    [ngClass]="getSubscriptionStatus(item) === 'expired' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'">
+                                    {{ getSubscriptionStatus(item) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
         </ng-container>
 
         <!-- Empty State -->
         <ng-template #emptyState>
-            <div
-                class="bg-white rounded-[2.5rem] shadow-sm border-2 border-dashed border-gray-100 p-12 text-center max-w-2xl mx-auto">
+            <ng-container *ngIf="latest$ | async as latest; else neverSubscribed">
+                <ng-container *ngIf="isExpired(latest)">
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border-2 border-dashed border-orange-200 p-12 text-center max-w-2xl mx-auto">
+                        <div
+                            class="w-20 h-20 bg-orange-50 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-8 text-orange-400">
+                            <i class="fas fa-hourglass-end font-black"></i>
+                        </div>
+                        <h2 class="text-2xl font-black text-gray-900 italic mb-4">Your Subscription Has Expired</h2>
+                        <p class="text-gray-500 font-medium max-w-sm mx-auto mb-2 leading-relaxed">
+                            Your <span class="font-bold capitalize text-gray-700">{{ latest.name }} Plan</span> expired on
+                            <span class="font-bold text-gray-700">{{ latest.endDate | date:'mediumDate' }}</span>.
+                        </p>
+                        <p class="text-gray-400 text-sm font-medium max-w-sm mx-auto mb-10 leading-relaxed">
+                            Renew your plan to restore all premium features and continue without interruption.
+                        </p>
+                        <button (click)="navigateToPlans()"
+                            class="px-10 py-4 rounded-2xl font-black text-sm text-white shadow-xl transition-all active:scale-95"
+                            [ngClass]="{
+                                'bg-indigo-600 hover:bg-indigo-700': userType === 'customer',
+                                'bg-emerald-600 hover:bg-emerald-700': userType === 'provider'
+                            }">
+                            RENEW YOUR PLAN
+                        </button>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #neverSubscribed>
                 <div
-                    class="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-8 text-gray-300">
-                    <i class="fas fa-box-open font-black"></i>
+                    class="bg-white rounded-[2.5rem] shadow-sm border-2 border-dashed border-gray-100 p-12 text-center max-w-2xl mx-auto">
+                    <div
+                        class="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-8 text-gray-300">
+                        <i class="fas fa-box-open font-black"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-gray-900 italic mb-4">No Active Premium Plan</h2>
+                    <p class="text-gray-500 font-medium max-w-sm mx-auto mb-10 leading-relaxed">
+                        You're currently using the basic features. Unlock growth with a premium plan tailored for your
+                        success.
+                    </p>
+                    <button (click)="navigateToPlans()"
+                        class="px-10 py-4 rounded-2xl font-black text-sm text-white shadow-xl shadow-gray-200 transition-all active:scale-95"
+                        [ngClass]="{
+                            'bg-indigo-600 hover:bg-indigo-700': userType === 'customer',
+                            'bg-emerald-600 hover:bg-emerald-700': userType === 'provider'
+                        }">
+                        EXPLORE PREMIUM PLANS
+                    </button>
                 </div>
-                <h2 class="text-2xl font-black text-gray-900 italic mb-4">No Active Premium Plan</h2>
-                <p class="text-gray-500 font-medium max-w-sm mx-auto mb-10 leading-relaxed">
-                    You're currently using the basic features. Unlock growth with a premium plan tailored for your
-                    success.
-                </p>
-                <button (click)="navigateToPlans()"
-                    class="px-10 py-4 rounded-2xl font-black text-sm text-white shadow-xl shadow-gray-200 transition-all active:scale-95"
-                    [ngClass]="{
-                        'bg-indigo-600 hover:bg-indigo-700': userType === 'customer',
-                        'bg-emerald-600 hover:bg-emerald-700': userType === 'provider'
-                    }">
-                    EXPLORE PREMIUM PLANS
-                </button>
-            </div>
+            </ng-template>
         </ng-template>
 
     </div>

@@ -23,6 +23,8 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
     private _destroy$ = new Subject<void>();
 
     subscription$!: Observable<ISubscription | null>;
+    history$!: Observable<ISubscription[]>;
+    latest$!: Observable<ISubscription | null>;
     userType = 'customer';
     readonly featureRegistry = FEATURE_REGISTRY;
 
@@ -36,6 +38,12 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
             );
 
         this.subscription$ = this._getSubscription();
+        this.history$ = this._subscriptionService.fetchSubscriptionHistory().pipe(
+            map(res => (res.data ?? []).filter(sub => !sub.isActive))
+        );
+        this.latest$ = this._subscriptionService.fetchLatestSubscription().pipe(
+            map(res => res.data ?? null)
+        );
     }
 
     private _getSubscription(): Observable<ISubscription | null> {
@@ -58,6 +66,27 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
     getFeatureLabel(key: string): string {
         const feature = Object.values(this.featureRegistry).find(f => f.key === key);
         return feature ? feature.label : key;
+    }
+
+    getSubscriptionStatus(sub: ISubscription): 'active' | 'expired' | 'cancelled' {
+        if (sub.isActive) return 'active';
+        if (sub.endDate && new Date(sub.endDate).getTime() < Date.now()) return 'expired';
+        return 'cancelled';
+    }
+
+    isExpired(sub: ISubscription | null): boolean {
+        return !!sub && !!sub.endDate && new Date(sub.endDate).getTime() < Date.now();
+    }
+
+    getConversionInfo(sub: ISubscription) {
+        const metadata = sub.metadata ?? {};
+        if (!metadata['convertedFromDuration']) return null;
+
+        return {
+            fromDuration: metadata['convertedFromDuration'],
+            creditAmount: metadata['creditAmount'] ?? 0,
+            convertedAt: metadata['convertedAt'] ? new Date(metadata['convertedAt']) : null,
+        };
     }
 
     ngOnDestroy(): void {

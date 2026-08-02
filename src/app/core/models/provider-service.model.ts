@@ -10,6 +10,7 @@ export interface IProviderService {
     category: {
         id: string;
         name: string;
+        keywords?: string[];
     };
     description: string;
     price: number;

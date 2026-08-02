@@ -31,6 +31,8 @@ export class ProviderProfileAboutComponent implements OnInit {
     additionalSkills: Set<string> = new Set();
     docs: IDocs[] = [];
     languages: ILanguage[] = [];
+    awards: string[] = [];
+    newAward: string = '';
 
     expertiseForm: FormGroup = this._fb.group({
         specialization: ['', Validators.required],
@@ -68,6 +70,7 @@ export class ProviderProfileAboutComponent implements OnInit {
             this.additionalSkills = new Set(provider?.additionalSkills ?? []);
             this.docs = [...(provider?.docs ?? [])];
             this.languages = [...(provider?.languages ?? [])];
+            this.awards = [...(provider?.awards ?? [])];
         });
     }
 
@@ -328,6 +331,33 @@ export class ProviderProfileAboutComponent implements OnInit {
                 expertise: this.expertise,
                 additionalSkills: [...this.additionalSkills],
                 providerBio: this.providerBio.trim()
+            }
+        }));
+    }
+
+    addAward() {
+        if (!this.newAward.trim()) {
+            this._toastr.error('Award text cannot be empty.');
+            return;
+        }
+        this.awards = [...this.awards, this.newAward.trim()];
+        this.newAward = '';
+        this._dispatchAwardsUpdate();
+    }
+
+    removeAward(index: number) {
+        this.awards.splice(index, 1);
+        this._dispatchAwardsUpdate();
+    }
+
+    private _dispatchAwardsUpdate() {
+        this._store.dispatch(providerActions.updateBio({
+            updateData: {
+                awards: [...this.awards],
+                providerBio: this.providerBio.trim(),
+                expertise: this.expertise,
+                additionalSkills: [...this.additionalSkills],
+                languages: this.languages
             }
         }));
     }

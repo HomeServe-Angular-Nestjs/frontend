@@ -1,8 +1,6 @@
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { NgxEchartsModule } from "ngx-echarts";
 import { EChartsOption } from 'echarts';
-import { AnalyticService } from "../../../../../../core/services/analytics.service";
-import { Subject, takeUntil } from "rxjs";
 import { IBookingPerformanceData } from "../../../../../../core/models/analytics.model";
 import { CallbackDataParams } from "echarts/types/dist/shared";
 
@@ -25,26 +23,15 @@ import { CallbackDataParams } from "echarts/types/dist/shared";
       </div>
     `,
 })
-export class ProviderPerformanceBookingChartComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class ProviderPerformanceBookingChartComponent {
+    @Input()
+    set data(value: IBookingPerformanceData[]) {
+        this.bookingStats = value ?? [];
+        this.updateChartOptions();
+    }
 
     bookingStats: IBookingPerformanceData[] = [];
     barChartOptions: EChartsOption = {};
-
-    ngOnInit(): void {
-        this._analyticService.getPerformanceBookingOverview()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => {
-                this.bookingStats = res.data ?? [];
-                this.updateChartOptions();
-            });
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     private updateChartOptions(): void {
         const allMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];

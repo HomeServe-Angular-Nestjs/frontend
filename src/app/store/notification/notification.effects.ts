@@ -2,8 +2,12 @@ import { inject } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { NotificationSocketService } from "../../core/services/socket-service/notification.service";
 import { notificationAction } from "./notification.action";
-import { map, switchMap } from "rxjs";
+import { map, switchMap, withLatestFrom } from "rxjs";
 import { ToastNotificationService } from "../../core/services/public/toastr.service";
+import { Store } from "@ngrx/store";
+import { selectNotificationCursor } from "./notification.selector";
+
+const NOTIFICATION_PAGE_LIMIT = 20;
 
 export const notificationEffects = {
     fetchAllNotifications$: createEffect(() => {
@@ -13,12 +17,39 @@ export const notificationEffects = {
         return actions$.pipe(
             ofType(notificationAction.fetchAllNotifications),
             switchMap(() =>
-                notificationService.fetchAllNotifications().pipe(
+                notificationService.fetchAllNotifications(undefined, NOTIFICATION_PAGE_LIMIT).pipe(
                     map((response) => {
-                        return notificationAction.notificationSuccess({ notifications: response.data ?? [] });
+                        return notificationAction.notificationSuccess({
+                            notifications: response.data?.data ?? [],
+                            cursor: response.data?.nextCursor ?? null,
+                            hasMore: response.data?.hasMore ?? false,
+                        });
                     })
                 )
             )
+        )
+    }, { functional: true }),
+
+    fetchNextNotifications$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const notificationService = inject(NotificationSocketService)
+        const store = inject(Store)
+
+        return actions$.pipe(
+            ofType(notificationAction.fetchNextNotifications),
+            withLatestFrom(store.select(selectNotificationCursor)),
+            switchMap(([_, cursor]) => {
+                if (!cursor) return [];
+                return notificationService.fetchAllNotifications(cursor, NOTIFICATION_PAGE_LIMIT).pipe(
+                    map((response) => {
+                        return notificationAction.appendNotificationsSuccess({
+                            notifications: response.data?.data ?? [],
+                            cursor: response.data?.nextCursor ?? null,
+                            hasMore: response.data?.hasMore ?? false,
+                        });
+                    })
+                )
+            })
         )
     }, { functional: true }),
 
@@ -33,7 +64,7 @@ export const notificationEffects = {
                 notificationService.markAllAsReadApi().pipe(
                     map((response) => {
                         toastr.success(response.message);
-                        return notificationAction.notificationSuccess({ notifications: response.data ?? [] });
+                        return notificationAction.markAllReadSuccess();
                     })
                 )
             )

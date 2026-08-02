@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { distinctUntilChanged, filter, map, Subject, takeUntil, tap, } from 'rxjs';
+import { distinctUntilChanged, filter, map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { BookingService } from '../../../../../../core/services/booking.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { selectCustomer, selectLocation, selectPhoneNumber } from '../../../../../../store/customer/customer.selector';
@@ -31,6 +31,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
   private readonly _route = inject(ActivatedRoute);
   private readonly _store = inject(Store);
   private readonly _destroy$ = new Subject<void>();
+  private readonly _dateChange$ = new Subject<void>();
 
   selectedAddress: string | null = null;
   selectedDate: string = '';
@@ -48,38 +49,61 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
     this._initPhoneNumber();
     this._initCustomerDetails();
     this._initLocation();
+    this._loadSlotsOnDateChange();
   }
 
   getAvailableSlots() {
-    this.selectedSlot = null;
+    this._dateChange$.next();
+  }
 
-    if (!this.providerId) {
-      this._toastr.error('Provider Id is missing.');
-      return;
-    }
-
-    if (!this.selectedDate) {
-      this._toastr.error('Please select a valid date.');
-      return;
-    }
-
-    this._providerService.fetchAvailableSlots(this.providerId, this.selectedDate)
+  private _loadSlotsOnDateChange(): void {
+    this._dateChange$
       .pipe(
         takeUntil(this._destroy$),
-        map((res) => {
-          const slots: ISlotUI[] = Array.isArray(res) ? res : (res.data || []);
-          return slots.map(s => ({
-            ...s,
-            isAvailable: s.isAvailable 
-          }));
+        switchMap(() => {
+          this.selectedSlot = null;
+          this._bookingService.selectedSlot.set(null);
+
+          if (!this.providerId) {
+            this._toastr.error('Provider Id is missing.');
+            return of([]);
+          }
+
+          if (!this.selectedDate) {
+            this._toastr.error('Please select a valid date.');
+            return of([]);
+          }
+
+          return this._providerService.fetchAvailableSlots(this.providerId, this.selectedDate)
+            .pipe(
+              map((res) => {
+                const slots: ISlotUI[] = Array.isArray(res) ? res : (res.data || []);
+                return slots.map(s => ({
+                  ...s,
+                  isAvailable: s.isAvailable
+                }));
+              })
+            );
         }),
-        tap(slots => this.availableSlots = this._sortSlotsByStartTime(slots))
-      ).subscribe();
+        map(slots => this._sortSlotsByStartTime(slots)),
+        tap(slots => this.availableSlots = slots)
+      )
+      .subscribe({
+        error: () => {
+          this.availableSlots = [];
+        }
+      });
   }
 
   selectSlot(slot: ISlotUI) {
     if (!this.selectedDate) {
       this._toastr.error('Date is missing.');
+      return;
+    }
+
+    if (this.selectedSlot?.from === slot.from) {
+      this.selectedSlot = null;
+      this._bookingService.selectedSlot.set(null);
       return;
     }
 
@@ -167,6 +191,7 @@ export class CustomerScheduleBookingDetailsComponent implements OnInit, OnDestro
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
+    this._bookingService.selectedSlot.set(null);
   }
 
   private _sortSlotsByStartTime(slots: ISlotUI[]): ISlotUI[] {

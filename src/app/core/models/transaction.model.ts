@@ -10,6 +10,7 @@ export interface ITransaction {
   status: TransactionStatus;
   amount: number;
   currency: string;
+  createdAt: Date;
   gateWayDetails: {
     orderId: string,
     paymentId: string,
@@ -19,7 +20,18 @@ export interface ITransaction {
   userDetails: {
     email: string,
     contact: string,
-  }
+    role: string,
+  } | null;
+  metadata?: {
+    bookingId?: string | null;
+    subscriptionId?: string | null;
+    breakup?: {
+      providerAmount?: number | null;
+      providerCommission?: number | null;
+      customerCommission?: number | null;
+      gst?: number | null;
+    } | null;
+  } | null;
 }
 
 export interface ITransactionStats {

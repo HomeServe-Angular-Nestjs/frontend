@@ -18,7 +18,7 @@ Angular 19 SPA for the HomeServe home services marketplace, containing the **Cus
 | State | NgRx (Store, Effects, Entity, Router-Store, Component-Store) |
 | Styling | Tailwind CSS, Angular Material, tailwind-scrollbar |
 | Maps | Mapbox GL JS + Mapbox Geocoder |
-| Geocoding | OpenCage Geocoding API |
+| Geocoding | Mapbox Geocoding API |
 | Charts | Apache ECharts (ngx-echarts) |
 | Real-Time | socket.io-client, WebRTC (metered TURN relay) |
 | UI Feedback | ngx-toastr, SweetAlert2, ngx-spinner, Notyf |
@@ -63,7 +63,7 @@ npm install
 ng serve          # dev server at http://localhost:4200
 ```
 
-The application reads API endpoints, the Socket.IO URL, and third-party keys (Mapbox, Razorpay, OpenCage, TURN relay) from `src/environments/env.ts` (development) and `env.prod.ts` (production). Update these files to point at your backend and supply your own keys.
+The application reads API endpoints, the Socket.IO URL, and third-party keys (Mapbox, Razorpay, TURN relay) from `src/environments/env.ts` (development) and `env.prod.ts` (production). Update these files to point at your backend and supply your own keys.
 
 ## Scripts
 

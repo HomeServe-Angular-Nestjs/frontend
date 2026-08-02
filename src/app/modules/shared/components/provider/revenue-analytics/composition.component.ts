@@ -1,9 +1,7 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
-import { Subject, takeUntil } from 'rxjs';
 import { IRevenueCompositionData } from '../../../../../core/models/analytics.model';
 import { CallbackDataParams } from 'echarts/types/dist/shared';
 
@@ -19,26 +17,15 @@ import { CallbackDataParams } from 'echarts/types/dist/shared';
       </div>
   `
 })
-export class RevenueCompositionChartsComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class RevenueCompositionChartsComponent {
+    @Input()
+    set data(value: IRevenueCompositionData[]) {
+        this.compositionChartData = value ?? [];
+        this.setRevenueCompositionChart();
+    }
 
     compositionOptions: EChartsOption = {};
     compositionChartData: IRevenueCompositionData[] = [];
-
-    ngOnInit(): void {
-        this._analyticService.getRevenueCompositionChartData()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => {
-                this.compositionChartData = res.data ?? [];
-                this.setRevenueCompositionChart();
-            });
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     private setRevenueCompositionChart() {
         const data = this.compositionChartData.map(item => ({

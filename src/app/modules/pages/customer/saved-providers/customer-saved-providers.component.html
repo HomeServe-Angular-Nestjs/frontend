@@ -1,0 +1,173 @@
+<main class="w-full px-4 md:px-6 py-6">
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Saved Providers</h1>
+        <p class="text-sm text-gray-500 mt-1">Keep your favorite professionals in one place and quickly book them again.</p>
+      </div>
+      <div
+        class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-full text-[10px] font-bold uppercase tracking-wider">
+        <i class="fas fa-heart"></i>
+        <span>{{ pagination().total }} Saved</span>
+      </div>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="flex flex-col md:flex-row gap-3 mb-6">
+      <div class="flex-1 min-w-0">
+        <div class="relative">
+          <input type="text" placeholder="Search saved providers..." [ngModel]="search()"
+            (ngModelChange)="onSearch($event)"
+            class="w-full h-10 border border-gray-200 rounded-xl pl-10 pr-3 text-sm outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all placeholder:text-gray-400" />
+          <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+        </div>
+      </div>
+      <div class="w-full md:w-44">
+        <div class="relative">
+          <select [ngModel]="sort()" (ngModelChange)="onSortChange($event)"
+            class="w-full h-10 border border-gray-200 rounded-xl pl-10 pr-8 text-sm cursor-pointer outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all bg-white appearance-none">
+            <option value="all">All</option>
+            <option value="best-rated">Best Rated</option>
+            <option value="nearest">Nearest</option>
+          </select>
+          <i class="fas fa-sort absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+          <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!isLoading(); else loadingState">
+      <ng-container *ngIf="providers().length > 0; else emptyState">
+        <app-customer-provider-view-card [providers]="providers()"></app-customer-provider-view-card>
+      </ng-container>
+    </ng-container>
+
+    <!-- Pagination -->
+    <div *ngIf="pagination().total > pagination().limit"
+      class="mt-auto py-10 flex justify-center border-t border-gray-100">
+      <app-customer-pagination [pagination]="pagination()" (pageChanged)="changePage($event)"></app-customer-pagination>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <ng-template #emptyState>
+    <div
+      class="flex flex-col items-center justify-center py-20 bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200">
+      <!-- Illustration -->
+      <div class="relative mb-8 mx-auto w-48 h-48">
+        <svg width="100%" height="100%" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="savedBgGrad" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#EEF2FF" />
+              <stop offset="1" stop-color="#FFE4E6" />
+            </linearGradient>
+            <linearGradient id="savedBookmarkGrad" x1="100" y1="48" x2="100" y2="152" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#6366F1" />
+              <stop offset="1" stop-color="#8B5CF6" />
+            </linearGradient>
+          </defs>
+
+          <!-- soft backdrop -->
+          <circle cx="100" cy="100" r="80" fill="url(#savedBgGrad)" />
+
+          <!-- floating hearts -->
+          <g class="float-heart">
+            <path
+              d="M147 50 C144 44, 136 44, 133 50 C129 58, 136 64, 147 70 C158 64, 165 58, 161 50 C158 44, 150 44, 147 50 Z"
+              fill="#F43F5E" opacity="0.85" />
+          </g>
+          <g class="float-heart-delay">
+            <path
+              d="M53 156 C51 152, 46 152, 44 156 C41 161, 46 165, 53 169 C60 165, 65 161, 62 156 C60 152, 55 152, 53 156 Z"
+              fill="#FB7185" opacity="0.75" />
+          </g>
+
+          <!-- bookmark -->
+          <path d="M75 48 H125 A7 7 0 0 1 132 55 V152 L100 128 L68 152 V55 A7 7 0 0 1 75 48 Z"
+            fill="url(#savedBookmarkGrad)" fill-opacity="0.15" stroke="url(#savedBookmarkGrad)" stroke-width="3"
+            stroke-linejoin="round" />
+
+          <!-- empty heart inside bookmark (dashed) -->
+          <path
+            d="M100 120 C 86 110, 79 102, 79 93 C 79 85, 85 80, 91 80 C 95 80, 98 82, 100 85 C 102 82, 105 80, 109 80 C 115 80, 121 85, 121 93 C 121 102, 114 110, 100 120 Z"
+            stroke="#F43F5E" stroke-width="2.5" stroke-dasharray="5 4" stroke-linecap="round" stroke-linejoin="round"
+            fill="none" />
+
+          <!-- sparkles -->
+          <path d="M156 100 L159 107 L166 110 L159 113 L156 120 L153 113 L146 110 L153 107 Z" fill="#F59E0B"
+            opacity="0.8" />
+          <circle cx="45" cy="96" r="3" fill="#6366F1" opacity="0.6" />
+          <circle cx="165" cy="140" r="2.5" fill="#F43F5E" opacity="0.5" />
+        </svg>
+      </div>
+
+      <ng-container *ngIf="hasSearch(); else noMatches">
+        <h3 class="text-xl font-black text-gray-900 mb-2">No results found</h3>
+        <p class="text-gray-500 text-center max-w-md px-6 mb-8 text-sm leading-relaxed">
+          No saved providers match your search. Try a different keyword or clear your search.
+        </p>
+        <button (click)="clearFilters()"
+          class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 transition-all hover:scale-105 active:scale-95">
+          Clear Search
+        </button>
+      </ng-container>
+      <ng-template #noMatches>
+        <ng-container *ngIf="hasSaved(); else noSaved">
+          <h3 class="text-xl font-black text-gray-900 mb-2">Saved providers unavailable</h3>
+          <p class="text-gray-500 text-center max-w-md px-6 mb-8 text-sm leading-relaxed">
+            The providers you saved are no longer available. Explore other top-rated professionals instead.
+          </p>
+        </ng-container>
+        <ng-template #noSaved>
+          <h3 class="text-xl font-black text-gray-900 mb-2">No saved providers yet</h3>
+          <p class="text-gray-500 text-center max-w-md px-6 mb-8 text-sm leading-relaxed">
+            Save your favorite service providers by tapping the heart icon on their profile, then find them here
+            anytime.
+          </p>
+        </ng-template>
+
+        <a routerLink="/view_providers"
+          class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 transition-all hover:scale-105 active:scale-95">
+          Browse Providers
+        </a>
+      </ng-template>
+    </div>
+  </ng-template>
+
+  <!-- Loading State (skeleton) -->
+  <ng-template #loadingState>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" aria-label="Loading saved providers">
+      <div *ngFor="let _ of [0,1,2,3,4,5]"
+        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6">
+        <!-- Header -->
+        <div class="flex items-start gap-4 mb-6">
+          <div class="h-16 w-16 rounded-xl bg-gray-200 animate-pulse"></div>
+          <div class="flex-1 space-y-2 pt-1">
+            <div class="h-4 w-3/4 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div class="flex items-center gap-1.5">
+              <div class="h-3 w-3 bg-gray-200 rounded animate-pulse" *ngFor="let _ of [0,1,2,3,4]"></div>
+              <div class="h-3 w-10 bg-gray-200 rounded animate-pulse ml-1"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details grid -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div *ngFor="let _ of [0,1,2,3]" class="flex items-center gap-2.5">
+            <div class="h-8 w-8 rounded-lg bg-gray-200 animate-pulse"></div>
+            <div class="flex-1 space-y-1.5">
+              <div class="h-2 w-8 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-3 w-12 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex items-center gap-3">
+          <div class="flex-1 h-11 bg-gray-200 rounded-xl animate-pulse"></div>
+          <div class="h-11 w-11 bg-gray-200 rounded-xl animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</main>

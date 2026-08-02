@@ -13,11 +13,12 @@ import { chatActions } from "../../../../../../store/chat/chat.action";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { Store } from "@ngrx/store";
 import { RescheduleBookingModalComponent } from "../../../../partials/shared/reschedule-booking/reschedule-booking.component";
+import { TransactionHistoryTimelineComponent } from "../../../../partials/shared/transaction-history-timeline/transaction-history-timeline.component";
 
 @Component({
     selector: 'app-customer-view-booking-details',
     templateUrl: './booking-details.component.html',
-    imports: [CommonModule, ButtonComponent, LoadingCircleAnimationComponent, RouterLink, RescheduleBookingModalComponent]
+    imports: [CommonModule, ButtonComponent, LoadingCircleAnimationComponent, RouterLink, RescheduleBookingModalComponent, TransactionHistoryTimelineComponent]
 })
 export class CustomerViewBookingDetailsComponent implements OnInit, OnDestroy {
     private readonly _toastr = inject(ToastNotificationService);

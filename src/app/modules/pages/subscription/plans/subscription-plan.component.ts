@@ -1,5 +1,5 @@
-import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from "@angular/core";
+import { CommonModule, KeyValuePipe } from "@angular/common";
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Router } from "@angular/router";
 import { selectAuthUserType } from "../../../../store/auth/auth.selector";
@@ -12,9 +12,14 @@ import { ToastNotificationService } from "../../../../core/services/public/toast
 import { SubscriptionService } from "../../../../core/services/subscription.service";
 import { ISubscriptionOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../core/models/payment.model";
 import { ICreateSubscription, ISubscription } from "../../../../core/models/subscription.model";
-import { PaymentDirection, PaymentSource, PaymentStatus, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
+import { PaymentDirection, PaymentSource, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
 import { SharedDataService } from "../../../../core/services/public/shared-data.service";
-import { KeyValuePipe } from "@angular/common";
+
+interface PlanBenefit {
+  icon: string;
+  title: string;
+  desc: string;
+}
 
 @Component({
   selector: 'app-subscription-plan-page',
@@ -41,19 +46,24 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  @Output() proceedSubEvent = new EventEmitter<IPlan>();
-
   userType = 'customer';
   plans$!: Observable<IPlan[]>;
   currentPlanId: string | null = null;
+  renewPlanId: string | null = null;
   previousPage: string | null = null;
   currentPlanDuration: string = '';
   currentSubscription$: Observable<ISubscription | null> = of(null);
+  latestSubscription$: Observable<ISubscription | null> = of(null);
 
   ngOnInit(): void {
     this._sharedService.setProviderHeader('Plans');
 
     this.currentSubscription$ = this._subscriptionService.fetchSubscription().pipe(
+      map(res => res.data ?? null),
+      shareReplay(1)
+    );
+
+    this.latestSubscription$ = this._subscriptionService.fetchLatestSubscription().pipe(
       map(res => res.data ?? null),
       shareReplay(1)
     );
@@ -65,12 +75,14 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
     const userType$ = this._store.select(selectAuthUserType);
 
-    this.plans$ = combineLatest([userType$, allPlans$, this.currentSubscription$]).pipe(
+    this.plans$ = combineLatest([userType$, allPlans$, this.currentSubscription$, this.latestSubscription$]).pipe(
       takeUntil(this._destroy$),
-      map(([userType, plans, subscription]) => {
+      map(([userType, plans, subscription, latest]) => {
         this.userType = userType ?? 'customer';
-        this.currentPlanId = subscription?.planId ?? null;
-        this.currentPlanDuration = subscription?.duration ?? '';
+        const hasActiveCurrent = !!subscription && !this.isExpired(subscription);
+        this.currentPlanId = hasActiveCurrent ? subscription.planId : null;
+        this.currentPlanDuration = hasActiveCurrent ? (subscription.duration ?? '') : '';
+        this.renewPlanId = latest && this.isExpired(latest) ? latest.planId : null;
 
         return plans.filter(plan => {
           const isRoleMatched = plan.role.toLowerCase() === this.userType.toLowerCase();
@@ -111,19 +123,14 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
     return this._paymentService.verifySubscriptionPayment(response, orderData).pipe(
       switchMap((verificationResponse) => {
-        const { verified, subscriptionId, transaction } = verificationResponse;
+        const { verified, transaction } = verificationResponse;
 
-        if (!transaction || !subscriptionId || !transaction.id || !verified) {
+        if (!transaction || !transaction.id || !verified) {
           this._toastr.error('Payment verification failed or transaction missing.');
           return throwError(() => new Error('Payment verification failed'));
         }
-        return this._subscriptionService.updatePaymentStatus({
-          transactionId: transaction.id,
-          subscriptionId,
-          paymentStatus: PaymentStatus.PAID
-        })
-      }),
-      map(() => void 0)
+        return of(void 0);
+      })
     );
   }
 
@@ -152,6 +159,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
               })
             )
             .subscribe(() => {
+              this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe();
               observer.next('dismissed');
               observer.complete();
             })
@@ -163,7 +171,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   private _afterSuccessfulSubscription() {
     this._toastr.success('Payment verified. Subscription completed.');
     let url = this.userType == 'customer'
-      ? '/subscriptions'
+      ? '/subscription'
       : '/provider/subscriptions'
     this._router.navigate([url]);
   }
@@ -190,7 +198,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     );
   }
 
-  private _initializeUpgrade(amount: number, plan: IPlan) {
+  private _initializeUpgrade(amount: number, plan: IPlan): Observable<'success' | 'dismissed'> {
     const subscriptionData: ICreateSubscription = {
       planId: plan.id,
       duration: plan.duration,
@@ -214,10 +222,11 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   }
 
   private _handleFreePlan() {
-    this._router.navigate(['provider', 'dashboard']);
+    const url = this.userType === 'provider' ? ['provider', 'dashboard'] : ['homepage'];
+    this._router.navigate(url);
   }
 
-  private _handleUpgrade(plan: IPlan): Observable<void> {
+  private _handleUpgrade(plan: IPlan): Observable<'success' | 'dismissed'> {
     return this.currentSubscription$
       .pipe(
         takeUntil(this._destroy$),
@@ -225,9 +234,22 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
         switchMap(subscription => this._subscriptionService.getUpgradeAmount(subscription.id)),
         map(res => res.data),
         filter(Boolean),
-        switchMap((amount) => this._initializeUpgrade(amount, plan).pipe(
-          map(() => void 0)
-        )),
+        switchMap(({ upgradeAmount, creditAmount, monthlyPrice, yearlyPrice }) => {
+          const confirmed = confirm(
+            `Upgrade to Yearly Plan\n\n` +
+            `Yearly price: ₹${yearlyPrice}\n` +
+            `Monthly paid: ₹${monthlyPrice}\n` +
+            `Prorated credit: ₹${creditAmount.toFixed(2)}\n\n` +
+            `Amount due: ₹${upgradeAmount}\n\n` +
+            `Your current monthly plan stays active until the payment is confirmed.`
+          );
+
+          if (!confirmed) {
+            return of('dismissed' as const);
+          }
+
+          return this._initializeUpgrade(upgradeAmount, plan);
+        }),
         catchError(err => {
           this._toastr.error('Upgrade failed.');
           return throwError(() => err);
@@ -241,13 +263,15 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
       return;
     }
 
-    const isUpgrade = this.currentPlanDuration === PlanDuration.MONTHLY;
-    if (isUpgrade) {
-      this._toastr.warning('You are already in subscription.');
+    if (this.currentPlanDuration === PlanDuration.YEARLY) {
+      this._toastr.warning('You are a yearly subscriber. Transitions are locked until your current term expires.');
       return;
-    };
+    }
 
-    const flow$ = this._initializePayment(plan);
+    const isUpgrade = this.currentPlanDuration === PlanDuration.MONTHLY && plan.duration === PlanDuration.YEARLY;
+    const flow$ = isUpgrade
+      ? this._handleUpgrade(plan)
+      : this._initializePayment(plan);
 
     flow$.pipe(takeUntil(this._destroy$)).subscribe({
       next: (status) => {
@@ -257,25 +281,11 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
           this._toastr.info('Payment dismissed.');
         }
       },
+      error: (err) => {
+        console.error('Subscription payment flow failed', err);
+        this._toastr.error('Something went wrong. Please try again.');
+      },
     });
-  }
-
-  getPlanButtonClass(plan: any): string {
-    const planName = plan.name?.toLowerCase();
-    const isCurrent = this.currentPlanId === plan.id;
-
-    if (isCurrent) {
-      return 'bg-gray-300 text-gray-600 border border-gray-400 cursor-not-allowed';
-    }
-
-    switch (planName) {
-      case 'free':
-        return 'bg-primary-50 text-primary-700 border border-primary-200 font-semibold';
-      case 'premium':
-        return 'bg-green-100 text-green-800 border border-green-400 hover:bg-green-200';
-      default:
-        return 'bg-gray-200 text-black border border-gray-300';
-    }
   }
 
   goBack() {
@@ -294,8 +304,20 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     return this.currentPlanDuration === 'yearly';
   }
 
+  isExpired(sub: ISubscription | null): boolean {
+    return !!sub && !!sub.endDate && new Date(sub.endDate).getTime() < Date.now();
+  }
+
+  isRenewalPlan(plan: any): boolean {
+    return !!this.renewPlanId && this.renewPlanId === plan.id;
+  }
+
   // Get the appropriate plan button text based on conditions
   getPlanButtonText(plan: any): string {
+    if (this.isRenewalPlan(plan)) {
+      return 'Renew ' + (plan.duration || '').toString();
+    }
+
     const planDuration = plan.duration?.toLowerCase();
 
     if (this.currentPlanDuration === PlanDuration.MONTHLY && planDuration === PlanDuration.YEARLY) {
@@ -306,7 +328,88 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
       return 'Get Started';
     }
 
+    if (!this.currentPlanId) {
+      return 'Choose ' + plan.duration;
+    }
+
     return 'Upgrade to ' + (plan.duration || '').toString();
+  }
+
+  getPlanTagline(plan: any): string {
+    const name = plan.name?.toLowerCase();
+    const yearly = plan.duration?.toLowerCase() === 'yearly';
+
+    if (name === 'free') {
+      return 'Everything you need to get started — at no cost.';
+    }
+
+    if (yearly) {
+      return this.userType === 'provider'
+        ? 'Full provider toolkit, billed once a year — best value.'
+        : 'Full premium experience, billed once a year — best value.';
+    }
+
+    return this.userType === 'provider'
+      ? 'Grow your business with premium provider tools.'
+      : 'Elevate every booking with premium customer benefits.';
+  }
+
+  getPerMonthPrice(plan: any): number {
+    return Math.round((plan.price || 0) / 12);
+  }
+
+  getSavingsPercent(plans: IPlan[], plan: any): number {
+    const monthly = plans.find(
+      p => p.name === plan.name && p.duration?.toLowerCase() === 'monthly'
+    );
+    if (!monthly || !monthly.price) return 0;
+
+    return Math.round((1 - plan.price / (monthly.price * 12)) * 100);
+  }
+
+  getBenefits(): PlanBenefit[] {
+    if (this.userType === 'provider') {
+      return [
+        {
+          icon: 'fa-chart-line',
+          title: 'Data-driven growth',
+          desc: 'Track bookings, revenue and ratings with your full analytics dashboard.',
+        },
+        {
+          icon: 'fa-magnifying-glass',
+          title: 'More visibility',
+          desc: 'Rank higher in search results with priority service listing placement.',
+        },
+        {
+          icon: 'fa-headset',
+          title: '24/7 support',
+          desc: 'Dedicated support whenever you need it — day or night.',
+        },
+      ];
+    }
+
+    return [
+      {
+        icon: 'fa-bolt',
+        title: 'Priority matching',
+        desc: 'Get matched with top-rated professionals before other customers.',
+      },
+      {
+        icon: 'fa-calendar-check',
+        title: 'Priority booking',
+        desc: 'Book the best pros faster with priority slots and quicker responses.',
+      },
+      {
+        icon: 'fa-headset',
+        title: '24/7 support',
+        desc: 'Dedicated support whenever you need it — day or night.',
+      },
+    ];
+  }
+
+  scrollToPlans(): void {
+    const grid = document.getElementById('plans-grid');
+    grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
 }

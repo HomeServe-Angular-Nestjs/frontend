@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { IBreadcrumb } from '../../models/breadcrumb.model';
+import { IBreadcrumb, IBreadcrumbParent } from '../../models/breadcrumb.model';
 
 @Injectable({
     providedIn: 'root'
@@ -17,7 +17,6 @@ export class BreadcrumbService {
             this.updateBreadcrumbs();
         });
 
-        // Handle initial load
         setTimeout(() => this.updateBreadcrumbs(), 0);
     }
 
@@ -30,21 +29,34 @@ export class BreadcrumbService {
 
     private addBreadcrumb(route: ActivatedRouteSnapshot, parentUrl: string[], breadcrumbs: IBreadcrumb[]) {
         if (route) {
-            // Construct the route URL
             const routeUrl = parentUrl.concat(route.url.map(url => url.path));
+            const queryString = this.buildQueryString(route.queryParams);
 
-            // Add breadcrumb if it has a label
+            const parent = route.data['breadcrumbParent'] as IBreadcrumbParent | undefined;
+            if (parent) {
+                breadcrumbs.push({
+                    label: parent.label,
+                    url: parent.path + queryString
+                });
+            }
+
             if (route.data['breadcrumb']) {
                 const breadcrumb: IBreadcrumb = {
                     label: this.getLabel(route.data['breadcrumb'], route),
-                    url: '/' + routeUrl.join('/')
+                    url: '/' + routeUrl.join('/') + queryString
                 };
                 breadcrumbs.push(breadcrumb);
             }
 
-            // Add child breadcrumbs recursively
             this.addBreadcrumb(route.firstChild!, routeUrl, breadcrumbs);
         }
+    }
+
+    private buildQueryString(queryParams: Record<string, any>): string {
+        const params = Object.entries(queryParams ?? {})
+            .filter(([, value]) => value !== undefined && value !== null && value !== '')
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+        return params.length ? '?' + params.join('&') : '';
     }
 
     private getLabel(breadcrumb: any, route: ActivatedRouteSnapshot): string {

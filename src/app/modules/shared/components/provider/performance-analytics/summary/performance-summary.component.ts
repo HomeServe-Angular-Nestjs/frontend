@@ -1,10 +1,7 @@
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
-import { AnalyticService } from "../../../../../../core/services/analytics.service";
-import { takeUntil, filter, Subject } from 'rxjs';
+import { Component, Input } from "@angular/core";
 import { TimeFormatterPipe } from "../../../../../../core/pipes/time-formatter.pipe";
 import { CommonModule } from "@angular/common";
 import { MetricPerformanceBadgePipe } from "../../../../../../core/pipes/performance-label.pipe";
-import { IResponse } from "../../../../models/response.model";
 import { IOverviewCard, IProviderPerformanceOverview } from "../../../../../../core/models/analytics.model";
 
 @Component({
@@ -12,13 +9,8 @@ import { IOverviewCard, IProviderPerformanceOverview } from "../../../../../../c
     templateUrl: './performance-summary.component.html',
     imports: [CommonModule, TimeFormatterPipe, MetricPerformanceBadgePipe],
 })
-export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
-
-    isLoading = true;
-
-    performanceOverviewStats: IProviderPerformanceOverview = {
+export class ProviderPerformanceSummaryComponent {
+    @Input() performanceOverviewStats: IProviderPerformanceOverview = {
         avgRating: 0,
         avgResponseTime: 0,
         completionRate: 0,
@@ -67,26 +59,4 @@ export class ProviderPerformanceSummaryComponent implements OnInit, OnDestroy {
             description: 'Punctuality performance'
         }
     ];
-
-    ngOnInit(): void {
-        this._getStats();
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
-
-    private _getStats() {
-        this.isLoading = true;
-        this._analyticService.getPerformanceSummary()
-            .pipe(
-                takeUntil(this._destroy$),
-                filter((res): res is Required<IResponse<IProviderPerformanceOverview>> => !!res.data)
-            )
-            .subscribe(res => {
-                this.performanceOverviewStats = res.data;
-                this.isLoading = false;
-            });
-    }
 }

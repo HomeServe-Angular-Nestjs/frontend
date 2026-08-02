@@ -26,13 +26,6 @@
                         <option value="duration-asc">Duration: Quickest</option>
                         <option value="duration-desc">Duration: Longest</option>
                     </select>
-
-                    <select
-                        class="bg-gray-50 border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none cursor-pointer"
-                        [(ngModel)]="selectedServiceCategory" (ngModelChange)="selectCategory($event)">
-                        <option value="">All Categories</option>
-                        <option *ngFor="let category of serviceCategories" [value]="category">{{category}}</option>
-                    </select>
                 </div>
             </div>
         </div>
@@ -63,12 +56,17 @@
             <!-- Duration Options -->
             <div class="lg:col-span-2">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">Duration filter</h3>
-                <div class="flex flex-wrap gap-2">
-                    <button *ngFor="let key of durationKeys" (click)="selectDuration(key)"
-                        [ngClass]="selectedDurationKey === key ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 scale-105' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'"
-                        class="px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300">
-                        {{ key }}
-                    </button>
+                <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Duration filter">
+                    <label *ngFor="let key of durationKeys" class="cursor-pointer select-none">
+                        <input type="radio" name="service-duration" class="sr-only" [value]="key"
+                            [checked]="selectedDurationKey === key" />
+                        <span (click)="selectDuration(key)" role="radio"
+                            [attr.aria-checked]="selectedDurationKey === key"
+                            [ngClass]="selectedDurationKey === key ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 scale-105' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'"
+                            class="inline-block px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300">
+                            {{ key }}
+                        </span>
+                    </label>
                 </div>
             </div>
         </div>

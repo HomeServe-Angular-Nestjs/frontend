@@ -5,6 +5,8 @@ import { notificationAction } from "./notification.action";
 
 export const initialNotificationState: INotificationState = {
     notifications: notificationAdaptor.getInitialState(),
+    cursor: null,
+    hasMore: false,
     loading: false,
     error: null
 };
@@ -14,9 +16,20 @@ export const notificationFeature = createFeature({
     reducer: createReducer(
         initialNotificationState,
 
-        on(notificationAction.notificationSuccess, (state, { notifications }) => ({
+        on(notificationAction.notificationSuccess, (state, { notifications, cursor, hasMore }) => ({
             ...state,
             notifications: notificationAdaptor.setAll(notifications, state.notifications),
+            cursor: cursor ?? null,
+            hasMore: hasMore ?? false,
+            loading: false,
+            error: null
+        })),
+
+        on(notificationAction.appendNotificationsSuccess, (state, { notifications, cursor, hasMore }) => ({
+            ...state,
+            notifications: notificationAdaptor.addMany(notifications, state.notifications),
+            cursor,
+            hasMore,
             loading: false,
             error: null
         })),
@@ -33,6 +46,12 @@ export const notificationFeature = createFeature({
             error: null
         })),
 
+        on(notificationAction.fetchNextNotifications, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
         on(notificationAction.addNotification, (state, { notification }) => ({
             ...state,
             notifications: notificationAdaptor.upsertOne(notification, state.notifications),
@@ -44,6 +63,16 @@ export const notificationFeature = createFeature({
             ...state,
             loading: true,
             error: null,
+        })),
+
+        on(notificationAction.markAllReadSuccess, (state) => ({
+            ...state,
+            notifications: notificationAdaptor.updateMany(
+                state.notifications.ids.map(id => ({ id: id as string, changes: { isRead: true } })),
+                state.notifications
+            ),
+            loading: false,
+            error: null
         })),
 
         on(notificationAction.removeNotification, (state) => ({
@@ -69,6 +98,8 @@ export const notificationFeature = createFeature({
         on(notificationAction.clearAllNotificationSuccess, (state) => ({
             ...state,
             notifications: notificationAdaptor.removeAll(state.notifications),
+            cursor: null,
+            hasMore: false,
             loading: false,
             error: null
         }))

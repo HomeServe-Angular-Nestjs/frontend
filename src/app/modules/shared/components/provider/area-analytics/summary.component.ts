@@ -1,7 +1,5 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
 import { IAreaSummary, IOverviewCard } from '../../../../../core/models/analytics.model';
 
 @Component({
@@ -65,11 +63,8 @@ import { IAreaSummary, IOverviewCard } from '../../../../../core/models/analytic
     </div>
   `
 })
-export class AreaKpiComponent implements OnInit, OnDestroy {
-  private _analyticService = inject(AnalyticService);
-  private _destroy$ = new Subject<void>();
-
-  areaSummary = {
+export class AreaKpiComponent {
+  @Input() areaSummary: IAreaSummary = {
     totalBookings: 0,
     topPerformingArea: 'N/A',
     underperformingArea: 'N/A',
@@ -110,17 +105,6 @@ export class AreaKpiComponent implements OnInit, OnDestroy {
       description: 'Time of day with the highest number of bookings',
     }
   ];
-
-  ngOnInit(): void {
-    this._analyticService.getAreaKpis()
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(res => this.areaSummary = res.data ?? this.areaSummary);
-  }
-
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
-  }
 
   getCardValue(card: IOverviewCard<IAreaSummary>): number | string {
     return this.areaSummary[card.valueKey];

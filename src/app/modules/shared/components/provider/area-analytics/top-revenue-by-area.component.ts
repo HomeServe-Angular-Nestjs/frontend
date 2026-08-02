@@ -1,9 +1,7 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
-import { Subject, takeUntil } from 'rxjs';
 import { ITopAreaRevenue } from '../../../../../core/models/analytics.model';
 
 @Component({
@@ -28,22 +26,13 @@ import { ITopAreaRevenue } from '../../../../../core/models/analytics.model';
     </section>
   `
 })
-export class TopAreasRevenueComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class TopAreasRevenueComponent {
+    @Input()
+    set data(value: ITopAreaRevenue[]) {
+        this.chartOption = this.getChartOption(value ?? []);
+    }
 
     chartOption!: EChartsOption;
-
-    ngOnInit(): void {
-        this._analyticService.getTopAreasRevenue()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => this.chartOption = this.getChartOption(res.data ?? []));
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     getChartOption(data: ITopAreaRevenue[]): EChartsOption {
         const locations = data.map(d => d.locationName);

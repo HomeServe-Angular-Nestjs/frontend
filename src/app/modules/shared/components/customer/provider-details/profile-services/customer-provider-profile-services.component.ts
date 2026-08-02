@@ -36,7 +36,6 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
   providerData!: IProvider | null;
   allServices: IProviderService[] = [];
   serviceData: IProviderService[] = [];
-  serviceCategories: string[] = [];
 
   serviceDurations: Record<ServiceDurationKey, IServiceDurationRange> = {
     "Quick Service": { minHours: 0, maxHours: 2 },
@@ -48,7 +47,6 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
 
   searchTerm: string = '';
   sortOption: SortOption = 'price-asc';
-  selectedServiceCategory: string = '';
   priceRange: IPriceRange = { min: undefined, max: undefined };
   selectedDuration?: IServiceDurationRange = undefined;
   selectedDurationKey?: ServiceDurationKey;
@@ -87,7 +85,6 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
         min: this.priceRange.min,
         max: this.priceRange.max
       },
-      category: this.selectedServiceCategory,
       duration: this.selectedDuration
     };
     this._filters$.next(filter);
@@ -98,16 +95,15 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
 
     // Search filter
     if (filters.search) {
-      const search = filters.search.toLowerCase();
-      filtered = filtered.filter(s =>
-        s.category.name.toLowerCase().includes(search) ||
-        s.description.toLowerCase().includes(search)
-      );
-    }
-
-    // Category filter
-    if (filters.category) {
-      filtered = filtered.filter(s => s.category.name === filters.category);
+      const search = filters.search.toLowerCase().trim();
+      filtered = filtered.filter(s => {
+        const categoryName = (s.category?.name ?? '').toLowerCase();
+        const description = (s.description ?? '').toLowerCase();
+        const keywords = (s.category?.keywords ?? []).map(k => k.toLowerCase());
+        return categoryName.includes(search) ||
+          description.includes(search) ||
+          keywords.some(k => k.includes(search));
+      });
     }
 
     // Price filter
@@ -154,7 +150,6 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
         if (res.data) {
           this.allServices = res.data;
           this.serviceData = [...this.allServices];
-          this.serviceCategories = [...new Set(this.allServices.map(s => s.category.name))];
           this._emitFilters();
         }
       },
@@ -177,18 +172,25 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
   }
 
   selectDuration(key: ServiceDurationKey) {
-    this.selectedDurationKey = key;
-    this.selectedDuration = this.serviceDurations[key];
-    this._emitFilters();
-  }
-
-  selectCategory(value: string) {
-    this.selectedServiceCategory = value;
+    if (this.selectedDurationKey === key) {
+      this.selectedDurationKey = undefined;
+      this.selectedDuration = undefined;
+    } else {
+      this.selectedDurationKey = key;
+      this.selectedDuration = this.serviceDurations[key];
+    }
     this._emitFilters();
   }
 
   selectPriceRange() {
-    const { min, max } = this.priceRange;
+    const normalize = (value: unknown): number | undefined => {
+      const num = Number(value);
+      return (value === '' || value === null || value === undefined || Number.isNaN(num)) ? undefined : num;
+    };
+
+    const min = normalize(this.priceRange.min);
+    const max = normalize(this.priceRange.max);
+    this.priceRange = { min, max };
 
     if ((min !== undefined && min < 0) || (max !== undefined && max < 0)) {
       this._toastr.error("Price cannot be negative.");
@@ -210,7 +212,6 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
 
   clearFilters() {
     this.searchTerm = '';
-    this.selectedServiceCategory = '';
     this.priceRange = { min: undefined, max: undefined };
     this.selectedDuration = undefined;
     this.selectedDurationKey = undefined;

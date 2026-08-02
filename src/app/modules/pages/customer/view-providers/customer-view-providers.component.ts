@@ -2,13 +2,14 @@ import { Component, computed, effect, inject, signal, ViewChild } from '@angular
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { switchMap } from 'rxjs';
+import { catchError, of, switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { decode as base64Decode } from 'js-base64';
 import { IFilterFetchProviders } from '../../../../core/models/user.model';
 import { CustomerProviderViewCardComponent } from "../../../shared/components/customer/provider-view-card/customer-provider-view-card.component";
 import { ProviderViewCardFilterComponent } from "../../../shared/partials/sections/customer/provider-view-card-filter/provider-view-card-filter.component";
 import { ProviderService } from '../../../../core/services/provider.service';
+import { CategoryService } from '../../../../core/services/category.service';
 import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
 import { IPagination } from '../../../../core/models/booking.model';
 import { CustomerPaginationComponent } from '../../../shared/partials/sections/customer/pagination/pagination.component';
@@ -20,6 +21,7 @@ import { CustomerPaginationComponent } from '../../../shared/partials/sections/c
 })
 export class CustomerViewProvidersComponent {
   private readonly _providerService = inject(ProviderService);
+  private readonly _categoryService = inject(CategoryService);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
@@ -27,8 +29,11 @@ export class CustomerViewProvidersComponent {
   @ViewChild(ProviderViewCardFilterComponent)
   filterComponent!: ProviderViewCardFilterComponent;
 
+  private _resolvedCategorySlug = '';
+
   filters = signal<IFilterFetchProviders>({
     search: '',
+    address: '',
     page: 1,
     limit: 10,
     status: 'all',
@@ -48,7 +53,20 @@ export class CustomerViewProvidersComponent {
   private providersResponse = toSignal(
     toObservable(this.filters).pipe(
       switchMap(filters =>
-        this._providerService.getProviders(filters)
+        this._providerService.getProviders(filters).pipe(
+          catchError((error) => {
+            console.error('[Search, Header] failed to get providers:', error);
+            this._toastr.error('Failed to fetch providers. Please try again.');
+            return of({
+              success: false,
+              message: '',
+              data: {
+                providerCards: [],
+                pagination: { total: 0, page: 1, limit: 10 },
+              },
+            });
+          })
+        )
       )
     ),
     { initialValue: null }
@@ -85,12 +103,15 @@ export class CustomerViewProvidersComponent {
       const categoryId = params.get('categoryId');
       nextFilters.categoryId = categoryId || '';
 
+      const address = params.get('address');
+      nextFilters.address = address || '';
+
       // Decode base64 ls param from homepage full search
       const ls = params.get('ls');
       if (ls) {
         try {
           const decoded = JSON.parse(base64Decode(ls));
-          nextFilters.search = decoded.title || '';
+          nextFilters.categoryId = decoded.categoryId || '';
           nextFilters.lat = decoded.lat != null ? Number(decoded.lat) : null;
           nextFilters.lng = decoded.lng != null ? Number(decoded.lng) : null;
         } catch {
@@ -98,10 +119,18 @@ export class CustomerViewProvidersComponent {
         }
       }
 
-      // Support category slug from popular services quick-links
+      // Resolve category slug from popular services quick-links to a real id
       const category = params.get('category');
-      if (category) {
-        nextFilters.search = category;
+      if (category && category !== this._resolvedCategorySlug) {
+        this._resolvedCategorySlug = category;
+        this._categoryService.searchCategories(category).subscribe(res => {
+          const match = res.data?.[0];
+          if (match) {
+            this.applyFilters({ categoryId: match.categoryId });
+          }
+        });
+      } else if (!category) {
+        this._resolvedCategorySlug = '';
       }
 
       // Support direct query params (override any inferred values)
@@ -111,6 +140,11 @@ export class CustomerViewProvidersComponent {
       const lng = params.get('lng');
       if (lat) nextFilters.lat = Number(lat);
       if (lng) nextFilters.lng = Number(lng);
+
+      if (!ls && !lat && !lng) {
+        nextFilters.lat = null;
+        nextFilters.lng = null;
+      }
 
       const merged = {
         ...current,

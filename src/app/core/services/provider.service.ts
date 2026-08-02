@@ -24,7 +24,8 @@ export class ProviderService {
 
     Object.entries(filter).forEach(([key, value]) => {
       if (value && value !== undefined && value !== null) {
-        params = params.set(key, value);
+        const paramValue = Array.isArray(value) ? (value as string[]).join(',') : value as string;
+        params = params.set(key, paramValue);
       }
     });
 

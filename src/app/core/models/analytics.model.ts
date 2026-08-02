@@ -160,3 +160,46 @@ export interface IPeakServiceTime {
     weekdayBookings: number;
     weekendBookings: number;
 }
+
+// ----------- Analytics Resource Bundles ------------
+
+export interface IPerformanceAnalyticsBundle {
+    summary: { performanceAnalytics: IProviderPerformanceOverview };
+    bookings: {
+        bookingOverview: IBookingPerformanceData[];
+        trends: IReviewChartData;
+    };
+    quality: {
+        responseTimeDistribution: IResponseTimeChartData[];
+        onTimeArrival: IOnTimeArrivalChartData[];
+        monthlyDisputeStats: IDisputeAnalyticsChartData[];
+    };
+    comparison: {
+        comparisonOverview: IComparisonOverviewData;
+        comparisonStats: IComparisonChartData[];
+    };
+}
+
+export interface IRevenueAnalyticsBundle {
+    summary: { revenueOverview: IProviderRevenueOverview };
+    trends: { trend: IRevenueTrendData };
+    growth: {
+        monthlyGrowth: IRevenueMonthlyGrowthRateData[];
+        composition: IRevenueCompositionData[];
+        topServices: ITopServicesByRevenue[];
+    };
+    clients: { newAndReturning: INewOrReturningClientData[] };
+}
+
+export interface IAreaAnalyticsBundle {
+    summary: { areaSummary: IAreaSummary };
+    demand: {
+        serviceDemand: IServiceDemandData[];
+        byLocation: ILocationRevenue[];
+    };
+    revenue: {
+        topAreas: ITopAreaRevenue[];
+        underperforming: IUnderperformingArea[];
+    };
+    peak: { peakServiceTime: IPeakServiceTime[] };
+}

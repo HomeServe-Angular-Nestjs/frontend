@@ -84,7 +84,7 @@ export interface IProvider extends IBaseUser {
     schedules: string[];
     subscriptionID: string;
     profession: string;
-    serviceRadius?: number;
+    serviceRadius?: number | null;
     enableSR: boolean;
     bookingLimit: number | null;
     bufferTime: number | null;
@@ -119,6 +119,7 @@ export interface IProviderState {
 export interface ICustomerState {
     customer: ICustomer | null;
     loading: boolean;
+    isSubmittingProfile: boolean;
     error: string | null;
 }
 
@@ -155,6 +156,7 @@ export interface IProviderUpdateBio {
     expertise?: IExpertise[];
     additionalSkills?: string[];
     languages?: ILanguage[];
+    awards?: string[];
 }
 
 export interface IVerificationStatusMetrics {
@@ -216,6 +218,7 @@ export interface IHomeSearch {
 
 export interface IFilterFetchProviders extends IHomeSearch {
     search?: string;
+    address?: string;
     isCertified?: boolean;
     status?: string;
     page?: number;
@@ -224,6 +227,7 @@ export interface IFilterFetchProviders extends IHomeSearch {
     date?: string;
     sort?: 'best_rated' | 'nearest' | 'all';
     categoryId?: string;
+    providerIds?: string[];
 }
 
 export interface IStats {

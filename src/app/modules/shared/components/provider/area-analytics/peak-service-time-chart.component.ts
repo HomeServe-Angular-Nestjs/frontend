@@ -1,10 +1,8 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { IPeakServiceTime } from '../../../../../core/models/analytics.model';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
-import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-peak-service-times',
@@ -29,23 +27,15 @@ import { Subject, takeUntil } from 'rxjs';
     </section>
   `
 })
-export class PeakServiceTimesComponent implements OnInit, OnDestroy {
-  private readonly _analyticService = inject(AnalyticService);
-  private _destroy$ = new Subject<void>();
+export class PeakServiceTimesComponent {
+  @Input()
+  set data(value: IPeakServiceTime[]) {
+    this.chartOption = this._getChartOption(value ?? []);
+  }
+
   private readonly hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`); // 6 AM to 11 PM
 
   chartOption!: EChartsOption;
-
-  ngOnInit(): void {
-    this._analyticService.getPeakServiceTime()
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(res => this.chartOption = this._getChartOption(res.data ?? []));
-  }
-
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
-  }
 
   private _getChartOption(data: IPeakServiceTime[]): EChartsOption {
     const hours = data.map(d => `${d.hour}:00`);

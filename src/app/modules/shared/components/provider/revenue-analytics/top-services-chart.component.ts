@@ -1,9 +1,7 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
-import { Subject, takeUntil } from 'rxjs';
 import { ITopServicesByRevenue } from '../../../../../core/models/analytics.model';
 
 @Component({
@@ -18,26 +16,15 @@ import { ITopServicesByRevenue } from '../../../../../core/models/analytics.mode
     </div>
   `
 })
-export class RevenueTopServicesChartComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class RevenueTopServicesChartComponent {
+    @Input()
+    set data(value: ITopServicesByRevenue[]) {
+        this.chartData = value ?? [];
+        this.setChartOptions();
+    }
 
     chartOptions: EChartsOption = {};
     chartData: ITopServicesByRevenue[] = [];
-
-    ngOnInit(): void {
-        this._analyticService.getTopServicesByRevenue()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => {
-                this.chartData = res.data ?? [];
-                this.setChartOptions();
-            });
-    }
-
-    ngOnDestroy(): void {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     private setChartOptions() {
 

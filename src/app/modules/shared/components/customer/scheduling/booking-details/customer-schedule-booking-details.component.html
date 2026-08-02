@@ -10,6 +10,20 @@
     </button>
   </div>
 
+  <div *ngIf="!selectedAddress || !phoneNumber"
+    class="mb-8 flex flex-wrap items-center justify-between gap-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl px-4 py-3">
+    <div class="flex items-start gap-2.5 text-xs font-medium">
+      <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+      <span>
+        Please add your {{ !selectedAddress && !phoneNumber ? 'location and phone number' : !selectedAddress ? 'service location' : 'phone number' }} to book a service.
+      </span>
+    </div>
+    <button (click)="navigateToProfile()"
+      class="text-[10px] font-bold text-amber-700 hover:text-amber-800 uppercase tracking-widest transition-colors bg-amber-100 px-3 py-1.5 rounded-full">
+      Update Details
+    </button>
+  </div>
+
   <!-- Customer Info -->
   <div class="bg-slate-50/50 rounded-2xl p-6 mb-8 border border-slate-100">
 

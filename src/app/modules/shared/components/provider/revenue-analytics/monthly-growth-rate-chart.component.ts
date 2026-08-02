@@ -1,8 +1,6 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { AnalyticService } from '../../../../../core/services/analytics.service';
-import { Subject, takeUntil } from 'rxjs';
 import { TopLevelFormatterParams } from 'echarts/types/dist/shared';
 import { IRevenueMonthlyGrowthRateData } from '../../../../../core/models/analytics.model';
 
@@ -18,26 +16,15 @@ import { IRevenueMonthlyGrowthRateData } from '../../../../../core/models/analyt
     </div>
   `
 })
-export class RevenueEarningsForecastChartComponent implements OnInit, OnDestroy {
-    private readonly _analyticService = inject(AnalyticService);
-    private _destroy$ = new Subject<void>();
+export class RevenueEarningsForecastChartComponent {
+    @Input()
+    set data(value: IRevenueMonthlyGrowthRateData[]) {
+        this.chartData = value ?? [];
+        this._setChartOptions();
+    }
 
     chartOptions: EChartsOption = {};
     chartData: IRevenueMonthlyGrowthRateData[] = [];
-
-    ngOnInit() {
-        this._analyticService.getMonthlyRevenueGrowthRate()
-            .pipe(takeUntil(this._destroy$))
-            .subscribe(res => {
-                this.chartData = res.data ?? [];
-                this._setChartOptions();
-            });
-    }
-
-    ngOnDestroy() {
-        this._destroy$.next();
-        this._destroy$.complete();
-    }
 
     private _setChartOptions() {
         const months = this.chartData.map(d => d.month);

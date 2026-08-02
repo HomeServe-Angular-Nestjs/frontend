@@ -12,6 +12,7 @@ import { Store } from "@ngrx/store";
 import { selectAuthUserType } from "./auth.selector";
 import { UserType } from "../../modules/shared/models/user.model";
 import { ToastNotificationService } from "../../core/services/public/toastr.service";
+import { SubscriptionService } from "../../core/services/subscription.service";
 
 export const authEffects = {
     login$: createEffect(() => {
@@ -88,5 +89,15 @@ export const authEffects = {
                     })
                 )),
         );
-    }, { functional: true })
+    }, { functional: true }),
+
+    logoutSubscriptionReset$: createEffect(() => {
+        const actions$ = inject(Actions);
+        const subscriptionService = inject(SubscriptionService);
+
+        return actions$.pipe(
+            ofType(authActions.logoutSuccess),
+            tap(() => subscriptionService.reset())
+        );
+    }, { functional: true, dispatch: false }),
 }; 

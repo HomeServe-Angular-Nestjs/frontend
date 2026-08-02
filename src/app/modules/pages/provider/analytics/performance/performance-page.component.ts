@@ -14,6 +14,9 @@ import { ProviderPerformanceComparisonChartComponent } from "../../../../shared/
 import { ProviderPerformanceOnTimeArrivalChartComponent } from "../../../../shared/components/provider/performance-analytics/reliability-chart/on-time-arrival-chart.component";
 import { ProviderPerformanceDisputesChartComponent } from "../../../../shared/components/provider/performance-analytics/reliability-chart/disputes-chart.component";
 import { ProviderPerformanceComparisonOverviewComponent } from "../../../../shared/components/provider/performance-analytics/comparison-chart/comparison-overview.component";
+import { AnalyticService } from "../../../../../core/services/analytics.service";
+import { IPerformanceAnalyticsBundle } from "../../../../../core/models/analytics.model";
+import { map, shareReplay } from "rxjs";
 
 
 echarts.use([
@@ -48,6 +51,12 @@ echarts.use([
 })
 export class ProviderPerformanceLayoutComponent implements OnInit {
     private readonly _sharedService = inject(SharedDataService);
+    private readonly _analyticService = inject(AnalyticService);
+
+    bundle$ = this._analyticService.getPerformanceBundle().pipe(
+        map(res => res?.data ?? null),
+        shareReplay(1)
+    );
 
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Performance Analytics');
