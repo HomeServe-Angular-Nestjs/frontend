@@ -17,6 +17,7 @@ export class ReservationSocketService extends BaseSocketService {
   private readonly NEW_RESERVATION = 'reservation:new'
   private readonly CHECK_RESERVATION = 'reservation:check';
   private readonly CREATE_RESERVATION = 'reservation:create';
+  private readonly RELEASE_RESERVATION = 'reservation:release';
   private readonly IS_RESERVED = 'reservation:reserved';
   private readonly RESERVATION_ERROR = 'reservation:error';
   private readonly INFORM_RESERVATION = 'reservation:inform';
@@ -107,6 +108,14 @@ export class ReservationSocketService extends BaseSocketService {
 
   createReservation(slot: ISendReservation) {
     this.emit<ISendReservation>(this.CREATE_RESERVATION, slot);
+  }
+
+  releaseReservation(slot: ISendReservation) {
+    this.emit<ISendReservation>(this.RELEASE_RESERVATION, slot);
+  }
+
+  resetPaymentGate(): void {
+    this._initiatePaymentSource.next(false);
   }
 
   checkReservationUpdates(slot: ISendReservation) {

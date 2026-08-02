@@ -81,11 +81,15 @@ export class ErrorHandlerService {
             return 'An unexpected error occurred. Please try again later.';
         }
 
-        if (errorCode) {
-            const mapped = this._codeMessages[errorCode as ErrorCodes];
-            if (mapped) {
-                return mapped;
-            }
+        const mapped = errorCode ? this._codeMessages[errorCode as ErrorCodes] : undefined;
+        const isGenericMapping = mapped === this._codeMessages[ErrorCodes.BAD_REQUEST];
+
+        if (backendMessage && this._isUserFriendly(backendMessage) && isGenericMapping) {
+            return backendMessage;
+        }
+
+        if (mapped) {
+            return mapped;
         }
 
         if (backendMessage && this._isUserFriendly(backendMessage)) {

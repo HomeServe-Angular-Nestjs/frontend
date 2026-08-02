@@ -96,6 +96,7 @@ export enum PaymentDirection {
 
 export enum PaymentSource {
   RAZORPAY = 'razorpay',
+  WALLET = 'wallet',
   INTERNAL = 'internal', // for wallet/commission transfers
 }
 

@@ -86,7 +86,12 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     this._bookingService.updateBooking(bookingData)
       .pipe(
         takeUntil(this._destroy$),
-        tap((res) => this._toastr.success(res.message))
+        tap((res) => {
+          this._toastr.success(res.message);
+          if (res.data) {
+            this._updateCancelledBookingData(bookingId, res.data);
+          }
+        })
       )
       .subscribe();
   }
@@ -122,10 +127,17 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (order) => {
           this._razorpayWrapperService.openCheckout(
-            order,"","","",
+            order, "", "", "",
             (paymentResponse: RazorpayPaymentResponse) =>
               this._verifyPaymentAndUpdateBooking(paymentResponse, order, bookingId),
+            () => {
+              this._toastr.info('Payment cancelled.');
+              this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe();
+            },
           );
+        },
+        error: () => {
+          this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe();
         }
       });
   }
@@ -166,6 +178,10 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
           this.cancellationReasonModal = false;
           this._toastr.success(res.message);
         },
+        error: () => {
+          this.bookingSelectedForCancellation = '';
+          this.cancellationReasonModal = false;
+        }
       });
   }
 
@@ -224,6 +240,12 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
       this._toastr.warning('Invalid booking data. Cannot proceed with payment.');
       return;
     }
+
+    if (booking.paymentSource === PaymentSource.WALLET) {
+      this._toastr.warning('Wallet payments are not available yet.');
+      return;
+    }
+
     if (booking.paymentSource === PaymentSource.RAZORPAY) {
       this._initiatePayment(totalAmount, booking.bookingId);
     }
