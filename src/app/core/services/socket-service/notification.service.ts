@@ -1,9 +1,9 @@
 import { inject, Injectable } from "@angular/core";
 import { BaseSocketService, ISocketError } from "./base-socket.service";
 import { API_ENV } from "../../../../environments/env";
-import { INotification, ISendNewNotification } from "../../models/notification.model";
+import { INotification, INotificationPage, ISendNewNotification } from "../../models/notification.model";
 import { lastValueFrom, Observable } from "rxjs";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Store } from "@ngrx/store";
 import { authActions } from "../../../store/auth/auth.actions";
 import { IResponse } from "../../../modules/shared/models/response.model";
@@ -108,8 +108,11 @@ export class NotificationSocketService extends BaseSocketService {
     // **************************************************[API For Notification]************************************************************
     // ------------------------------------------------------------------------------------------------------------------------------
 
-    fetchAllNotifications(): Observable<IResponse<INotification[]>> {
-        return this._http.get<IResponse<INotification[]>>(`${this._notificationApi}`);
+    fetchAllNotifications(cursor?: string, limit?: number): Observable<IResponse<INotificationPage>> {
+        let params = new HttpParams();
+        if (cursor) params = params.set('cursor', cursor);
+        if (limit) params = params.set('limit', limit);
+        return this._http.get<IResponse<INotificationPage>>(`${this._notificationApi}`, { params });
     }
 
     markAsReadApi(id: string): Observable<IResponse<INotification>> {

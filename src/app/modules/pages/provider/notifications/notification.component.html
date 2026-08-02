@@ -87,6 +87,13 @@
 
             </ng-container>
 
+            <!-- Load More -->
+            <div class="load-more-container" *ngIf="hasMore() && !(loading$ | async)">
+                <button class="load-more-btn" (click)="loadMore()">
+                    <i class="fas fa-sync-alt"></i> Load More
+                </button>
+            </div>
+
             <!-- Empty -->
             <ng-template #empty>
                 <div class="empty-state">

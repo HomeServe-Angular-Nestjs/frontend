@@ -18,12 +18,13 @@ import { SubmitCancellationComponent } from "../../../../partials/shared/submit-
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
 import { RescheduleBookingModalComponent } from "../../../../partials/shared/reschedule-booking/reschedule-booking.component";
+import { TransactionHistoryTimelineComponent } from "../../../../partials/shared/transaction-history-timeline/transaction-history-timeline.component";
 
 @Component({
   selector: 'app-provider-view-booking-details',
   standalone: true,
   templateUrl: './booking-details.component.html',
-  imports: [CommonModule, FormsModule, ReportModalComponent, SubmitCancellationComponent, RescheduleBookingModalComponent],
+  imports: [CommonModule, FormsModule, ReportModalComponent, SubmitCancellationComponent, RescheduleBookingModalComponent, TransactionHistoryTimelineComponent],
   providers: [ReportService]
 })
 export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {

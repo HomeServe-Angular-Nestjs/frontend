@@ -35,6 +35,16 @@ export const showNotificationError = createSelector(
     (error) => error
 )
 
+export const selectNotificationCursor = createSelector(
+    notificationFeature.selectCursor,
+    (cursor) => cursor
+);
+
+export const selectHasMoreNotifications = createSelector(
+    notificationFeature.selectHasMore,
+    (hasMore) => hasMore
+);
+
 export const hasAnyUnread = createSelector(
     selectAllNotifications,
     (notifications) => notifications.some(n => !n.isRead)
