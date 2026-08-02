@@ -89,12 +89,32 @@
     <!-- Awards & Recognition -->
     <section class="relative bg-white p-6 rounded-lg shadow space-y-3">
         <h2 class="text-xl font-semibold text-gray-800">Awards & Recognition</h2>
-        <div class="flex items-start gap-3">
-            <div class="text-yellow-500 text-2xl">🏆</div>
-            <div>
-                <div class="font-medium text-gray-700">Best Service Provider 2023</div>
-                <div class="text-sm text-gray-500">HomeServe Annual Awards</div>
+
+        <div *ngIf="awards.length > 0; else noAwards" class="space-y-2">
+            <div *ngFor="let award of awards; let i = index"
+                class="flex items-start gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 pr-8 relative">
+                <span class="text-yellow-500 text-2xl">🏆</span>
+                <p class="font-medium text-gray-700">{{ award }}</p>
+                <button (click)="removeAward(i)" class="absolute top-2 right-3 text-red-400 hover:text-red-600"
+                    aria-label="Remove award">
+                    <i class="fas fa-times-circle text-sm"></i>
+                </button>
             </div>
+        </div>
+
+        <!-- Empty State -->
+        <ng-template #noAwards>
+            <div class="text-gray-500 italic">No awards added yet.</div>
+        </ng-template>
+
+        <!-- Add Award Input -->
+        <div class="flex items-center gap-2 pt-2">
+            <input type="text" [(ngModel)]="newAward" placeholder="Add an award..."
+                class="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring focus:ring-green-400" />
+            <button (click)="addAward()"
+                class="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm">
+                Add
+            </button>
         </div>
     </section>
 

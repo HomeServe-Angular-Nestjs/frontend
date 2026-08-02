@@ -44,7 +44,9 @@ export class CustomerProviderViewCardComponent implements OnInit, OnDestroy {
   }
 
   viewProvider(providerId: string) {
-    this._router.navigate(['provider_details', providerId, 'about']);
+    this._router.navigate(['provider_details', providerId, 'about'], {
+      queryParamsHandling: 'preserve'
+    });
   }
 
   getStarType(index: number, rating: number = 0): 'full' | 'half' | 'empty' {

@@ -24,7 +24,6 @@ export interface IFilter {
     date?: Date | string;
     isCertified?: boolean;
     sort?: SortOption;
-    category?: string;
     priceRange?: IPriceRange;
     duration?: IServiceDurationRange;
 };

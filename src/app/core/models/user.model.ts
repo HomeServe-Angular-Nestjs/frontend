@@ -155,6 +155,7 @@ export interface IProviderUpdateBio {
     expertise?: IExpertise[];
     additionalSkills?: string[];
     languages?: ILanguage[];
+    awards?: string[];
 }
 
 export interface IVerificationStatusMetrics {

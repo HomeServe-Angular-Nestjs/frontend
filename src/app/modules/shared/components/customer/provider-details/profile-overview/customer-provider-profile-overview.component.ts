@@ -12,10 +12,11 @@ import { chatActions } from '../../../../../../store/chat/chat.action';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { ReportModalComponent } from '../../../../partials/shared/report-modal/report-modal.component';
 import { IReportSubmit, ReportService } from '../../../../../../core/services/report.service';
+import { IsSavedPipe } from '../../../../../../core/pipes/is-saved-provider.pipe';
 
 @Component({
   selector: 'app-customer-provider-profile-overview',
-  imports: [CommonModule, ReportModalComponent],
+  imports: [CommonModule, ReportModalComponent, IsSavedPipe],
   providers: [ReportService],
   templateUrl: './customer-provider-profile-overview.component.html',
 })

@@ -1,12 +1,14 @@
 import { inject } from "@angular/core";
 import { act, Actions, createEffect, ofType } from "@ngrx/effects";
 import { customerActions } from "./customer.actions";
-import { catchError, finalize, map, of, switchMap, tap, throwError } from "rxjs";
+import { catchError, debounceTime, finalize, map, of, switchMap, take, tap, throwError } from "rxjs";
 import { CustomerService } from "../../core/services/customer.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { handleApiError } from "../../core/utils/handle-errors.utils";
 import { ToastNotificationService } from "../../core/services/public/toastr.service";
 import { LoadingService } from "../../core/services/public/loading.service";
+import { Store } from "@ngrx/store";
+import { selectSavedProviders } from "./customer.selector";
 
 export const customerEffects = {
     fetchOneCustomer$: createEffect(() => {
@@ -51,14 +53,25 @@ export const customerEffects = {
         const actions$ = inject(Actions);
         const customerService = inject(CustomerService);
         const toastr = inject(ToastNotificationService);
+        const store = inject(Store);
 
         return actions$.pipe(
             ofType(customerActions.updateAddToSaved),
+            debounceTime(300),
             switchMap(({ providerId }) =>
-                customerService.updateAddToSaved(providerId).pipe(
-                    map((customer) => customerActions.customerSuccessAction({ customer })),
-                    catchError((error: HttpErrorResponse) => {
-                        return handleApiError(error, customerActions.customerFailureAction, toastr);
+                store.select(selectSavedProviders).pipe(
+                    take(1),
+                    switchMap((savedProviders) => {
+                        const wasSaved = savedProviders.includes(providerId);
+                        return customerService.updateAddToSaved(providerId).pipe(
+                            map((customer) => {
+                                toastr.success(wasSaved ? 'Removed from favorites' : 'Added to favorites');
+                                return customerActions.customerSuccessAction({ customer });
+                            }),
+                            catchError((error: HttpErrorResponse) => {
+                                return handleApiError(error, customerActions.customerFailureAction, toastr);
+                            })
+                        );
                     })
                 )
             )

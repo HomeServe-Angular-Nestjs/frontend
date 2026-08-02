@@ -33,7 +33,7 @@ export class CustomerService {
   }
 
   updateAddToSaved(providerId: string): Observable<ICustomer> {
-    return this._http.patch<ICustomer>(`${this._apiUrl}/saved_providers`, { providerId });
+    return this._http.patch<ICustomer>(`${this._apiUrl}/favorites/${providerId}`, {});
   }
 
   updateProfile(profileData: ICustomerProfileData): Observable<IResponse<ICustomer>> {
