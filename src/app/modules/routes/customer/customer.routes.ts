@@ -120,6 +120,12 @@ export const customerRoutes: Routes = [
             data: { breadcrumb: 'My Wallet' }
           },
           {
+            path: 'saved',
+            loadComponent: () => import('../../pages/customer/saved-providers/customer-saved-providers.component')
+              .then(c => c.CustomerSavedProvidersComponent),
+            data: { breadcrumb: 'Saved Providers' }
+          },
+          {
             path: 'notifications',
             loadComponent: () => import('../../shared/components/customer/notifications/notifications.component')
               .then(c => c.CustomerNotificationComponent),

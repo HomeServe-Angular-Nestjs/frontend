@@ -119,6 +119,7 @@ export interface IProviderState {
 export interface ICustomerState {
     customer: ICustomer | null;
     loading: boolean;
+    isSubmittingProfile: boolean;
     error: string | null;
 }
 
@@ -226,6 +227,7 @@ export interface IFilterFetchProviders extends IHomeSearch {
     date?: string;
     sort?: 'best_rated' | 'nearest' | 'all';
     categoryId?: string;
+    providerIds?: string[];
 }
 
 export interface IStats {

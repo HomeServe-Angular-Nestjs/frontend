@@ -5,7 +5,8 @@ import { customerActions } from "./customer.actions";
 export const initialCustomerState: ICustomerState = {
     customer: null,
     error: null,
-    loading: false
+    loading: false,
+    isSubmittingProfile: false
 }
 
 export const customerFeature = createFeature({
@@ -31,16 +32,30 @@ export const customerFeature = createFeature({
             error: null
         })),
 
+        on(customerActions.changeAvatar, (state) => ({
+            ...state,
+            loading: true,
+            error: null
+        })),
+
+        on(customerActions.updateProfile, (state) => ({
+            ...state,
+            isSubmittingProfile: true,
+            error: null
+        })),
+
         on(customerActions.customerSuccessAction, (state, { customer }) => ({
             ...state,
             customer,
-            loading: false
+            loading: false,
+            isSubmittingProfile: false
         })),
 
         on(customerActions.customerFailureAction, (state, { error }) => ({
             ...state,
             error,
-            loading: false
+            loading: false,
+            isSubmittingProfile: false
         })),
     )
 })

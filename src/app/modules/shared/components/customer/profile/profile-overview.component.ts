@@ -3,7 +3,7 @@ import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { map, Observable, of, Subject, takeUntil } from "rxjs";
 import { ICustomer } from "../../../../../core/models/user.model";
 import { Store } from "@ngrx/store";
-import { selectCustomer } from "../../../../../store/customer/customer.selector";
+import { selectCustomer, selectCustomerLoading, selectCustomerState, selectIsSubmittingProfile } from "../../../../../store/customer/customer.selector";
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { getValidationMessage } from "../../../../../core/utils/form-validation.utils";
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
@@ -26,11 +26,14 @@ export class CustomerProfileOverviewComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
   private _originalCustomerData!: string;
+  private _profileSaveDispatched = false;
 
   isEditing = false;
   isLoading = true;
 
   customer$: Observable<ICustomer | null> = this._store.select(selectCustomer);
+  avatarLoading$: Observable<boolean> = this._store.select(selectCustomerLoading);
+  profileSubmitting$: Observable<boolean> = this._store.select(selectIsSubmittingProfile);
   googleLogin$: Observable<boolean> = of(false);
   center: [number, number] = [76.9560, 8.5010];
   showMap = false;
@@ -39,8 +42,8 @@ export class CustomerProfileOverviewComponent implements OnInit, OnDestroy {
   phoneRegex = REGEXP_ENV.phone;
 
   profileForm: FormGroup = this._fb.group({
-    fullname: ['', Validators.required],
-    username: ['', Validators.required],
+    fullname: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
+    username: ['', [Validators.required, Validators.minLength(3)]],
     phone: ['', [Validators.required, Validators.pattern(this.phoneRegex)]],
     email: ['', [Validators.required, Validators.email]],
     address: ['', Validators.required],
@@ -77,6 +80,23 @@ export class CustomerProfileOverviewComponent implements OnInit, OnDestroy {
     this.googleLogin$ = this.customer$.pipe(
       map(customer => !!customer?.googleId)
     );
+
+    this._store.select(selectCustomerState)
+      .pipe(
+        takeUntil(this._destroy$)
+      ).subscribe(state => {
+        if (!this._profileSaveDispatched) return;
+
+        if (state.error) {
+          this._profileSaveDispatched = false;
+          return;
+        }
+
+        if (state.customer && !state.loading) {
+          this._profileSaveDispatched = false;
+          this.isEditing = false;
+        }
+      });
   }
 
   toggleEditMode() {
@@ -87,6 +107,12 @@ export class CustomerProfileOverviewComponent implements OnInit, OnDestroy {
         this.profileForm.patchValue(JSON.parse(this._originalCustomerData));
       }
     }
+  }
+
+  fullnameError(): string {
+    const control = this.profileForm.get('fullname');
+    if (!control?.touched || !control?.invalid || !control.errors) return '';
+    return getValidationMessage(control, 'fullname') || '';
   }
 
   onImageError(event: Event) {
@@ -122,8 +148,8 @@ export class CustomerProfileOverviewComponent implements OnInit, OnDestroy {
         this.isEditing = false;
         return;
       }
+      this._profileSaveDispatched = true;
       this._store.dispatch(customerActions.updateProfile({ profileData }));
-      this.isEditing = false;
       return;
     }
 

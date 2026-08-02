@@ -8,6 +8,17 @@ export const selectCustomer = createSelector(
     selectCustomerState,
     (state) => state.customer
 );
+
+export const selectCustomerLoading = createSelector(
+    selectCustomerState,
+    (state) => state.loading
+);
+
+export const selectIsSubmittingProfile = createSelector(
+    selectCustomerState,
+    (state) => state.isSubmittingProfile
+);
+
 export const selectSavedProviders = createSelector(
     selectCustomerState,
     (state) => state.customer?.savedProviders ?? []
@@ -38,7 +49,6 @@ export const selectLocation = createSelector(
         };
     }
 );
-
 
 export const selectCustomerId = createSelector(
     selectCustomerState,
