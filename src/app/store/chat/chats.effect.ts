@@ -39,11 +39,16 @@ export const chatEffects = {
 
         return actions$.pipe(
             ofType(chatActions.fetchMessages),
-            switchMap(({ chatId, receiverId, beforeMessageId }) =>
-                chatService.fetchAllMessages(chatId, receiverId, beforeMessageId).pipe(
+            switchMap(({ chatId, receiverId, beforeMessageId, limit }) =>
+                chatService.fetchAllMessages(chatId, receiverId, beforeMessageId, limit).pipe(
                     map((response) => {
-                        if (response.success && response.data) {
-                            return chatActions.fetchMessagesSuccess({ messages: response.data, beforeMessageId });
+                        if (response.success && response.data?.messages) {
+                            return chatActions.fetchMessagesSuccess({
+                                messages: response.data.messages,
+                                hasMore: response.data.hasMore,
+                                nextCursor: response.data.nextCursor,
+                                beforeMessageId
+                            });
                         } else {
                             throw new Error('failed to fetch messages.');
                         }

@@ -116,7 +116,6 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
-    this._chatSocket.stopListeningMessages();
     this._notificationService.stopListeningNotifications();
     this._reservationService.stopListeningReservationUpdates();
   }

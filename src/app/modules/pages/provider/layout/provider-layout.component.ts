@@ -40,7 +40,6 @@ export class ProviderLayoutComponent implements OnInit, OnDestroy {
       takeUntil(this._destroy$)
     ).subscribe(status => {
       if (status === 'authenticated') {
-        this._chatSocket.stopListeningMessages();
         this._chatSocket.connect();
         this._notificationSocket.connect();
         this._videoSocketService.connect();

@@ -7,7 +7,8 @@ export type ChatRole = 'sender' | 'receiver';
 export interface ISendMessage {
     receiverId: string;
     message: string;
-    type: UserType
+    type: UserType;
+    clientMessageId?: string;
 }
 
 interface IBase {
@@ -51,14 +52,24 @@ export interface IMessage extends IBase {
     messageType: MessageType;
     attachments?: string[];
     isRead: boolean;
+    clientMessageId?: string;
+    isPending?: boolean;
+}
+
+export interface IMessagePage {
+    messages: IMessage[];
+    hasMore: boolean;
+    nextCursor: string | null;
 }
 
 export interface IChatState {
     chats: EntityState<IChat>;
     messages: EntityState<IMessage>;
     selectedChatId: string | null;
-    isAllMessagesFetched: boolean,
+    hasMoreMessages: boolean;
+    nextCursor: string | null;
     isFetchingAllChats: boolean,
     isLoadingMessages: boolean;
-    error: string | null;
+    chatsError: string | null;
+    messagesError: string | null;
 }

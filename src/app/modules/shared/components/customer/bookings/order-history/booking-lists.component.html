@@ -80,7 +80,7 @@
           <!-- Bottom Actions -->
           <div class="px-5 py-3 border-t border-gray-50 flex justify-between items-center bg-gray-50/10">
             <div class="flex items-center gap-4">
-              <button
+              <button (click)="goToChat(list.provider.id)"
                 class="text-xs font-bold text-gray-400 hover:text-indigo-600 flex items-center gap-2 transition-colors">
                 <i class="far fa-comment-dots"></i>
                 Chat

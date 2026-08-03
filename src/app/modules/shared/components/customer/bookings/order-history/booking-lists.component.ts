@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { BehaviorSubject, finalize, map, Subject, takeUntil, tap, withLatestFrom } from "rxjs";
 import { BookingService } from "../../../../../../core/services/booking.service";
@@ -17,6 +17,9 @@ import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { CustomerLeaveAReviewComponent } from "../leave-a-review/leave-a-review.component";
 import { ISubmitReview } from "../../../../../../core/models/reviews.model";
 import { SubmitCancellationComponent } from "../../../../partials/shared/submit-cancellation/submit-cancellation.component";
+import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
+import { chatActions } from "../../../../../../store/chat/chat.action";
+import { Store } from "@ngrx/store";
 
 @Component({
   selector: 'app-customer-booking-lists',
@@ -29,6 +32,9 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _paymentService = inject(PaymentService);
   private readonly _razorpayWrapperService = inject(RazorpayWrapperService);
+  private readonly _chatService = inject(ChatSocketService);
+  private readonly _store = inject(Store);
+  private readonly _router = inject(Router);
 
   private _destroy$ = new Subject<void>();
   private _bookingsData$ = new BehaviorSubject<IBookingResponse[]>([]);
@@ -253,6 +259,27 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
 
   onPageChange(newPage: number) {
     this._fetchBookings(newPage);
+  }
+
+  goToChat(providerId: string) {
+    if (providerId) {
+      this._chatService.fetchChat({ id: providerId, type: 'provider' })
+        .subscribe({
+          next: (response) => {
+            if (response.success && response.data?.id) {
+              this._store.dispatch(chatActions.addChat({ chat: response.data }));
+              this._store.dispatch(chatActions.selectChat({ chatId: response.data.id }));
+              this._router.navigate(['chat']);
+            } else {
+              this._toastr.error('Unable to fetch chat.');
+            }
+          },
+          error: (err) => {
+            this._toastr.error('An error occurred while fetching chat.');
+            console.error('Chat error:', err);
+          }
+        });
+    }
   }
 
   openModal(bookingId: string) {

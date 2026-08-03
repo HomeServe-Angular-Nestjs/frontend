@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Store } from "@ngrx/store";
-import { selectAllChats } from "../../../../../../store/chat/chat.selector";
+import { selectAllChats, selectIsFetchingAllChats } from "../../../../../../store/chat/chat.selector";
 import { chatActions } from "../../../../../../store/chat/chat.action";
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from "rxjs";
 import { IChat } from "../../../../../../core/models/chat.model";
@@ -21,8 +21,11 @@ export class ChatListComponent implements OnInit, OnDestroy {
     private _searchTerm$ = new BehaviorSubject<string>('');
     searchTerm = '';
     chats$!: Observable<IChat[]>
+    isFetchingChats$!: Observable<boolean>
 
     ngOnInit(): void {
+        this.isFetchingChats$ = this._store.select(selectIsFetchingAllChats);
+
         this.chats$ = combineLatest([
             this._store.select(selectAllChats).pipe(filter((chat) => !!chat)),
             this._searchTerm$,
@@ -67,9 +70,8 @@ export class ChatListComponent implements OnInit, OnDestroy {
         }
     }
 
-    viewMessages(chatId: string, receiverId: string) {
+    viewMessages(chatId: string) {
         this._store.dispatch(chatActions.selectChat({ chatId }));
-        this._store.dispatch(chatActions.fetchMessages({ chatId, receiverId }));
         this._chatSocketService.markMessagesRead(chatId);
     }
 

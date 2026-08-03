@@ -1,31 +1,56 @@
 <ng-container *ngIf="(chat$ | async) as chat; else noChatSelected">
 
-    <!-- ================= LOADING STATE ================= -->
+    <!-- ================= LOADING STATE (SKELETON) ================= -->
     <ng-container *ngIf="(isLoadingMessages$ | async); else errorCheck">
-        <div class="flex-1 flex justify-center items-center bg-white">
-            <app-loading-circle-animation color="green"
-                text="Please wait while we fetch your conversation..."></app-loading-circle-animation>
+        <div class="flex flex-col flex-1 min-h-0 overflow-hidden bg-white">
+            <!-- Header skeleton -->
+            <div class="px-4 py-2 border-b bg-white flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-gray-200 animate-pulse"></div>
+                    <div class="space-y-1.5">
+                        <div class="h-3 w-28 bg-gray-200 animate-pulse rounded"></div>
+                        <div class="h-2 w-12 bg-gray-200 animate-pulse rounded"></div>
+                    </div>
+                </div>
+                <div class="w-6 h-6 bg-gray-200 animate-pulse rounded-full"></div>
+            </div>
+
+            <!-- Message bubbles skeleton -->
+            <div class="flex-1 px-6 py-4 space-y-4 bg-white">
+                <div class="flex justify-start">
+                    <div class="h-10 w-2/3 bg-gray-200 animate-pulse rounded-lg rounded-bl-none"></div>
+                </div>
+                <div class="flex justify-end">
+                    <div class="h-10 w-1/2 bg-blue-100 animate-pulse rounded-lg rounded-br-none"></div>
+                </div>
+                <div class="flex justify-start">
+                    <div class="h-10 w-3/5 bg-gray-200 animate-pulse rounded-lg rounded-bl-none"></div>
+                </div>
+                <div class="flex justify-end">
+                    <div class="h-10 w-2/5 bg-blue-100 animate-pulse rounded-lg rounded-br-none"></div>
+                </div>
+            </div>
         </div>
     </ng-container>
 
     <!-- ================= ERROR STATE ================= -->
     <ng-template #errorCheck>
-        <ng-container *ngIf="(chatError$ | async) as error; else chatSuccess">
+        <ng-container *ngIf="(messagesError$ | async) as error; else chatSuccess">
             <div class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white">
-                <!-- <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-4">
+                <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-4">
                     <i class="fas fa-exclamation-circle text-2xl"></i>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">
                     {{ (error.code === 'NO_ACTIVE_BOOKINGS') ? 'Access Restricted' : 'Connection Error' }}
-                </h3> -->
+                </h3>
                 <p class="text-sm text-gray-500 max-w-xs mx-auto mb-6">
                     {{ error?.message || 'We encountered an issue while loading your messages.' }}
                 </p>
-                <!-- <button
+                <button
                     (click)="tryAgain()"
                     class="px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
                     Try Again
-                </button> -->
+                </button>
             </div>
         </ng-container>
     </ng-template>
@@ -38,9 +63,22 @@
                 <ng-container *ngIf="chat.receiver as receiver">
 
                     <!-- User Info -->
-                    <div class="flex items-center gap-3 min-w-0">
-                        <img [src]="receiver.avatar" alt="User avatar" referrerpolicy="no-referrer"
-                            class="w-9 h-9 rounded-full object-cover border border-blue-100" />
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <!-- Back (mobile) -->
+                        <button aria-label="Back to chats" (click)="goBackToList()"
+                            class="lg:hidden text-gray-500 hover:text-gray-800 transition shrink-0">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+
+                        <!-- Toggle chat list (desktop) -->
+                        <button aria-label="Toggle chat list" (click)="toggleChatList()"
+                            class="hidden lg:flex text-gray-500 hover:text-gray-800 transition shrink-0">
+                            <i class="fas fa-bars"></i>
+                        </button>
+
+                        <img [src]="receiver.avatar || 'assets/images/profile_placeholder.jpg'"
+                            (error)="onImgError($event)" alt="User avatar" referrerpolicy="no-referrer"
+                            class="w-9 h-9 rounded-full object-cover border border-blue-100 shrink-0" />
 
                         <div class="min-w-0">
                             <h2 class="text-sm font-semibold text-gray-800 leading-tight truncate">
@@ -53,7 +91,7 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex items-center gap-4 text-gray-400">
+                    <div class="flex items-center gap-4 text-gray-400 shrink-0">
                         <button aria-label="Video Call" (click)="startVideoCall()"
                             class="hover:text-blue-600 transition">
                             <i class="fas fa-video text-sm"></i>
@@ -79,11 +117,13 @@
                               'bg-blue-600 text-white rounded-br-none':
                                 message.senderId === currentUserId,
                               'bg-gray-100 text-gray-900 rounded-bl-none':
-                                message.senderId !== currentUserId
+                                message.senderId !== currentUserId,
+                              'opacity-60': message.isPending
                             }">
                                 <p>{{ message.content }}</p>
-                                <div class="text-xs opacity-70 mt-1 text-right">
-                                    {{ message.createdAt | date: 'shortTime' }}
+                                <div class="text-xs opacity-70 mt-1 flex items-center justify-end gap-1">
+                                    <i *ngIf="message.isPending" class="fas fa-clock" aria-hidden="true"></i>
+                                    <span>{{ message.createdAt | date: 'shortTime' }}</span>
                                 </div>
                             </div>
                         </div>
