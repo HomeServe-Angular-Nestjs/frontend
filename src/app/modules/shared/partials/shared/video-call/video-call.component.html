@@ -2,6 +2,7 @@
   class="fixed z-[99999] bg-gradient-to-br from-gray-900 to-black overflow-hidden shadow-2xl transition-all duration-300 ease-in-out ring-1 ring-white/10"
   [class.flex]="!isMinimized" [class.flex-col]="!isMinimized" [class.w-80]="isMinimized" [class.h-48]="isMinimized"
   [class.rounded-2xl]="isMinimized" [class.cursor-move]="isMinimized" [class.inset-0]="!isMinimized"
+  [class.bottom-6]="isMinimized" [class.right-6]="isMinimized"
   [style.transform]="isMinimized ? transform : 'none'" (mousedown)="isMinimized && startDrag($event)">
 
   <!-- Shared remote video -->
@@ -16,8 +17,15 @@
   <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/50" *ngIf="showRemotePlayButton">
     <button (click)="playRemoteVideo()"
       class="bg-blue-600 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition">
-      <i class="fa-solid fa-play mr-2"></i> Click to View Video
+      <i class="fa-solid fa-play mr-2"></i> Click to View Video & Enable Audio
     </button>
+  </div>
+
+  <!-- END SCREEN -->
+  <div class="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/80 text-white"
+    *ngIf="callStatus === 'ended'">
+    <i class="fa-solid fa-phone-slash text-3xl text-red-400 mb-3"></i>
+    <p class="text-lg font-semibold">{{ endReasonLabel }}</p>
   </div>
 
   <!-- Local preview -->
@@ -43,7 +51,11 @@
           } @else if (callStatus === 'calling') {
             Calling...
           } @else if (callStatus === 'connected') {
-            Connected
+            @if (peerReconnecting) {
+              Reconnecting...
+            } @else {
+              Connected
+            }
           } @else {
             Ended
           }
@@ -56,6 +68,8 @@
           } @else if (callStatus === 'calling') {
             <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
             Ringing
+          } @else if (callStatus === 'ended') {
+            Call ended
           } @else {
             <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
             {{ formattedDuration }}

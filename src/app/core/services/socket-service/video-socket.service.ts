@@ -1,6 +1,13 @@
 import { inject, Injectable, Injector, signal } from "@angular/core";
 import { BaseSocketService } from "./base-socket.service";
 import { VideoCallService } from "../video-call.service";
+import {
+  IAcceptedEventPayload,
+  IEndedEventPayload,
+  IInitiatedEventPayload,
+  IRingingEventPayload,
+} from "../../models/video-call.model";
+import { CallEndReason } from "../../enums/enums";
 
 export type VideoRoleType = 'caller' | 'callee';
 
@@ -12,22 +19,34 @@ export class VideoCallSocketService extends BaseSocketService {
   protected override namespace: string = '/video-call';
 
   private SIGNAL = 'video-call:signal';
-  private VIDEO_CALL_ROLE = 'video-call:role';
-  private VIDEO_CALL_USER_JOIN = 'video-call:join';
   private VIDEO_CALL_INITIATE = 'video-call:initiate';
-  private VIDEO_CALL_RINGING = 'video-call:ringing';
   private VIDEO_CALL_ACCEPT = 'video-call:accept';
+  private VIDEO_CALL_DECLINE = 'video-call:decline';
   private VIDEO_CALL_LEAVE = 'video-call:leave';
+  private VIDEO_CALL_JOIN = 'video-call:join';
+
+  private VIDEO_CALL_INITIATED = 'video-call:initiated';
+  private VIDEO_CALL_RINGING = 'video-call:ringing';
+  private VIDEO_CALL_ACCEPTED = 'video-call:accepted';
+  private VIDEO_CALL_ENDED = 'video-call:ended';
   private VIDEO_CALL_UNAVAILABLE = 'video-call:unavailable';
+  private VIDEO_CALL_PEER_RECONNECTING = 'video-call:peer-reconnecting';
+  private VIDEO_CALL_REJOINED = 'video-call:rejoined';
 
   private _listeners: Record<string, (msg: any) => void> = {};
-  private _acceptListener?: (data: any) => void;
-  private _ringingListener?: (caller: any) => void;
   private _pendingSignals: any[] = [];
   private _isListening = false;
+  private _acceptListener?: (data: IAcceptedEventPayload) => void;
+  private _ringingListener?: (event: IRingingEventPayload) => void;
+  private _initiatedListener?: (event: IInitiatedEventPayload) => void;
+  private _peerReconnectingListener?: (event: { callId: string }) => void;
+  private _rejoinedListener?: (event: { callId: string }) => void;
+  private _socketReconnectedListener?: () => void;
 
   readonly role = signal<VideoRoleType | null>(null);
-  partnerId!: string;
+  readonly callId = signal<string | null>(null);
+  readonly endReason = signal<CallEndReason | null>(null);
+  partnerId = '';
 
   constructor() {
     super();
@@ -37,24 +56,26 @@ export class VideoCallSocketService extends BaseSocketService {
     console.log('[VideoCallSocket] Connected');
     this.initSignalListener();
 
-    this.onRinging((data: { callerId: string }) => {
-      if (data?.callerId) {
-        this.callService ??= this.injector.get(VideoCallService);
-        this.callService.showIncomingFloating(data.callerId);
-      }
-    });
+    const activeCallId = this.callId();
+    if (activeCallId) {
+      console.log('[VideoCallSocket] Rejoining active call after reconnect:', activeCallId);
+      this.rejoinCall(activeCallId);
+      if (this._socketReconnectedListener) this._socketReconnectedListener();
+    }
   }
 
   protected override onDisconnect(reason: string): void {
-    console.log('[VideoCallSocket] Disconnected');
+    console.log('[VideoCallSocket] Disconnected:', reason);
   }
 
   /* ===================== SIGNAL ===================== */
-  sendSignal(data: any) {
-    this.emit(this.SIGNAL, {
-      targetUserId: this.partnerId,
-      ...data,
-    });
+  sendSignal(data: { type: 'offer' | 'answer' | 'ice-candidate' | 'media-error'; offer?: any; answer?: any; candidate?: any }) {
+    const callId = this.callId();
+    if (!callId) {
+      console.warn('[VideoCallSocket] Cannot send signal without a callId');
+      return;
+    }
+    this.emit(this.SIGNAL, { callId, ...data });
   }
 
   onSignal(type: string, callback: (msg: any) => void) {
@@ -66,16 +87,62 @@ export class VideoCallSocketService extends BaseSocketService {
     this._pendingSignals = this._pendingSignals.filter(e => e.type !== type);
   }
 
-  onJoin(payload: { callee: string }) {
-    this.emit(this.VIDEO_CALL_USER_JOIN, payload);
+  /* ===================== CALL FLOW ===================== */
+  startCall(callee: string) {
+    this.reset();
+    this.endReason.set(null);
+    this.partnerId = callee;
+    this.role.set('caller');
+    this.emit(this.VIDEO_CALL_INITIATE, { callee });
   }
 
-  onRinging(callback: (caller: any) => void) {
+  acceptCall(callId: string) {
+    this.endReason.set(null);
+    this.callId.set(callId);
+    this.role.set('callee');
+    this.emit(this.VIDEO_CALL_ACCEPT, { callId });
+  }
+
+  declineCall(callId: string) {
+    this.emit(this.VIDEO_CALL_DECLINE, { callId });
+    this.reset();
+  }
+
+  endCall() {
+    const callId = this.callId();
+    if (callId) {
+      this.emit(this.VIDEO_CALL_LEAVE, { callId });
+    }
+    this.reset();
+  }
+
+  rejoinCall(callId: string) {
+    this.emit(this.VIDEO_CALL_JOIN, { callId });
+  }
+
+  /* ===================== EVENT SUBSCRIPTIONS ===================== */
+  onInitiated(callback: (event: IInitiatedEventPayload) => void) {
+    this._initiatedListener = callback;
+  }
+
+  onRinging(callback: (event: IRingingEventPayload) => void) {
     this._ringingListener = callback;
   }
 
-  onAccept(callback: (data: any) => void) {
+  onAccept(callback: (data: IAcceptedEventPayload) => void) {
     this._acceptListener = callback;
+  }
+
+  onPeerReconnecting(callback: (event: { callId: string }) => void) {
+    this._peerReconnectingListener = callback;
+  }
+
+  onRejoined(callback: (event: { callId: string }) => void) {
+    this._rejoinedListener = callback;
+  }
+
+  onSocketReconnected(callback: () => void) {
+    this._socketReconnectedListener = callback;
   }
 
   initSignalListener() {
@@ -92,53 +159,49 @@ export class VideoCallSocketService extends BaseSocketService {
       }
     });
 
-    this.listen(this.VIDEO_CALL_ROLE, (event: { role: VideoRoleType }) => {
-      this.role.set(event.role);
+    this.listen(this.VIDEO_CALL_INITIATED, (event: IInitiatedEventPayload) => {
+      this.callId.set(event.callId);
+      if (this._initiatedListener) this._initiatedListener(event);
     });
 
-    this.listen(this.VIDEO_CALL_LEAVE, () => {
+    this.listen(this.VIDEO_CALL_RINGING, (event: IRingingEventPayload) => {
+      this.callId.set(event.callId);
+      this.partnerId = event.callerId;
       this.callService ??= this.injector.get(VideoCallService);
-      this.callService.endCall();
-      this.partnerId = undefined as any;
-      this.role.set(null);
-      this._pendingSignals = [];
+      this.callService.showIncomingFloating(event.callerId);
+      if (this._ringingListener) this._ringingListener(event);
+    });
+
+    this.listen(this.VIDEO_CALL_ACCEPTED, (data: IAcceptedEventPayload) => {
+      if (this._acceptListener) this._acceptListener(data);
+    });
+
+    this.listen(this.VIDEO_CALL_ENDED, (event: IEndedEventPayload) => {
+      this.callService ??= this.injector.get(VideoCallService);
+      this.callService.handleEnd(event.reason);
+      this.reset();
     });
 
     this.listen(this.VIDEO_CALL_UNAVAILABLE, (event: { message: string }) => {
       this._toastr.error(event?.message || 'Call unavailable');
       this.callService ??= this.injector.get(VideoCallService);
-      this.callService.endCall();
-      this.partnerId = undefined as any;
-      this.role.set(null);
-      this._pendingSignals = [];
+      this.callService.handleEnd(CallEndReason.FAILED);
+      this.reset();
     });
 
-    this.listen(this.VIDEO_CALL_RINGING, (event: any) => {
-      if (this._ringingListener) this._ringingListener(event);
+    this.listen(this.VIDEO_CALL_PEER_RECONNECTING, (event: { callId: string }) => {
+      if (this._peerReconnectingListener) this._peerReconnectingListener(event);
     });
 
-    this.listen(this.VIDEO_CALL_ACCEPT, (data) => {
-      if (this._acceptListener) this._acceptListener(data);
+    this.listen(this.VIDEO_CALL_REJOINED, (event: { callId: string }) => {
+      if (this._rejoinedListener) this._rejoinedListener(event);
     });
   }
 
-  /* ===================== CALL FLOW ===================== */
-  startCall(callee: string) {
-    this.partnerId = callee;
-    this.role.set("caller");
-    this.emit(this.VIDEO_CALL_INITIATE, { callee });
-  }
-
-  acceptCall(callerId: string) {
-    this.partnerId = callerId;
-    this.role.set("callee");
-    this.emit(this.VIDEO_CALL_ACCEPT, { callerId });
-  }
-
-  endCall(partnerId: string) {
-    this.emit(this.VIDEO_CALL_LEAVE, { callee: partnerId });
-    this.partnerId = undefined as any;
+  private reset() {
+    this.callId.set(null);
     this.role.set(null);
+    this.partnerId = '';
     this._pendingSignals = [];
   }
 }
