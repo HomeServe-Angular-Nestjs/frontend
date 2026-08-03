@@ -69,12 +69,22 @@
 
             <div>
               <p class="text-sm font-medium text-gray-900">
-                {{ t.source }}
+                {{ description(t) }}
               </p>
               <p class="text-xs text-gray-500">
-                {{ t.createdAt | date:'mediumDate' }} • {{ t.method }}
+                {{ t.createdAt | date:'mediumDate' }} • {{ t.source }}
               </p>
-              <p class="text-xs text-gray-400 mt-1">Txn ID: {{ t.transactionId }}</p>
+              <p class="text-xs text-gray-400 mt-1">
+                <button *ngIf="t.bookingId"
+                  (click)="openBooking(t)"
+                  class="underline text-blue-600 hover:text-blue-800 cursor-pointer">
+                  Booking #{{ t.bookingId | slice:0:8 }}
+                </button>
+                <span *ngIf="t.subscriptionId">Subscription #{{ t.subscriptionId | slice:0:8 }}</span>
+                <span *ngIf="t.gatewayOrderId">Order #{{ t.gatewayOrderId | slice:0:8 }}</span>
+              </p>
+              <p class="text-xs text-gray-400" *ngIf="t.paymentId">Txn ID: {{ t.paymentId }}</p>
+              <p class="text-xs text-gray-400" *ngIf="t.gatewayOrderId">Gateway Order ID: {{ t.gatewayOrderId | slice:0:8 }}</p>
             </div>
 
           </div>
@@ -90,6 +100,10 @@
 
             <div class="text-xs rounded px-2 mt-1 inline-block">
               {{ displayType(t.transactionType) }}
+            </div>
+
+            <div class="text-xs text-gray-400 mt-1" *ngIf="t.balanceAfter !== null && t.balanceAfter !== undefined">
+              Balance after: ₹{{ t.balanceAfter | number:'1.2-2' }}
             </div>
           </div>
         </div>

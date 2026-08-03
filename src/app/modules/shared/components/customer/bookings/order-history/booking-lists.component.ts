@@ -7,7 +7,6 @@ import { BookingService } from "../../../../../../core/services/booking.service"
 import { FullDateWithTimePipe } from "../../../../../../core/pipes/to-full-date-with-time.pipe";
 import { IBookingResponse, IPagination, IReview } from "../../../../../../core/models/booking.model";
 import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
-import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../../../../../../core/enums/enums";
 import { PaymentService } from "../../../../../../core/services/payment.service";
@@ -22,7 +21,7 @@ import { SubmitCancellationComponent } from "../../../../partials/shared/submit-
 @Component({
   selector: 'app-customer-booking-lists',
   templateUrl: './booking-lists.component.html',
-  imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent, ButtonComponent, CustomerLeaveAReviewComponent, SubmitCancellationComponent],
+  imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, ButtonComponent, CustomerLeaveAReviewComponent, SubmitCancellationComponent],
   providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerBookingListsComponent implements OnInit, OnDestroy {
