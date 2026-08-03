@@ -70,6 +70,7 @@ export class CustomerProviderProfileOverviewComponent implements OnInit, OnDestr
         .subscribe({
           next: (response) => {
             if (response.success && response.data?.id) {
+              this._store.dispatch(chatActions.addChat({ chat: response.data }));
               this._store.dispatch(chatActions.selectChat({ chatId: response.data.id }));
               this._router.navigate(['chat']);
             } else {

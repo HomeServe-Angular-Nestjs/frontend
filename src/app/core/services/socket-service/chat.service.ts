@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Store } from "@ngrx/store";
 import { lastValueFrom, Observable } from "rxjs";
 import { BaseSocketService, ISocketError } from "./base-socket.service";
-import { IChat, IMessage, IParticipant, ISendMessage } from "../../models/chat.model";
+import { IChat, IMessage, IMessagePage, IParticipant, ISendMessage } from "../../models/chat.model";
 import { IResponse } from "../../../modules/shared/models/response.model";
 import { API_ENV } from "../../../../environments/env";
 import { chatActions } from "../../../store/chat/chat.action";
@@ -55,6 +55,7 @@ export class ChatSocketService extends BaseSocketService {
     }
 
     private _setupAuthErrorHandler(): void {
+        this.socket?.off('token:expired');
         this.socket?.on('token:expired', async () => {
             console.warn('[ChatSocket] Server token:expired event received');
             await this._refreshTokensAndReconnect();
@@ -76,10 +77,6 @@ export class ChatSocketService extends BaseSocketService {
 
     markMessagesRead(chatId: string): void {
         this.emit('markMessagesRead', { chatId });
-    }
-
-    stopListeningMessages(): void {
-        this.removeListener('newMessage');
     }
 
     private _refreshAccessToken(): Observable<void> {
@@ -106,16 +103,19 @@ export class ChatSocketService extends BaseSocketService {
     // **************************************************[API For Messages]*******************************************************
     // ------------------------------------------------------------------------------------------------------------------------------
 
-    fetchAllMessages(chatId: string, receiverId: string, beforeMessageId?: string): Observable<IResponse<IMessage[]>> {
+    fetchAllMessages(chatId: string, receiverId: string, beforeMessageId?: string, limit?: number): Observable<IResponse<IMessagePage>> {
         let params = new HttpParams()
             .set('chatId', chatId)
             .set('receiverId', receiverId);
-
 
         if (beforeMessageId) {
             params = params.set('beforeMessageId', beforeMessageId);
         }
 
-        return this._http.get<IResponse<IMessage[]>>(`${this._messageApi}`, { params });
+        if (limit) {
+            params = params.set('limit', limit);
+        }
+
+        return this._http.get<IResponse<IMessagePage>>(`${this._messageApi}`, { params });
     }
 }

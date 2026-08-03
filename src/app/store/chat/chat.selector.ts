@@ -43,12 +43,27 @@ export const selectSelectedChatsMessage = createSelector(
 
 export const selectIsAllMessagesFetched = createSelector(
     chatFeature.selectChatState,
-    (state) => state.isAllMessagesFetched
+    (state) => !state.hasMoreMessages
+);
+
+export const selectHasMoreMessages = createSelector(
+    chatFeature.selectChatState,
+    (state) => state.hasMoreMessages
+);
+
+export const selectNextCursor = createSelector(
+    chatFeature.selectChatState,
+    (state) => state.nextCursor
 );
 
 export const selectChatError = createSelector(
     chatFeature.selectChatState,
-    (state) => state.error
+    (state) => state.chatsError
+);
+
+export const selectMessagesError = createSelector(
+    chatFeature.selectChatState,
+    (state) => state.messagesError
 );
 
 

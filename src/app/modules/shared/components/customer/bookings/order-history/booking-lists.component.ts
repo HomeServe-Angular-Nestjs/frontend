@@ -1,13 +1,12 @@
 import { Component, inject, OnDestroy, OnInit, } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { BehaviorSubject, finalize, map, Subject, takeUntil, tap, withLatestFrom } from "rxjs";
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { FullDateWithTimePipe } from "../../../../../../core/pipes/to-full-date-with-time.pipe";
 import { IBookingResponse, IPagination, IReview } from "../../../../../../core/models/booking.model";
 import { CustomerPaginationComponent } from "../../../../partials/sections/customer/pagination/pagination.component";
-import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { BookingStatus, CancelStatus, PaymentDirection, PaymentSource, PaymentStatus, TransactionStatus, TransactionType } from "../../../../../../core/enums/enums";
 import { PaymentService } from "../../../../../../core/services/payment.service";
@@ -18,11 +17,14 @@ import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { CustomerLeaveAReviewComponent } from "../leave-a-review/leave-a-review.component";
 import { ISubmitReview } from "../../../../../../core/models/reviews.model";
 import { SubmitCancellationComponent } from "../../../../partials/shared/submit-cancellation/submit-cancellation.component";
+import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
+import { chatActions } from "../../../../../../store/chat/chat.action";
+import { Store } from "@ngrx/store";
 
 @Component({
   selector: 'app-customer-booking-lists',
   templateUrl: './booking-lists.component.html',
-  imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, LoadingCircleAnimationComponent, ButtonComponent, CustomerLeaveAReviewComponent, SubmitCancellationComponent],
+  imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, ButtonComponent, CustomerLeaveAReviewComponent, SubmitCancellationComponent],
   providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerBookingListsComponent implements OnInit, OnDestroy {
@@ -30,6 +32,9 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _paymentService = inject(PaymentService);
   private readonly _razorpayWrapperService = inject(RazorpayWrapperService);
+  private readonly _chatService = inject(ChatSocketService);
+  private readonly _store = inject(Store);
+  private readonly _router = inject(Router);
 
   private _destroy$ = new Subject<void>();
   private _bookingsData$ = new BehaviorSubject<IBookingResponse[]>([]);
@@ -38,6 +43,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   isReviewModalOpen = false;
   cancellationReasonModal = false;
   selectedBookingIdForReview = '';
+  selectedBookingProviderName = '';
   bookingSelectedForCancellation = '';
   prevReview: IReview | null = null;
   pagination: IPagination = {
@@ -185,7 +191,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
       });
   }
 
-  openReviewModal(bookingStatus: BookingStatus, review: IReview | null, bookingId: string) {
+  openReviewModal(bookingStatus: BookingStatus, review: IReview | null, bookingId: string, providerName: string) {
     const isPossible = bookingStatus === BookingStatus.COMPLETED
       || bookingStatus === BookingStatus.CANCELLED;
 
@@ -195,6 +201,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     }
 
     this.selectedBookingIdForReview = bookingId;
+    this.selectedBookingProviderName = providerName ?? '';
     this.prevReview = review ?? null;
     this.isReviewModalOpen = true;
   }
@@ -212,25 +219,38 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
         }),
         withLatestFrom(this.bookingData$),
         tap(([res, bookings]) => {
-          if (!bookings || bookings.length == 0) return;
-          const updatedBooking = bookings.map(booking => ({
-            ...booking,
-            review: {
-              desc: reviewData.description,
-              rating: reviewData.ratings,
-              writtenAt: new Date(),
-            } as IReview
-          }));
+          if (!res.success || !bookings || bookings.length == 0) return;
+          const updatedBooking = bookings.map(booking =>
+            booking.bookingId === this.selectedBookingIdForReview
+              ? {
+                  ...booking,
+                  review: {
+                    desc: reviewData.description,
+                    rating: reviewData.ratings,
+                    writtenAt: new Date(),
+                  } as IReview
+                }
+              : booking
+          );
 
           this._bookingsData$.next(updatedBooking);
         }),
-
         finalize(() => {
           this.isReviewModalOpen = false;
+          this.selectedBookingIdForReview = '';
+          this.selectedBookingProviderName = '';
+          this.prevReview = null;
         }),
-
       )
-      .subscribe();
+      .subscribe({
+        error: () => {
+          this.isReviewModalOpen = false;
+          this.selectedBookingIdForReview = '';
+          this.selectedBookingProviderName = '';
+          this.prevReview = null;
+          this._toastr.error('Failed to add review. Please try again.');
+        }
+      });
   }
 
   completePayment(booking: IBookingResponse) {
@@ -254,6 +274,27 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
 
   onPageChange(newPage: number) {
     this._fetchBookings(newPage);
+  }
+
+  goToChat(providerId: string) {
+    if (providerId) {
+      this._chatService.fetchChat({ id: providerId, type: 'provider' })
+        .subscribe({
+          next: (response) => {
+            if (response.success && response.data?.id) {
+              this._store.dispatch(chatActions.addChat({ chat: response.data }));
+              this._store.dispatch(chatActions.selectChat({ chatId: response.data.id }));
+              this._router.navigate(['chat']);
+            } else {
+              this._toastr.error('Unable to fetch chat.');
+            }
+          },
+          error: (err) => {
+            this._toastr.error('An error occurred while fetching chat.');
+            console.error('Chat error:', err);
+          }
+        });
+    }
   }
 
   openModal(bookingId: string) {

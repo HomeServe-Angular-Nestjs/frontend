@@ -1,5 +1,5 @@
 import { createFeature, createReducer, on } from "@ngrx/store";
-import { IChatState } from "../../core/models/chat.model";
+import { IChatState, IMessage } from "../../core/models/chat.model";
 import { chatAdaptor, messageAdaptor } from "./chat.entities";
 import { chatActions } from "./chat.action";
 
@@ -8,9 +8,11 @@ export const initialChatState: IChatState = {
     messages: messageAdaptor.getInitialState(),
     isLoadingMessages: false,
     isFetchingAllChats: false,
-    isAllMessagesFetched: false,
+    hasMoreMessages: true,
+    nextCursor: null,
     selectedChatId: null,
-    error: null,
+    chatsError: null,
+    messagesError: null,
 }
 
 export const chatFeature = createFeature({
@@ -21,20 +23,20 @@ export const chatFeature = createFeature({
         on(chatActions.fetchAllChat, (state) => ({
             ...state,
             isFetchingAllChats: true,
-            error: null
+            chatsError: null
         })),
 
         on(chatActions.fetchAllChatSuccess, (state, { chats }) => ({
             ...state,
             chats: chatAdaptor.setAll(chats, state.chats),
             isFetchingAllChats: false,
-            error: null
+            chatsError: null
         })),
 
         on(chatActions.fetchAllChatFailure, (state, { error }) => ({
             ...state,
             isFetchingAllChats: false,
-            error,
+            chatsError: error,
         })),
 
         on(chatActions.selectChat, (state, { chatId }) => ({
@@ -42,54 +44,85 @@ export const chatFeature = createFeature({
             selectedChatId: chatId
         })),
 
-        on(chatActions.fetchMessages, (state) => ({
+        on(chatActions.clearSelectedChat, (state) => ({
             ...state,
-            isLoadingMessages: true,
-            error: null
+            selectedChatId: null
         })),
 
-        on(chatActions.fetchMessagesSuccess, (state, { messages, beforeMessageId }) => {
+        on(chatActions.addChat, (state, { chat }) => ({
+            ...state,
+            chats: chatAdaptor.upsertOne(chat, state.chats)
+        })),
 
-            // If this is a "load more" call and no messages returned, stop further fetching
-            if (beforeMessageId && messages.length === 0) {
-                return {
-                    ...state,
-                    isLoadingMessages: false,
-                    isAllMessagesFetched: true
-                };
+        on(chatActions.fetchMessages, (state, { beforeMessageId }) => ({
+            ...state,
+            isLoadingMessages: true,
+            messagesError: null,
+            ...(beforeMessageId
+                ? {}
+                : { hasMoreMessages: true, nextCursor: null })
+        })),
+
+        on(chatActions.fetchMessagesSuccess, (state, { messages, hasMore, nextCursor, beforeMessageId }) => {
+            let updatedMessages: ReturnType<typeof messageAdaptor.getInitialState>;
+
+            if (beforeMessageId) {
+                updatedMessages = messageAdaptor.addMany(messages, state.messages);
+            } else {
+                const confirmedClientIds = new Set(
+                    messages
+                        .filter((m) => !!m.clientMessageId)
+                        .map((m) => m.clientMessageId)
+                );
+                const pendingMessages = Object.values(state.messages.entities)
+                    .filter((m): m is IMessage =>
+                        !!m?.isPending && !!m.clientMessageId && !confirmedClientIds.has(m.clientMessageId)
+                    );
+
+                updatedMessages = messageAdaptor.setAll(messages, state.messages);
+                if (pendingMessages.length > 0) {
+                    updatedMessages = messageAdaptor.addMany(pendingMessages, updatedMessages);
+                }
             }
-
-            // If all messages already fetched, avoid updating again
-            if (state.isAllMessagesFetched && beforeMessageId) {
-                return {
-                    ...state,
-                    isLoadingMessages: false
-                };
-            }
-
-            // Apply new messages
-            const updatedMessages = beforeMessageId
-                ? messageAdaptor.addMany(messages, state.messages)
-                : messageAdaptor.setAll(messages, state.messages);
 
             return {
                 ...state,
                 messages: updatedMessages,
                 isLoadingMessages: false,
+                hasMoreMessages: hasMore,
+                nextCursor,
             }
         }),
 
         on(chatActions.fetchMessagesFailure, (state, { error }) => ({
             ...state,
             isLoadingMessages: false,
-            isAllMessagesFetched: false,
-            error,
+            hasMoreMessages: false,
+            messagesError: error,
         })),
 
-        on(chatActions.addMessage, (state, { message }) => ({
+        on(chatActions.addPendingMessage, (state, { message }) => ({
             ...state,
             messages: messageAdaptor.addOne(message, state.messages)
         })),
+
+        on(chatActions.addMessage, (state, { message }) => {
+            let messages = state.messages;
+
+            if (message.clientMessageId) {
+                const pending = Object.values(messages.entities).find(
+                    (m) => !!m?.isPending && m.clientMessageId === message.clientMessageId
+                );
+                if (pending?.id) {
+                    messages = messageAdaptor.removeOne(pending.id, messages);
+                }
+            }
+
+            return {
+                ...state,
+                messages: messageAdaptor.addOne(message, messages)
+            }
+        }),
 
         on(chatActions.updateChatLastMessage, (state, { chatId, lastMessage, lastSeenAt }) => ({
             ...state,
@@ -102,7 +135,8 @@ export const chatFeature = createFeature({
         on(chatActions.clearMessages, (state) => ({
             ...state,
             messages: messageAdaptor.removeAll(state.messages),
-            isAllMessagesFetched: false
+            hasMoreMessages: true,
+            nextCursor: null
         })),
     )
 });

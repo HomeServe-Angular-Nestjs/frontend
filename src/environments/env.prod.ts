@@ -28,6 +28,7 @@ export const API_ENV = {
   providerService: `${domainName}/provider-service`,
   cart: `${domainName}/cart`,
   coupon: `${domainName}/coupon`,
+  videoCall: `${domainName}/video-call`,
 };
 
 export const API_KEY = {
@@ -50,26 +51,6 @@ export const REGEXP_ENV = {
 
 export const ICE_SERVERS = [
   { urls: "stun:stun.relay.metered.ca:80" },
-  {
-    urls: "turn:global.relay.metered.ca:80",
-    username: "1b5c834b93a455e980999ef5",
-    credential: "BDHDGRa4FMJlPOlp",
-  },
-  {
-    urls: "turn:global.relay.metered.ca:80?transport=tcp",
-    username: "1b5c834b93a455e980999ef5",
-    credential: "BDHDGRa4FMJlPOlp",
-  },
-  {
-    urls: "turn:global.relay.metered.ca:443",
-    username: "1b5c834b93a455e980999ef5",
-    credential: "BDHDGRa4FMJlPOlp",
-  },
-  {
-    urls: "turns:global.relay.metered.ca:443?transport=tcp",
-    username: "1b5c834b93a455e980999ef5",
-    credential: "BDHDGRa4FMJlPOlp",
-  },
 ];
 
 export const MAPBOX_LOCATION_BOUNDS = '74.86,8.17,77.70,12.97'; // Kerala

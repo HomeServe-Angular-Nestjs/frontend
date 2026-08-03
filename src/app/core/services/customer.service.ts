@@ -1,11 +1,10 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
-import { IChangePassword, ICustomer, ICustomerProfileData, IDisplayReviews } from "../models/user.model";
+import { IChangePassword, ICustomer, ICustomerProfileData } from "../models/user.model";
 import { Observable } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
-import { ISubmitReview } from "../models/reviews.model";
 
 @Injectable({ providedIn: 'root' })
 export class CustomerService {
@@ -46,10 +45,6 @@ export class CustomerService {
 
   changeAvatar(formData: FormData): Observable<IResponse<ICustomer>> {
     return this._http.patch<IResponse<ICustomer>>(`${this._apiUrl}/avatar`, formData);
-  }
-
-  submitReview(reviewData: ISubmitReview): Observable<IResponse<IDisplayReviews>> {
-    return this._http.post<IResponse<IDisplayReviews>>(`${this._apiUrl}/reviews`, reviewData);
   }
 
   getProviderGalleryImages(providerId: string): Observable<IResponse<string[]>> {

@@ -111,6 +111,7 @@ export class ProviderBookingRecentComponent implements OnInit, OnChanges, OnDest
         .subscribe({
           next: (response) => {
             if (response.success && response.data?.id) {
+              this._store.dispatch(chatActions.addChat({ chat: response.data }));
               this._store.dispatch(chatActions.selectChat({ chatId: response.data.id }));
               this._router.navigate(['provider', 'chat']);
             } else {

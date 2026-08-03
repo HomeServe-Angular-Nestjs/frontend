@@ -238,10 +238,106 @@
 </div>
 
 <ng-template #loading>
-    <div class="flex flex-col items-center justify-center min-h-[400px]">
-        <app-loading-circle-animation></app-loading-circle-animation>
-        <p class="mt-4 text-gray-400 font-bold text-[10px] uppercase tracking-widest animate-pulse">Syncing Details...
-        </p>
+    <div class="animate-pulse" aria-busy="true">
+
+        <!-- Header skeleton -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-gray-200 rounded-lg"></div>
+                <div class="space-y-2">
+                    <div class="w-40 h-5 bg-gray-200 rounded"></div>
+                    <div class="w-28 h-3 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="w-24 h-6 bg-gray-200 rounded-full"></div>
+                <div class="w-20 h-8 bg-gray-200 rounded-lg"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Main content skeleton -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-50">
+                        <div class="w-40 h-4 bg-gray-200 rounded"></div>
+                        <div class="w-24 h-6 bg-gray-200 rounded-lg"></div>
+                    </div>
+                    <div class="divide-y divide-gray-50">
+                        <div *ngFor="let _ of [1,2]" class="px-6 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-gray-200 rounded-lg"></div>
+                                <div class="space-y-2">
+                                    <div class="w-32 h-4 bg-gray-200 rounded"></div>
+                                    <div class="w-24 h-3 bg-gray-200 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="w-16 h-4 bg-gray-200 rounded"></div>
+                        </div>
+                    </div>
+                    <div class="px-6 py-5 bg-gray-50/50 border-t border-gray-100 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <div class="w-16 h-3 bg-gray-200 rounded"></div>
+                            <div class="w-20 h-4 bg-gray-200 rounded"></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="w-16 h-3 bg-gray-200 rounded"></div>
+                            <div class="w-20 h-4 bg-gray-200 rounded"></div>
+                        </div>
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+                            <div class="w-24 h-4 bg-gray-200 rounded"></div>
+                            <div class="w-24 h-7 bg-gray-200 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-3">
+                            <div class="w-28 h-3 bg-gray-200 rounded"></div>
+                            <div class="w-36 h-4 bg-gray-200 rounded"></div>
+                            <div class="w-40 h-3 bg-gray-200 rounded"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="w-32 h-3 bg-gray-200 rounded"></div>
+                            <div class="w-44 h-3 bg-gray-200 rounded"></div>
+                            <div class="w-36 h-3 bg-gray-200 rounded"></div>
+                            <div class="w-28 h-3 bg-gray-200 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar skeleton -->
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                    <div class="w-36 h-3 bg-gray-200 rounded mb-5"></div>
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="w-12 h-12 bg-gray-200 rounded-xl"></div>
+                        <div class="flex-1 space-y-2">
+                            <div class="w-28 h-4 bg-gray-200 rounded"></div>
+                            <div class="w-40 h-3 bg-gray-200 rounded"></div>
+                            <div class="w-32 h-3 bg-gray-200 rounded"></div>
+                        </div>
+                    </div>
+                    <div class="w-full h-9 bg-gray-200 rounded-lg"></div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-3">
+                    <div class="w-36 h-3 bg-gray-200 rounded"></div>
+                    <div class="flex justify-between items-center">
+                        <div class="w-16 h-3 bg-gray-200 rounded"></div>
+                        <div class="w-20 h-3 bg-gray-200 rounded"></div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="w-16 h-3 bg-gray-200 rounded"></div>
+                        <div class="w-20 h-3 bg-gray-200 rounded"></div>
+                    </div>
+                    <div class="w-40 h-3 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </ng-template>
 

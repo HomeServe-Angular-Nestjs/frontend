@@ -18,6 +18,7 @@ export abstract class BaseSocketService {
 
   connect(): void {
     if (this.socket && this.socket.connected) {
+      this.onConnect();
       return;
     }
 
@@ -44,11 +45,14 @@ export abstract class BaseSocketService {
     }
 
     this.socket.connect();
+
+    this.socket?.off('error');
     this.socket?.on('error', (error) => {
       console.error('Received socket error:', error);
       this._toastr.error(error?.message || 'A socket connection error occurred');
     });
 
+    this.socket?.off('exception');
     this.socket?.on('exception', (error: any) => {
       console.error('WS Exception:', error);
       const message = error?.message || error?.error?.message || 'An unexpected error occurred';

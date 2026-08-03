@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { WalletService } from "../../../../../core/services/wallet.service";
-import { IWallet } from "../../../../../core/models/wallet.model";
+import { ICustomerTransactionData, IWallet } from "../../../../../core/models/wallet.model";
 import { combineLatest, filter, map, Subject, switchMap, takeUntil } from "rxjs";
 import { CommonModule } from "@angular/common";
 import { ITransactionFilter } from "../../../../../core/models/transaction.model";
@@ -9,6 +9,7 @@ import { CustomerPaginationComponent } from "../../../partials/sections/customer
 import { FormsModule } from "@angular/forms";
 import { DebounceService } from "../../../../../core/services/public/debounce.service";
 import { TransactionType } from "../../../../../core/enums/enums";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-customer-wallet',
@@ -19,6 +20,7 @@ import { TransactionType } from "../../../../../core/enums/enums";
 export class CustomerWalletComponent implements OnInit, OnDestroy {
   private readonly _walletService = inject(WalletService);
   private readonly _debounceService = inject(DebounceService);
+  private readonly _router = inject(Router);
   private _destroy$ = new Subject<void>();
 
   walletSignal = toSignal(this._fetchWallet(), { initialValue: null });
@@ -100,6 +102,34 @@ export class CustomerWalletComponent implements OnInit, OnDestroy {
         return 'Subscription Payment';
       default:
         return 'All';
+    }
+  }
+
+  referenceLabel(t: ICustomerTransactionData) {
+    if (t.bookingId) return 'Booking';
+    if (t.subscriptionId) return 'Subscription';
+    return t.gatewayOrderId ? 'Order' : '';
+  }
+
+  description(t: ICustomerTransactionData) {
+    const label = this.referenceLabel(t);
+    const id = t.bookingId ?? t.subscriptionId ?? t.gatewayOrderId ?? '';
+    const ref = label ? `${label} #${id?.toUpperCase()?.slice(0, 8)}` : '';
+    switch (t.transactionType) {
+      case TransactionType.BOOKING_PAYMENT:
+        return ref ? `Paid for ${ref}` : 'Paid for booking';
+      case TransactionType.BOOKING_REFUND:
+        return ref ? `Refund for ${ref}` : 'Booking refund';
+      case TransactionType.SUBSCRIPTION_PAYMENT:
+        return ref ? `Subscription payment for ${ref}` : 'Subscription payment';
+      default:
+        return this.displayType(t.transactionType);
+    }
+  }
+
+  openBooking(t: ICustomerTransactionData) {
+    if (t.bookingId) {
+      this._router.navigate(['/profile/bookings', t.bookingId]);
     }
   }
 

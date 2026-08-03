@@ -5,17 +5,11 @@ import * as authSelector from '../../store/auth/auth.selector';
 import { combineLatest, map, Observable, take } from 'rxjs';
 import { ToastNotificationService } from '../services/public/toastr.service';
 
-/**
- * Guard that controls access to routes based on authentication status and user role.
- * This guard checks the user's authentication status and role from the store:
- * - If the user is authenticated and has the correct role (or no role is required), the route is activated.
- * - If the user is not authenticated or does not have the correct role, they are redirected to the appropriate login page
- *   with the current URL stored in the query parameters for a potential return after login.
- */
 
 export const getRoleFromRoute = (route: ActivatedRouteSnapshot): string | undefined => {
   while (route) {
-    if (route.data?.['role']) return route.data['role'];
+    const data = route.data ?? {};
+    if ('role' in data) return data['role'] as string | undefined;
     route = route.parent!;
   }
   return undefined;

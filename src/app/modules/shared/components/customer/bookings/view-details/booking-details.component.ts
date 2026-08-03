@@ -8,7 +8,6 @@ import { IBookingDetailCustomer, IOrderedServiceUI, IRescheduleData } from "../.
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { BookingStatus } from "../../../../../../core/enums/enums";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
-import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { chatActions } from "../../../../../../store/chat/chat.action";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { Store } from "@ngrx/store";
@@ -18,7 +17,7 @@ import { TransactionHistoryTimelineComponent } from "../../../../partials/shared
 @Component({
     selector: 'app-customer-view-booking-details',
     templateUrl: './booking-details.component.html',
-    imports: [CommonModule, ButtonComponent, LoadingCircleAnimationComponent, RouterLink, RescheduleBookingModalComponent, TransactionHistoryTimelineComponent]
+    imports: [CommonModule, ButtonComponent, RouterLink, RescheduleBookingModalComponent, TransactionHistoryTimelineComponent]
 })
 export class CustomerViewBookingDetailsComponent implements OnInit, OnDestroy {
     private readonly _toastr = inject(ToastNotificationService);
@@ -86,6 +85,7 @@ export class CustomerViewBookingDetailsComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: (response) => {
                     if (response.success && response.data?.id) {
+                        this._store.dispatch(chatActions.addChat({ chat: response.data }));
                         this._store.dispatch(chatActions.selectChat({ chatId: response.data.id }));
                         this._router.navigate(['chat']);
                     } else {

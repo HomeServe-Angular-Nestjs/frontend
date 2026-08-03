@@ -1,23 +1,25 @@
 import { CommonModule } from "@angular/common";
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, Injector, NgZone, OnDestroy, OnInit, QueryList, signal, ViewChild, ViewChildren } from "@angular/core";
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { FormsModule } from "@angular/forms";
-import { delay, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
+import { distinctUntilChanged, filter, map, Observable, Subject, take, takeUntil } from "rxjs";
 import { Store } from "@ngrx/store";
 import { IChat, IMessage, ISendMessage } from "../../../../../../core/models/chat.model";
-import { selectChatError, selectIsAllMessagesFetched, selectIsLoadingMessages, selectSelectedChat, selectSelectedChatsMessage } from "../../../../../../store/chat/chat.selector";
+import { selectHasMoreMessages, selectIsLoadingMessages, selectMessagesError, selectNextCursor, selectSelectedChat, selectSelectedChatsMessage } from "../../../../../../store/chat/chat.selector";
 import { UserType } from "../../../../models/user.model";
 import { selectAuthUserId } from "../../../../../../store/auth/auth.selector";
 import { chatActions } from "../../../../../../store/chat/chat.action";
-import { LoadingCircleAnimationComponent } from "../../loading-Animations/loading-circle/loading-circle.component";
 import { VideoCallService } from "../../../../../../core/services/video-call.service";
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
+import { ChatPaneService } from "../../../../../../core/services/public/chat-pane.service";
+
+const MESSAGE_PAGE_SIZE = 20;
 
 @Component({
   selector: 'app-chat-message-area',
   templateUrl: './chat-message-area.component.html',
-  imports: [CommonModule, FormsModule, LoadingCircleAnimationComponent],
+  imports: [CommonModule, FormsModule],
 })
 export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly _chatSocketService = inject(ChatSocketService);
@@ -25,6 +27,7 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly _cdRef = inject(ChangeDetectorRef);
   private readonly _bookingService = inject(BookingService);
   private _toastr = inject(ToastNotificationService);
+  private readonly _chatPaneService = inject(ChatPaneService);
 
   private readonly _ngZone = inject(NgZone);
   private readonly _store = inject(Store);
@@ -37,33 +40,28 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
   private _preserveScroll = false;
 
   // State flags
-  isLoading = signal(true);
-  private _initialAutoScrollDone = false;
   private _isFetching = false;
+  private hasMoreMessages = false;
+  private nextCursor: string | null = null;
 
   @ViewChild('messageScrollBox', { static: false })
   messageScrollBox!: ElementRef<HTMLDivElement>;
-  @ViewChildren('messageItem')
-  messageItems!: QueryList<ElementRef>;
 
   messages$!: Observable<IMessage[]>;
   chat$!: Observable<IChat>;
   isLoadingMessages$!: Observable<boolean>;
-  chatError$!: Observable<any>;
+  messagesError$!: Observable<any>;
   currentUserId!: string;
   receiverId!: string;
   receiverType: UserType = 'customer';
   textMessage: string = '';
-  isAllMessagesFetched = false;
 
   ngOnInit(): void {
     this.isLoadingMessages$ = this._store.select(selectIsLoadingMessages);
-    this.chatError$ = this._store.select(selectChatError);
+    this.messagesError$ = this._store.select(selectMessagesError);
 
     this.messages$ = this._store.select(selectSelectedChatsMessage).pipe(
-      delay(800),
       map(messages => (messages ?? []).filter(msg => !!msg)),
-      tap(() => this.isLoading.set(false)),
       takeUntil(this._destroy$),
     );
 
@@ -81,7 +79,6 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (!this._isEmpty(messages)) {
           this._scrollToBottomImmediate();
-          this._initialAutoScrollDone = true;
           return;
         }
 
@@ -107,12 +104,32 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.receiverType = receiver.type;
       }
     });
+
+    this._store.select(selectHasMoreMessages)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(hasMore => this.hasMoreMessages = hasMore);
+
+    this._store.select(selectNextCursor)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(cursor => this.nextCursor = cursor);
+
+    this.isLoadingMessages$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(loading => { if (!loading) this._isFetching = false; });
+
+    this._store.select(selectSelectedChat).pipe(
+      filter(chat => !!chat && !!chat.receiver?.id),
+      map(chat => ({ chatId: chat!.id, receiverId: chat!.receiver.id })),
+      distinctUntilChanged((a, b) => a.chatId === b.chatId && a.receiverId === b.receiverId),
+      takeUntil(this._destroy$)
+    ).subscribe(({ chatId, receiverId }) => {
+      this._store.dispatch(chatActions.fetchMessages({ chatId, receiverId, limit: MESSAGE_PAGE_SIZE }));
+    });
   }
 
   ngAfterViewInit(): void {
     // ensures I am in the bottom after the view is ready (first time).
     this._afterDOMPaint(() => this._scrollToBottomImmediate());
-
   }
 
   ngOnDestroy(): void {
@@ -161,64 +178,82 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onScroll() {
     const el = this.messageScrollBox?.nativeElement;
-    if (!el || this._isFetching) return;
+    if (!el || this._isFetching || !this.hasMoreMessages || !this.nextCursor) return;
 
     const pixelThreshold = 60;
     if (el.scrollTop <= pixelThreshold) {
       this._isFetching = true;
+      this._preserveScroll = true;
+      this._prevScrollTop = el.scrollTop;
+      this._prevScrollHeight = el.scrollHeight;
 
-      // Get first visible message before fetching
-      const firstVisible = this.messageItems.find(item => {
-        const rect = item.nativeElement.getBoundingClientRect();
-        return rect.top >= 0; // first item in view
-      });
-
-      const firstMessageId = firstVisible?.nativeElement.dataset?.messageId;
-
-      this._store.select(selectIsAllMessagesFetched).pipe(take(1)).subscribe(isAllFetched => {
-        if (isAllFetched) {
-          this._isFetching = false;
-          return;
-        }
-
-        this.chat$.pipe(take(1)).subscribe(chat => {
-          this._store.dispatch(chatActions.fetchMessages({
-            chatId: chat.id,
-            receiverId: this.receiverId,
-            beforeMessageId: firstMessageId
-          }));
-        });
-
-        // Delay scroll restore until after messages$ updates
-        this.messages$.pipe(take(1)).subscribe(() => {
-          if (firstMessageId) {
-            const elFirst = this.messageItems.find(
-              item => item.nativeElement.dataset?.messageId === firstMessageId
-            );
-            if (elFirst) {
-              el.scrollTop = elFirst.nativeElement.offsetTop;
-            }
-          }
-          this._isFetching = false;
-        });
+      this.chat$.pipe(take(1)).subscribe(chat => {
+        this._store.dispatch(chatActions.fetchMessages({
+          chatId: chat.id,
+          receiverId: this.receiverId,
+          beforeMessageId: this.nextCursor!,
+          limit: MESSAGE_PAGE_SIZE
+        }));
       });
     }
+  }
+
+  private _generateClientMessageId(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return `msg-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   }
 
   sendMessage() {
     const trimmedMessage = this.textMessage.trim();
     if (!trimmedMessage) return;
 
-    const msgContent: ISendMessage = {
-      message: trimmedMessage,
-      receiverId: this.receiverId,
-      type: this.receiverType
-    };
+    const clientMessageId = this._generateClientMessageId();
 
-    this._chatSocketService.sendMessage(msgContent);
+    this.chat$.pipe(take(1)).subscribe(chat => {
+      const pendingMessage: IMessage = {
+        id: clientMessageId,
+        chatId: chat.id,
+        senderId: this.currentUserId,
+        receiverId: this.receiverId,
+        content: trimmedMessage,
+        messageType: 'text',
+        isRead: false,
+        isDeleted: false,
+        clientMessageId,
+        isPending: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      this._store.dispatch(chatActions.addPendingMessage({ message: pendingMessage }));
+
+      const msgContent: ISendMessage = {
+        message: trimmedMessage,
+        receiverId: this.receiverId,
+        type: this.receiverType,
+        clientMessageId,
+      };
+
+      this._chatSocketService.sendMessage(msgContent);
+    });
+
     this.textMessage = '';
-
     this._afterDOMPaint(() => this._scrollToBottomSmooth());
+  }
+
+  toggleChatList(): void {
+    this._chatPaneService.toggleList();
+  }
+
+  goBackToList(): void {
+    this._store.dispatch(chatActions.clearSelectedChat());
+  }
+
+  onImgError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    target.src = 'assets/images/profile_placeholder.jpg';
   }
 
   startVideoCall() {
@@ -251,7 +286,8 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
       if (chat?.id) {
         this._store.dispatch(chatActions.fetchMessages({
           chatId: chat.id,
-          receiverId: this.receiverId
+          receiverId: this.receiverId,
+          limit: MESSAGE_PAGE_SIZE
         }));
       }
     });

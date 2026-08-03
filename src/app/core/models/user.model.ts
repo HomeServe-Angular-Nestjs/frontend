@@ -204,6 +204,7 @@ export interface IDisplayReviews {
     avgRating: number;
     totalReviews: number;
     allFetched: boolean;
+    nextCursor: string | null;
 }
 
 export interface ISearchedLocation {

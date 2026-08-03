@@ -38,6 +38,7 @@ export const customerRoutes: Routes = [
         component: CustomerProviderProfileLayoutComponent,
         canActivate: [AuthGuard],
         data: {
+          role: null,
           breadcrumb: 'Provider Details',
           breadcrumbParent: { label: 'Service Providers', path: '/view_providers' }
         },

@@ -15,7 +15,12 @@ import {
   VideoRoleType,
 } from "../../../../../core/services/socket-service/video-socket.service";
 import { VideoCallService } from "../../../../../core/services/video-call.service";
-import { ICE_SERVERS } from "../../../../../../environments/env";
+import { CallEndReason } from "../../../../../core/enums/enums";
+
+const MAX_ICE_RECOVERY_RETRIES = 3;
+const MAX_PC_REBUILDS = 2;
+const DISCONNECT_RECOVERY_MS = 5000;
+const END_SCREEN_MS = 2000;
 
 @Component({
   selector: "app-video-call",
@@ -35,6 +40,12 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   private pendingIce: RTCIceCandidate[] = [];
   private tracksAdded = false;
 
+  private _iceRetryCount = 0;
+  private _pcRebuilds = 0;
+  private _recoveryInProgress = false;
+  private _disconnectedTimer?: ReturnType<typeof setInterval>;
+  private _closeTimer?: ReturnType<typeof setTimeout>;
+
   isMinimized = false;
   isAudioEnabled = true;
   isVideoEnabled = true;
@@ -44,6 +55,9 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   callStatus: 'connecting' | 'calling' | 'connected' | 'ended' = 'calling';
   callDuration = 0;
   private _timerInterval?: ReturnType<typeof setInterval>;
+
+  endReasonDisplay: CallEndReason | null = null;
+  peerReconnecting = false;
 
   private readonly MEDIA_TIMEOUT_MS = 20000;
   private _mediaAcquisitionAborted = false;
@@ -58,12 +72,13 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
 
   showRemotePlayButton = false;
 
+  private _callEnded = false;
+
   constructor() {
     effect(() => {
       const r = this._videoSocketService.role();
       if (r) {
         this.role = r;
-        console.log("Video role set:", r);
       }
     });
   }
@@ -74,80 +89,14 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     this._callEnded = false;
 
     try {
-      this._pc = new RTCPeerConnection({
-        iceServers: ICE_SERVERS,
-        iceTransportPolicy: "all",
-      });
-      console.log('[VideoCall] PeerConnection created');
+      await this._createPeerConnection();
 
-      (window as any)._pc = this._pc;
-
-      this._pc.onconnectionstatechange = () => {
-        console.log('[VideoCall] Connection State:', this._pc.connectionState);
-        if (this._pc.connectionState === 'disconnected' || this._pc.connectionState === 'failed') {
-          console.warn('[VideoCall] Peer disconnected!');
-          // Optionally handle UI feedback here
-        }
-      };
-
-      this._pc.oniceconnectionstatechange = () => {
-        console.log('[VideoCall] ICE Connection State:', this._pc.iceConnectionState);
-        if (this._pc.iceConnectionState === 'failed') {
-          console.error('[VideoCall] ICE Connection Failed! Check STUN/TURN servers.');
-          this._pc.restartIce();
-        }
-      };
-
-      this._pc.ontrack = (event) => {
-        console.log('[VideoCall] Received Remote Track:', event.track.kind, event.streams[0]?.id);
-        console.log('[Caller] ontrack fired:', event.track.kind, event.streams);
-
-        // prevent duplicates
-        if (!this.remoteStream.getTracks().some(t => t.id === event.track.id)) {
-          console.log('[VideoCall] Adding remote track to stream');
-          this.remoteStream.addTrack(event.track);
-        }
-
-        const rv = this.remoteVideoRef?.nativeElement;
-        if (rv) {
-          // 1. Set Critical Attributes
-          rv.muted = true; // START MUTED to allow autoplay
-          rv.playsInline = true;
-          rv.autoplay = true;
-
-          // 2. Set Source
-          rv.srcObject = this.remoteStream;
-
-          // 3. Play when ready
-          rv.onloadedmetadata = () => {
-            console.log('[VideoCall] Remote video metadata loaded. Attempting play...');
-            rv.play()
-              .then(() => {
-                console.log('[VideoCall] Remote video playing successfully');
-                rv.muted = false; // Unmute after successful play if desired, or let user unmute
-              })
-              .catch(err => {
-                console.warn("Remote video play blocked (Autoplay Policy):", err);
-                this.showRemotePlayButton = true; // Show fallback UI
-              });
-          };
-        }
-      };
-
-      this._pc.onicecandidate = (event) => {
-        if (event.candidate) {
-          console.log('[VideoCall] Sending ICE candidate');
-          this._videoSocketService.sendSignal({
-            type: "ice-candidate",
-            candidate: event.candidate,
-          });
-        }
-      };
-
-      this._videoSocketService.onAccept(async () => {
-        console.log('[VideoCall] Call Accepted (Caller view)');
+      this._videoSocketService.onAccept(async (data) => {
         if (this.role !== "caller") return;
+        if (data?.callId && data.callId !== this._videoSocketService.callId()) return;
+        if (this.callStatus === 'connected' || this.callStatus === 'connecting') return;
 
+        console.log('[VideoCall] Call Accepted (Caller view)');
         this.callStatus = 'connecting';
         this._startTimer();
 
@@ -155,32 +104,265 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!stream) {
           console.error('[VideoCall] Caller media unavailable — ending call');
           this._videoSocketService.sendSignal({ type: "media-error" });
-          this.endCall();
+          this.showEndReason(CallEndReason.FAILED);
           return;
         }
         this.callStatus = 'connected';
-        this._maybeAddLocalTracks();
         await this._startOffer();
       });
 
       this._registerSignalHandlers();
+      this._registerReconnectHandlers();
 
       this._videoSocketService.initSignalListener();
-
     } catch (error) {
       console.error('[VideoCall] Initialization error:', error);
+      this.showEndReason(CallEndReason.FAILED);
     }
   }
 
   async ngAfterViewInit() {
     console.log('[VideoCall] View Init (Active Media Request Disabled)');
-    // DO NOT Call media here. It is triggered by onAccept or onSignal('offer')
   }
+
+  /* ============================== Peer Connection ============================== */
+
+  private async _createPeerConnection() {
+    const iceServers = await this._videoCallService.getIceServers();
+    this._pc = new RTCPeerConnection({
+      iceServers,
+      iceTransportPolicy: "all",
+    });
+    this.tracksAdded = false;
+    this._setupPeerConnectionHandlers();
+    return this._pc;
+  }
+
+  private _setupPeerConnectionHandlers() {
+    this._pc.onconnectionstatechange = () => {
+      console.log('[VideoCall] Connection State:', this._pc.connectionState);
+      if (this._pc.connectionState === 'failed') {
+        this._handleIceRecovery();
+      }
+    };
+
+    this._pc.oniceconnectionstatechange = () => {
+      console.log('[VideoCall] ICE Connection State:', this._pc.iceConnectionState);
+      this._handleIceConnectionState(this._pc.iceConnectionState);
+    };
+
+    this._pc.ontrack = (event) => {
+      if (!this.remoteStream.getTracks().some(t => t.id === event.track.id)) {
+        this.remoteStream.addTrack(event.track);
+      }
+
+      const rv = this.remoteVideoRef?.nativeElement;
+      if (rv) {
+        rv.muted = true;
+        rv.playsInline = true;
+        rv.autoplay = true;
+        rv.srcObject = this.remoteStream;
+
+        rv.onloadedmetadata = () => {
+          rv.play()
+            .then(() => {
+              console.log('[VideoCall] Remote video playing successfully');
+              rv.muted = false;
+            })
+            .catch((err) => {
+              console.warn("Remote video play blocked (Autoplay Policy):", err);
+              this.showRemotePlayButton = true;
+            });
+        };
+      }
+    };
+
+    this._pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        this._videoSocketService.sendSignal({
+          type: "ice-candidate",
+          candidate: event.candidate,
+        });
+      }
+    };
+  }
+
+  /* ============================== ICE Recovery ============================== */
+
+  private _handleIceConnectionState(state: RTCIceConnectionState) {
+    if (this._callEnded) return;
+
+    if (state === 'connected' || state === 'completed') {
+      this._iceRetryCount = 0;
+      this._stopDisconnectedRecovery();
+    } else if (state === 'disconnected') {
+      this._startDisconnectedRecovery();
+    } else if (state === 'failed') {
+      this._stopDisconnectedRecovery();
+      this._handleIceRecovery();
+    }
+  }
+
+  private _startDisconnectedRecovery() {
+    if (this._disconnectedTimer) return;
+    this._disconnectedTimer = setInterval(() => {
+      if (this._callEnded || !this._pc) {
+        this._stopDisconnectedRecovery();
+        return;
+      }
+      if (this._pc.iceConnectionState === 'disconnected') {
+        this._handleIceRecovery();
+      }
+    }, DISCONNECT_RECOVERY_MS);
+  }
+
+  private _stopDisconnectedRecovery() {
+    if (this._disconnectedTimer) {
+      clearInterval(this._disconnectedTimer);
+      this._disconnectedTimer = undefined;
+    }
+  }
+
+  private async _handleIceRecovery() {
+    if (this._callEnded || this._recoveryInProgress || !this._pc) return;
+    this._recoveryInProgress = true;
+
+    try {
+      if (this._iceRetryCount >= MAX_ICE_RECOVERY_RETRIES) {
+        if (this._pcRebuilds >= MAX_PC_REBUILDS) {
+          console.error('[VideoCall] Recovery exhausted — ending call');
+          this.showEndReason(CallEndReason.FAILED);
+          return;
+        }
+        await this._rebuildPeerConnection();
+        return;
+      }
+
+      this._iceRetryCount++;
+      console.log(`[VideoCall] ICE restart attempt #${this._iceRetryCount}`);
+      this._pc.restartIce();
+      await this._startOffer();
+    } catch (e) {
+      console.error('[VideoCall] ICE recovery failed:', e);
+    } finally {
+      this._recoveryInProgress = false;
+    }
+  }
+
+  private async _rebuildPeerConnection() {
+    console.log('[VideoCall] Rebuilding PeerConnection (fresh PC + full re-offer)');
+    this._pcRebuilds++;
+    this._closePeerConnection();
+    await this._createPeerConnection();
+
+    if (this.localStream) {
+      this._maybeAddLocalTracks();
+    }
+    await this._startOffer();
+  }
+
+  private _handleSocketReconnected() {
+    if (this._callEnded || !this._pc) return;
+
+    const state = this._pc.iceConnectionState;
+    if (state === 'failed' || state === 'disconnected') {
+      this._iceRetryCount = 0;
+      this._handleIceRecovery();
+    }
+  }
+
+  /* ============================== Signal Handlers ============================== */
+
+  private _registerReconnectHandlers() {
+    this._videoSocketService.onPeerReconnecting(() => {
+      this.peerReconnecting = true;
+    });
+    this._videoSocketService.onRejoined(() => {
+      this.peerReconnecting = false;
+    });
+    this._videoSocketService.onSocketReconnected(() => this._handleSocketReconnected());
+  }
+
+  private _registerSignalHandlers() {
+    this._videoSocketService.onSignal("offer", async (data) => {
+      if (!this._isCurrentCall(data) || this.role !== 'callee') return;
+
+      console.log('[VideoCall] Received OFFER (Callee)');
+
+      if (this.callStatus !== 'connected') {
+        this.callStatus = 'connecting';
+        this._startTimer();
+      }
+
+      await this._pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+
+      if (!this.localStream) {
+        const stream = await this._acquireStream();
+        if (!stream) {
+          console.error('[VideoCall] Local media unavailable — ending call');
+          this._videoSocketService.sendSignal({ type: "media-error" });
+          this.showEndReason(CallEndReason.FAILED);
+          return;
+        }
+        this.localStream = stream;
+        this._attachLocalStreamToVideo();
+        await this._bindLocalTracksToTransceivers();
+      }
+
+      const answer = await this._pc.createAnswer();
+      await this._pc.setLocalDescription(answer);
+      this._videoSocketService.sendSignal({ type: "answer", answer });
+      this.callStatus = 'connected';
+
+      this._processPendingIce();
+    });
+
+    this._videoSocketService.onSignal("answer", async (data) => {
+      if (!this._isCurrentCall(data) || this.role !== 'caller') return;
+      console.log('[VideoCall] Received ANSWER');
+      await this._pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+      this._processPendingIce();
+    });
+
+    this._videoSocketService.onSignal("media-error", () => {
+      console.error('[VideoCall] Peer failed to acquire media');
+      this.showEndReason(CallEndReason.FAILED);
+    });
+
+    this._videoSocketService.onSignal("ice-candidate", async (data) => {
+      if (!this._isCurrentCall(data)) return;
+      const candidate = new RTCIceCandidate(data.candidate);
+      if (!this._pc.remoteDescription) {
+        this.pendingIce.push(candidate);
+      } else {
+        await this.addIceCandidateSafe(candidate);
+      }
+    });
+  }
+
+  private _isCurrentCall(data: { callId?: string }): boolean {
+    const currentCallId = this._videoSocketService.callId();
+    if (!currentCallId || !data?.callId) return false;
+    return data.callId === currentCallId;
+  }
+
+  private async _bindLocalTracksToTransceivers() {
+    if (!this.localStream) return;
+    const transceivers = this._pc.getTransceivers();
+    for (const track of this.localStream.getTracks()) {
+      const transceiver = transceivers.find(t => t.receiver.track?.kind === track.kind);
+      if (transceiver) {
+        transceiver.direction = 'sendrecv';
+        await transceiver.sender.replaceTrack(track);
+      }
+    }
+    this.tracksAdded = true;
+  }
+
+  /* ============================== Media ============================== */
 
   private _maybeAddLocalTracks() {
     if (this.tracksAdded || !this.localStream) return;
-
-    console.log(`[VideoCall] Adding ${this.localStream.getTracks().length} local tracks to PC`);
     this.localStream.getTracks().forEach((track) => {
       this._pc.addTrack(track, this.localStream!);
     });
@@ -190,22 +372,19 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   private _streamPromise: Promise<MediaStream | null> | null = null;
 
   private async ensureLocalStream() {
-    // 1. If we already have a stream, reuse it.
     if (this.localStream && this.localStream.active) {
       this._attachLocalStreamToVideo();
-      this._maybeAddLocalTracks(); // CRITICAL: Ensure tracks added if stream pre-exists
+      this._maybeAddLocalTracks();
       return this.localStream;
     }
 
-    // 2. If a request is already in-flight, return that promise (Singleton Request)
     if (this._streamPromise) {
-      console.log('[VideoCall] Stream request in progress, joining existing promise...');
       try {
         const stream = await this._streamPromise;
         if (stream) {
           this.localStream = stream;
           this._attachLocalStreamToVideo();
-          this._maybeAddLocalTracks(); // CRITICAL: Ensure tracks added for piggybacker
+          this._maybeAddLocalTracks();
         }
         return stream;
       } catch (e) {
@@ -213,26 +392,22 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    // 3. Start a new request
-    console.log('[VideoCall] Initiating new media request...');
     this._streamPromise = this._acquireStream();
 
     try {
       this.localStream = await this._streamPromise;
       if (this.localStream) {
         this._attachLocalStreamToVideo();
-        this._maybeAddLocalTracks(); // CRITICAL: Ensure tracks added for creator
+        this._maybeAddLocalTracks();
       }
       return this.localStream;
     } finally {
-      // 4. Always clear the promise so future calls can retry if this one failed
       this._streamPromise = null;
     }
   }
 
   private async _acquireStream(): Promise<MediaStream | null> {
     try {
-      console.log('[VideoCall] Opening Camera/Mic...');
       const stream = await this._withTimeout(
         navigator.mediaDevices.getUserMedia({
           audio: true,
@@ -243,16 +418,11 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
       );
       if (this._mediaAcquisitionAborted) {
         stream.getTracks().forEach(t => t.stop());
-        console.log('[VideoCall] Media released (call ended during acquisition)');
         return null;
       }
-      console.log('[VideoCall] Media Access Granted:', stream.id);
       return stream;
     } catch (err: any) {
-      if (this._mediaAcquisitionAborted) {
-        console.log('[VideoCall] Media acquisition aborted by user');
-        return null;
-      }
+      if (this._mediaAcquisitionAborted) return null;
       console.error('[VideoCall] Media Access Denied/Failed:', err);
       return null;
     }
@@ -273,7 +443,6 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
       this.localStream.getTracks().forEach(t => t.stop());
       this.localStream = undefined;
     }
-    // Force clear video src to help browser release lock
     if (this.localVideoRef?.nativeElement) {
       this.localVideoRef.nativeElement.srcObject = null;
     }
@@ -283,10 +452,8 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.localVideoRef?.nativeElement || !this.localStream) return;
 
     const lv = this.localVideoRef.nativeElement;
-    // Only set if different to avoid reloading
     if (lv.srcObject !== this.localStream) {
-      console.log('[VideoCall] Attaching local stream to video element');
-      lv.muted = true; // Always mute local video
+      lv.muted = true;
       lv.autoplay = true;
       lv.playsInline = true;
       lv.srcObject = this.localStream;
@@ -294,117 +461,34 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private _registerSignalHandlers() {
-    this._videoSocketService.onSignal("offer", async (data) => {
-      console.log('[VideoCall] Received OFFER (Callee)');
-
-      this.callStatus = 'connecting';
-      this._startTimer();
-
-      // 1️⃣ Apply remote offer FIRST (mandatory)
-      await this._pc.setRemoteDescription(
-        new RTCSessionDescription(data.offer)
-      );
-      console.log('[VideoCall] Remote Description set (Offer)');
-
-      // 2️⃣ Acquire local media — use _acquireStream directly to avoid
-      //    _maybeAddLocalTracks which would create extra transceivers
-      //    not matching the offer's m= sections.
-      const stream = await this._acquireStream();
-      if (!stream) {
-        console.error('[VideoCall] Local media unavailable — ending call');
-        this._videoSocketService.sendSignal({ type: "media-error" });
-        this.endCall();
-        return;
-      }
-      this.localStream = stream;
-      this._attachLocalStreamToVideo();
-
-      // 3️⃣ Bind local tracks to the EXISTING transceivers created from the offer
-      const transceivers = this._pc.getTransceivers();
-      for (const track of this.localStream.getTracks()) {
-        const transceiver = transceivers.find(t => t.receiver.track?.kind === track.kind);
-        if (transceiver) {
-          transceiver.direction = 'sendrecv';
-          await transceiver.sender.replaceTrack(track);
-        }
-      }
-      this.tracksAdded = true;
-
-      // 4️⃣ Create SDP answer (safe now)
-      const answer = await this._pc.createAnswer();
-      console.log('[VideoCall] Answer created');
-
-      // 5️⃣ Apply local description
-      await this._pc.setLocalDescription(answer);
-      console.log('[VideoCall] Local Description set (Answer)');
-
-      // 6️⃣ Send answer to caller
-      this._videoSocketService.sendSignal({
-        type: "answer",
-        answer,
-      });
-      console.log('[VideoCall] ANSWER sent');
-      this.callStatus = 'connected';
-
-      // 7️⃣ Process buffered ICE (unchanged)
-      this._processPendingIce();
-    });
-
-
-    this._videoSocketService.onSignal("answer", async (data) => {
-      console.log('[VideoCall] Received ANSWER');
-      console.log('[VideoCall] Setting Remote Description (Answer)');
-      await this._pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-
-      this._processPendingIce();
-    });
-
-    this._videoSocketService.onSignal("media-error", () => {
-      console.error('[VideoCall] Peer failed to acquire media');
-      this.endCall();
-    });
-
-    this._videoSocketService.onSignal("ice-candidate", async (data) => {
-      console.log('[VideoCall] Received Remote ICE Candidate');
-      const candidate = new RTCIceCandidate(data.candidate);
-      if (!this._pc.remoteDescription) {
-        console.log('[VideoCall] Buffering ICE candidate (remote desc not set)');
-        this.pendingIce.push(candidate);
-      } else {
-        await this.addIceCandidateSafe(candidate);
-      }
-    });
+  private async _startOffer() {
+    console.log('[VideoCall] Starting Offer...');
+    const offer = await this._pc.createOffer();
+    await this._pc.setLocalDescription(offer);
+    this._videoSocketService.sendSignal({ type: "offer", offer });
   }
+
+  /* ============================== ICE Buffer ============================== */
 
   private async _processPendingIce() {
     if (this.pendingIce.length > 0) {
-      console.log(`[VideoCall] Processing ${this.pendingIce.length} buffered ICE candidates`);
-      for (const candidate of this.pendingIce) {
+      const buffered = this.pendingIce;
+      this.pendingIce = [];
+      for (const candidate of buffered) {
         await this.addIceCandidateSafe(candidate);
       }
-      this.pendingIce = [];
     }
   }
 
   private async addIceCandidateSafe(candidate: RTCIceCandidate) {
     try {
       await this._pc.addIceCandidate(candidate);
-      console.log('[VideoCall] Added ICE candidate successfully');
     } catch (e) {
       console.error('[VideoCall] Failed to add ICE candidate', e);
     }
   }
 
-  private async _startOffer() {
-    console.log('[VideoCall] Starting Offer...');
-    const offer = await this._pc.createOffer();
-    console.log('[VideoCall] Setting Local Description (Offer)');
-    await this._pc.setLocalDescription(offer);
-
-    console.log('[VideoCall] Sending OFFER signal');
-    this._videoSocketService.sendSignal({ type: "offer", offer });
-  }
+  /* ============================== UI Controls ============================== */
 
   toggleAudioEnabling() {
     this.isAudioEnabled = !this.isAudioEnabled;
@@ -440,6 +524,20 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
 
+  get endReasonLabel(): string {
+    switch (this.endReasonDisplay) {
+      case CallEndReason.MISSED: return 'Missed call';
+      case CallEndReason.DECLINED: return 'Call declined';
+      case CallEndReason.CANCELLED: return 'Call cancelled';
+      case CallEndReason.FAILED: return 'Call failed';
+      case CallEndReason.DISCONNECTED: return 'Connection lost';
+      case CallEndReason.REMOTE_LEFT: return 'Call ended';
+      case CallEndReason.TIMEOUT: return 'Call timed out';
+      case CallEndReason.ACCEPTED_ELSEWHERE: return 'Call answered elsewhere';
+      default: return 'Call ended';
+    }
+  }
+
   private _startTimer() {
     this.callDuration = 0;
     this._timerInterval = setInterval(() => {
@@ -454,29 +552,40 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private _callEnded = false;
+  /* ============================== End / Cleanup ============================== */
 
+  /** Local end (user pressed hang-up). Emits the single authoritative leave. */
   endCall() {
     if (this._callEnded) return;
     this._callEnded = true;
 
-    console.log('[VideoCall] Ending Call - Cleanup started');
-    this.callStatus = 'ended';
+    const reason = this.callStatus === 'calling'
+      ? CallEndReason.CANCELLED
+      : CallEndReason.ENDED;
+
+    this._teardown();
+    this._videoSocketService.endCall();
+    this._showEndScreen(reason);
+  }
+
+  /** Server-driven end (missed, declined, remote left, etc). No leave is emitted. */
+  showEndReason(reason: CallEndReason) {
+    if (this._callEnded) return;
+    this._callEnded = true;
+
+    this._teardown();
+    this._showEndScreen(reason);
+  }
+
+  private _teardown() {
     this._stopTimer();
-
-    // Signal that any in-flight media acquisition should be abandoned
+    this._stopDisconnectedRecovery();
     this._mediaAcquisitionAborted = true;
+    this._stopAllTracks();
+    this._closePeerConnection();
+  }
 
-    // Stop all local tracks
-    if (this.localStream) {
-      this.localStream.getTracks().forEach((track) => {
-        console.log(`[VideoCall] Stopping local track: ${track.kind}`);
-        track.stop();
-      });
-      this.localStream = undefined;
-    }
-
-    // Close PeerConnection
+  private _closePeerConnection() {
     if (this._pc) {
       try {
         this._pc.ontrack = null;
@@ -484,18 +593,21 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
         this._pc.oniceconnectionstatechange = null;
         this._pc.onconnectionstatechange = null;
         this._pc.close();
-        console.log('[VideoCall] PeerConnection closed');
       } catch (e) {
         console.warn('[VideoCall] Error closing PC', e);
       }
       this._pc = undefined as any;
     }
-
-    this._videoSocketService.endCall(this.partnerId);
-    this._videoCallService.endCall();
   }
 
-  // Smooth Dragging
+  private _showEndScreen(reason: CallEndReason) {
+    this.callStatus = 'ended';
+    this.endReasonDisplay = reason;
+    this._closeTimer = setTimeout(() => this._videoCallService.endCall(), END_SCREEN_MS);
+  }
+
+  /* ============================== Drag ============================== */
+
   startDrag(event: MouseEvent) {
     if (!this.isMinimized) return;
     event.stopPropagation();
@@ -554,8 +666,15 @@ export class VideoCallComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('[VideoCall] Component Destroyed');
     this._stopTimer();
-    this.endCall();
+    this._stopDisconnectedRecovery();
+    if (this._closeTimer) clearTimeout(this._closeTimer);
+
+    if (this._callEnded) {
+      this._stopAllTracks();
+      this._closePeerConnection();
+    } else {
+      this.endCall();
+    }
   }
 }

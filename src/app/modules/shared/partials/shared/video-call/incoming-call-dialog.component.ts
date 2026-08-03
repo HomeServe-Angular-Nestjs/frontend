@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-incoming-call-floating',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DragDropModule],
   template: `
     <div
       class="fixed bottom-6 right-6 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl p-6 w-80 border border-white/20 ring-1 ring-black/5 cursor-move transition-all animate-bounce-in"
