@@ -43,6 +43,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   isReviewModalOpen = false;
   cancellationReasonModal = false;
   selectedBookingIdForReview = '';
+  selectedBookingProviderName = '';
   bookingSelectedForCancellation = '';
   prevReview: IReview | null = null;
   pagination: IPagination = {
@@ -190,7 +191,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
       });
   }
 
-  openReviewModal(bookingStatus: BookingStatus, review: IReview | null, bookingId: string) {
+  openReviewModal(bookingStatus: BookingStatus, review: IReview | null, bookingId: string, providerName: string) {
     const isPossible = bookingStatus === BookingStatus.COMPLETED
       || bookingStatus === BookingStatus.CANCELLED;
 
@@ -200,6 +201,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
     }
 
     this.selectedBookingIdForReview = bookingId;
+    this.selectedBookingProviderName = providerName ?? '';
     this.prevReview = review ?? null;
     this.isReviewModalOpen = true;
   }
@@ -217,25 +219,38 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
         }),
         withLatestFrom(this.bookingData$),
         tap(([res, bookings]) => {
-          if (!bookings || bookings.length == 0) return;
-          const updatedBooking = bookings.map(booking => ({
-            ...booking,
-            review: {
-              desc: reviewData.description,
-              rating: reviewData.ratings,
-              writtenAt: new Date(),
-            } as IReview
-          }));
+          if (!res.success || !bookings || bookings.length == 0) return;
+          const updatedBooking = bookings.map(booking =>
+            booking.bookingId === this.selectedBookingIdForReview
+              ? {
+                  ...booking,
+                  review: {
+                    desc: reviewData.description,
+                    rating: reviewData.ratings,
+                    writtenAt: new Date(),
+                  } as IReview
+                }
+              : booking
+          );
 
           this._bookingsData$.next(updatedBooking);
         }),
-
         finalize(() => {
           this.isReviewModalOpen = false;
+          this.selectedBookingIdForReview = '';
+          this.selectedBookingProviderName = '';
+          this.prevReview = null;
         }),
-
       )
-      .subscribe();
+      .subscribe({
+        error: () => {
+          this.isReviewModalOpen = false;
+          this.selectedBookingIdForReview = '';
+          this.selectedBookingProviderName = '';
+          this.prevReview = null;
+          this._toastr.error('Failed to add review. Please try again.');
+        }
+      });
   }
 
   completePayment(booking: IBookingResponse) {

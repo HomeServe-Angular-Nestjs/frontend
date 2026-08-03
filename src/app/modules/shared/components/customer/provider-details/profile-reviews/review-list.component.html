@@ -1,4 +1,4 @@
-<ng-container *ngIf="reviewResponse$ | async as reviewResponse">
+<ng-container *ngIf="reviewResponse$ | async as reviewResponse; else loadingOrError">
     <div class="bg-white rounded-lg shadow-lg p-6">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <div>
@@ -8,59 +8,102 @@
                     {{ reviewResponse.avgRating | number:'1.1-1' }}
                 </p>
             </div>
-
-            <!--!todo <div class="flex flex-wrap gap-3">
-                <select class="border rounded-lg px-3 py-1.5 text-sm">
-                    <option>Most Recent</option>
-                    <option>Highest Rated</option>
-                    <option>Lowest Rated</option>
-                </select>
-
-                <select class="border rounded-lg px-3 py-1.5 text-sm">
-                    <option>All Ratings</option>
-                    <option>5 Stars</option>
-                    <option>4 Stars</option>
-                    <option>3 Stars</option>
-                    <option>2 Stars</option>
-                    <option>1 Star</option>
-                </select>
-            </div> -->
         </div>
 
         <!-- Reviews -->
-        <div class="space-y-6">
-            <ng-container *ngIf="reviewResponse.reviews.length">
-
-                <div *ngFor="let review of reviewResponse.reviews" class="border-b pb-6">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                                <img [src]="review.avatar"
-                                    (error)="review.avatar = 'assets/images/profile_placeholder.jpg'"
-                                    class="w-full h-full object-cover" />
-                            </div>
-                            <div>
-                                <p class="font-medium">{{ review.name }}</p>
-                                <p class="text-sm text-gray-500">{{ review.email }}</p>
-                            </div>
+        <div *ngIf="reviewResponse.reviews.length; else emptyReviews" class="space-y-6">
+            <div *ngFor="let review of reviewResponse.reviews" class="border-b pb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                            <img [src]="review.avatar"
+                                (error)="review.avatar = 'assets/images/profile_placeholder.jpg'"
+                                class="w-full h-full object-cover" />
                         </div>
-                        <div class="flex items-center gap-1">
-                            <span class="text-yellow-400">⭐</span>
-                            <span class="font-medium">{{ review.rating }}</span>
-                            <span class="text-gray-500 text-sm pl-2">{{ review.writtenAt | date }}</span>
+                        <div>
+                            <p class="font-medium">{{ review.name }}</p>
+                            <p class="text-sm text-gray-500">{{ review.email }}</p>
                         </div>
                     </div>
-
-                    <p class="text-gray-600 mb-3">{{ review.desc }}</p>
-
+                    <div class="flex items-center gap-1">
+                        <span class="text-yellow-400">⭐</span>
+                        <span class="font-medium">{{ review.rating }}</span>
+                        <span class="text-gray-500 text-sm pl-2">{{ review.writtenAt | date }}</span>
+                    </div>
                 </div>
-            </ng-container>
+
+                <p class="text-gray-600 mb-3">{{ review.desc }}</p>
+            </div>
 
             <div class="text-center pt-4">
-                <app-button *ngIf="!reviewResponse.allFetched" text="Load More Reviews" (clicked)="loadMoreReviews()"
+                <app-button *ngIf="!reviewResponse.allFetched" [text]="isLoadingMore ? 'Loading...' : 'Load More Reviews'"
+                    [disabled]="isLoadingMore" (clicked)="loadMoreReviews()"
                     buttonClass="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors">
                 </app-button>
             </div>
         </div>
+
+        <!-- Empty State -->
+        <ng-template #emptyReviews>
+            <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
+                <div class="relative mb-6">
+                    <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-400">
+                        <i class="far fa-star text-3xl"></i>
+                    </div>
+                    <div
+                        class="absolute -bottom-1 -right-1 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow border border-gray-100 text-gray-300">
+                        <i class="fas fa-quote-left text-xs"></i>
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-1.5">No reviews yet</h3>
+                <p class="text-sm text-gray-500 max-w-md leading-relaxed">
+                    This provider hasn't received any reviews yet. Check back soon to see what customers have to say.
+                </p>
+            </div>
+        </ng-template>
     </div>
 </ng-container>
+
+<!-- Loading Skeleton / Error State -->
+<ng-template #loadingOrError>
+    <div *ngIf="loadError" class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
+            <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-400 mb-4">
+                <i class="fas fa-exclamation-triangle text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-1.5">Couldn't load reviews</h3>
+            <p class="text-sm text-gray-500 mb-6 max-w-md leading-relaxed">
+                Something went wrong while fetching reviews. Please try again.
+            </p>
+            <button (click)="retryLoad()"
+                class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+                Try Again
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="!loadError && isLoading" class="bg-white rounded-lg shadow-lg p-6 animate-pulse" aria-busy="true">
+        <div class="mb-6">
+            <div class="w-40 h-5 bg-gray-200 rounded mb-2"></div>
+            <div class="w-64 h-3 bg-gray-200 rounded"></div>
+        </div>
+        <div class="space-y-6">
+            <div *ngFor="let _ of [1,2,3]" class="border-b pb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-full bg-gray-200"></div>
+                        <div class="space-y-1.5">
+                            <div class="w-28 h-3 bg-gray-200 rounded"></div>
+                            <div class="w-36 h-2.5 bg-gray-200 rounded"></div>
+                        </div>
+                    </div>
+                    <div class="w-20 h-4 bg-gray-200 rounded"></div>
+                </div>
+                <div class="space-y-2">
+                    <div class="w-full h-3 bg-gray-200 rounded"></div>
+                    <div class="w-2/3 h-3 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
