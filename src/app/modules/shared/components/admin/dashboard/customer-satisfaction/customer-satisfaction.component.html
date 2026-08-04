@@ -1,0 +1,59 @@
+<div class="flex flex-col gap-4">
+    <h2 class="text-lg font-bold text-gray-800">Customer Satisfaction</h2>
+
+    <!-- Compact KPI chips -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" *ngIf="stats && !isLoading">
+        <app-admin-overview-card title="Total Reviews" [value]="stats.totalReviews" icon="fa-solid fa-star"
+            iconBg="bg-blue-50 text-blue-600"></app-admin-overview-card>
+        <app-admin-overview-card title="Active" [value]="stats.activeReviews" icon="fa-solid fa-check-circle"
+            iconBg="bg-green-50 text-green-600"></app-admin-overview-card>
+        <app-admin-overview-card title="Reported" [value]="stats.reportedReviews" icon="fa-solid fa-flag"
+            iconBg="bg-red-50 text-red-600"></app-admin-overview-card>
+        <app-admin-overview-card title="Hidden" [value]="stats.inactiveReviews" icon="fa-solid fa-eye-slash"
+            iconBg="bg-gray-100 text-gray-600"></app-admin-overview-card>
+    </div>
+
+    <!-- Rating distribution + lowest rated providers -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Rating Distribution -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 tracking-tight">Rating Distribution</h3>
+                    <p class="text-xs font-medium text-slate-400 mt-0.5 uppercase tracking-wider">Review quality breakdown</p>
+                </div>
+                <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-star text-amber-500"></i>
+                </div>
+            </div>
+
+            <div *ngIf="isLoading" class="flex items-center justify-center py-16">
+                <div class="w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+            </div>
+
+            <div *ngIf="!isLoading && stats && stats.distribution.length" class="space-y-4">
+                <div *ngFor="let item of stats.distribution" class="flex items-center gap-3">
+                    <span class="text-sm text-amber-500 w-16 shrink-0 whitespace-nowrap">{{ getStarLabel(item.rating) }}</span>
+                    <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500"
+                            [style.width.%]="(item.count / getMaxCount(stats.distribution)) * 100"></div>
+                    </div>
+                    <span class="text-xs text-slate-500 w-14 text-right shrink-0">{{ item.percentage }}%</span>
+                    <span class="text-xs text-slate-400 w-8 text-right shrink-0">({{ item.count }})</span>
+                </div>
+            </div>
+
+            <div *ngIf="!isLoading && (!stats || !stats.distribution.length)"
+                class="flex flex-col items-center justify-center py-16 text-slate-400">
+                <i class="fa-solid fa-star mb-2 text-3xl"></i>
+                <p class="text-sm">No reviews yet</p>
+            </div>
+        </div>
+
+        <!-- Lowest Rated Providers -->
+        <app-admin-lowest-rated-providers></app-admin-lowest-rated-providers>
+    </div>
+
+    <!-- Average Rating Trend -->
+    <app-admin-rating-trend-chart></app-admin-rating-trend-chart>
+</div>

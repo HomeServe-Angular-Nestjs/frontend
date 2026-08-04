@@ -42,18 +42,18 @@ export class AdminDashboardOverviewComponent implements OnInit {
             subtext: 'Confirmed for today',
         },
         {
-            title: 'New Users This Week',
-            value: 0,
-            icon: 'fas fa-user-plus',
-            iconBg: 'bg-purple-100 text-purple-700',
-            subtext: 'Compared to last week',
-        },
-        {
             title: 'Weekly Revenue',
             value: `₹ ${0}`,
             icon: 'fas fa-indian-rupee-sign',
             iconBg: 'bg-red-100 text-red-700',
             subtext: 'Past 7 days',
+        },
+        {
+            title: 'Average Rating',
+            value: 0,
+            icon: 'fas fa-star',
+            iconBg: 'bg-amber-100 text-amber-700',
+            subtext: 'Based on 0 reviews',
         }
     ];
 
@@ -70,7 +70,6 @@ export class AdminDashboardOverviewComponent implements OnInit {
                         ['activeProviders', 'Active Providers'],
                         ['pendingVerifications', 'Pending Verifications'],
                         ['todaysBookings', 'Bookings Today'],
-                        ['newUsersThisWeek', 'New Users This Week'],
                         ['weeklyTransactions', 'Weekly Revenue']
                     ]);
 
@@ -87,6 +86,20 @@ export class AdminDashboardOverviewComponent implements OnInit {
                     }
                 }
             }
-        })
+        });
+
+        this._adminService.getReviewStats().pipe(
+            map(res => res.data),
+            filter(Boolean)
+        ).subscribe({
+            next: (data) => {
+                const stat = this.overviewStats.find(s => s.title === 'Average Rating');
+                if (stat && data) {
+                    stat.value = `${data.averageRating} / 5`;
+                    stat.rating = data.averageRating;
+                    stat.subtext = `Based on ${data.totalReviews} reviews`;
+                }
+            }
+        });
     }
 }

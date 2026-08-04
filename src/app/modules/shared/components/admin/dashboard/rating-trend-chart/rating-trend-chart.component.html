@@ -1,0 +1,12 @@
+<app-admin-chart-card title="Average Rating Trend" subtitle="Last 30 days" icon="fa-chart-line"
+    iconBg="bg-amber-50" iconColor="text-amber-500" [loading]="isLoading">
+    <div class="h-[260px]" *ngIf="!isEmpty">
+        <div echarts [options]="chartOptions" class="w-full h-full" [loading]="isLoading" [autoResize]="true"></div>
+    </div>
+
+    <div *ngIf="!isLoading && isEmpty"
+        class="flex flex-col items-center justify-center py-16 text-slate-400">
+        <i class="fa-solid fa-chart-line mb-2 text-3xl"></i>
+        <p class="text-sm">No reviews in the last 30 days</p>
+    </div>
+</app-admin-chart-card>

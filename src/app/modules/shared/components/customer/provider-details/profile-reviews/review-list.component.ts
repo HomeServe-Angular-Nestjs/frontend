@@ -5,16 +5,21 @@ import { ProviderService } from '../../../../../../core/services/provider.servic
 import { ActivatedRoute } from '@angular/router';
 import { IDisplayReviews } from '../../../../../../core/models/user.model';
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
+import { ReportModalComponent } from '../../../../partials/shared/report-modal/report-modal.component';
+import { IReportSubmit, ReportService } from '../../../../../../core/services/report.service';
+import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
 @Component({
   selector: 'app-customer-reviews-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent],
+  imports: [CommonModule, ButtonComponent, ReportModalComponent],
   templateUrl: './review-list.component.html',
 })
 export class CustomerReviewListComponent implements OnInit, OnDestroy {
   private readonly _route = inject(ActivatedRoute);
   private readonly _providerService = inject(ProviderService);
+  private readonly _reportService = inject(ReportService);
+  private readonly _toastr = inject(ToastNotificationService);
 
   private _destroy$ = new Subject<void>();
 
@@ -24,6 +29,8 @@ export class CustomerReviewListComponent implements OnInit, OnDestroy {
   isLoading = true;
   isLoadingMore = false;
   loadError = false;
+  openReportModal = false;
+  reportedReviewId: string | null = null;
 
   ngOnInit() {
     this._route.parent!.paramMap.pipe(
@@ -96,6 +103,35 @@ export class CustomerReviewListComponent implements OnInit, OnDestroy {
     return this._providerService.getReviews(providerId, cursor).pipe(
       map(response => response.data ?? null)
     );
+  }
+
+  reportReview(reviewId: string) {
+    if (!reviewId) return;
+    this.reportedReviewId = reviewId;
+    this.openReportModal = true;
+  }
+
+  submitReviewReport(report: Omit<IReportSubmit, 'targetId'>) {
+    if (!this.reportedReviewId) return;
+
+    const reportData: IReportSubmit = {
+      ...report,
+      targetId: this.reportedReviewId,
+    };
+
+    this._reportService.submit(reportData).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this._toastr.success('Review report has been submitted.');
+        } else {
+          this._toastr.error('Failed to submit review report.');
+        }
+      },
+      complete: () => {
+        this.openReportModal = false;
+        this.reportedReviewId = null;
+      }
+    });
   }
 
   ngOnDestroy() {

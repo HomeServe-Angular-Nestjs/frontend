@@ -194,6 +194,7 @@ export interface IChangePassword {
 }
 
 interface IDisplayReviewItem extends IReview {
+    reviewId: string;
     name: string;
     avatar: string;
     email: string;

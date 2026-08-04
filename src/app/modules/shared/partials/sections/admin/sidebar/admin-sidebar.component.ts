@@ -20,15 +20,8 @@ export class AdminSidebarComponent {
       icon: 'fa-tachometer-alt',
       route: 'admin/dashboard'
     },
-    {
-      name: 'User Management',
-      icon: 'fa-user-shield',
-      subItems: [
-        { name: 'Users', route: 'admin/users', icon: 'fa-users' },
-        { name: 'Ratings & Reviews', route: 'admin/ratings&reviews', icon: 'fa-star' },
-        // { name: 'Approvals', route: 'admin/approvals', icon: 'fa-circle-check' }
-      ]
-    },
+    { name: 'User Management', icon: 'fa-users', route: 'admin/users' },
+    { name: 'Ratings & Reviews', icon: 'fa-star', route: 'admin/ratings&reviews' },
     {
       name: 'Category Management',
       icon: 'fa-layer-group',

@@ -1,7 +1,7 @@
 import { ReportStatus } from "../enums/enums";
 import { IPagination } from "./booking.model";
 
-export type ReportedType = 'customer' | 'provider';
+export type ReportedType = 'customer' | 'provider' | 'review';
 
 export interface IReport {
     id: string;

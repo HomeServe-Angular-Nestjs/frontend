@@ -5,11 +5,12 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { AdminService } from '../../../../../../core/services/admin.service';
 import { filter, map } from 'rxjs';
 import { ITopProviders } from '../../../../../../core/models/user.model';
+import { AdminChartCardComponent } from '../../../../partials/sections/admin/chart-card/admin-chart-card.component';
 
 @Component({
     selector: 'app-admin-top-earning-providers-bar-chart',
     standalone: true,
-    imports: [CommonModule, NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AdminChartCardComponent],
     templateUrl: './top-earning-providers-bar-chart.component.html',
 })
 export class AdminTopProvidersBarChartComponent implements OnInit {
@@ -17,6 +18,7 @@ export class AdminTopProvidersBarChartComponent implements OnInit {
 
     chartOptions: EChartsOption = {};
     isLoading = true;
+    chartHeight = 260;
 
     ngOnInit(): void {
         this._adminService.getTopEarningProviders().pipe(
@@ -24,6 +26,7 @@ export class AdminTopProvidersBarChartComponent implements OnInit {
             filter(Boolean)
         ).subscribe({
             next: (data) => {
+                this.chartHeight = Math.max(260, data.length * 34);
                 this._setupChart(data);
                 this.isLoading = false;
             },

@@ -5,11 +5,12 @@ import { EChartsOption } from 'echarts';
 import { AdminService } from '../../../../../../core/services/admin.service';
 import { filter, map } from 'rxjs';
 import { IAdminDashboardSubscription } from '../../../../../../core/models/subscription.model';
+import { AdminChartCardComponent } from '../../../../partials/sections/admin/chart-card/admin-chart-card.component';
 
 @Component({
     selector: 'app-admin-subscription-pie-chart',
     standalone: true,
-    imports: [CommonModule, NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AdminChartCardComponent],
     templateUrl: './subscription-pie-chart.component.html',
 })
 export class SubscriptionPieChartComponent implements OnInit {
@@ -60,9 +61,9 @@ export class SubscriptionPieChartComponent implements OnInit {
                 }
             },
             legend: {
-                orient: 'vertical',
-                right: '5%',
-                top: 'middle',
+                orient: 'horizontal',
+                bottom: 0,
+                left: 'center',
                 icon: 'circle',
                 itemWidth: 10,
                 itemHeight: 10,
@@ -77,8 +78,8 @@ export class SubscriptionPieChartComponent implements OnInit {
                 {
                     name: 'Subscriptions',
                     type: 'pie',
-                    radius: ['55%', '85%'],
-                    center: ['40%', '50%'],
+                    radius: ['45%', '72%'],
+                    center: ['50%', '46%'],
                     avoidLabelOverlap: false,
                     itemStyle: {
                         borderRadius: 12,

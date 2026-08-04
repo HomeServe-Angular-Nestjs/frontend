@@ -6,6 +6,10 @@
     <div class="w-full text-center sm:text-left">
         <div class="text-sm lg:text-2xl font-bold ">{{ value }}</div>
         <div class="text-sm text-gray-600">{{ title }}</div>
+        <div *ngIf="rating" class="flex items-center justify-center sm:justify-start gap-1 mt-1">
+            <i class="fa-solid fa-star text-amber-400 text-xs" *ngFor="let s of getStarArray()"></i>
+            <i class="fa-regular fa-star text-gray-300 text-xs" *ngFor="let s of getEmptyStarArray()"></i>
+        </div>
         <div *ngIf="subtext" class="text-xs text-gray-400 mt-1">{{ subtext }}</div>
     </div>
 </div>
