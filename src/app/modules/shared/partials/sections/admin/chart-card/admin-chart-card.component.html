@@ -1,0 +1,18 @@
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col h-full">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h3 class="text-lg font-bold text-slate-800 tracking-tight">{{ title }}</h3>
+            <p *ngIf="subtitle" class="text-xs font-medium text-slate-400 mt-0.5 uppercase tracking-wider">{{ subtitle }}</p>
+        </div>
+        <div *ngIf="icon" class="w-10 h-10 rounded-xl flex items-center justify-center" [ngClass]="[iconBg, iconColor]">
+            <i [class]="'fas ' + icon"></i>
+        </div>
+    </div>
+
+    <div class="relative flex-1 min-h-[300px] overflow-hidden">
+        <div *ngIf="loading" class="absolute inset-0 flex items-center justify-center">
+            <div class="w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+        </div>
+        <ng-content *ngIf="!loading"></ng-content>
+    </div>
+</div>

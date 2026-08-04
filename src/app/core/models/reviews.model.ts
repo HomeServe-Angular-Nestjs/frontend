@@ -35,13 +35,25 @@ export interface PaginatedReviewResponse {
 }
 
 export type SortByRatingType = 'latest' | 'oldest' | 'highest' | 'lowest';
-export type SearchByReviewType = 'review id' | 'provider' | 'content';
+export type SearchByReviewType = 'review id' | 'customer' | 'provider' | 'content';
 
 export interface IReviewFilters {
   minRating?: string;
   sortBy?: SortByRatingType;
   search?: string;
   searchBy?: SearchByReviewType;
+  status?: 'all' | 'active' | 'hidden';
+  reported?: 'all' | 'reported' | 'not reported';
+  page?: number;
+}
+
+export interface IReviewQueryParams {
+  minRating?: string;
+  sortBy?: SortByRatingType;
+  search?: string;
+  searchBy?: SearchByReviewType;
+  status?: boolean | 'all';
+  isReported?: boolean | 'all';
   page?: number;
 }
 
@@ -69,9 +81,31 @@ export interface IReviewFilter {
   sort?: 'asc' | 'desc';
   time?: "all" | "last_6_months" | "last_year";
 }
+export interface IReviewDistribution {
+  rating: number;
+  count: number;
+  percentage: number;
+}
+
 export interface IAdminReviewStats {
   totalReviews: number;
   activeReviews: number;
+  inactiveReviews: number;
   reportedReviews: number;
   averageRating: number;
+  distribution: IReviewDistribution[];
+}
+
+export interface ILowestRatedProvider {
+  providerId: string;
+  providerName: string;
+  providerAvatar: string;
+  avgRating: number;
+  totalReviews: number;
+}
+
+export interface IRatingTrendPoint {
+  date: string;
+  avgRating: number;
+  count: number;
 }

@@ -4,11 +4,12 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { EChartsOption, graphic } from 'echarts';
 import { AdminService } from '../../../../../../core/services/admin.service';
 import { filter, map } from 'rxjs';
+import { AdminChartCardComponent } from '../../../../partials/sections/admin/chart-card/admin-chart-card.component';
 
 @Component({
     selector: 'app-admin-dashboard-revenue-chart',
     standalone: true,
-    imports: [CommonModule, NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AdminChartCardComponent],
     templateUrl: './revenue-chart.component.html',
 })
 export class AdminRevenueChartComponent implements OnInit {

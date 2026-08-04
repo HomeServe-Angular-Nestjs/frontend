@@ -6,7 +6,7 @@ import { BehaviorSubject, Observable, tap } from "rxjs";
 import { IFilter } from "../models/filter.model";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { IAdminBookingDetails, IAdminBookingFilter, IBookingStats, IPaginatedBookingsResponse } from "../models/booking.model";
-import { IAdminReviewStats, IReviewFilters, PaginatedReviewResponse } from "../models/reviews.model";
+import { IAdminReviewStats, ILowestRatedProvider, IRatingTrendPoint, IReviewQueryParams, PaginatedReviewResponse } from "../models/reviews.model";
 import { IAdminDashboardRevenue, IAdminDashboardSubscription } from "../models/subscription.model";
 import { IReportDownloadBookingData, IReportDownloadTransactionData, IReportDownloadUserData } from "../models/admin-report.model";
 import { IAdminSettings } from "../models/admin-settings.model";
@@ -89,7 +89,7 @@ export class AdminService {
         return this._http.get<IResponse<IBookingStats>>(`${this._adminUrl}/bookings/stats`);
     }
 
-    getReviewData(filter: IReviewFilters): Observable<IResponse<PaginatedReviewResponse>> {
+    getReviewData(filter: IReviewQueryParams): Observable<IResponse<PaginatedReviewResponse>> {
         let params = new HttpParams();
 
         for (let [key, value] of Object.entries(filter)) {
@@ -105,7 +105,17 @@ export class AdminService {
         return this._http.get<IResponse<IAdminReviewStats>>(`${this._adminUrl}/reviews/stats`);
     }
 
-    updateReviewStatus(data: { reviewId: string, providerId: string, status: boolean }): Observable<IResponse> {
+    getLowestRatedProviders(limit: number = 5): Observable<IResponse<ILowestRatedProvider[]>> {
+        let params = new HttpParams().set('limit', limit);
+        return this._http.get<IResponse<ILowestRatedProvider[]>>(`${this._adminUrl}/reviews/lowest_rated`, { params });
+    }
+
+    getRatingTrend(days: number = 30): Observable<IResponse<IRatingTrendPoint[]>> {
+        let params = new HttpParams().set('days', days);
+        return this._http.get<IResponse<IRatingTrendPoint[]>>(`${this._adminUrl}/reviews/rating_trend`, { params });
+    }
+
+    updateReviewStatus(data: { reviewId: string, status: boolean }): Observable<IResponse> {
 
         return this._http.patch<IResponse>(`${this._adminUrl}/reviews/status`, data);
     }

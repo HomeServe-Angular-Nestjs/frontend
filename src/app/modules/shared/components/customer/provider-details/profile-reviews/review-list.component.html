@@ -33,6 +33,15 @@
                 </div>
 
                 <p class="text-gray-600 mb-3">{{ review.desc }}</p>
+
+                <div class="flex justify-end">
+                    <button type="button" (click)="reportReview(review.reviewId)"
+                        class="text-[10px] font-bold text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors flex items-center gap-1.5 py-1 px-2 hover:bg-red-50 rounded-md"
+                        [title]="'Report this review'">
+                        <i class="fas fa-flag"></i>
+                        Report
+                    </button>
+                </div>
             </div>
 
             <div class="text-center pt-4">
@@ -62,6 +71,11 @@
             </div>
         </ng-template>
     </div>
+
+    <ng-container *ngIf="openReportModal">
+        <app-report-modal (closeEvent)="openReportModal = false"
+            (submitEvent)="submitReviewReport($event)"></app-report-modal>
+    </ng-container>
 </ng-container>
 
 <!-- Loading Skeleton / Error State -->

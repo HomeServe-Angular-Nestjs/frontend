@@ -1,0 +1,50 @@
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col h-full">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h3 class="text-lg font-bold text-slate-800 tracking-tight">Lowest Rated Providers</h3>
+            <p class="text-xs font-medium text-slate-400 mt-0.5 uppercase tracking-wider">Requires attention</p>
+        </div>
+        <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+            <i class="fas fa-exclamation-triangle text-red-500"></i>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="flex items-center justify-center py-16">
+        <div class="w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+    </div>
+
+    <table *ngIf="!isLoading && providers.length" class="w-full text-sm">
+        <thead>
+            <tr class="text-left text-xs uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                <th class="py-2 font-semibold">Provider</th>
+                <th class="py-2 font-semibold text-center">Avg Rating</th>
+                <th class="py-2 font-semibold text-right">Reviews</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let provider of providers" class="border-b border-slate-50">
+                <td class="py-3">
+                    <div class="flex items-center gap-3">
+                        <img [src]="provider.providerAvatar || 'assets/default-avatar.png'"
+                            class="w-8 h-8 rounded-full object-cover bg-slate-100" alt="">
+                        <span class="font-medium text-slate-700">{{ provider.providerName }}</span>
+                    </div>
+                </td>
+                <td class="py-3">
+                    <div class="flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-star text-amber-400 text-xs" *ngFor="let s of getStarArray(provider.avgRating)"></i>
+                        <i class="fa-regular fa-star text-gray-300 text-xs" *ngFor="let s of getEmptyStarArray(provider.avgRating)"></i>
+                        <span class="ml-1 text-xs text-slate-500">{{ provider.avgRating }}</span>
+                    </div>
+                </td>
+                <td class="py-3 text-right text-slate-500">{{ provider.totalReviews }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && !providers.length"
+        class="flex flex-col items-center justify-center py-16 text-slate-400">
+        <i class="fa-solid fa-circle-check mb-2 text-3xl"></i>
+        <p class="text-sm">No providers need attention</p>
+    </div>
+</div>

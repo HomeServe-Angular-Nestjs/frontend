@@ -1,131 +1,293 @@
-<div class="review-management-container">
-    <!-- Header Section -->
-    <div class="header-section">
-        <div class="title-info">
-            <h1>Review Management</h1>
-            <!-- <p>Monitor and moderate service reviews across the platform</p> -->
-        </div>
-        <div class="stats-grid" *ngIf="stats">
-            <app-admin-overview-card title="Total Reviews" [value]="stats.totalReviews" icon="fa-solid fa-star"
-                iconBg="bg-blue-50 text-blue-600"></app-admin-overview-card>
-            <app-admin-overview-card title="Active" [value]="stats.activeReviews" icon="fa-solid fa-check-circle"
-                iconBg="bg-green-50 text-green-600"></app-admin-overview-card>
-            <app-admin-overview-card title="Reported" [value]="stats.reportedReviews" icon="fa-solid fa-flag"
-                iconBg="bg-red-50 text-red-600"></app-admin-overview-card>
-            <app-admin-overview-card title="Avg. Rating" [value]="stats.averageRating + ' / 5'"
-                icon="fa-solid fa-chart-line" iconBg="bg-amber-50 text-amber-600"></app-admin-overview-card>
+<section class="relative min-h-screen bg-gray-50/50">
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-gray-100 pb-6">
+        <div class="space-y-1">
+            <h2 class="text-xl font-semibold text-gray-800 tracking-tight">Review Management</h2>
+            <div class="flex items-center gap-2">
+                <span class="flex h-2 w-2 rounded-full bg-blue-500"></span>
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Moderate service reviews across the platform</p>
+            </div>
         </div>
     </div>
 
-    <!-- Filters Section -->
-    <div class="filters-container">
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" [(ngModel)]="filters.search" (keyup.enter)="onFilterChange()"
-                placeholder="Search reviews...">
-        </div>
-        <div class="filter-actions">
-            <select [(ngModel)]="filters.searchBy" (change)="onFilterChange()">
-                <option value="content">Search in Content</option>
-                <option value="provider">Search Provider</option>
-                <option value="customer">Search Customer</option>
+    <!-- Stats -->
+    <div class="max-w-7xl mx-auto mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" *ngIf="stats">
+        <app-admin-overview-card title="Reported" [value]="stats.reportedReviews" icon="fa-solid fa-flag"
+            iconBg="bg-red-50 text-red-600"></app-admin-overview-card>
+        <app-admin-overview-card title="Hidden" [value]="stats.inactiveReviews" icon="fa-solid fa-eye-slash"
+            iconBg="bg-slate-50 text-slate-600"></app-admin-overview-card>
+        <app-admin-overview-card title="Active" [value]="stats.activeReviews" icon="fa-solid fa-check-circle"
+            iconBg="bg-green-50 text-green-600"></app-admin-overview-card>
+        <app-admin-overview-card title="Total Reviews" [value]="stats.totalReviews" icon="fa-solid fa-star"
+            iconBg="bg-blue-50 text-blue-600"></app-admin-overview-card>
+    </div>
+
+    <!-- Filters -->
+    <div class="max-w-7xl mx-auto mt-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+            <div class="lg:col-span-3 relative">
+                <input [(ngModel)]="filters.search" type="text" placeholder="Search reviews..." (keyup.enter)="onFilterChange()"
+                    class="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all" />
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"></i>
+            </div>
+
+            <select [(ngModel)]="filters.searchBy" (ngModelChange)="onFilterChange()"
+                class="w-full lg:col-span-2 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/10 outline-none cursor-pointer">
+                <option value="content">Review Content</option>
+                <option value="provider">Provider</option>
+                <option value="customer">Customer</option>
                 <option value="review id">Review ID</option>
             </select>
-            <select [(ngModel)]="filters.sortBy" (change)="onFilterChange()">
+
+            <select [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()"
+                class="w-full lg:col-span-2 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/10 outline-none cursor-pointer">
+                <option value="all">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="hidden">Hidden</option>
+            </select>
+
+            <select [(ngModel)]="filters.reported" (ngModelChange)="onFilterChange()"
+                class="w-full lg:col-span-2 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/10 outline-none cursor-pointer">
+                <option value="all">All (Any)</option>
+                <option value="reported">Reported</option>
+                <option value="not reported">Not Reported</option>
+            </select>
+
+            <select [(ngModel)]="filters.sortBy" (ngModelChange)="onFilterChange()"
+                class="w-full lg:col-span-2 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/10 outline-none cursor-pointer">
                 <option value="latest">Latest First</option>
                 <option value="oldest">Oldest First</option>
                 <option value="highest">Highest Rated</option>
                 <option value="lowest">Lowest Rated</option>
             </select>
-            <select [(ngModel)]="filters.minRating" (change)="onFilterChange()">
+
+            <select [(ngModel)]="filters.minRating" (ngModelChange)="onFilterChange()"
+                class="w-full lg:col-span-1 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/10 outline-none cursor-pointer">
                 <option value="">All Ratings</option>
-                <option value="4">4+ Stars</option>
-                <option value="3">3+ Stars</option>
-                <option value="2">2+ Stars</option>
-                <option value="1">1+ Stars</option>
+                <option value="4">4★+</option>
+                <option value="3">3★+</option>
+                <option value="2">2★+</option>
+                <option value="1">1★+</option>
             </select>
-            <button class="btn-refresh" (click)="onFilterChange()">
-                <i class="fa-solid fa-rotate"></i>
-            </button>
         </div>
     </div>
 
-    <!-- Table Section -->
-    <div class="table-card">
-        <table class="modern-table">
-            <thead>
-                <tr>
-                    <th>Review Info</th>
-                    <th>Customer</th>
-                    <th>Provider</th>
-                    <th>Rating</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let review of reviews">
-                    <td class="review-text-cell">
-                        <div class="review-id">ID: #{{ review.reviewId }}</div>
-                        <p class="review-desc">{{ review.desc }}</p>
-                    </td>
-                    <td>
-                        <div class="user-info">
-                            <img [src]="review.reviewedBy.customerAvatar || 'assets/default-avatar.png'" alt="">
-                            <div class="details">
-                                <span class="name">{{ review.reviewedBy.customerName }}</span>
-                                <span class="email">{{ review.reviewedBy.customerEmail }}</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="user-info">
-                            <img [src]="review.providerAvatar || 'assets/default-avatar.png'" alt="">
-                            <div class="details">
-                                <span class="name">{{ review.providerName }}</span>
-                                <span class="email">{{ review.providerEmail }}</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="rating-stars">
-                            <i class="fa-solid fa-star filled" *ngFor="let s of getStarArray(review.rating)"></i>
-                            <i class="fa-regular fa-star" *ngFor="let s of getEmptyStarArray(review.rating)"></i>
-                            <span class="num">({{ review.rating }})</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="date">{{ review.writtenAt | date:'mediumDate' }}</span>
-                    </td>
-                    <td>
-                        <span class="badge" [ngClass]="review.isActive ? 'active' : 'inactive'">
-                            {{ review.isActive ? 'Active' : 'Hidden' }}
-                        </span>
-                        <div *ngIf="review.isReported" class="reported-badge">
-                            <i class="fa-solid fa-circle-exclamation"></i> Reported
-                        </div>
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <button [class]="review.isActive ? 'btn-hide' : 'btn-show'"
-                                (click)="toggleReviewStatus(review)"
-                                [title]="review.isActive ? 'Hide Review' : 'Show Review'">
-                                <i class="fa-solid" [ngClass]="review.isActive ? 'fa-eye-slash' : 'fa-eye'"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr *ngIf="reviews.length === 0">
-                    <td colspan="7" class="empty-state">
-                        <i class="fa-solid fa-inbox"></i>
-                        <p>No reviews found matching your filters.</p>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Table -->
+    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-gray-50/50 border-b border-gray-100">
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Review Info</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Rating</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Provider</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                    </tr>
+                </thead>
 
-        <!-- Pagination -->
-        <app-admin-pagination [pagination]="pagination" (pageChange)="onPageChange($event)"></app-admin-pagination>
+                <tbody class="divide-y divide-gray-50" *ngIf="!isLoading && reviews.length > 0; else noData">
+                    <tr *ngFor="let review of reviews" class="hover:bg-blue-50/30 transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-mono text-gray-400">#{{ review.reviewId }}</span>
+                                <span class="text-sm text-gray-700 line-clamp-2 mt-1 max-w-xs">{{ review.desc }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-1">
+                                <i class="fa-solid fa-star text-xs" [ngClass]="review.rating >= 1 ? 'text-amber-400' : 'text-gray-200'"></i>
+                                <i class="fa-solid fa-star text-xs" [ngClass]="review.rating >= 2 ? 'text-amber-400' : 'text-gray-200'"></i>
+                                <i class="fa-solid fa-star text-xs" [ngClass]="review.rating >= 3 ? 'text-amber-400' : 'text-gray-200'"></i>
+                                <i class="fa-solid fa-star text-xs" [ngClass]="review.rating >= 4 ? 'text-amber-400' : 'text-gray-200'"></i>
+                                <i class="fa-solid fa-star text-xs" [ngClass]="review.rating >= 5 ? 'text-amber-400' : 'text-gray-200'"></i>
+                                <span class="ml-1 text-xs font-semibold text-gray-500">{{ review.rating }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <img [src]="review.reviewedBy.customerAvatar || 'assets/default-avatar.png'" alt=""
+                                    class="w-10 h-10 rounded-full object-cover bg-gray-100" />
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold text-gray-800">{{ review.reviewedBy.customerName }}</span>
+                                    <span class="text-xs text-gray-500">{{ review.reviewedBy.customerEmail }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <img [src]="review.providerAvatar || 'assets/default-avatar.png'" alt=""
+                                    class="w-10 h-10 rounded-full object-cover bg-gray-100" />
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold text-gray-800">{{ review.providerName }}</span>
+                                    <span class="text-xs text-gray-500">{{ review.providerEmail }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm text-gray-500 whitespace-nowrap">{{ review.writtenAt | date:'mediumDate' }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col items-start gap-1.5">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                                    [ngClass]="review.isActive ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'">
+                                    {{ review.isActive ? 'Active' : 'Hidden' }}
+                                </span>
+                                <span *ngIf="review.isReported"
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-600">
+                                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Reported
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-end gap-2">
+                                <button (click)="openDetails(review)"
+                                    class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition-all"
+                                    title="View Details">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                                <button (click)="toggleReviewStatus(review)"
+                                    [ngClass]="review.isActive
+                                        ? 'bg-red-50 text-red-500 hover:bg-red-100'
+                                        : 'bg-green-50 text-green-600 hover:bg-green-100'"
+                                    class="w-9 h-9 inline-flex items-center justify-center rounded-lg transition-all"
+                                    [title]="review.isActive ? 'Hide Review' : 'Restore Review'">
+                                    <i class="fa-solid" [ngClass]="review.isActive ? 'fa-eye-slash' : 'fa-rotate-left'"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+
+                <ng-template #noData>
+                    <tbody class="divide-y divide-gray-50">
+                        <ng-container *ngIf="isLoading; else emptyState">
+                            <tr *ngFor="let i of [0,1,2,3,4]">
+                                <td class="px-6 py-4" colspan="7">
+                                    <div class="animate-pulse flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-gray-200"></div>
+                                        <div class="flex-1 space-y-2">
+                                            <div class="h-3 bg-gray-200 rounded w-1/3"></div>
+                                            <div class="h-2.5 bg-gray-100 rounded w-2/3"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <ng-template #emptyState>
+                            <tr>
+                                <td colspan="7" class="px-6 py-20 text-center">
+                                    <div class="flex flex-col items-center justify-center gap-3">
+                                        <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center">
+                                            <i class="fa-solid fa-inbox text-2xl text-gray-300"></i>
+                                        </div>
+                                        <p class="text-sm font-medium text-gray-500">No reviews found matching your filters.</p>
+                                        <p class="text-xs text-gray-400">Try adjusting your search or filters.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </tbody>
+                </ng-template>
+            </table>
+        </div>
+
+        <div class="p-4 border-t border-gray-50 bg-gray-50/30">
+            <app-admin-pagination [pagination]="pagination" (pageChange)="onPageChange($event)"></app-admin-pagination>
+        </div>
     </div>
-</div>
+
+    <!-- Review Details Modal -->
+    <ng-container *ngIf="selectedReview">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all">
+            <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
+                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800">Review Details</h3>
+                    <button (click)="closeDetails()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="px-6 py-6 space-y-5">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Booking ID</p>
+                            <p class="text-sm font-mono text-gray-700 mt-1">#{{ selectedReview.reviewId }}</p>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <i *ngFor="let s of getStarArray(selectedReview.rating)" class="fa-solid fa-star text-sm text-amber-400"></i>
+                            <i *ngFor="let s of getEmptyStarArray(selectedReview.rating)" class="fa-regular fa-star text-sm text-gray-200"></i>
+                            <span class="ml-1 text-sm font-semibold text-gray-600">{{ selectedReview.rating }} / 5</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Review</p>
+                        <p class="text-sm text-gray-700 leading-relaxed mt-1.5">{{ selectedReview.desc }}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50 rounded-2xl p-4">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Customer</p>
+                            <div class="flex items-center gap-3">
+                                <img [src]="selectedReview.reviewedBy.customerAvatar || 'assets/default-avatar.png'" alt=""
+                                    class="w-9 h-9 rounded-full object-cover bg-gray-100" />
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-gray-800 truncate">{{ selectedReview.reviewedBy.customerName }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ selectedReview.reviewedBy.customerEmail }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 rounded-2xl p-4">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Provider</p>
+                            <div class="flex items-center gap-3">
+                                <img [src]="selectedReview.providerAvatar || 'assets/default-avatar.png'" alt=""
+                                    class="w-9 h-9 rounded-full object-cover bg-gray-100" />
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-gray-800 truncate">{{ selectedReview.providerName }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ selectedReview.providerEmail }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Submitted</p>
+                            <p class="text-sm text-gray-700 mt-1">{{ selectedReview.writtenAt | date:'medium' }}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                                [ngClass]="selectedReview.isActive ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'">
+                                {{ selectedReview.isActive ? 'Active' : 'Hidden' }}
+                            </span>
+                            <span *ngIf="selectedReview.isReported"
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-600">
+                                <i class="fa-solid fa-circle-exclamation mr-1"></i> Reported
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 rounded-b-3xl border-t border-gray-100">
+                    <button (click)="closeDetails()"
+                        class="px-4 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-white hover:text-gray-900 border border-transparent hover:border-gray-200 transition-all">
+                        Close
+                    </button>
+                    <button (click)="toggleReviewStatus(selectedReview)"
+                        [ngClass]="selectedReview.isActive
+                            ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
+                            : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'"
+                        class="px-6 py-2.5 text-sm font-medium rounded-lg text-white shadow-sm hover:shadow transition-all focus:ring-2 focus:ring-offset-2">
+                        <i class="fa-solid mr-1.5" [ngClass]="selectedReview.isActive ? 'fa-eye-slash' : 'fa-rotate-left'"></i>
+                        {{ selectedReview.isActive ? 'Hide Review' : 'Restore Review' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</section>

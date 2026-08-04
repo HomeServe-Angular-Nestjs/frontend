@@ -12,6 +12,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { provideEchartsCore } from 'ngx-echarts';
 import { UserTrackingBarChartComponent } from "../user-tracking-bar-chart/user-tracking-bar-chart.component";
 import { AdminTopProvidersBarChartComponent } from "../top-earning-providers-bar-chart/top-earning-providers-bar-chart.component";
+import { CustomerSatisfactionComponent } from "../customer-satisfaction/customer-satisfaction.component";
 
 echarts.use([
   TitleComponent,
@@ -33,7 +34,8 @@ echarts.use([
     AdminRevenueChartComponent,
     SubscriptionPieChartComponent,
     UserTrackingBarChartComponent,
-    AdminTopProvidersBarChartComponent
+    AdminTopProvidersBarChartComponent,
+    CustomerSatisfactionComponent
   ],
   providers: [provideEchartsCore({ echarts })],
 })

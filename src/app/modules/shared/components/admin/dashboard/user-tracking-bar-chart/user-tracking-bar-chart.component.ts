@@ -5,11 +5,12 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { AdminService } from '../../../../../../core/services/admin.service';
 import { filter, map } from 'rxjs';
 import { IAdminDashboardUserStats } from '../../../../../../core/models/user.model';
+import { AdminChartCardComponent } from '../../../../partials/sections/admin/chart-card/admin-chart-card.component';
 
 @Component({
     selector: 'app-admin-user-tracking-bar-chart',
     standalone: true,
-    imports: [CommonModule, NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AdminChartCardComponent],
     templateUrl: './user-tracking-bar-chart.component.html',
 })
 export class UserTrackingBarChartComponent implements OnInit {

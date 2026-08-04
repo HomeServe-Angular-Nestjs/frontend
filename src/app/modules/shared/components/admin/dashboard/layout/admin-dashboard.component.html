@@ -1,27 +1,28 @@
-<section class="bg-gray-50 p px-4">
-    <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800">
-        Overview
-    </h1>
+<section class="bg-gray-50 px-4 py-4">
     <app-admin-dashboard-overview></app-admin-dashboard-overview>
 </section>
 
-<section class="w-full flex flex-col lg:flex-row gap-4 px-4">
-    <!-- Left Column -->
-    <div class="flex flex-col gap-4 w-full lg:w-1/2">
-        <!-- Subscription Pie Chart -->
-        <app-admin-subscription-pie-chart></app-admin-subscription-pie-chart>
-
-        <!-- User Tracking Bar Chart -->
-        <app-admin-dashboard-revenue-chart></app-admin-dashboard-revenue-chart>
-    </div>
-
-    <!-- Right Column -->
-    <div class="w-full lg:w-1/2">
-        <app-admin-user-tracking-bar-chart></app-admin-user-tracking-bar-chart>
+<!-- Primary Analytics: Revenue hero + Subscription donut -->
+<section class="px-4 pb-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2">
+            <app-admin-dashboard-revenue-chart></app-admin-dashboard-revenue-chart>
+        </div>
+        <div>
+            <app-admin-subscription-pie-chart></app-admin-subscription-pie-chart>
+        </div>
     </div>
 </section>
 
-<!-- Top Providers -->
-<section class="p-4">
-    <app-admin-top-earning-providers-bar-chart></app-admin-top-earning-providers-bar-chart>
+<!-- Engagement & Performance -->
+<section class="px-4 pb-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <app-admin-user-tracking-bar-chart></app-admin-user-tracking-bar-chart>
+        <app-admin-top-earning-providers-bar-chart></app-admin-top-earning-providers-bar-chart>
+    </div>
+</section>
+
+<!-- Customer Satisfaction -->
+<section class="px-4 pb-4">
+    <app-admin-customer-satisfaction></app-admin-customer-satisfaction>
 </section>
