@@ -34,6 +34,8 @@
                 <option value="booking">Booking Related</option>
                 <option value="subscription">Subscriptions</option>
                 <option value="refund">Refunds</option>
+                <option value="gst">GST</option>
+                <option value="commission">Commissions</option>
             </select>
 
             <select [ngModel]="filters().method" (ngModelChange)="onMethodChange($event)" class="filter-select">
@@ -51,7 +53,7 @@
     </div>
 
     <div class="transaction-table-card">
-        <table class="modern-table">
+        <table class="modern-table text-xs">
             <thead>
                 <tr>
                     <th>SL No</th>
@@ -60,6 +62,7 @@
                     <th>Type</th>
                     <th>Method</th>
                     <th>Amount</th>
+                    <th>Payment ID</th>
                     <th>Reference</th>
                     <th>Source</th>
                 </tr>
@@ -111,12 +114,30 @@
                         </span>
                     </td>
 
-                    <td class="reference-cell">
-                        <div class="ref-box" (click)="copyToClipboard(tx.referenceId)" [title]="'Copy Reference ID'">
-                            <span class="ref-type">{{ tx.referenceType }}</span>
-                            <span class="ref-id">#{{ tx.referenceId.slice(10) }}</span>
+                    <td class="payment-cell">
+                        <span *ngIf="tx.paymentId" class="payment-id" (click)="copyToClipboard(tx.paymentId)"
+                            [title]="'Copy Payment ID'">
+                            <span class="ref-id">#{{ tx.paymentId.slice(-12) }}</span>
                             <i class="fa-solid fa-copy copy-icon"></i>
-                        </div>
+                        </span>
+                        <span *ngIf="!tx.paymentId" class="muted-dash">—</span>
+                    </td>
+
+                    <td class="reference-cell">
+                        <ng-container *ngIf="tx.referenceType === 'booking' && tx.bookingId; else refBox">
+                            <button class="booking-link" (click)="openBooking(tx.bookingId)" [title]="'View Booking'">
+                                <span class="ref-type">booking</span>
+                                <span class="ref-id">#{{ tx.referenceId.slice(-12) }}</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </button>
+                        </ng-container>
+                        <ng-template #refBox>
+                            <div class="ref-box" (click)="copyToClipboard(tx.referenceId)" [title]="'Copy Reference ID'">
+                                <span class="ref-type">{{ tx.referenceType }}</span>
+                                <span class="ref-id">#{{ tx.referenceId.slice(10) }}</span>
+                                <i class="fa-solid fa-copy copy-icon"></i>
+                            </div>
+                        </ng-template>
                     </td>
 
                     <td class="source-cell">
@@ -127,7 +148,7 @@
                 </tr>
 
                 <tr *ngIf="transactions().length === 0">
-                    <td colspan="8" class="empty-state">
+                    <td colspan="9" class="empty-state">
                         <i class="fa-solid fa-receipt"></i>
                         <p>No transactions found matching your filters.</p>
                     </td>

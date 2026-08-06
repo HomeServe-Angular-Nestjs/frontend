@@ -11,6 +11,7 @@ import { FormsModule } from "@angular/forms";
 import { toObservable, toSignal } from "@angular/core/rxjs-interop";
 import { PaymentDirection, TransactionType } from "../../../../../core/enums/enums";
 import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-admin-transactions',
@@ -29,6 +30,7 @@ export class AdminTransactionsComponent implements OnInit, OnDestroy {
   private readonly _sharedService = inject(SharedDataService);
   private readonly _debounceService = inject(DebounceService);
   private readonly _toastr = inject(ToastNotificationService);
+  private readonly _router = inject(Router);
 
   private readonly _destroy$ = new Subject<void>();
 
@@ -94,7 +96,7 @@ export class AdminTransactionsComponent implements OnInit, OnDestroy {
     this._debounceService.onSearch(700)
       .pipe(takeUntil(this._destroy$))
       .subscribe(value => {
-        this.filters.update(f => ({ ...f, search: value }));
+        this.filters.update(f => ({ ...f, search: value, page: 1 }));
       });
   }
 
@@ -150,23 +152,27 @@ export class AdminTransactionsComponent implements OnInit, OnDestroy {
   }
 
   onDateChange(value: 'all' | 'last_six_months' | 'last_year') {
-    this.filters.update(f => ({ ...f, date: value }));
+    this.filters.update(f => ({ ...f, date: value, page: 1 }));
   }
 
   onSort(value: 'newest' | 'oldest' | 'high' | 'low') {
-    this.filters.update(f => ({ ...f, sort: value }));
+    this.filters.update(f => ({ ...f, sort: value, page: 1 }));
   }
 
   onTypeChange(value: string) {
-    this.filters.update(f => ({ ...f, type: value }));
+    this.filters.update(f => ({ ...f, type: value, page: 1 }));
   }
 
   onMethodChange(value: PaymentDirection | 'all') {
-    this.filters.update(f => ({ ...f, method: value }));
+    this.filters.update(f => ({ ...f, method: value, page: 1 }));
   }
 
   pageChange(page: number) {
     this.filters.update(f => ({ ...f, page }));
+  }
+
+  openBooking(bookingId: string) {
+    this._router.navigate(['/admin/booking_details', bookingId]);
   }
 
   copyToClipboard(value: string) {
