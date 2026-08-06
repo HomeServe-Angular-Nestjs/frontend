@@ -1,0 +1,31 @@
+<div class="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Documents</h3>
+    <div *ngIf="documents.length > 0; else empty" class="space-y-3">
+        <div *ngFor="let doc of documents"
+            class="flex items-center justify-between rounded-xl border border-gray-100 p-4 hover:bg-gray-50/50 transition-colors">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 shrink-0 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-file"></i>
+                </div>
+                <div class="min-w-0 space-y-0.5">
+                    <p class="text-sm font-medium text-gray-800 truncate">{{ doc.label }}</p>
+                    <p class="text-xs text-gray-400">Uploaded {{ doc.uploadedAt | date: 'MMM d, y' }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <span class="px-3 py-1 rounded-full text-xs font-medium capitalize"
+                    [ngClass]="statusPillClass(doc.verificationStatus)">{{ doc.verificationStatus }}</span>
+                <a [href]="doc.fileUrl" target="_blank" rel="noopener"
+                    class="text-blue-600 hover:text-blue-800 text-sm">
+                    <i class="fa-solid fa-external-link"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <ng-template #empty>
+        <div class="flex flex-col items-center justify-center text-gray-400 py-16">
+            <i class="fa-solid fa-folder-open text-3xl mb-2 text-gray-300"></i>
+            <p class="text-sm">No documents found</p>
+        </div>
+    </ng-template>
+</div>

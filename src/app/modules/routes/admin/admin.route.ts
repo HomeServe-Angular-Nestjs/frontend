@@ -24,7 +24,7 @@ export const adminRoute: Routes = [
             pathMatch: 'full',
             redirectTo: 'dashboard'
           },
-          {
+          { 
             path: 'dashboard',
             loadComponent: () => import('../../shared/components/admin/dashboard/layout/admin-dashboard.component').then(c => c.AdminDashboardComponent),
             data: { breadcrumb: 'Dashboard' }
@@ -33,6 +33,18 @@ export const adminRoute: Routes = [
             path: 'users',
             loadComponent: () => import('../../shared/components/admin/users/user-management.component').then(c => c.UserManagementComponent),
             data: { breadcrumb: 'Users' }
+          },
+          {
+            path: 'customers/:id',
+            loadComponent: () => import('../../shared/components/admin/user-details/customer-details/customer-details.component')
+              .then(c => c.CustomerDetailsComponent),
+            data: { breadcrumb: 'Customer Details' }
+          },
+          {
+            path: 'providers/:id',
+            loadComponent: () => import('../../shared/components/admin/user-details/provider-details/provider-details.component')
+              .then(c => c.ProviderDetailsComponent),
+            data: { breadcrumb: 'Provider Details' }
           },
           {
             path: 'approvals',

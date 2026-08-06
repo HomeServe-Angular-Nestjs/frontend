@@ -11,6 +11,7 @@ import { IAdminDashboardRevenue, IAdminDashboardSubscription } from "../models/s
 import { IReportDownloadBookingData, IReportDownloadTransactionData, IReportDownloadUserData } from "../models/admin-report.model";
 import { IAdminSettings } from "../models/admin-settings.model";
 import { ISalesReportBundle, ISalesReportFilter } from "../models/sales-report.model";
+import { ICustomerDetailsBundle, IProviderDetailsBundle, VerificationStatusType } from "../models/user-details.model";
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -191,5 +192,17 @@ export class AdminService {
         return this._http.post<Blob>(`${this._adminUrl}/sales-report/export/excel`, filter, {
             responseType: 'blob' as 'json'
         });
+    }
+
+    fetchCustomerDetails(customerId: string): Observable<IResponse<ICustomerDetailsBundle>> {
+        return this._http.get<IResponse<ICustomerDetailsBundle>>(`${this._adminUrl}/customers/${customerId}`);
+    }
+
+    fetchProviderDetails(providerId: string): Observable<IResponse<IProviderDetailsBundle>> {
+        return this._http.get<IResponse<IProviderDetailsBundle>>(`${this._adminUrl}/providers/${providerId}`);
+    }
+
+    verifyProvider(data: { providerId: string, status: VerificationStatusType }): Observable<IResponse<boolean>> {
+        return this._http.patch<IResponse<boolean>>(`${this._adminUrl}/approvals/verify`, data);
     }
 }
