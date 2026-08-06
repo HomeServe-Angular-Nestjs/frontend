@@ -3,6 +3,7 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, switchMap, takeUntil } from 'rxjs';
 import { AdminService } from '../../../../../../core/services/admin.service';
+import { SharedDataService } from '../../../../../../core/services/public/shared-data.service';
 import { ICustomerDetailsBundle } from '../../../../../../core/models/user-details.model';
 import { OverviewCardComponent } from '../../../../partials/sections/admin/overview-card/admin-overview-card.component';
 import { UserDetailsHeaderComponent } from '../components/user-details-header/user-details-header.component';
@@ -28,11 +29,13 @@ import { UserReviewsTableComponent } from '../components/reviews-table/reviews-t
 export class CustomerDetailsComponent implements OnInit, OnDestroy {
     private readonly _route = inject(ActivatedRoute);
     private readonly _adminService = inject(AdminService);
+    private readonly _sharedData = inject(SharedDataService);
     private readonly destroy$ = new Subject<void>();
 
     bundle!: ICustomerDetailsBundle;
 
     ngOnInit(): void {
+        this._sharedData.setAdminHeader('Customer Details');
         this._route.params.pipe(
             takeUntil(this.destroy$),
             switchMap(params => this._adminService.fetchCustomerDetails(params['id']))
