@@ -51,10 +51,6 @@ export class CategoryService {
         return this._http.patch<IResponse<boolean>>(`${this._categoryUrl}/profession/${professionId}/toggle-status`, {});
     }
 
-    removeProfession(professionId: string): Observable<IResponse<boolean>> {
-        return this._http.delete<IResponse<boolean>>(`${this._categoryUrl}/profession/${professionId}`);
-    }
-
     // ----------------------------
     // Service Category Methods
     // ----------------------------
@@ -90,10 +86,6 @@ export class CategoryService {
 
     updateServiceCategoryStatus(id: string): Observable<IResponse<boolean>> {
         return this._http.patch<IResponse<boolean>>(`${this._categoryUrl}/service/${id}/toggle-status`, {});
-    }
-
-    removeServiceCategory(id: string): Observable<IResponse<boolean>> {
-        return this._http.delete<IResponse<boolean>>(`${this._categoryUrl}/service/${id}`);
     }
 
     searchCategories(search: string): Observable<IResponse<ICustomerSearchCategories[]>> {

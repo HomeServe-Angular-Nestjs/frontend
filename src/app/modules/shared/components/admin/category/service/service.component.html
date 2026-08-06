@@ -42,6 +42,12 @@
 
         <ng-template #professionTpl let-row>
             <span class="text-gray-500">{{ getProfessionName(row.professionId) | titlecase}}</span>
+            <span *ngIf="isParentProfessionInactive(row.professionId)"
+                class="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700"
+                title="Parent profession is inactive, so this service is unavailable">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Profession inactive
+            </span>
         </ng-template>
 
         <ng-template #actionsTpl let-row>
@@ -51,15 +57,10 @@
                     title="Edit">
                     <i class="fa-solid fa-pen-to-square text-sm"></i>
                 </button>
-                <button (click)="toggleStatus(row.id)"
+                <button (click)="toggleStatus(row)"
                     [class]="row.isActive ? 'text-green-500 hover:text-green-700 hover:bg-green-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'"
                     class="p-1.5 rounded-md transition-all duration-200" [title]="row.isActive ? 'Disable' : 'Enable'">
                     <i class="fa-solid" [ngClass]="row.isActive ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
-                </button>
-                <button (click)="removeService(row)"
-                    class="p-1.5 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
-                    title="Delete">
-                    <i class="fa-solid fa-trash text-sm"></i>
                 </button>
             </div>
         </ng-template>
@@ -104,7 +105,9 @@
                                 class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <div *ngIf="serviceForm.get('name')?.touched && serviceForm.get('name')?.invalid"
                                 class="text-red-500 text-xs mt-1">
-                                Name is required (min 3 chars).
+                                <span *ngIf="serviceForm.get('name')?.hasError('required')">Service name is required.</span>
+                                <span *ngIf="serviceForm.get('name')?.hasError('minlength')">Service name must be at least 3 characters.</span>
+                                <span *ngIf="serviceForm.get('name')?.hasError('duplicate')">A service with this name already exists for the selected profession.</span>
                             </div>
                         </div>
 
@@ -173,8 +176,8 @@
                             Cancel
                         </button>
 
-                        <button type="submit" [disabled]="serviceForm.invalid"
-                            class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">
+                        <button type="submit"
+                            class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700">
                             {{ isEditMode() ? 'Update Service' : 'Save Service' }}
                         </button>
                     </div>

@@ -92,18 +92,24 @@ export class AdminCategoryProfessionComponent implements OnInit, OnDestroy {
 
     if (profession.id) {
       // Update
-      this._categoryService.updateProfession(payload, profession.id)
-        .pipe(takeUntil(this._destroy$))
-        .subscribe({
-          next: (res) => {
-            if (res.success) {
-              this._loadProfessions();
-              this.closeModal();
-              this._toastr.success(res.message);
-            } else {
-              this._toastr.error(res.message);
-            }
-          },
+      this._openConfirmation('Are you sure you want to update this profession?', 'Confirm Update')
+        .afterClosed()
+        .subscribe(confirmed => {
+          if (!confirmed) return;
+
+          this._categoryService.updateProfession(payload, profession.id)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe({
+              next: (res) => {
+                if (res.success) {
+                  this._loadProfessions();
+                  this.closeModal();
+                  this._toastr.success(res.message);
+                } else {
+                  this._toastr.error(res.message);
+                }
+              },
+            });
         });
     } else {
       // Create
@@ -127,39 +133,30 @@ export class AdminCategoryProfessionComponent implements OnInit, OnDestroy {
     this.openModal(profession);
   }
 
-  removeProfession(profession: IProfession) {
-    this._dialog.open(ConfirmDialogComponent, {
-      data: {
-        title: 'Remove Profession',
-        message: `Are you sure you want to remove ${profession.name}?`,
-      },
-    })
+  toggleStatus(profession: IProfession) {
+    const message = profession.isActive
+      ? `Deactivate "${profession.name}"? All its service categories and linked provider services will be deactivated.`
+      : `Activate "${profession.name}"?`;
+
+    this._openConfirmation(message, profession.isActive ? 'Confirm Deactivation' : 'Confirm Activation')
       .afterClosed()
-      .subscribe(confirm => {
-        if (!confirm) return;
-        this._categoryService.removeProfession(profession.id)
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        this._categoryService.updateProfessionStatus(profession.id)
           .pipe(takeUntil(this._destroy$))
           .subscribe({
             next: (res) => {
               if (res.success) {
                 this._loadProfessions();
-                this._toastr.success(res.message);
               }
             }
           });
       });
   }
 
-  toggleStatus(professionId: string) {
-    this._categoryService.updateProfessionStatus(professionId)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe({
-        next: (res) => {
-          if (res.success) {
-            this._loadProfessions();
-          }
-        }
-      });
+  private _openConfirmation(message: string, title: string) {
+    return this._dialog.open(ConfirmDialogComponent, { data: { title, message } });
   }
 
   trackByProfessionId(index: number, profession: IProfession): string {

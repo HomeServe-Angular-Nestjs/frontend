@@ -59,7 +59,7 @@ export class ProviderEditOverviewComponent implements OnInit, OnDestroy {
     this.provider$ = this.store.select(selectProvider)
       .pipe(takeUntil(this._destroy$));
 
-    this._categoryService.getProfessions()
+    this._categoryService.getProfessions({ isActive: 'true' })
       .pipe(takeUntil(this._destroy$))
       .subscribe();
   }

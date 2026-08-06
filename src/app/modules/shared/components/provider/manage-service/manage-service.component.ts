@@ -81,6 +81,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
 
   viewMode = signal<'list' | 'form'>('list');
   isEditing = signal(false);
+  editingService = signal<IProviderService | null>(null);
   serviceForm!: FormGroup;
   categorySearchControl = new FormControl('');
 
@@ -209,8 +210,43 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
           ));
           this._updateStats();
           this._toastr.info(`Service ${!service.isActive ? 'activated' : 'deactivated'}`);
+        },
+        error: () => {
+          ele.checked = service.isActive;
         }
       });
+  }
+
+  isParentInactive(service: IProviderService): boolean {
+    return (
+      service.category?.isActive === false ||
+      service.profession?.isActive === false
+    );
+  }
+
+  getUnavailabilityReason(service: IProviderService | null): string | null {
+    if (!service) return null;
+    const professionInactive = service.profession?.isActive === false;
+    const categoryInactive = service.category?.isActive === false;
+
+    if (professionInactive && categoryInactive) {
+      return 'Category & profession inactive';
+    }
+    if (professionInactive) {
+      return 'Profession inactive';
+    }
+    if (categoryInactive) {
+      return 'Category inactive';
+    }
+    return null;
+  }
+
+  isServiceUnavailable(service: IProviderService): boolean {
+    return (
+      service.isActive === false ||
+      service.category?.isActive === false ||
+      service.profession?.isActive === false
+    );
   }
 
   onFiltersChanged(filters: IServiceFilter) {
@@ -320,7 +356,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   }
 
   private _loadProfessions() {
-    this._categoryService.getProfessions()
+    this._categoryService.getProfessions({ isActive: 'true' })
       .pipe(takeUntil(this._destroy$))
       .subscribe(res => {
         if (res.data) this.professions.set(res.data);
@@ -334,7 +370,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this._categoryService.getServiceCategories({ profession: profId }, 1, 100)
+    this._categoryService.getServiceCategories({ profession: profId, isActive: 'true' }, 1, 100)
       .pipe(takeUntil(this._destroy$))
       .subscribe(res => {
         if (res.data) {
@@ -359,6 +395,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   private _openCreateForm(): void {
     this.viewMode.set('form');
     this.isEditing.set(false);
+    this.editingService.set(null);
 
     this.categorySearchControl.setValue('');
     this.selectedFile = null;
@@ -377,6 +414,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     this.viewMode.set('form');
     this.isEditing.set(true);
     this.isCreating.set(false);
+    this.editingService.set(service);
 
     this.categorySearchControl.setValue('');
     this.selectedFile = null;
@@ -399,6 +437,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     this.viewMode.set('list');
     this.isEditing.set(false);
     this.isCreating.set(false);
+    this.editingService.set(null);
   }
 
   ngOnDestroy(): void {

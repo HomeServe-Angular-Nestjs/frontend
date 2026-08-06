@@ -6,7 +6,6 @@ export class ErrorHandlerService {
 
     /** Predefined user-friendly messages keyed by backend error code. */
     private readonly _codeMessages: Partial<Record<ErrorCodes, string>> = {
-
         // ── Auth & Session ─────────────────────────────────────────────────
         [ErrorCodes.UNAUTHORIZED_ACCESS]: 'Your session has expired. Please log in again.',
         [ErrorCodes.INVALID_CREDENTIALS]: 'Incorrect email or password. Please try again.',
@@ -75,6 +74,21 @@ export class ErrorHandlerService {
         [ErrorCodes.INTERNAL_SERVER_ERROR]: 'An unexpected error occurred. Please try again later.',
     };
 
+    /** Codes whose mapped text is a generic fallback — for these, prefer a user-friendly backend message. */
+    private readonly _genericCodes = new Set<ErrorCodes>([
+        ErrorCodes.BAD_REQUEST,
+        ErrorCodes.CONFLICT,
+        ErrorCodes.NOT_FOUND,
+        ErrorCodes.RESOURCE_NOT_FOUND,
+        ErrorCodes.VALIDATION_FAILED,
+        ErrorCodes.RESOURCE_CONFLICT,
+        ErrorCodes.MONGO_DUPLICATE_KEY,
+        ErrorCodes.OPERATION_NOT_ALLOWED,
+        ErrorCodes.FORBIDDEN,
+        ErrorCodes.RATE_LIMIT_EXCEEDED,
+        ErrorCodes.SERVICE_UNAVAILABLE,
+    ]);
+
    
     getErrorMessage(status: number, errorCode?: string, backendMessage?: string): string {
         if (status >= 500) {
@@ -82,7 +96,7 @@ export class ErrorHandlerService {
         }
 
         const mapped = errorCode ? this._codeMessages[errorCode as ErrorCodes] : undefined;
-        const isGenericMapping = mapped === this._codeMessages[ErrorCodes.BAD_REQUEST];
+        const isGenericMapping = !!errorCode && this._genericCodes.has(errorCode as ErrorCodes);
 
         if (backendMessage && this._isUserFriendly(backendMessage) && isGenericMapping) {
             return backendMessage;
@@ -113,6 +127,8 @@ export class ErrorHandlerService {
             /null reference/i,
             /stack trace/i,
             /at \w+\.?\w+\s*\(/,           // stack frame pattern
+            /not found with (id|ID):/i,     // leaks a raw object id
+            /[0-9a-f]{24}/i,                // raw Mongo ObjectId
         ];
         return !technicalPatterns.some(p => p.test(message));
     }
