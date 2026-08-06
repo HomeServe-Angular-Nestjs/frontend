@@ -51,15 +51,15 @@ export class AdminSidebarComponent {
       route: 'admin/transactions'
     },
     {
+      name: 'Complaint Management',
+      icon: 'fa-bullhorn',
+      route: 'admin/complaints'
+    },
+    {
       name: 'Sales Report',
       icon: 'fa-chart-pie',
       route: 'admin/sales-report'
     },
-    {
-      name: 'Complaint Management',
-      icon: 'fa-bullhorn',
-      route: 'admin/complaints'
-    }
   ];
 
   openedMenu: string | null = null;

@@ -1,97 +1,317 @@
-<div class="bg-white w-full max-w-3xl rounded-lg border p-5">
+<div class="bg-white w-full max-w-6xl rounded-xl border shadow-lg overflow-hidden">
     <ng-container *ngIf="reportId && report">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-lg font-semibold text-gray-800">Report Details</h2>
-            <span class="px-2 py-0.5 text-xs font-medium rounded-md" [ngClass]="getReportStatusClasses(report.status)">
-                {{ report.status | titlecase }}
-            </span>
-        </div>
-
-        <!-- Reporter & Reported -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-            <!-- Reporter -->
-            <div class="p-4 border rounded-lg flex items-start gap-3">
-                <img [src]="report.reportedBy.avatar" alt="Reporter"
-                    class="w-12 h-12 rounded-full border object-cover" />
+        <div class="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-indigo-50 to-white">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-lg">
+                    <i class="fas fa-search"></i>
+                </div>
                 <div>
-                    <h3 class="text-xs text-gray-500">Reporter</h3>
-                    <p class="text-sm font-medium text-gray-800">{{ report.reportedBy.name }}</p>
-                    <p class="text-xs text-gray-500">ID: {{ report.reportedBy.reportedId }}</p>
-                    <p class="text-xs text-gray-500">{{ report.reportedBy.email }}</p>
+                    <h2 class="text-lg font-semibold text-gray-800 leading-tight">Investigation Workspace</h2>
+                    <p class="text-xs text-gray-500">Complaint <span class="font-mono">{{ report.id | slice:0:10 | uppercase }}</span></p>
                 </div>
             </div>
-
-            <!-- Reported Party -->
-            <div class="p-4 border rounded-lg flex items-start gap-3">
-                <img [src]="report.target.avatar" alt="Reported Party"
-                    class="w-12 h-12 rounded-full border object-cover" />
-                <div>
-                    <h3 class="text-xs text-gray-500">Reported Party</h3>
-                    <p class="text-sm font-medium text-gray-800">{{ report.target.name }}</p>
-                    <p class="text-xs text-gray-500">ID: {{ report.target.targetId }}</p>
-                    <p class="text-xs text-gray-500">{{ report.target.email }}</p>
-                </div>
+            <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize" [ngClass]="getReportStatusClasses(report.status)">
+                    {{ report.status }}
+                </span>
+                <button (click)="closeModal()" class="text-gray-400 hover:text-gray-700 text-lg" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Report Info -->
-        <div class="p-4 border rounded-lg mb-5">
-            <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <i class="fas fa-info-circle text-blue-500"></i>
-                Report Information
-            </h3>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-5 p-6 max-h-[80vh] overflow-y-auto">
+            <!-- LEFT COLUMN -->
+            <div class="lg:col-span-3 space-y-5">
+                <!-- Complaint Information -->
+                <section class="rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                        <i class="fas fa-file-alt text-indigo-500"></i>
+                        <h3 class="text-sm font-semibold text-gray-700">Complaint Information</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <p class="text-xs text-gray-500">Created Date</p>
+                            <p class="font-medium text-gray-800 mt-0.5">{{ report.createdAt | date:'medium' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Complaint Type</p>
+                            <p class="font-medium text-gray-800 mt-0.5 capitalize">{{ report.type }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Reason</p>
+                            <p class="font-medium text-gray-800 mt-0.5 capitalize">{{ report.reason }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Last Updated</p>
+                            <p class="font-medium text-gray-800 mt-0.5">{{ report.updatedAt | date:'medium' }}</p>
+                        </div>
+                        <div *ngIf="report.resolvedAt">
+                            <p class="text-xs text-gray-500">Resolved On</p>
+                            <p class="font-medium text-gray-800 mt-0.5">{{ report.resolvedAt | date:'medium' }}</p>
+                        </div>
+                    </div>
+                </section>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                <div>
-                    <p class="text-xs text-gray-500">Type</p>
-                    <p class="font-medium text-gray-800">{{ report.type | titlecase }}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500">Reason</p>
-                    <p class="font-medium text-gray-800">{{ report.reason }}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500">Created On</p>
-                    <p class="font-medium text-gray-800">{{ report.createdAt | date:'medium' }}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500">Last Updated</p>
-                    <p class="font-medium text-gray-800">{{ report.updatedAt | date:'medium' }}</p>
-                </div>
+                <!-- Reporter & Target -->
+                <section class="rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                        <i class="fas fa-users text-indigo-500"></i>
+                        <h3 class="text-sm font-semibold text-gray-700">Parties Involved</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Reporter -->
+                        <div class="p-4 border rounded-lg">
+                            <span class="text-xs font-medium text-gray-500">Reporter</span>
+                            <div class="mt-2 flex items-start gap-3">
+                                <img [src]="report.reportedBy.avatar" alt="Reporter" class="w-12 h-12 rounded-full border object-cover" />
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-sm font-semibold text-gray-800 truncate">{{ report.reportedBy.name }}</p>
+                                        <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full capitalize"
+                                            [class.bg-blue-50]="report.reportedBy.role === 'customer'"
+                                            [class.text-blue-600]="report.reportedBy.role === 'customer'"
+                                            [class.bg-purple-50]="report.reportedBy.role === 'provider'"
+                                            [class.text-purple-600]="report.reportedBy.role === 'provider'">
+                                            {{ report.reportedBy.role }}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 truncate">{{ report.reportedBy.email }}</p>
+                                    <p class="text-xs text-gray-400 font-mono mt-0.5">ID: {{ report.reportedBy.reportedId | slice:0:10 | uppercase }}</p>
+                                    <button (click)="openProfile()"
+                                        class="mt-2 text-xs font-medium text-indigo-600 hover:text-indigo-700">
+                                        <i class="fas fa-external-link-alt mr-1"></i>View profile
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Target -->
+                        <div class="p-4 rounded-lg bg-red-50/40 border border-red-100">
+                            <span class="text-xs font-semibold text-red-600">Reported Target</span>
+                            <div class="mt-2 flex items-start gap-3">
+                                <img [src]="report.target.avatar" alt="Target" class="w-12 h-12 rounded-full border object-cover" />
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-sm font-semibold text-gray-800 truncate">{{ report.target.name }}</p>
+                                        <span class="px-2 py-0.5 text-[10px] font-semibold capitalize rounded-full"
+                                            [class.bg-blue-50]="report.target.role === 'customer'"
+                                            [class.text-blue-600]="report.target.role === 'customer'"
+                                            [class.bg-purple-50]="report.target.role === 'provider'"
+                                            [class.text-purple-600]="report.target.role === 'provider'">
+                                            {{ report.target.role }}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 truncate">{{ report.target.email }}</p>
+                                    <p class="text-xs text-gray-400 font-mono mt-0.5">ID: {{ report.target.targetId | slice:0:10 | uppercase }}</p>
+                                    <button (click)="openProfile()"
+                                        class="mt-2 text-xs font-medium text-indigo-600 hover:text-indigo-700">
+                                        <i class="fas fa-external-link-alt mr-1"></i>View profile
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Complaint Description -->
+                <section class="rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                        <i class="fas fa-quote-left text-indigo-500"></i>
+                        <h3 class="text-sm font-semibold text-gray-700">Complaint Description</h3>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ report.description }}</p>
+                    </div>
+                </section>
+
+                <!-- Related Information -->
+                <section class="rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                        <i class="fas fa-link text-indigo-500"></i>
+                        <h3 class="text-sm font-semibold text-gray-700">Related Information</h3>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <!-- Review complaint -->
+                        <ng-container *ngIf="report.type === 'review' && report.related?.review as review">
+                            <div class="flex items-start gap-3 rounded-lg border border-gray-200 p-4">
+                                <div class="text-amber-400 mt-0.5">
+                                    <ng-container *ngFor="let star of [1,2,3,4,5]">
+                                        <i class="fas fa-star" [class.text-gray-200]="star > review.rating"></i>
+                                    </ng-container>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm text-gray-800 whitespace-pre-line">{{ review.desc }}</p>
+                                    <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                                        <span class="px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">
+                                            <i class="fas fa-book mr-1"></i>Reference: {{ review.bookingReference | slice:0:10 | uppercase }}
+                                        </span>
+                                        <span class="px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">Services booked: {{ review.serviceCount }}</span>
+                                        <span class="px-2 py-0.5 rounded-full" [class.bg-green-50]="review.isActive" [class.text-green-600]="review.isActive" [class.bg-gray-100]="!review.isActive" [class.text-gray-500]="!review.isActive">
+                                            <i class="fas fa-eye mr-1"></i>{{ review.isActive ? 'Visible to users' : 'Hidden' }}
+                                        </span>
+                                        <span *ngIf="review.isReported" class="px-2 py-0.5 bg-red-50 text-red-600 rounded-full">
+                                            <i class="fas fa-flag mr-1"></i>Reported
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Still-visible notice -->
+                            <div *ngIf="isReviewVisible()"
+                                class="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                                <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+                                <div>
+                                    <p class="text-sm font-medium text-amber-800">This review is still visible to users.</p>
+                                    <p class="text-xs text-amber-700 mt-0.5">
+                                        Resolving this complaint does not hide it. Hide the review from the
+                                        <button (click)="openReviewModeration()" class="underline font-medium text-amber-800 hover:text-amber-900">
+                                            Review Moderation
+                                        </button>
+                                        screen.
+                                    </p>
+                                </div>
+                            </div>
+                        </ng-container>
+
+                        <!-- Customer / Provider complaints -->
+                        <ng-container *ngIf="report.type !== 'review' && report.related?.targetProfile as profile">
+                            <div class="flex items-center justify-between rounded-lg border border-gray-100 p-4">
+                                <div class="flex items-center gap-3">
+                                    <img [src]="profile.avatar" class="w-10 h-10 rounded-full border object-cover" />
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">{{ profile.name }}</p>
+                                        <p class="text-xs text-gray-500">{{ profile.email }}</p>
+                                    </div>
+                                    <span class="px-2 py-0.5 text-[10px] font-semibold capitalize rounded-full bg-purple-50 text-purple-600">
+                                        {{ profile.role }}
+                                    </span>
+                                </div>
+                                <button (click)="openProfile()"
+                                    class="text-xs font-medium text-indigo-600 hover:text-indigo-700">
+                                    <i class="fas fa-external-link-alt mr-1"></i>View profile
+                                </button>
+                            </div>
+                        </ng-container>
+
+                        <!-- Recent bookings -->
+                        <ng-container *ngIf="report.type !== 'review'">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Recent Bookings</p>
+                                <div *ngIf="report.related?.recentBookings?.length; else noBookings" class="divide-y divide-gray-100 border border-gray-100 rounded-lg">
+                                    <button *ngFor="let booking of report.related!.recentBookings" (click)="openBooking(booking.bookingId)"
+                                        class="flex items-center justify-between px-4 py-2.5 text-sm w-full text-left hover:bg-indigo-50 transition group">
+                                        <div>
+                                            <p class="font-mono text-xs text-gray-700 flex items-center gap-2">
+                                                {{ booking.bookingId | slice:0:12 | uppercase }}
+                                                <i class="fas fa-external-link-alt text-xs text-indigo-400 opacity-0 group-hover:opacity-100 transition"></i>
+                                            </p>
+                                            <p class="text-xs text-gray-500 mt-0.5">{{ booking.createdAt | date:'medium' }}</p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <span class="px-2 py-0.5 text-[10px] font-medium capitalize rounded-full bg-blue-50 text-blue-600">{{ booking.bookingStatus }}</span>
+                                            <span class="text-xs text-gray-500">₹{{ booking.totalAmount }}</span>
+                                            <i *ngIf="booking.hasReview" class="fas fa-star text-amber-400" title="Has review"></i>
+                                        </div>
+                                    </button>
+                                </div>
+                                <ng-template #noBookings>
+                                    <p class="text-sm text-gray-400">No booking history available.</p>
+                                </ng-template>
+                            </div>
+                        </ng-container>
+                    </div>
+                </section>
+
+                <!-- Resolution note (after decision) -->
+                <section *ngIf="report.resolutionNote" class="rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                        <i class="fas fa-gavel text-indigo-500"></i>
+                        <h3 class="text-sm font-semibold text-gray-700">Resolution Note</h3>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line">{{ report.resolutionNote }}</p>
+                    </div>
+                </section>
             </div>
 
-            <div class="mt-4">
-                <p class="text-xs text-gray-500">Description</p>
-                <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                    {{ report.description }}
-                </p>
+            <!-- RIGHT COLUMN -->
+            <div class="lg:col-span-2 space-y-5">
+                <!-- Previous Complaints -->
+                <section class="rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                        <i class="fas fa-history text-indigo-500"></i>
+                        <h3 class="text-sm font-semibold text-gray-700">Previous Complaints</h3>
+                    </div>
+                    <div class="p-4">
+                        <ng-container *ngIf="report.previousReports as prev">
+                            <p class="text-xs text-gray-500 mb-3">Involving the same target ({{ prev.total }} total)</p>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="rounded-lg bg-gray-50 p-3 text-center">
+                                    <p class="text-xl font-semibold text-gray-800">{{ prev.total }}</p>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wide mt-0.5">Total</p>
+                                </div>
+                                <div class="rounded-lg bg-yellow-50 p-3 text-center">
+                                    <p class="text-xl font-semibold text-yellow-600">{{ prev.pending }}</p>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wide mt-0.5">Pending</p>
+                                </div>
+                                <div class="rounded-lg bg-green-50 p-3 text-center">
+                                    <p class="text-xl font-semibold text-green-600">{{ prev.resolved }}</p>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wide mt-0.5">Resolved</p>
+                                </div>
+                                <div class="rounded-lg bg-red-50 p-3 text-center">
+                                    <p class="text-xl font-semibold text-red-600">{{ prev.rejected }}</p>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wide mt-0.5">Rejected</p>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </section>
+
+                <!-- Investigation Notes -->
+                <section class="rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-sticky-note text-indigo-500"></i>
+                            <h3 class="text-sm font-semibold text-gray-700">Investigation Notes</h3>
+                        </div>
+                        <span class="px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-500 rounded-full">Internal only</span>
+                    </div>
+                    <div class="p-4">
+                        <textarea [(ngModel)]="report.investigationNotes" rows="5"
+                            placeholder="Record your findings here..."
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"></textarea>
+                        <div class="mt-2 flex items-center justify-between">
+                            <span *ngIf="notesSaved()" class="text-xs text-green-600">
+                                <i class="fas fa-check mr-1"></i>Saved
+                            </span>
+                            <span *ngIf="isSavingNotes()" class="text-xs text-gray-500">Saving...</span>
+                            <app-button
+                                [disabled]="isSavingNotes() || !report.investigationNotes?.trim()"
+                                (clicked)="saveNotes()"
+                                buttonClass="ml-auto px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition disabled:opacity-50"
+                                icon="save" text="Save Notes">
+                            </app-button>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
-        
-        <!-- Actions -->
-        <div class="flex justify-end gap-2">
+
+        <!-- Footer / Resolution actions -->
+        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
             <app-button
-                buttonClass="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition"
+                buttonClass="px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition"
                 text="Close" (clicked)="closeModal()">
             </app-button>
 
-            <!-- <app-button 
-                buttonClass="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 flex items-center gap-2 transition shadow-sm"
-                icon="comment-alt" text="Ask for Clarification"></app-button> -->
-
-            <app-button (clicked)="updateStatus(report.id, ReportStatus.REJECTED)"
-                [disabled]="isActionDisabled(report.status)" [ngClass]="{
-                    'opacity-50 cursor-not-allowed': isActionDisabled(report.status)
-                }"
+            <app-button (clicked)="updateStatus(ReportStatus.REJECTED)"
+                [disabled]="isActionDisabled(report.status)" [class.opacity-50]="isActionDisabled(report.status)"
                 buttonClass="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition"
                 icon="ban" text="Reject">
             </app-button>
 
-            <app-button (clicked)="updateStatus(report.id, ReportStatus.RESOLVED)"
-                [disabled]="isActionDisabled(report.status)" [ngClass]="{
-                    'opacity-50 cursor-not-allowed': isActionDisabled(report.status)
-                }"
+            <app-button (clicked)="updateStatus(ReportStatus.RESOLVED)"
+                [disabled]="isActionDisabled(report.status)" [class.opacity-50]="isActionDisabled(report.status)"
                 buttonClass="px-3 py-1.5 text-sm font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100 transition"
                 icon="check-circle" text="Resolve">
             </app-button>

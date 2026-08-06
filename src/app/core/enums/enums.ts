@@ -178,8 +178,7 @@ export enum NotificationTemplateId {
 export enum ReportStatus {
   PENDING = 'pending',
   REJECTED = 'rejected',
-  RESOLVED = 'resolved',
-  IN_PROGRESS = 'in_progress'
+  RESOLVED = 'resolved'
 }
 
 export enum ComplaintReason {

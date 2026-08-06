@@ -13,8 +13,8 @@ import { AdminComplaintViewComponent } from "../complaint-view/complaint-view.co
 import { ReportStatus } from "../../../../../../core/enums/enums";
 import { IAdminOverViewCard, OverviewCardComponent } from "../../../../partials/sections/admin/overview-card/admin-overview-card.component";
 import { MatDialog } from "@angular/material/dialog";
-import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
+import { ResolutionDialogComponent } from "../../../../partials/shared/resolution-dialog/resolution-dialog.component";
 
 @Component({
     selector: 'app-admin-complaint-management',
@@ -149,13 +149,6 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
                 subtext: 'Awaiting review',
             },
             {
-                title: 'In Progress',
-                value: data.in_progress || 0,
-                icon: 'fas fa-spinner',
-                iconBg: 'bg-blue-100 text-blue-700',
-                subtext: 'Currently being reviewed',
-            },
-            {
                 title: 'Resolved',
                 value: data.resolved || 0,
                 icon: 'fas fa-check-circle',
@@ -179,12 +172,6 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
         ]
     }
 
-    private _openConfirmationDialog(message: string, title: string) {
-        return this._dialog.open(ConfirmDialogComponent, {
-            data: { title, message },
-        });
-    }
-
     trackByReportId(index: number, report: IReport): string {
         return report.id;
     }
@@ -204,13 +191,6 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
     toggleReportViewModal(reportId?: string) {
         if (reportId) {
             this.selectedReportId = reportId;
-            this._reportService.changeStatus(reportId, ReportStatus.IN_PROGRESS)
-                .pipe(takeUntil(this.destroy$))
-                .subscribe({
-                    next: () => {
-                        this._updateStatus(reportId, ReportStatus.IN_PROGRESS)
-                    }
-                });
         }
         this.isReportViewModalOpen.update(v => v = !v);
     }
@@ -220,14 +200,19 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
     }
 
     resolveReport(reportId: string) {
-        this._openConfirmationDialog(
-            'The report will be closed permanently.',
-            'Mark as resolved?')
-            .afterClosed()
+        const dialogRef = this._dialog.open(ResolutionDialogComponent, {
+            data: {
+                title: 'Resolve this complaint?',
+                message: 'Provide a note explaining how the complaint was resolved.',
+                isResolve: true
+            },
+        });
+
+        dialogRef.afterClosed()
             .pipe(
                 takeUntil(this.destroy$),
-                filter(isConfirmed => isConfirmed),
-                switchMap(() => this._reportService.changeStatus(reportId, ReportStatus.RESOLVED)),
+                filter((result): result is { note: string } => !!result && !!result.note),
+                switchMap(({ note }) => this._reportService.changeStatus(reportId, ReportStatus.RESOLVED, note)),
                 filter(res => res.success)
             )
             .subscribe({
@@ -245,8 +230,6 @@ export class AdminComplaintManagementComponent implements OnInit, OnDestroy {
                 return 'bg-red-100 text-red-700';
             case ReportStatus.RESOLVED:
                 return 'bg-green-100 text-green-700';
-            case ReportStatus.IN_PROGRESS:
-                return 'bg-blue-100 text-blue-700';
             default:
                 return 'bg-gray-100 text-gray-700';
         }

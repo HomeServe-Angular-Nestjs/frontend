@@ -37,8 +37,12 @@ export class ReportService {
         return this._http.get<IResponse<IReportDetail>>(`${this._reportAPI}/${reportId}`)
     }
 
-    changeStatus(reportId: string, status: ReportStatus): Observable<IResponse> {
-        return this._http.patch<IResponse>(`${this._reportAPI}/${reportId}/status`, { status });
+    changeStatus(reportId: string, status: ReportStatus, resolutionNote?: string): Observable<IResponse> {
+        return this._http.patch<IResponse>(`${this._reportAPI}/${reportId}/status`, { status, resolutionNote });
+    }
+
+    updateInvestigationNotes(reportId: string, investigationNotes: string): Observable<IResponse> {
+        return this._http.patch<IResponse>(`${this._reportAPI}/${reportId}/notes`, { investigationNotes });
     }
 
     fetchOverviewData(): Observable<IResponse<IReportOverViewMatrix>> {
