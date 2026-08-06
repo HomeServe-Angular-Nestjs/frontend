@@ -1,0 +1,6 @@
+<app-admin-chart-card title="Sales Distribution" subtitle="Revenue share by profession" icon="fa-chart-pie"
+    [loading]="loading">
+    <div class="h-[360px]">
+        <div echarts [options]="options" class="w-full h-full" [loading]="loading" [autoResize]="true"></div>
+    </div>
+</app-admin-chart-card>

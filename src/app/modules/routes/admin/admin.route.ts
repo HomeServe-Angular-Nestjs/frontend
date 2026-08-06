@@ -71,6 +71,12 @@ export const adminRoute: Routes = [
             data: { breadcrumb: 'Reports' }
           },
           {
+            path: 'sales-report',
+            loadComponent: () => import('../../shared/components/admin/sales-report/layout/sales-report-layout.component')
+              .then(c => c.AdminSalesReportLayoutComponent),
+            data: { breadcrumb: 'Sales Report' }
+          },
+          {
             path: 'coupons',
             loadComponent: () => import('../../shared/components/admin/coupons/coupons.component')
               .then(c => c.AdminCouponsComponent),

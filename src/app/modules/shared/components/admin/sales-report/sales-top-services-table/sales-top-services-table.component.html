@@ -1,0 +1,13 @@
+<app-admin-chart-card title="Top Selling Services" subtitle="Top services by bookings in the period"
+    icon="fa-ranking-star" [loading]="loading">
+    <app-admin-simple-table [data]="services" [columns]="columns" [isLoading]="loading"
+        [templates]="{ serviceName: serviceNameTpl, revenue: revenueTpl }"
+        [noDataMessage]="'No services found for the selected filters.'">
+    </app-admin-simple-table>
+    <ng-template #serviceNameTpl let-row>
+        <span class="service-name" [title]="row.serviceName">{{ row.serviceName }}</span>
+    </ng-template>
+    <ng-template #revenueTpl let-row>
+        <span class="font-semibold text-emerald-600">{{ formatINR(row.revenue) }}</span>
+    </ng-template>
+</app-admin-chart-card>

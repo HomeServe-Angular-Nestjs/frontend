@@ -1,0 +1,43 @@
+<app-admin-chart-card title="Cancellation Analysis" subtitle="Cancelled orders by category and provider"
+    icon="fa-ban" [loading]="loading">
+    <ng-container *ngIf="cancellation; else noData">
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="cancellation-stat">
+                <span class="stat-label">Cancelled Orders</span>
+                <span class="stat-value">{{ cancellation.cancelledOrders | number }}</span>
+            </div>
+            <div class="cancellation-stat">
+                <span class="stat-label">Cancellation Rate</span>
+                <span class="stat-value">{{ cancellation.cancellationRate }}%</span>
+            </div>
+        </div>
+
+        <div class="cancel-section">
+            <h4 class="section-title"><i class="fa-solid fa-tags"></i> Top Cancelled Categories</h4>
+            <div class="cancel-list" *ngIf="cancellation.topCancelledCategories.length; else empty">
+                <div class="cancel-row" *ngFor="let c of cancellation.topCancelledCategories">
+                    <span class="cancel-name">{{ c.name }}</span>
+                    <span class="cancel-count">{{ c.bookings }} <i class="fa-solid fa-xmark text-rose-400"></i></span>
+                </div>
+            </div>
+            <ng-template #empty><p class="empty-text">—</p></ng-template>
+        </div>
+
+        <div class="cancel-section">
+            <h4 class="section-title"><i class="fa-solid fa-user-slash"></i> Top Cancelled Providers</h4>
+            <div class="cancel-list" *ngIf="cancellation.topCancelledProviders.length; else emptyProviders">
+                <div class="cancel-row" *ngFor="let p of cancellation.topCancelledProviders">
+                    <span class="cancel-name">{{ p.name }}</span>
+                    <span class="cancel-count">{{ p.bookings }} <i class="fa-solid fa-xmark text-rose-400"></i></span>
+                </div>
+            </div>
+            <ng-template #emptyProviders><p class="empty-text">—</p></ng-template>
+        </div>
+    </ng-container>
+    <ng-template #noData>
+        <div class="py-8 text-center text-gray-400">
+            <i class="fa-solid fa-ban text-3xl mb-2"></i>
+            <p>No cancellation data available.</p>
+        </div>
+    </ng-template>
+</app-admin-chart-card>

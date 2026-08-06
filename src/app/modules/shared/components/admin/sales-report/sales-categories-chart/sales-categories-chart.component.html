@@ -1,0 +1,10 @@
+<app-admin-chart-card title="Top Professions & Categories" subtitle="Bookings and revenue by segment"
+    icon="fa-chart-column" [loading]="loading">
+    <div class="flex gap-2 mb-3">
+        <button class="toggle-btn" [class.active]="view === 'professions'" (click)="setView('professions')">Professions</button>
+        <button class="toggle-btn" [class.active]="view === 'categories'" (click)="setView('categories')">Categories</button>
+    </div>
+    <div class="h-[330px]">
+        <div echarts [options]="options" class="w-full h-full" [loading]="loading" [autoResize]="true"></div>
+    </div>
+</app-admin-chart-card>

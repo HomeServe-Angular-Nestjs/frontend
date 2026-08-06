@@ -1,0 +1,109 @@
+<div class="sales-report-container">
+    <!-- Header -->
+    <div class="header-top">
+        <div class="title-info">
+            <h1>Sales Report</h1>
+            <p>Monitor completed sales, revenue trends, and provider performance across the platform.</p>
+        </div>
+        <div class="export-actions">
+            <button class="export-btn export-excel" (click)="exportExcel()">
+                <i class="fa-solid fa-file-excel"></i> Export Excel
+            </button>
+            <button class="export-btn export-pdf" (click)="exportPdf()">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="filters-bar">
+        <div class="filter-group">
+            <label class="filter-label">Date Range</label>
+            <select [ngModel]="range()" (ngModelChange)="onRangeChange($event)" class="filter-select">
+                <option *ngFor="let option of rangeOptions" [value]="option">{{ rangeLabels[option] }}</option>
+            </select>
+
+            <ng-container *ngIf="range() === 'custom'">
+                <input type="date" [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event)" class="filter-date"
+                    aria-label="From date" />
+                <input type="date" [ngModel]="toDate()" (ngModelChange)="toDate.set($event)" class="filter-date"
+                    aria-label="To date" />
+            </ng-container>
+        </div>
+
+        <div class="filter-group">
+            <select [ngModel]="professionId()" (ngModelChange)="professionId.set($event)" class="filter-select">
+                <option value="">All Professions</option>
+                <option *ngFor="let p of filterOptions().professions" [value]="p.id">{{ p.name }}</option>
+            </select>
+
+            <select [ngModel]="categoryId()" (ngModelChange)="categoryId.set($event)" class="filter-select">
+                <option value="">All Categories</option>
+                <option *ngFor="let c of filterOptions().categories" [value]="c.id">{{ c.name }}</option>
+            </select>
+
+            <select [ngModel]="providerId()" (ngModelChange)="providerId.set($event)" class="filter-select">
+                <option value="">All Providers</option>
+                <option *ngFor="let p of filterOptions().providers" [value]="p.id">{{ p.name }}</option>
+            </select>
+
+            <select [ngModel]="bookingStatus()" (ngModelChange)="bookingStatus.set($event)" class="filter-select">
+                <option value="">All Statuses</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="confirmed">Confirmed</option>
+            </select>
+        </div>
+
+        <button class="reset-btn" (click)="resetFilters()">
+            <i class="fa-solid fa-rotate"></i> Reset
+        </button>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <app-admin-overview-card *ngFor="let stat of summaryCards()" [icon]="stat.icon" [iconBg]="stat.iconBg"
+            [title]="stat.title" [value]="stat.value">
+        </app-admin-overview-card>
+    </div>
+
+    <!-- Bookings Sold Strip -->
+    <div class="bookings-strip">
+        <div class="strip-item" *ngFor="let b of bookingsStrip()">
+            <span class="strip-label">{{ b.label }}</span>
+            <span class="strip-value">{{ b.value | number }}</span>
+        </div>
+    </div>
+
+    <!-- Trend + Distribution -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+        <div class="lg:col-span-2">
+            <app-admin-sales-trend-chart [trend]="trend()" [loading]="isLoading()"></app-admin-sales-trend-chart>
+        </div>
+        <div>
+            <app-admin-sales-distribution-chart [distribution]="distribution()"
+                [loading]="isLoading()"></app-admin-sales-distribution-chart>
+        </div>
+    </div>
+
+    <!-- Professions / Categories -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+        <div class="lg:col-span-2">
+            <app-admin-sales-categories-chart [professions]="professions()" [categories]="categories()"
+                [loading]="isLoading()"></app-admin-sales-categories-chart>
+        </div>
+        <div>
+            <app-admin-sales-cancellation-analysis [cancellation]="cancellation()"
+                [loading]="isLoading()"></app-admin-sales-cancellation-analysis>
+        </div>
+    </div>
+
+    <!-- Tables -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <app-admin-sales-top-services-table [services]="services()" [loading]="isLoading()"></app-admin-sales-top-services-table>
+        <app-admin-sales-provider-performance-table [providers]="providers()"
+            [loading]="isLoading()"></app-admin-sales-provider-performance-table>
+    </div>
+</div>

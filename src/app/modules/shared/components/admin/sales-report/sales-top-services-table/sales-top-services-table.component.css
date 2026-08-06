@@ -1,0 +1,11 @@
+.service-name {
+    display: inline-block;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: help;
+    color: #1e293b;
+    font-weight: 600;
+}

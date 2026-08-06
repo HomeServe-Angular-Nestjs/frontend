@@ -1,0 +1,25 @@
+:host {
+    display: block;
+}
+
+.toggle-btn {
+    padding: 0.4rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle-btn.active {
+    background: #6366f1;
+    color: white;
+    border-color: #6366f1;
+}
+
+.toggle-btn:hover:not(.active) {
+    background: #eef2ff;
+}
