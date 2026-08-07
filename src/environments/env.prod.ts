@@ -29,6 +29,7 @@ export const API_ENV = {
   cart: `${domainName}/cart`,
   coupon: `${domainName}/coupon`,
   videoCall: `${domainName}/video-call`,
+  landing: `${domainName}/landing`,
 };
 
 export const API_KEY = {

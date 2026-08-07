@@ -1,0 +1,49 @@
+<section class="py-16 sm:py-20 lg:py-24 relative overflow-hidden bg-slate-950">
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute -top-24 -right-24 w-[40rem] h-[40rem] bg-blue-600/30 rounded-full blur-[140px]"></div>
+    <div class="absolute -bottom-32 -left-24 w-[32rem] h-[32rem] bg-indigo-600/30 rounded-full blur-[140px]"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 sm:px-8 relative z-10">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div class="text-white">
+        <p class="text-xs font-bold uppercase tracking-widest text-blue-300">For Professionals</p>
+        <h2 class="mt-3 text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-wrap-balance">
+          Turn Your Skills into a Thriving Business
+        </h2>
+        <p class="mt-4 text-lg text-slate-300 max-w-xl leading-relaxed">
+          Join HomeServe to reach more customers, manage every job in one place, and get paid reliably.
+        </p>
+
+        <ul class="mt-8 space-y-4">
+          <li *ngFor="let benefit of benefits" class="flex items-start gap-3.5">
+            <div class="w-9 h-9 shrink-0 rounded-lg bg-blue-600 text-white flex items-center justify-center text-sm">
+              <i [class]="'fas ' + benefit.icon"></i>
+            </div>
+            <div>
+              <p class="font-bold text-white">{{ benefit.title }}</p>
+              <p class="text-sm text-slate-300">{{ benefit.description }}</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div appScrollReveal class="bg-white rounded-2xl p-8 md:p-10 shadow-2xl text-center">
+        <div class="mx-auto w-16 h-16 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl">
+          <i class="fas fa-handshake"></i>
+        </div>
+        <h3 class="mt-5 text-2xl font-extrabold text-slate-900 tracking-tight">Start earning with HomeServe</h3>
+        <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+          Create your professional profile, set your schedule, and start accepting bookings today. No upfront fees to
+          begin.
+        </p>
+        <a routerLink="/provider/signup"
+          class="mt-7 w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-all duration-200 shadow-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/40 active:translate-y-0.5">
+          Become a Provider
+          <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+        <p class="mt-4 text-center text-xs text-slate-400">Already a provider? <a routerLink="/provider/login" class="font-bold text-blue-600 hover:underline">Log in</a></p>
+      </div>
+    </div>
+  </div>
+</section>

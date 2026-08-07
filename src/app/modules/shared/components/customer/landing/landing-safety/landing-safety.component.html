@@ -1,0 +1,24 @@
+<section id="safety" class="py-16 sm:py-20 lg:py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6 sm:px-8">
+    <div class="max-w-3xl mx-auto text-center">
+      <p class="text-xs font-bold uppercase tracking-widest text-blue-600">Safety & Trust</p>
+      <h2 class="mt-3 text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight text-wrap-balance">
+        Safer Than Hiring Randomly
+      </h2>
+      <p class="mt-4 text-base md:text-lg text-slate-600 leading-relaxed">
+        Every layer of HomeServe is built around one idea: protecting your home and your peace of mind.
+      </p>
+    </div>
+
+    <div class="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let item of items; let i = index" appScrollReveal [delay]="i * 80"
+        class="rounded-lg border border-slate-200 bg-slate-50/60 p-7 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg hover:border-blue-200">
+        <div class="w-12 h-12 rounded-lg bg-blue-600 text-white flex items-center justify-center text-lg shadow-sm">
+          <i [class]="'fas ' + item.icon" aria-hidden="true"></i>
+        </div>
+        <h3 class="mt-5 text-lg font-bold text-slate-900 tracking-tight">{{ item.title }}</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">{{ item.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>

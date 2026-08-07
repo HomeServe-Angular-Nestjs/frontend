@@ -16,9 +16,7 @@ export const getRoleFromRoute = (route: ActivatedRouteSnapshot): string | undefi
 }
 
 export const getLoginRedirectPath = (url: string): string => {
-  if (url.includes('provider')) return 'provider/login';
-  if (url.includes('admin')) return 'admin/login';
-  return 'login';
+  return 'landing_page';
 }
 
 export const AuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> => {

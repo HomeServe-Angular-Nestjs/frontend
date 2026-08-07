@@ -1,3 +1,32 @@
-<app-customer-hero-section></app-customer-hero-section>
-<app-customer-how-it-works></app-customer-how-it-works>
-<app-customer-service-overview></app-customer-service-overview>
+<app-landing-nav></app-landing-nav>
+
+<app-landing-hero [statistics]="data().statistics"></app-landing-hero>
+
+<app-landing-search [categories]="data().categories"></app-landing-search>
+
+@if (!loading()) {
+  <app-landing-categories [categories]="data().categories"></app-landing-categories>
+
+  <app-landing-why-choose></app-landing-why-choose>
+
+  <app-landing-how-it-works></app-landing-how-it-works>
+
+  <app-landing-featured-providers [providers]="data().featuredProviders"></app-landing-featured-providers>
+
+  <app-landing-testimonials [testimonials]="data().testimonials"></app-landing-testimonials>
+
+  <app-landing-safety></app-landing-safety>
+
+  <app-landing-provider-cta></app-landing-provider-cta>
+
+  <app-landing-faq></app-landing-faq>
+
+  <app-landing-footer></app-landing-footer>
+} @else {
+  <section class="min-h-[60vh] bg-slate-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="mx-auto w-12 h-12 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin"></div>
+      <p class="mt-4 text-sm font-semibold text-slate-500">Loading HomeServe…</p>
+    </div>
+  </section>
+}

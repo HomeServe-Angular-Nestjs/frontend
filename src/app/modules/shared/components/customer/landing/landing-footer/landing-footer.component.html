@@ -1,0 +1,84 @@
+<footer class="bg-slate-950 text-slate-300">
+  <div class="max-w-7xl mx-auto px-6 sm:px-8 py-16">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-10">
+      <!-- Brand -->
+      <div class="col-span-2">
+        <a routerLink="/landing_page" class="flex items-center gap-2" aria-label="HomeServe home">
+          <svg width="28" height="22" viewBox="0 0 28 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M13.7549 5.98438C13.8486 5.89062 13.9893 5.84375 14.1299 5.84375C14.2236 5.84375 14.3643 5.89062 14.458 5.98438L23.1299 13.0625V20.75C23.1299 21.1719 22.7549 21.5 22.3799 21.5H17.083C16.708 21.5 16.333 21.1719 16.333 20.75V16.25C16.333 15.875 16.0049 15.5 15.583 15.5H12.583C12.208 15.5 11.833 15.875 11.833 16.25V20.75C11.833 21.1719 11.5049 21.5 11.1299 21.5H5.87988C5.45801 21.5 5.12988 21.1719 5.12988 20.75V13.1094L13.7549 5.98438ZM27.3955 10.8125C27.5361 10.9062 27.6299 11.0938 27.6299 11.2344C27.6299 11.375 27.583 11.5156 27.4893 11.6094L26.2705 13.0625C26.1768 13.2031 26.0361 13.25 25.8486 13.25C25.708 13.25 25.5674 13.2031 25.4736 13.1094L14.458 4.0625C14.3643 3.96875 14.2236 3.92188 14.1299 3.92188C13.9893 3.92188 13.8486 3.96875 13.7549 4.0625L2.73926 13.1094C2.64551 13.2031 2.50488 13.25 2.36426 13.25C2.17676 13.25 2.03613 13.2031 1.94238 13.0625L0.723633 11.6094C0.676758 11.5156 0.583008 11.375 0.583008 11.2344C0.583008 11.0938 0.676758 10.9062 0.817383 10.8125L12.6768 1.01562C13.0518 0.734375 13.5674 0.546875 14.1299 0.546875C14.6455 0.546875 15.1611 0.734375 15.5361 1.01562L19.7549 4.48438V1.10938C19.7549 0.78125 19.9893 0.546875 20.3174 0.546875H22.9424C23.2236 0.546875 23.5049 0.78125 23.5049 1.10938V7.57812L27.3955 10.8125Z"
+              fill="#3b82f6" />
+          </svg>
+          <span class="text-xl font-extrabold tracking-tight text-white">HomeServe</span>
+        </a>
+        <p class="mt-4 text-sm text-slate-400 leading-relaxed max-w-xs">
+          Your trusted marketplace for background-verified home services. Book professionals in minutes with secure
+          payments and full support.
+        </p>
+        <div class="mt-5 flex items-center gap-3">
+          <a href="#" aria-label="Facebook" class="h-9 w-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-colors">
+            <i class="fab fa-facebook-f text-sm"></i>
+          </a>
+          <a href="#" aria-label="Instagram" class="h-9 w-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-colors">
+            <i class="fab fa-instagram text-sm"></i>
+          </a>
+          <a href="#" aria-label="Twitter" class="h-9 w-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-colors">
+            <i class="fab fa-twitter text-sm"></i>
+          </a>
+          <a href="#" aria-label="LinkedIn" class="h-9 w-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-colors">
+            <i class="fab fa-linkedin-in text-sm"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Company -->
+      <nav aria-label="Company">
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Company</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li *ngFor="let link of companyLinks">
+            <a href="/landing_page" (click)="$event.preventDefault(); scrollTo(link.target)"
+              class="text-sm text-slate-400 hover:text-white transition-colors">{{ link.label }}</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Services -->
+      <nav aria-label="Services">
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Services</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li *ngFor="let service of services">
+            <a href="/landing_page" (click)="$event.preventDefault(); scrollTo('services')"
+              class="text-sm text-slate-400 hover:text-white transition-colors">{{ service }}</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Support -->
+      <nav aria-label="Support">
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Support</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li *ngFor="let link of supportLinks">
+            <a href="/landing_page" (click)="$event.preventDefault(); scrollTo(link.target)"
+              class="text-sm text-slate-400 hover:text-white transition-colors">{{ link.label }}</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Legal -->
+      <nav aria-label="Legal">
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Legal</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li *ngFor="let link of legalLinks">
+            <a href="/landing_page" (click)="$event.preventDefault()"
+              class="text-sm text-slate-400 hover:text-white transition-colors">{{ link.label }}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-xs text-slate-500">&copy; {{ year }} HomeServe. All rights reserved.</p>
+      <p class="text-xs text-slate-500">Made with care for every home.</p>
+    </div>
+  </div>
+</footer>

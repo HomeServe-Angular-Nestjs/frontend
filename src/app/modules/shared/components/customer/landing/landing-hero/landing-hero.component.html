@@ -1,0 +1,85 @@
+<section class="relative w-full h-[42rem] overflow-hidden bg-slate-950">
+  <!-- Slides -->
+  <div class="absolute inset-0">
+    <ng-container *ngFor="let image of images; let i = index">
+      <div class="absolute inset-0 transition-opacity duration-1000"
+        [ngClass]="{ 'opacity-100': i === currentSlide, 'opacity-0': i !== currentSlide }">
+        <img [src]="image.url" [alt]="image.alt" class="w-full h-full object-cover" fetchpriority="high" />
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Dark Readability Overlay -->
+  <div class="absolute inset-0 bg-slate-950/70 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent z-10"></div>
+
+  <!-- Foreground Content -->
+  <div class="relative z-20 h-full flex items-center pt-14 px-6 sm:px-12 md:px-20 max-w-7xl mx-auto pb-16">
+    <div class="max-w-2xl text-left">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-bold uppercase tracking-wider text-blue-200 backdrop-blur-sm">
+        <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+        Home Services On Demand
+      </div>
+
+      <h1 class="mt-6 text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.12] text-wrap-balance">
+        Your Trusted Partner for <br>
+        <span class="text-blue-400">Home Services</span>
+      </h1>
+
+      <p class="mt-6 text-lg md:text-xl text-slate-200 max-w-xl leading-relaxed">
+        Connect with elite, background-verified professionals for all your home service, repair, and cleaning needs.
+        Book in minutes, relax, and enjoy work done right.
+      </p>
+
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row gap-4 mt-9">
+        <button (click)="scrollToSearch($event)"
+          class="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-all duration-200 flex items-center justify-center gap-2.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/40 shadow-sm active:translate-y-0.5">
+          <span>Browse Services</span>
+          <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        </button>
+        <a routerLink="/provider/signup"
+          class="px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 hover:border-white/40 font-semibold rounded-md transition-all duration-200 flex items-center justify-center gap-2.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/20 shadow-sm active:translate-y-0.5 backdrop-blur-sm">
+          <span>Become a Provider</span>
+          <i class="fa-solid fa-handshake text-xs"></i>
+        </a>
+      </div>
+
+      <!-- Platform Statistics -->
+      <div *ngIf="statistics" class="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl">
+        <div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur-sm px-4 py-3">
+          <p class="text-2xl font-black text-white">
+            <span appCountUp [target]="statistics.completedJobs" prefix=""></span>+
+          </p>
+          <p class="mt-1 text-xs text-slate-300 font-semibold">Completed Jobs</p>
+        </div>
+        <div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur-sm px-4 py-3">
+          <p class="text-2xl font-black text-white">
+            <span appCountUp [target]="statistics.verifiedProviders" prefix=""></span>+
+          </p>
+          <p class="mt-1 text-xs text-slate-300 font-semibold">Verified Providers</p>
+        </div>
+        <div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur-sm px-4 py-3">
+          <p class="text-2xl font-black text-white">
+            <span appCountUp [target]="statistics.averageRating" [decimals]="1" prefix=""></span>
+            <i class="fas fa-star text-yellow-400 text-sm align-middle ml-1"></i>
+          </p>
+          <p class="mt-1 text-xs text-slate-300 font-semibold">Average Rating</p>
+        </div>
+        <div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur-sm px-4 py-3">
+          <p class="text-2xl font-black text-white">
+            <span appCountUp [target]="statistics.totalCategories" prefix=""></span>+
+          </p>
+          <p class="mt-1 text-xs text-slate-300 font-semibold">Service Categories</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide Indicators -->
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+    <button *ngFor="let image of images; let i = index" (click)="selectSlide(i)"
+      class="h-1.5 transition-all duration-300 rounded-full"
+      [ngClass]="{ 'w-6 bg-blue-600': i === currentSlide, 'w-1.5 bg-white/60 hover:bg-white': i !== currentSlide }"
+      [attr.aria-label]="'Go to slide ' + (i + 1)"></button>
+  </div>
+</section>

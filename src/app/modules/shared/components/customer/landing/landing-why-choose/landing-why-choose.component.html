@@ -1,0 +1,25 @@
+<section id="why-choose" class="py-16 sm:py-20 lg:py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6 sm:px-8">
+    <div class="max-w-3xl mx-auto text-center">
+      <p class="text-xs font-bold uppercase tracking-widest text-blue-600">Why HomeServe</p>
+      <h2 class="mt-3 text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight text-wrap-balance">
+        Book with Total Confidence
+      </h2>
+      <p class="mt-4 text-base md:text-lg text-slate-600 leading-relaxed">
+        Every booking on HomeServe is protected by the practices that make a marketplace truly trustworthy.
+      </p>
+    </div>
+
+    <div class="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let feature of features; let i = index" appScrollReveal [delay]="i * 80"
+        class="group rounded-lg border border-slate-200 bg-white p-7 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg">
+        <div
+          class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg transition-colors duration-300 group-hover:bg-blue-600 group-hover:text-white">
+          <i [class]="'fas ' + feature.icon" aria-hidden="true"></i>
+        </div>
+        <h3 class="mt-5 text-lg font-bold text-slate-900 tracking-tight">{{ feature.title }}</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">{{ feature.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>
