@@ -17,7 +17,7 @@ export const adminRoute: Routes = [
         path: '',
         canActivate: [AuthGuard],
         loadComponent: () => import('../../pages/admin/layout/admin-layout.component').then(c => c.AdminHomepageComponent),
-        data: { breadcrumb: 'Admin' },
+        data: { breadcrumb: 'Admin', role: 'admin' },
         children: [
           {
             path: '',

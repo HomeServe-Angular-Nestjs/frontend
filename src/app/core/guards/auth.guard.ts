@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import * as authSelector from '../../store/auth/auth.selector';
 import { combineLatest, map, Observable, take } from 'rxjs';
 import { ToastNotificationService } from '../services/public/toastr.service';
+import { navigationAfterLogin } from '../utils/navigation.utils';
 
 
 export const getRoleFromRoute = (route: ActivatedRouteSnapshot): string | undefined => {
@@ -15,7 +16,8 @@ export const getRoleFromRoute = (route: ActivatedRouteSnapshot): string | undefi
   return undefined;
 }
 
-export const getLoginRedirectPath = (url: string): string => {
+export const getLoginRedirectPath = (url: string, type?: string | null): string => {
+  if (url?.includes('admin') || type === 'admin') return 'admin/login';
   return 'landing_page';
 }
 
@@ -31,7 +33,6 @@ export const AuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
     take(1),
     map(([status, type]) => {
       const requiredRole = getRoleFromRoute(route);
-      let redirectPath = getLoginRedirectPath(state.url);
 
       if (status === 'authenticated') {
         if (!requiredRole || type === requiredRole) {
@@ -39,12 +40,13 @@ export const AuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
         }
 
         toastr.error('Access denied: Unauthorized');
-        return router.createUrlTree([redirectPath], {
+        return router.createUrlTree([navigationAfterLogin(type || 'customer')], {
           queryParams: { return: state.url }
         });
       }
 
-      toastr.info('Please login first.', 'Info', { positionClass: "top-10px" });
+      const redirectPath = getLoginRedirectPath(state.url, type);
+      toastr.error('Your session has expired. Please log in again.');
       return router.createUrlTree([redirectPath], {
         queryParams: { return: state.url }
       });
