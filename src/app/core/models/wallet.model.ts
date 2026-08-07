@@ -67,6 +67,8 @@ export interface ITransactionAdminList {
     amount: number;
     referenceId: string;
     referenceType: string;
+    bookingId: string | null;
+    paymentId: string | null;
     source: PaymentSource;
 }
 

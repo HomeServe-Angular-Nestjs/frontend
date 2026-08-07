@@ -4,13 +4,13 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { CategoryService } from '../../../../../../core/services/category.service';
 import { IProfession, IServiceCategory, IServiceCategoryFilter } from '../../../../../../core/models/category.model';
 import { IPagination } from '../../../../../../core/models/booking.model';
-import { Subject, takeUntil } from 'rxjs';
+import { catchError, EMPTY, Subject, switchMap, takeUntil } from 'rxjs';
 import { AdminPaginationComponent } from '../../../../partials/sections/admin/pagination/pagination.component';
 import { DebounceService } from '../../../../../../core/services/public/debounce.service';
-import { MatDialog } from '@angular/material/dialog';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
-import { ConfirmDialogComponent } from '../../../../partials/shared/confirm-dialog-box/confirm-dialog.component';
 import { AdminSimpleTableComponent, TableColumn } from '../../../../partials/sections/admin/table/reusable-table.component';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../../partials/shared/confirm-dialog-box/confirm-dialog.component';
 
 @Component({
   selector: 'app-admin-category-service',
@@ -22,9 +22,10 @@ export class AdminCategoryServiceComponent implements OnInit, OnDestroy {
   private readonly _debounceService = inject(DebounceService);
   private readonly _categoryService = inject(CategoryService);
   private readonly _fb = inject(FormBuilder);
-  private readonly _dialog = inject(MatDialog);
   private readonly _toastr = inject(ToastNotificationService);
+  private readonly _dialog = inject(MatDialog);
   private readonly _destroy$ = new Subject<void>();
+  private readonly _fetchTrigger$ = new Subject<{ filter: IServiceCategoryFilter; page: number; limit: number }>();
 
   // Data Signals
   services = signal<IServiceCategory[]>([]);
@@ -59,6 +60,7 @@ export class AdminCategoryServiceComponent implements OnInit, OnDestroy {
   constructor() {
     this._initForm();
     this._setupSearchDebounce();
+    this._setupFetchTrigger();
 
     // Subscribe to updates
     this._categoryService.professions$
@@ -84,6 +86,7 @@ export class AdminCategoryServiceComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.pagination.update(p => ({ ...p, page: 1 }));
     this._fetchServices(1);
   }
 
@@ -149,9 +152,10 @@ export class AdminCategoryServiceComponent implements OnInit, OnDestroy {
     if (this.serviceForm.invalid) return;
 
     const { name, professionId, isActive } = this.serviceForm.value;
+    const trimmedName = name.trim();
     const isDuplicate = this.services().some(s =>
       s.professionId === professionId &&
-      s.name.toLowerCase().trim() === name.toLowerCase().trim() &&
+      s.name.toLowerCase().trim() === trimmedName.toLowerCase() &&
       s.id !== this.currentServiceId()
     );
 
@@ -161,22 +165,27 @@ export class AdminCategoryServiceComponent implements OnInit, OnDestroy {
     }
 
     const serviceData: Partial<IServiceCategory> = {
-      name,
+      name: trimmedName,
       professionId,
       isActive,
       keywords: this.keywords()
     };
 
     if (this.isEditMode() && this.currentServiceId()) {
-      this._categoryService.updateServiceCategory(this.currentServiceId()!, serviceData)
-        .pipe(takeUntil(this._destroy$))
-        .subscribe({
-          next: (res) => {
-            this._fetchServices(this.pagination().page);
-            this.closeModal();
-            this._toastr.success('Service updated successfully');
-          },
-          error: (error) => this._toastr.error(error.message || 'Failed to update service')
+      this._openConfirmation('Are you sure you want to update this service?', 'Confirm Update')
+        .afterClosed()
+        .subscribe(confirmed => {
+          if (!confirmed) return;
+
+          this._categoryService.updateServiceCategory(this.currentServiceId()!, serviceData)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe({
+              next: (res) => {
+                this._fetchServices(this.pagination().page);
+                this.closeModal();
+                this._toastr.success('Service updated successfully');
+              }
+            });
         });
     } else {
       this._categoryService.createServiceCategory(serviceData)
@@ -186,50 +195,46 @@ export class AdminCategoryServiceComponent implements OnInit, OnDestroy {
             this._fetchServices(1);
             this.closeModal();
             this._toastr.success('Service created successfully');
-          },
-          error: (error) => this._toastr.error(error.message || 'Failed to create service')
+          }
         });
     }
   }
 
-  toggleStatus(serviceId: string) {
-    this._categoryService.updateServiceCategoryStatus(serviceId)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe({
-        next: () => {
-          this.services.update(current =>
-            current.map(s => s.id === serviceId ? { ...s, isActive: !s.isActive } : s)
-          );
-          this._toastr.success('Status updated successfully');
-        }
-      })
-  }
+  toggleStatus(service: IServiceCategory) {
+    const message = service.isActive
+      ? `Deactivate "${service.name}"? Provider services linked to it will be disabled and hidden from customers.`
+      : `Activate "${service.name}"?`;
 
-  removeService(service: IServiceCategory) {
-    this._dialog.open(ConfirmDialogComponent, {
-      data: {
-        title: 'Remove Service',
-        message: `Are you sure you want to remove ${service.name}?`,
-      },
-    })
+    this._openConfirmation(message, service.isActive ? 'Confirm Deactivation' : 'Confirm Activation')
       .afterClosed()
-      .subscribe(confirm => {
-        if (!confirm) return;
-        this._categoryService.removeServiceCategory(service.id)
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        this._categoryService.updateServiceCategoryStatus(service.id)
           .pipe(takeUntil(this._destroy$))
           .subscribe({
-            next: (res) => {
-              this._fetchServices(this.pagination().page);
-              this._toastr.success('Service removed successfully');
-            },
-            error: (error) => this._toastr.error('Failed to remove service')
+            next: () => {
+              this.services.update(current =>
+                current.map(s => s.id === service.id ? { ...s, isActive: !s.isActive } : s)
+              );
+              this._toastr.success('Status updated successfully');
+            }
           });
       });
+  }
+
+  private _openConfirmation(message: string, title: string) {
+    return this._dialog.open(ConfirmDialogComponent, { data: { title, message } });
   }
 
   getProfessionName(professionId: string): string {
     const profession = this.professions().find(p => p.id === professionId);
     return profession ? profession.name : 'Unknown';
+  }
+
+  isParentProfessionInactive(professionId: string): boolean {
+    const profession = this.professions().find(p => p.id === professionId);
+    return !!profession && profession.isActive === false;
   }
 
   private _fetchServices(page: number = 1) {
@@ -239,16 +244,23 @@ export class AdminCategoryServiceComponent implements OnInit, OnDestroy {
       isActive: this.selectedStatus(),
     };
 
-    // Use the passed page number for the request
-    this._categoryService.getServiceCategories(filter, page, this.pagination().limit)
-      .pipe(takeUntil(this._destroy$))
+    this._fetchTrigger$.next({ filter, page, limit: this.pagination().limit });
+  }
+
+  private _setupFetchTrigger() {
+    this._fetchTrigger$
+      .pipe(
+        switchMap(({ filter, page, limit }) =>
+          this._categoryService.getServiceCategories(filter, page, limit).pipe(catchError(() => EMPTY))
+        ),
+        takeUntil(this._destroy$)
+      )
       .subscribe({
         next: (res) => {
           if (res.data) {
             this.pagination.set(res.data.pagination);
           }
-        },
-        error: (err) => console.error(err)
+        }
       });
   }
 
@@ -266,6 +278,7 @@ export class AdminCategoryServiceComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(term => {
         this.searchTerm.set(term);
+        this.pagination.update(p => ({ ...p, page: 1 }));
         this._fetchServices(1);
       });
   }

@@ -13,6 +13,9 @@ export interface IReport {
     status: ReportStatus;
     createdAt: string;
     updatedAt: string;
+    investigationNotes?: string;
+    resolutionNote?: string;
+    resolvedAt?: string;
 }
 
 export interface IReportFilter {
@@ -26,6 +29,43 @@ export interface IReportWithPagination {
     pagination: IPagination;
 }
 
+export interface IReportTargetSummary {
+    total: number;
+    pending: number;
+    resolved: number;
+    rejected: number;
+}
+
+export interface IReportBookingInfo {
+    bookingId: string;
+    createdAt: Date | string;
+    bookingStatus: string;
+    totalAmount: number;
+    hasReview: boolean;
+}
+
+export interface IReportReviewInfo {
+    desc: string;
+    rating: number;
+    writtenAt: Date | string;
+    isReported: boolean;
+    isActive: boolean;
+    serviceCount: number;
+    bookingReference: string;
+}
+
+export interface IReportRelated {
+    targetProfile?: {
+        id: string;
+        name: string;
+        email: string;
+        avatar: string;
+        role: 'customer' | 'provider';
+    };
+    recentBookings?: IReportBookingInfo[];
+    review?: IReportReviewInfo;
+}
+
 export interface IReportDetail {
     id: string;
     reportedBy: {
@@ -33,12 +73,14 @@ export interface IReportDetail {
         name: string;
         email: string;
         avatar: string;
+        role: 'customer' | 'provider';
     };
     target: {
         targetId: string;
         name: string;
         email: string;
         avatar: string;
+        role: 'customer' | 'provider';
     };
     type: ReportedType;
     reason: string;
@@ -46,6 +88,11 @@ export interface IReportDetail {
     description: string;
     createdAt: Date | string;
     updatedAt: Date | string;
+    resolvedAt?: Date | string;
+    investigationNotes?: string;
+    resolutionNote?: string;
+    related?: IReportRelated;
+    previousReports?: IReportTargetSummary;
 }
 
 export interface IReportOverViewMatrix {
@@ -54,5 +101,4 @@ export interface IReportOverViewMatrix {
     resolved: number;
     rejected: number;
     flagged: number;
-    in_progress: number;
 }

@@ -148,7 +148,7 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
     this._serviceManagementService.getServicesByProviderId(providerId).subscribe({
       next: (res) => {
         if (res.data) {
-          this.allServices = res.data;
+          this.allServices = res.data.filter(s => s.category?.isActive !== false);
           this.serviceData = [...this.allServices];
           this._emitFilters();
         }

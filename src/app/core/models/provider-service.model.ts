@@ -6,11 +6,13 @@ export interface IProviderService {
     profession: {
         id: string;
         name: string;
+        isActive?: boolean;
     }
     category: {
         id: string;
         name: string;
         keywords?: string[];
+        isActive?: boolean;
     };
     description: string;
     price: number;

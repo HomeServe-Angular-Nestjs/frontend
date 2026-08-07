@@ -1,0 +1,35 @@
+<div class="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Availability</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+            <p class="text-xs uppercase tracking-wide text-gray-500 mb-3">Weekly Schedule</p>
+            <div class="space-y-3">
+                <div *ngFor="let day of availability.days"
+                    class="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-3">
+                    <span class="text-sm font-medium text-gray-700 capitalize">{{ day.day }}</span>
+                    <span *ngIf="day.isAvailable" class="text-xs text-gray-500">{{ timeRangeLabel(day) }}</span>
+                    <span *ngIf="!day.isAvailable"
+                        class="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">Unavailable</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <p class="text-xs uppercase tracking-wide text-gray-500 mb-3">Vacation</p>
+            <div *ngIf="availability.vacation.isOnVacation; else noVacation"
+                class="rounded-lg border border-amber-100 bg-amber-50/50 p-4">
+                <p class="text-sm font-medium text-amber-700 mb-2">
+                    <i class="fa-solid fa-umbrella-beach mr-1"></i> On Vacation
+                </p>
+                <ul class="space-y-1">
+                    <li *ngFor="let d of availability.vacation.days" class="text-sm text-gray-600">
+                        {{ d.date | date: 'MMM d, y' }}
+                        <span *ngIf="d.reason" class="text-gray-400">— {{ d.reason }}</span>
+                    </li>
+                </ul>
+            </div>
+            <ng-template #noVacation>
+                <p class="text-sm text-gray-400">Not on vacation</p>
+            </ng-template>
+        </div>
+    </div>
+</div>

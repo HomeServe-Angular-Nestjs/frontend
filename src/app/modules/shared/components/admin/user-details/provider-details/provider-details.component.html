@@ -1,0 +1,36 @@
+<ng-container *ngIf="bundle">
+    <div class="flex flex-col gap-8 pb-8">
+        <app-user-details-header [profile]="bundle.profile" [role]="'provider'"
+            (statusChanged)="onStatusChanged($event)"
+            (verificationChanged)="onVerificationChanged($event)"></app-user-details-header>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            <app-admin-overview-card title="Active Services" [value]="bundle.statistics.activeServices"
+                icon="fa-solid fa-briefcase" iconBg="bg-blue-100 text-blue-600"></app-admin-overview-card>
+            <app-admin-overview-card title="Total Bookings" [value]="bundle.statistics.totalBookings"
+                icon="fa-solid fa-calendar-check" iconBg="bg-indigo-100 text-indigo-600"></app-admin-overview-card>
+            <app-admin-overview-card title="Completed Jobs" [value]="bundle.statistics.completedJobs"
+                icon="fa-solid fa-circle-check" iconBg="bg-green-100 text-green-600"></app-admin-overview-card>
+            <app-admin-overview-card title="Total Revenue"
+                [value]="'$' + bundle.statistics.totalRevenue.toLocaleString()"
+                icon="fa-solid fa-dollar-sign" iconBg="bg-emerald-100 text-emerald-600"></app-admin-overview-card>
+            <app-admin-overview-card title="Avg Rating" [value]="bundle.statistics.averageRating"
+                icon="fa-solid fa-star" iconBg="bg-amber-100 text-amber-600"
+                [rating]="bundle.statistics.averageRating"></app-admin-overview-card>
+            <app-admin-overview-card title="Total Reviews" [value]="bundle.statistics.totalReviews"
+                icon="fa-solid fa-comments" iconBg="bg-pink-100 text-pink-600"></app-admin-overview-card>
+        </div>
+
+        <app-user-details-info-card [title]="'About'" [items]="[
+            { label: 'Profession', value: bundle.profile.profession },
+            { label: 'Experience', value: bundle.profile.experience + ' years' },
+            { label: 'Bio', value: bundle.profile.bio }
+        ]"></app-user-details-info-card>
+
+        <app-provider-services-table [services]="bundle.services"></app-provider-services-table>
+        <app-availability-card [availability]="bundle.availability"></app-availability-card>
+        <app-documents-card [documents]="bundle.documents"></app-documents-card>
+        <app-user-bookings-table [bookings]="bundle.recentBookings"></app-user-bookings-table>
+        <app-user-reviews-table [reviews]="bundle.reviews"></app-user-reviews-table>
+    </div>
+</ng-container>

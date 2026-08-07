@@ -10,6 +10,8 @@ import { IAdminReviewStats, ILowestRatedProvider, IRatingTrendPoint, IReviewQuer
 import { IAdminDashboardRevenue, IAdminDashboardSubscription } from "../models/subscription.model";
 import { IReportDownloadBookingData, IReportDownloadTransactionData, IReportDownloadUserData } from "../models/admin-report.model";
 import { IAdminSettings } from "../models/admin-settings.model";
+import { ISalesReportBundle, ISalesReportFilter } from "../models/sales-report.model";
+import { ICustomerDetailsBundle, IProviderDetailsBundle, VerificationStatusType } from "../models/user-details.model";
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -168,5 +170,39 @@ export class AdminService {
 
     fetchBookingDetails(bookingId: string): Observable<IResponse<IAdminBookingDetails>> {
         return this._http.get<IResponse<IAdminBookingDetails>>(`${this._adminUrl}/bookings/details/${bookingId}`);
+    }
+
+    getSalesReport(filter: ISalesReportFilter = {}): Observable<IResponse<ISalesReportBundle>> {
+        let params = new HttpParams();
+        for (const [key, value] of Object.entries(filter)) {
+            if (value != null && value !== '') {
+                params = params.set(key, value as string);
+            }
+        }
+        return this._http.get<IResponse<ISalesReportBundle>>(`${this._adminUrl}/sales-report`, { params });
+    }
+
+    downloadSalesReportPdf(filter: ISalesReportFilter = {}): Observable<Blob> {
+        return this._http.post<Blob>(`${this._adminUrl}/sales-report/export/pdf`, filter, {
+            responseType: 'blob' as 'json'
+        });
+    }
+
+    downloadSalesReportExcel(filter: ISalesReportFilter = {}): Observable<Blob> {
+        return this._http.post<Blob>(`${this._adminUrl}/sales-report/export/excel`, filter, {
+            responseType: 'blob' as 'json'
+        });
+    }
+
+    fetchCustomerDetails(customerId: string): Observable<IResponse<ICustomerDetailsBundle>> {
+        return this._http.get<IResponse<ICustomerDetailsBundle>>(`${this._adminUrl}/customers/${customerId}`);
+    }
+
+    fetchProviderDetails(providerId: string): Observable<IResponse<IProviderDetailsBundle>> {
+        return this._http.get<IResponse<IProviderDetailsBundle>>(`${this._adminUrl}/providers/${providerId}`);
+    }
+
+    verifyProvider(data: { providerId: string, status: VerificationStatusType }): Observable<IResponse<boolean>> {
+        return this._http.patch<IResponse<boolean>>(`${this._adminUrl}/approvals/verify`, data);
     }
 }

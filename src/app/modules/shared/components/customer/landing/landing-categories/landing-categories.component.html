@@ -1,0 +1,72 @@
+<section id="services" class="py-16 sm:py-20 lg:py-24 bg-slate-50 relative overflow-hidden">
+  <!-- Subtle Mesh Background -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-50/40 rounded-full blur-[120px]"></div>
+    <div class="absolute top-[40%] -right-[10%] w-[50%] h-[50%] bg-indigo-50/40 rounded-full blur-[120px]"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 sm:px-8 relative z-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+      <div class="max-w-2xl space-y-4">
+        <p class="text-xs font-bold uppercase tracking-widest text-blue-600">Popular Categories</p>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight text-wrap-balance">
+          Services for <span class="text-blue-600">Every Corner</span> of Your Home
+        </h2>
+        <p class="text-slate-600 text-base md:text-lg max-w-xl leading-relaxed">
+          Live marketplace activity across our verified network of home service professionals.
+        </p>
+      </div>
+    </div>
+
+    <ng-container *ngIf="categories.length; else loadingGrid">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <button *ngFor="let cat of categories; let i = index" (click)="openCategory(cat)"
+          appScrollReveal [delay]="i * 80"
+          class="group relative bg-white rounded-lg border border-slate-200 overflow-hidden text-left shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:border-slate-300 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/30">
+          <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
+            <img [src]="identity(cat).image" [alt]="cat.name" loading="lazy" decoding="async"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/10 to-transparent"></div>
+            <div class="absolute top-4 left-4 z-20">
+              <div
+                class="w-10 h-10 rounded-md bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-base shadow-sm">
+                <i [class]="'fas ' + identity(cat).icon"></i>
+              </div>
+            </div>
+            <div class="absolute bottom-4 left-4 right-4">
+              <h3 class="text-lg font-bold text-white tracking-tight">{{ cat.name }}</h3>
+              <p class="text-xs font-semibold text-blue-200 mt-0.5">{{ cat.providerCount }} providers available</p>
+            </div>
+          </div>
+
+          <div class="p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1">
+                <i class="fas fa-star text-yellow-400 text-xs"></i>
+                <span class="text-xs font-bold text-slate-700">{{ cat.avgRating || 'New' }}</span>
+                <span class="text-[10px] text-slate-400">({{ cat.bookingCount }} jobs)</span>
+              </div>
+              <span class="text-xs font-bold text-slate-500">From ₹{{ cat.startingPrice || '—' }}</span>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+              <span class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">View Services</span>
+              <i class="fas fa-arrow-right text-xs text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all"></i>
+            </div>
+          </div>
+        </button>
+      </div>
+    </ng-container>
+
+    <ng-template #loadingGrid>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div *ngFor="let _ of [1, 2, 3, 4]" class="rounded-lg bg-white border border-slate-100 overflow-hidden">
+          <div class="aspect-[4/3] bg-slate-100 animate-pulse"></div>
+          <div class="p-4 space-y-3">
+            <div class="h-4 bg-slate-100 animate-pulse rounded w-2/3"></div>
+            <div class="h-3 bg-slate-100 animate-pulse rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</section>

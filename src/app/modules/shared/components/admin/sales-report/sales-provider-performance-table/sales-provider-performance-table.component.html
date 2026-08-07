@@ -1,0 +1,16 @@
+<app-admin-chart-card title="Provider Performance" subtitle="Completed jobs, revenue and completion rate"
+    icon="fa-users-gear" [loading]="loading">
+    <app-admin-simple-table [data]="providers" [columns]="columns" [isLoading]="loading"
+        [templates]="{ revenue: revenueTpl, completionRate: completionTpl }"
+        [noDataMessage]="'No providers found for the selected filters.'">
+    </app-admin-simple-table>
+    <ng-template #revenueTpl let-row>
+        <span class="font-semibold text-indigo-600">{{ formatINR(row.revenue) }}</span>
+    </ng-template>
+    <ng-template #completionTpl let-row>
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
+            [ngClass]="row.completionRate >= 80 ? 'bg-emerald-50 text-emerald-700' : row.completionRate >= 50 ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'">
+            {{ row.completionRate }}%
+        </span>
+    </ng-template>
+</app-admin-chart-card>

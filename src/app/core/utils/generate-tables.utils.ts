@@ -31,14 +31,14 @@ export const createAdminTableUI = (columns: string[], users: IUserData[]): Table
                     icon: 'fas fa-trash',
                     styles: 'text-red-500'
                 },
-                // {
-                //     id: user.id,
-                //     value: user.id,
-                //     toolTip: 'View',
-                //     action: 'view',
-                //     icon: 'fas fa-eye',
-                //     styles: 'text-blue-500'
-                // }
+                {
+                    id: user.id,
+                    value: user.id,
+                    toolTip: 'View',
+                    action: 'view',
+                    icon: 'fas fa-eye',
+                    styles: 'text-blue-500'
+                }
             ]
         }))
     };

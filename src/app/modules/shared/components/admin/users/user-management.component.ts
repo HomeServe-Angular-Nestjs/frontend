@@ -1,5 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { filter, map, Observable, Subject, switchMap, takeUntil, tap, BehaviorSubject, combineLatest } from 'rxjs';
 import { IUpdateUserStatus, IUserData, UType } from '../../../../../core/models/user.model';
 import { ToastNotificationService } from '../../../../../core/services/public/toastr.service';
@@ -23,6 +24,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   private readonly _userManagementService = inject(AdminService);
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _sharedData = inject(SharedDataService);
+  private readonly _router = inject(Router);
 
   private readonly destroy$ = new Subject<void>();
   private readonly _refresh$ = new BehaviorSubject<void>(undefined);
@@ -93,8 +95,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         }
       });
     } else if (action === 'view') {
-      // Handle view action if needed
-      console.log('Viewing user:', userId);
+      const role = this._userManagementService.currentRole;
+      this._router.navigate(['/admin', role === 'customer' ? 'customers' : 'providers', userId]);
     }
   }
 

@@ -1,9 +1,10 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpContext, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_ENV } from "../../../environments/env";
 import { BehaviorSubject, Observable, tap } from "rxjs";
 import { ICustomerSearchCategories, IProfession, IProfessionFilter, IServiceCategory, IServiceCategoryFilter, IServiceCategoryWithPagination } from "../models/category.model";
 import { IResponse } from "../../modules/shared/models/response.model";
+import { USE_CREDENTIALS } from "../interceptors/auth.interceptor";
 
 
 @Injectable({ providedIn: 'root' })
@@ -51,10 +52,6 @@ export class CategoryService {
         return this._http.patch<IResponse<boolean>>(`${this._categoryUrl}/profession/${professionId}/toggle-status`, {});
     }
 
-    removeProfession(professionId: string): Observable<IResponse<boolean>> {
-        return this._http.delete<IResponse<boolean>>(`${this._categoryUrl}/profession/${professionId}`);
-    }
-
     // ----------------------------
     // Service Category Methods
     // ----------------------------
@@ -92,13 +89,10 @@ export class CategoryService {
         return this._http.patch<IResponse<boolean>>(`${this._categoryUrl}/service/${id}/toggle-status`, {});
     }
 
-    removeServiceCategory(id: string): Observable<IResponse<boolean>> {
-        return this._http.delete<IResponse<boolean>>(`${this._categoryUrl}/service/${id}`);
-    }
-
-    searchCategories(search: string): Observable<IResponse<ICustomerSearchCategories[]>> {
+    searchCategories(search: string, isPublic = false): Observable<IResponse<ICustomerSearchCategories[]>> {
         const params = new HttpParams().set('search', search);
-        return this._http.get<IResponse<ICustomerSearchCategories[]>>(`${this._categoryUrl}/search`, { params });
+        const options = isPublic ? { params, context: new HttpContext().set(USE_CREDENTIALS, false) } : { params };
+        return this._http.get<IResponse<ICustomerSearchCategories[]>>(`${this._categoryUrl}/search`, options);
     }
 
     fetchAvailableServiceByProfessionId(professionId: string): Observable<IResponse<IServiceCategory[]>> {

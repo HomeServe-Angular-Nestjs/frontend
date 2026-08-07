@@ -1,0 +1,22 @@
+<div class="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Addresses</h3>
+    <div *ngIf="addresses.length > 0; else empty" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div *ngFor="let address of addresses" class="rounded-xl border border-gray-100 bg-gray-50/50 p-5 space-y-1">
+            <div class="flex items-center justify-between mb-1">
+                <p class="text-sm font-semibold text-gray-800">{{ address.label }}</p>
+                <span *ngIf="address.isDefault"
+                    class="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">Default</span>
+            </div>
+            <p class="text-sm text-gray-600">{{ address.address }}</p>
+            <p *ngIf="address.coordinates" class="text-xs text-gray-400 mt-2">
+                Lat: {{ address.coordinates[0] }}, Lng: {{ address.coordinates[1] }}
+            </p>
+        </div>
+    </div>
+    <ng-template #empty>
+        <div class="flex flex-col items-center justify-center text-gray-400 py-16">
+            <i class="fa-solid fa-map-location-dot text-3xl mb-2 text-gray-300"></i>
+            <p class="text-sm">No addresses found</p>
+        </div>
+    </ng-template>
+</div>

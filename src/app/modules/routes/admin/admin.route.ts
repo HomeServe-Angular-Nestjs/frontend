@@ -17,14 +17,14 @@ export const adminRoute: Routes = [
         path: '',
         canActivate: [AuthGuard],
         loadComponent: () => import('../../pages/admin/layout/admin-layout.component').then(c => c.AdminHomepageComponent),
-        data: { breadcrumb: 'Admin' },
+        data: { breadcrumb: 'Admin', role: 'admin' },
         children: [
           {
             path: '',
             pathMatch: 'full',
             redirectTo: 'dashboard'
           },
-          {
+          { 
             path: 'dashboard',
             loadComponent: () => import('../../shared/components/admin/dashboard/layout/admin-dashboard.component').then(c => c.AdminDashboardComponent),
             data: { breadcrumb: 'Dashboard' }
@@ -33,6 +33,18 @@ export const adminRoute: Routes = [
             path: 'users',
             loadComponent: () => import('../../shared/components/admin/users/user-management.component').then(c => c.UserManagementComponent),
             data: { breadcrumb: 'Users' }
+          },
+          {
+            path: 'customers/:id',
+            loadComponent: () => import('../../shared/components/admin/user-details/customer-details/customer-details.component')
+              .then(c => c.CustomerDetailsComponent),
+            data: { breadcrumb: 'Customer Details' }
+          },
+          {
+            path: 'providers/:id',
+            loadComponent: () => import('../../shared/components/admin/user-details/provider-details/provider-details.component')
+              .then(c => c.ProviderDetailsComponent),
+            data: { breadcrumb: 'Provider Details' }
           },
           {
             path: 'approvals',
@@ -69,6 +81,12 @@ export const adminRoute: Routes = [
             loadComponent: () => import('../../shared/components/admin/reports/layout/report-layout.component')
               .then(c => c.AdminReportsComponent),
             data: { breadcrumb: 'Reports' }
+          },
+          {
+            path: 'sales-report',
+            loadComponent: () => import('../../shared/components/admin/sales-report/layout/sales-report-layout.component')
+              .then(c => c.AdminSalesReportLayoutComponent),
+            data: { breadcrumb: 'Sales Report' }
           },
           {
             path: 'coupons',
