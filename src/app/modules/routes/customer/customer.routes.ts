@@ -1,5 +1,6 @@
 import { Routes } from "@angular/router";
 import { AuthGuard } from "../../../core/guards/auth.guard";
+import { GuestGuard } from "../../../core/guards/guest.guard";
 import { CustomerLayoutPageComponent } from "../../pages/customer/layout/customer-layout-page.component";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
 import { CustomerProviderProfileLayoutComponent } from "../../pages/customer/provider-details-page/customer-provider-profile-layout.component";
@@ -9,6 +10,7 @@ export const customerRoutes: Routes = [
   {
     path: 'landing_page',
     pathMatch: 'full',
+    canActivate: [GuestGuard],
     loadComponent: () => import('../../pages/customer/landing-page/customer-landing-page.component')
       .then(c => c.CustomerLandingPageComponent),
   },
