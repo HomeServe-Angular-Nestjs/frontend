@@ -4,7 +4,7 @@ import { ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { Store } from "@ngrx/store";
 import { selectProvider } from "../../../../../../store/provider/provider.selector";
-import { BehaviorSubject, Subject, combineLatest, filter, finalize, map, switchMap, takeUntil } from "rxjs";
+import { BehaviorSubject, Subject, filter, finalize, map, switchMap, takeUntil } from "rxjs";
 
 import { IBookingDetailProvider, IOrderedServiceUI, IRescheduleData } from "../../../../../../core/models/booking.model";
 import { BookingService } from "../../../../../../core/services/booking.service";
@@ -67,32 +67,6 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   showCancelBookingModal = signal(false);
   showRescheduleModal = signal(false);
   get cancelled(): BookingStatus { return BookingStatus.CANCELLED };
-
-  get totalServiceCharge(): number {
-    const bookingData = this.bookingDataSource.getValue();
-    if (!bookingData) return 0;
-
-    const providerCommission = bookingData.transaction?.providerCommission ?? 0;
-    const subServiceCharge = bookingData.orderedServices.reduce((acc, item) => item.price + acc, 0);
-
-    return subServiceCharge - providerCommission;
-  }
-
-  subServiceCharge$ = this.bookingData$.pipe(
-    map(data => {
-      if (!data || !data.orderedServices) return 0;
-
-      return data.orderedServices.reduce((acc, item) => item.price + acc, 0);
-    })
-  );
-
-  totalServiceCharge$ = combineLatest([this.subServiceCharge$, this.bookingData$]).pipe(
-    map(([subServiceCharge, bookingData]) => {
-      if (!bookingData) return 0;
-      const providerCommission = bookingData.transaction?.providerCommission ?? 0;
-      return subServiceCharge - providerCommission;
-    })
-  );
 
   ngOnInit(): void {
     this._sharedData.setProviderHeader('Bookings');
