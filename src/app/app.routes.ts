@@ -3,13 +3,12 @@ import { authRoutes } from './modules/routes/auth/auth.routes';
 import { customerRoutes } from './modules/routes/customer/customer.routes';
 import { providerRoutes } from './modules/routes/provider/provider.routes';
 import { adminRoute } from './modules/routes/admin/admin.route';
-import { RootRedirectGuard } from './core/guards/root-redirect.guard';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    canActivate: [RootRedirectGuard],
+    redirectTo: 'landing_page',
   },
   {
     path: 'provider',
