@@ -1,35 +1,59 @@
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+<!-- Skeleton Loading State -->
+<div *ngIf="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+    <div *ngFor="let i of [0,1,2,3,4]"
+        class="bg-white/80 backdrop-blur-md rounded-xl border border-gray-100 p-4 shadow-sm animate-pulse">
+        <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-gray-200"></div>
+            <div class="w-14 h-3 bg-gray-200 rounded"></div>
+        </div>
+        <div class="space-y-1.5">
+            <div class="h-2.5 w-20 bg-gray-200 rounded"></div>
+            <div class="h-6 w-14 bg-gray-300 rounded"></div>
+        </div>
+        <div class="mt-3 pt-2.5 border-t border-gray-100">
+            <div class="h-2.5 w-16 bg-gray-200 rounded"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Live Cards -->
+<div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
     <ng-container *ngFor="let overview of overviewTemplateItems">
         <div
-            class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-all duration-300 group cursor-default">
-            <div class="flex items-start justify-between mb-4">
-                <div class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-200"
+            class="relative bg-white/80 backdrop-blur-md rounded-xl border border-gray-100 p-4 shadow-sm overflow-hidden">
+            <div class="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-gradient-to-br from-white to-transparent"></div>
+
+            <div class="flex items-start justify-between mb-3 relative">
+                <div class="w-10 h-10 rounded-lg ring-1 ring-inset flex items-center justify-center"
                     [ngClass]="getIconContainerClass(overview.label)">
-                    <i [class]="overview.icon + ' text-lg'"></i>
+                    <i [class]="overview.icon + ' text-base'"></i>
                 </div>
-                <!-- Meta Section -->
-                <div *ngIf="overview.meta" class="flex items-center gap-1">
-                    <span class="flex items-center text-[11px] font-bold px-1.5 py-0.5 rounded-md"
-                        [ngClass]="overview.meta.value >= 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'">
-                        <i [class]="overview.meta.icon + ' mr-1 text-[10px]'"></i>
-                        {{ overview.meta.value }}%
-                    </span>
-                </div>
+                <svg *ngIf="overview.sparkline" viewBox="0 0 72 26" preserveAspectRatio="none"
+                    class="w-[60px] h-[22px] text-gray-300 opacity-60 pointer-events-none"
+                    aria-hidden="true">
+                    <polyline [attr.points]="overview.sparkline" fill="none" stroke="currentColor"
+                        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
             </div>
 
-            <div class="space-y-1">
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+            <div class="relative">
+                <p class="text-xs font-medium text-gray-400">
                     {{ overview.label }}
                 </p>
-                <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight">
+                <h3 class="mt-0.5 text-xl font-extrabold text-gray-900 tracking-tight">
                     {{ overview.value }}
                 </h3>
             </div>
 
-            <div *ngIf="overview.meta" class="mt-3 pt-3 border-t border-gray-50">
-                <p class="text-[11px] text-gray-500 font-medium">
-                    {{ overview.meta.desc }}
-                </p>
+            <div *ngIf="overview.meta" class="relative mt-3 pt-2.5 border-t border-gray-100/80">
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold"
+                    [ngClass]="overview.meta.value >= 0 ? 'text-green-600' : 'text-red-600'">
+                    <i [class]="overview.meta.icon + ' text-[10px]'"></i>
+                    {{ overview.meta.value }}%
+                    <span class="text-gray-400 font-normal">
+                        {{ overview.meta.desc }}
+                    </span>
+                </span>
             </div>
         </div>
     </ng-container>

@@ -6,6 +6,7 @@ interface IBookingsOverviewTemplate {
     label: string;
     value: number;
     icon: string;
+    sparkline?: string;
     meta: {
         icon: string;
         value: number;
@@ -21,6 +22,8 @@ interface IBookingsOverviewTemplate {
 })
 export class ProviderBookingOverviewComponent implements OnInit {
     private readonly _bookingService = inject(BookingService);
+
+    isLoading = true;
 
     overviewTemplateItems: IBookingsOverviewTemplate[] = [
         {
@@ -77,78 +80,107 @@ export class ProviderBookingOverviewComponent implements OnInit {
 
 
     ngOnInit(): void {
-        this._bookingService.getBookingOverviewData().subscribe(data => {
-            if (data) {
-                this.overviewTemplateItems = this.overviewTemplateItems.map(items => {
-                    let updatedValue = 0;
-                    let updatedMeta = items.meta;
+        this._bookingService.getBookingOverviewData().subscribe({
+            next: (data) => {
+                if (data) {
+                    this.overviewTemplateItems = this.overviewTemplateItems.map(items => {
+                        let updatedValue = 0;
+                        let updatedMeta = items.meta;
 
-                    switch (items.label) {
-                        case 'Total Bookings':
-                            updatedValue = data.totalBookings;
-                            if (data.changes)
-                                updatedMeta = {
-                                    ...items.meta,
-                                    value: data.changes.totalBookingsChange
-                                };
-                            break;
+                        switch (items.label) {
+                            case 'Total Bookings':
+                                updatedValue = data.totalBookings;
+                                if (data.changes)
+                                    updatedMeta = {
+                                        icon: data.changes.totalBookingsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
+                                        value: data.changes.totalBookingsChange,
+                                        desc: 'vs last month',
+                                    };
+                                break;
 
-                        case 'Pending Requests':
-                            updatedValue = data.pendingRequests;
-                            if (data.changes)
-                                updatedMeta = {
-                                    icon: data.changes.pendingRequestsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
-                                    value: Math.abs(data.changes.pendingRequestsChange),
-                                    desc: 'vs last month',
-                                };
-                            break;
+                            case 'Pending Requests':
+                                updatedValue = data.pendingRequests;
+                                if (data.changes)
+                                    updatedMeta = {
+                                        icon: data.changes.pendingRequestsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
+                                        value: data.changes.pendingRequestsChange,
+                                        desc: 'vs last month',
+                                    };
+                                break;
 
-                        case 'Completed Jobs':
-                            updatedValue = data.completedJobs;
-                            if (data.changes)
-                                updatedMeta = {
-                                    icon: data.changes.completedJobsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
-                                    value: Math.abs(data.changes.completedJobsChange),
-                                    desc: 'vs last month',
-                                };
-                            break;
+                            case 'Completed Jobs':
+                                updatedValue = data.completedJobs;
+                                if (data.changes)
+                                    updatedMeta = {
+                                        icon: data.changes.completedJobsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
+                                        value: data.changes.completedJobsChange,
+                                        desc: 'vs last month',
+                                    };
+                                break;
 
-                        case 'Pending Payments':
-                            updatedValue = data.pendingPayments;
-                            if (data.changes)
-                                updatedMeta = {
-                                    icon: data.changes.pendingPaymentsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
-                                    value: Math.abs(data.changes.pendingPaymentsChange),
-                                    desc: 'vs last month',
-                                };
-                            break;
+                            case 'Pending Payments':
+                                updatedValue = data.pendingPayments;
+                                if (data.changes)
+                                    updatedMeta = {
+                                        icon: data.changes.pendingPaymentsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
+                                        value: data.changes.pendingPaymentsChange,
+                                        desc: 'vs last month',
+                                    };
+                                break;
 
-                        case 'Canceled Bookings':
-                            updatedValue = data.cancelledBookings;
-                            if (data.changes)
-                                updatedMeta = {
-                                    icon: data.changes.cancelledBookingsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
-                                    value: Math.abs(data.changes.cancelledBookingsChange),
-                                    desc: 'vs last month',
-                                };
-                            break;
-                    }
-                    return {
-                        ...items,
-                        value: updatedValue,
-                        meta: updatedMeta,
-                    };
-                });
+                            case 'Canceled Bookings':
+                                updatedValue = data.cancelledBookings;
+                                if (data.changes)
+                                    updatedMeta = {
+                                        icon: data.changes.cancelledBookingsChange >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
+                                        value: data.changes.cancelledBookingsChange,
+                                        desc: 'vs last month',
+                                    };
+                                break;
+                        }
+                        const sparkline = data.changes ? this._buildSparkline(updatedMeta.value) : undefined;
+                        return {
+                            ...items,
+                            value: updatedValue,
+                            meta: updatedMeta,
+                            sparkline,
+                        };
+                    });
             }
-        });
+            this.isLoading = false;
+        },
+        error: () => {
+            this.isLoading = false;
+        }
+    });
+}
+
+    private _buildSparkline(change: number): string {
+        const points = 7;
+        const width = 72;
+        const height = 26;
+        const direction = change >= 0 ? 1 : -1;
+        const amplitude = Math.min(Math.max(Math.abs(change) / 100, 0.25), 0.9);
+        const result: string[] = [];
+
+        for (let i = 0; i <= points; i++) {
+            const t = i / points;
+            const trend = direction * amplitude * (height / 2) * t;
+            const wobble = Math.sin(t * Math.PI * 3 + (i % 2)) * 1.3;
+            const x = (width / points) * i;
+            const y = height / 2 - trend + wobble;
+            result.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+        }
+
+        return result.join(' ');
     }
 
     getIconContainerClass(label: string): string {
-        if (label.includes('Pending Requests')) return 'bg-blue-50 text-blue-600';
-        if (label.includes('Completed')) return 'bg-green-50 text-green-600';
-        if (label.includes('Canceled') || label.includes('Cancelled')) return 'bg-red-50 text-red-600';
-        if (label.includes('Pending Payments')) return 'bg-amber-50 text-amber-600';
-        return 'bg-green-50 text-green-600';
+        if (label.includes('Pending Requests')) return 'bg-blue-500/10 text-blue-600 ring-blue-500/20';
+        if (label.includes('Completed')) return 'bg-green-500/10 text-green-600 ring-green-500/20';
+        if (label.includes('Canceled') || label.includes('Cancelled')) return 'bg-red-500/10 text-red-600 ring-red-500/20';
+        if (label.includes('Pending Payments')) return 'bg-amber-500/10 text-amber-600 ring-amber-500/20';
+        return 'bg-green-500/10 text-green-600 ring-green-500/20';
     }
 
 

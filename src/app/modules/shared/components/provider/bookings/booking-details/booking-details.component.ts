@@ -66,6 +66,7 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
   showReportModal = signal(false);
   showCancelBookingModal = signal(false);
   showRescheduleModal = signal(false);
+  isLoading = signal(true);
   get cancelled(): BookingStatus { return BookingStatus.CANCELLED };
 
   ngOnInit(): void {
@@ -75,7 +76,9 @@ export class ProviderViewBookingDetailsComponents implements OnInit, OnDestroy {
       takeUntil(this._destroy$),
       map(param => param.get('id')),
       filter((id): id is string => !!id),
-      switchMap(id => this._bookingService.getBookingDetails(id))
+      switchMap(id => this._bookingService.getBookingDetails(id).pipe(
+        finalize(() => this.isLoading.set(false))
+      ))
     ).subscribe(bookingData => this.bookingDataSource.next(bookingData));
 
     this._store.select(selectProvider).pipe(
