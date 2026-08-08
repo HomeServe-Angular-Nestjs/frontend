@@ -1,3 +1,21 @@
+<!-- Scope Toggle -->
+<div class="flex items-center gap-1 mb-4">
+    <div class="inline-flex items-center rounded-full bg-white/100 backdrop-blur-md border border-gray-100 shadow-sm p-1 gap-1">
+        <button type="button"
+            (click)="onScopeChange('month')"
+            [ngClass]="selectedScope === 'month' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors duration-200 cursor-pointer">
+            This Month
+        </button>
+        <button type="button"
+            (click)="onScopeChange('total')"
+            [ngClass]="selectedScope === 'total' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors duration-200 cursor-pointer">
+            All Time
+        </button>
+    </div>
+</div>
+
 <!-- Skeleton Loading State -->
 <div *ngIf="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
     <div *ngFor="let i of [0,1,2,3,4]"

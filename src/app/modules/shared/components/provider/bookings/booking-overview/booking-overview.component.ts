@@ -24,6 +24,7 @@ export class ProviderBookingOverviewComponent implements OnInit {
     private readonly _bookingService = inject(BookingService);
 
     isLoading = true;
+    selectedScope: 'month' | 'total' = 'month';
 
     overviewTemplateItems: IBookingsOverviewTemplate[] = [
         {
@@ -80,7 +81,18 @@ export class ProviderBookingOverviewComponent implements OnInit {
 
 
     ngOnInit(): void {
-        this._bookingService.getBookingOverviewData().subscribe({
+        this._loadOverview();
+    }
+
+    onScopeChange(scope: 'month' | 'total'): void {
+        if (scope === this.selectedScope) return;
+        this.selectedScope = scope;
+        this.isLoading = true;
+        this._loadOverview();
+    }
+
+    private _loadOverview(): void {
+        this._bookingService.getBookingOverviewData(this.selectedScope).subscribe({
             next: (data) => {
                 if (data) {
                     this.overviewTemplateItems = this.overviewTemplateItems.map(items => {
