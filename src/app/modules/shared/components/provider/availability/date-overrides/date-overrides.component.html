@@ -1,121 +1,136 @@
-<section class="bg-white border rounded-lg p-6 space-y-4">
+<section class="card space-y-6">
 
     <!-- Header -->
-    <div class="flex items-start justify-between">
+    <div class="flex items-start justify-between gap-4">
         <div class="space-y-1">
-            <h2 class="text-xl font-bold text-gray-900 tracking-tight">
-                Date overrides
-            </h2>
-            <p class="text-sm text-gray-500">
-                Change availability for specific dates.
-            </p>
+            <h2 class="section-title">Date overrides</h2>
+            <p class="section-subtext">Change availability for specific dates.</p>
         </div>
-        <app-button *ngIf="overrides().length" (clicked)="openModal()" buttonClass="px-4 py-2 rounded-full bg-green-600 text-white text-sm
-             hover:bg-green-700 transition" text="+ Add Override"></app-button>
+        <app-button *ngIf="overrides().length" (clicked)="openModal()"
+            buttonClass="btn-cta" text="+ Add Override"></app-button>
     </div>
 
     <!-- Content -->
-    <div class="min-h-[120px] flex items-center">
+    <div class="min-h-[120px]">
 
-        <ng-container *ngIf="overrides().length; else noOverrides">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+        <!-- Skeleton Loading -->
+        <ng-container *ngIf="isLoading; else overrideContent">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let i of [0,1,2]" class="rounded-lg border border-neutral-200 p-4 space-y-3">
+                    <div class="skeleton h-5 w-24"></div>
+                    <div class="skeleton h-4 w-32"></div>
+                    <div class="skeleton h-3 w-full"></div>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- Loaded Content -->
+        <ng-template #overrideContent>
+            <ng-container *ngIf="overrides().length; else noOverrides">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
                 <div *ngFor="let override of overrides()"
-                    class="group relative rounded-xl border p-4 transition-all duration-200" [ngClass]="{
-                        'bg-gray-50/50 border-gray-200 hover:border-green-200 hover:bg-white hover:shadow-sm': override.isAvailable,
-                        'bg-gray-50/50 border-gray-200 hover:border-red-200 hover:bg-white hover:shadow-sm': !override.isAvailable
-                        }">
+                    class="group relative rounded-lg border p-4 transition-all duration-200 animate-card-in"
+                    [ngClass]="override.isAvailable
+                        ? 'bg-green-50/50 border-green-300 hover:bg-white hover:shadow-md'
+                        : 'bg-red-50/50 border-red-300 hover:bg-white hover:shadow-md'">
 
                     <!-- Delete Button -->
                     <app-button (clicked)="deleteOverride(override.date)"
-                        buttonClass="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
+                        buttonClass="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors text-lg leading-none"
                         text="&times;"></app-button>
 
-                    <!-- Date & Time -->
-                    <div class="space-y-1 pr-6">
-                        <p class="text-sm font-medium text-gray-900">
+                    <div class="space-y-3 pr-8">
+                        <!-- Status badge -->
+                        <span class="badge" [ngClass]="override.isAvailable ? 'badge-green' : 'badge-red'">
+                            {{ override.isAvailable ? 'Custom Hours' : 'Unavailable' }}
+                        </span>
+
+                        <!-- Date -->
+                        <p class="text-base font-bold text-gray-900">
                             {{ override.date | date : 'MMMM d, y' }}
                         </p>
 
-                        <p *ngIf="override.isAvailable; else unavailableTpl" class="text-sm text-gray-700">
-                            {{ formatTimeRanges(override.timeRanges) }}
+                        <!-- Time chips -->
+                        <div *ngIf="override.isAvailable" class="flex flex-wrap gap-1.5">
+                            <span *ngFor="let range of override.timeRanges" class="chip">
+                                {{ range.startTime }} – {{ range.endTime }}
+                            </span>
+                        </div>
+
+                        <!-- Reason -->
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            {{ override.reason || reasonFallback(override) }}
                         </p>
-
-                        <ng-template #unavailableTpl>
-                            <p class="text-sm text-gray-500">Unavailable</p>
-                        </ng-template>
                     </div>
-
-                    <!-- Reason -->
-                    <p class="mt-3 text-xs text-gray-400 leading-relaxed">
-                        {{ override.reason || reason }}
-                    </p>
                 </div>
             </div>
         </ng-container>
 
         <!-- Empty State -->
         <ng-template #noOverrides>
-            <div class="w-full flex flex-col items-center justify-center text-center">
+            <div class="w-full flex flex-col items-center justify-center text-center py-10">
 
-                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                    <i class="fas fa-calendar-times text-gray-400 text-lg"></i>
+                <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <i class="fas fa-calendar-days text-gray-400 text-xl"></i>
                 </div>
 
-                <h3 class="text-sm font-semibold text-gray-900">
-                    No date overrides yet
+                <h3 class="text-base font-semibold text-gray-900">
+                    No overrides yet
                 </h3>
 
                 <p class="text-sm text-gray-500 mt-1 max-w-xs">
-                    Add a date override to change availability for specific days.
+                    Set special availability for specific dates.
                 </p>
 
-                <app-button class="mt-4" (clicked)="openModal()" buttonClass="px-4 py-2 rounded-full bg-green-600 text-white text-sm
-                    hover:bg-green-700 transition" text="+ Add Override"></app-button>
+                <app-button class="mt-5" (clicked)="openModal()"
+                    buttonClass="btn-cta" text="+ Add Override"></app-button>
             </div>
+        </ng-template>
         </ng-template>
     </div>
 </section>
 
 <!-- Date Override Modal -->
-<div *ngIf="modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog"
+<div *ngIf="modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog"
     aria-modal="true">
 
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md px-6 py-6">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md px-6 py-6 animate-scale-in">
 
         <!-- Header -->
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center justify-between mb-6">
             <h3 class="text-lg font-bold text-gray-900">
                 Add Date Override
             </h3>
 
             <button type="button" (click)="closeModal()"
-                class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                class="w-8 h-8 inline-flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition text-2xl leading-none">
                 &times;
             </button>
         </div>
 
         <!-- Availability -->
-        <div class="mb-8 space-y-3">
+        <div class="mb-6 space-y-3">
             <label class="block text-xs font-bold uppercase tracking-wider text-gray-500">
                 Availability
             </label>
 
-            <div class="inline-flex w-full rounded-xl border overflow-hidden">
-
-                <button type="button" (click)="selectAvailability('custom')" class="flex-1 px-4 py-3 text-sm font-semibold
-                       flex items-center gap-2 justify-center transition" [ngClass]="availability() === 'custom'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'">
-                    <i class="fas fa-clock"></i>
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" (click)="selectAvailability('custom')"
+                    class="flex flex-col items-center gap-1.5 px-4 py-3 rounded-xl border text-sm font-semibold transition"
+                    [ngClass]="availability() === 'custom'
+                      ? 'bg-green-600 border-green-600 text-white shadow-md'
+                      : 'bg-white border-gray-200 text-gray-600 hover:bg-green-50 hover:border-green-300'">
+                    <i class="fas fa-clock text-base"></i>
                     Custom hours
                 </button>
 
-                <button type="button" (click)="selectAvailability('unavailable')" class="flex-1 px-4 py-3 text-sm font-semibold
-                       flex items-center gap-2 justify-center transition" [ngClass]="availability() === 'unavailable'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'">
-                    <i class="fas fa-ban"></i>
+                <button type="button" (click)="selectAvailability('unavailable')"
+                    class="flex flex-col items-center gap-1.5 px-4 py-3 rounded-xl border text-sm font-semibold transition"
+                    [ngClass]="availability() === 'unavailable'
+                      ? 'bg-red-600 border-red-600 text-white shadow-md'
+                      : 'bg-white border-gray-200 text-gray-600 hover:bg-red-50 hover:border-red-300'">
+                    <i class="fas fa-ban text-base"></i>
                     Unavailable
                 </button>
             </div>
@@ -124,69 +139,75 @@
                 You can add one or more time slots for this date.
             </p>
 
-            <p class="text-xs text-gray-500" *ngIf="availability() === 'unavailable'">
-                No bookings will be allowed on this date.
+            <p class="text-xs text-red-600" *ngIf="availability() === 'unavailable'">
+                This date will be fully blocked.
             </p>
         </div>
 
         <!-- Form -->
-        <form *ngIf="availability" [formGroup]="form" class="space-y-8 border-t pt-8">
+        <form *ngIf="availability" [formGroup]="form" class="space-y-6 border-t pt-6">
 
             <!-- Date -->
-            <div class="space-y-3">
+            <div class="space-y-1.5">
                 <label class="text-xs font-bold uppercase tracking-wider text-gray-500">
                     Date
                 </label>
 
-                <input type="date" [min]="today" formControlName="date" class="w-full rounded-lg border-gray-300
-                      text-sm px-3 py-2.5">
+                <input type="date" [min]="today" formControlName="date" class="input-field w-full">
+
+                <p class="text-xs text-gray-400" *ngIf="!form.get('date')?.value">
+                    Pick a future date
+                </p>
+                <p class="error-inline" *ngIf="form.get('date')?.value && dateError">
+                    <i class="fas fa-circle-exclamation mr-1"></i>{{ dateError }}
+                </p>
             </div>
 
             <!-- Time Ranges -->
-            <div *ngIf="availability() === 'custom'" class="space-y-6">
+            <div *ngIf="availability() === 'custom'" class="space-y-5">
 
-                <!-- Time Editor -->
-                <div [formGroup]="slotDraftForm" class="space-y-3">
+                <!-- Time Builder -->
+                <div [formGroup]="slotDraftForm" class="space-y-1.5">
                     <label class="text-xs font-bold uppercase tracking-wider text-gray-500">
                         Time slot
                     </label>
 
-                    <div class="flex items-center gap-3">
-                        <input type="time" formControlName="from"
-                            class="w-32 rounded-lg border-gray-300 px-3 py-2 text-sm">
-
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <input type="time" formControlName="from" class="time-input !px-3 !py-2 flex-1 min-w-28">
                         <span class="text-gray-400 text-sm">→</span>
+                        <input type="time" formControlName="to" class="time-input !px-3 !py-2 flex-1 min-w-28">
 
-                        <input type="time" formControlName="to"
-                            class="w-32 rounded-lg border-gray-300 px-3 py-2 text-sm">
-
-                        <button type="button" (click)="addDraftSlot()" class="ml-2 px-4 py-2 rounded-lg
-                           bg-green-600 text-white text-sm font-semibold
-                           hover:bg-green-700 transition
-                           disabled:opacity-50">
+                        <button type="button" (click)="addDraftSlot()" [disabled]="addSlotDisabled"
+                            class="btn-primary !px-4 !py-2 text-sm">
                             Add
                         </button>
                     </div>
+
+                    <p class="error-inline" *ngIf="slotDraftError">
+                        <i class="fas fa-circle-exclamation mr-1"></i>{{ slotDraftError }}
+                    </p>
                 </div>
 
                 <!-- Empty State -->
-                <div *ngIf="timeRanges.length === 0" class="text-xs text-gray-500 py-2">
+                <p *ngIf="timeRanges.length === 0" class="text-xs text-gray-400">
                     No time slots added yet.
-                </div>
+                </p>
 
-                <!-- Slot List -->
-                <ul *ngIf="timeRanges.length" formArrayName="timeRanges" class="space-y-3">
+                <!-- Error: custom requires slots -->
+                <p class="error-inline" *ngIf="timeRanges.length === 0">
+                    <i class="fas fa-circle-exclamation mr-1"></i>At least one time slot is required
+                </p>
 
-                    <li *ngFor="let group of timeRanges.controls; let i = index" [formGroupName]="i" class="flex items-center justify-between
-                     bg-gray-50 border rounded-lg
-                     px-4 py-2.5 text-sm">
-
+                <!-- Slot chips -->
+                <ul *ngIf="timeRanges.length" formArrayName="timeRanges" class="flex flex-wrap gap-1.5">
+                    <li *ngFor="let group of timeRanges.controls; let i = index" [formGroupName]="i"
+                        class="chip gap-1.5">
                         <span class="font-medium text-gray-700">
                             {{ group.value.from }} – {{ group.value.to }}
                         </span>
 
-                        <button type="button" (click)="removeTimeRange(i)" class="text-gray-400 hover:text-red-500
-                           text-lg leading-none">
+                        <button type="button" (click)="removeTimeRange(i)"
+                            class="text-gray-400 hover:text-red-500 text-base leading-none transition">
                             &times;
                         </button>
                     </li>
@@ -194,25 +215,27 @@
             </div>
 
             <!-- Reason -->
-            <div class="space-y-3">
+            <div class="space-y-1.5">
                 <label class="text-xs font-bold uppercase tracking-wider text-gray-500">
                     Reason <span class="text-gray-400 font-normal">(Optional)</span>
                 </label>
 
-                <input type="text" formControlName="reason" placeholder="e.g. Doctor appointment" class="w-full rounded-lg border-gray-300
-                      text-sm px-3 py-2.5">
+                <input type="text" formControlName="reason" placeholder="e.g. Doctor appointment"
+                    class="input-field w-full">
+
+                <p class="error-inline" *ngIf="reasonError">
+                    <i class="fas fa-circle-exclamation mr-1"></i>{{ reasonError }}
+                </p>
             </div>
         </form>
 
         <!-- Footer -->
-        <div class="flex justify-end gap-4 pt-6 mt-8 border-t">
-            <button type="button" (click)="closeModal()" class="px-4 py-2 text-sm text-gray-600">
+        <div class="flex justify-end gap-3 pt-6 mt-6 border-t">
+            <button type="button" (click)="closeModal()" class="btn-secondary">
                 Cancel
             </button>
 
-            <button type="button" (click)="saveChanges()" [disabled]="form.invalid || !availability" class="px-6 py-2 text-sm font-bold
-                     text-white bg-green-600 rounded-lg
-                     hover:bg-green-700 disabled:opacity-50">
+            <button type="button" (click)="saveChanges()" [disabled]="saveDisabled" class="btn-primary">
                 Save Changes
             </button>
         </div>

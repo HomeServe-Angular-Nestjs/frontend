@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ProviderService } from '../../../../../../core/services/provider.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 import { FormsModule } from '@angular/forms';
-import { Subject, finalize, map, takeUntil } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -34,12 +34,29 @@ export class ProviderAvailabilityComponentSlotRulesComponent implements OnDestro
     () => this.bufferTime() !== this.originalBufferTime()
   );
 
+  readonly isLoading = computed(() => this.providerData() === null);
+
   readonly providerId = computed(() => this.providerData()?.id);
+
+  readonly exampleUnavailableUntil = computed(() => {
+    const buffer = Math.max(0, this.bufferTime() ?? 0);
+    const totalMinutes = 600 + 60 + buffer;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const format = (value: number) => String(value).padStart(2, '0');
+    return `${format(hours)}:${format(minutes)}`;
+  });
+
+  readonly canDecrement = computed(() => (this.bufferTime() ?? 0) > 0);
 
   constructor() {
     effect(() => {
       this.bufferTime.set(this.originalBufferTime());
     });
+  }
+
+  applyStep(delta: number) {
+    this.bufferTime.set(Math.max(0, (this.bufferTime() ?? 0) + delta));
   }
 
   onSubmit() {

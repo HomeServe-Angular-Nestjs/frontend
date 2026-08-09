@@ -18,10 +18,17 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
   private readonly _toastr = inject(ToastNotificationService);
   private readonly _destroy$ = new Subject<void>();
 
-  isManageMode = true;
   isDirty = false;
+  isSaving = false;
+  isLoading = true;
   mode: 'preview' | 'manage' = 'manage';
   defaultTimeRange = { from: '09:00', to: '17:00' };
+
+  readonly minutesInDay = 24 * 60;
+
+  editorDay: IAvailabilityListView | null = null;
+  editorIndex: number | null = null;
+  editorDraft = { from: '', to: '' };
 
   weeklyAvailability: IAvailabilityListView[] = [
     { label: WeekEnum.SUN, active: false, timeRanges: [] },
@@ -34,7 +41,7 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    this._fetchAvailability()
+    this._fetchAvailability();
   }
 
   setMode(mode: 'preview' | 'manage') {
@@ -54,36 +61,91 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
     this.markDirty();
   }
 
-  addFirstSlot(day: IAvailabilityListView) {
-    day.active = true;
-    day.timeRanges = [{ ...this.defaultTimeRange }]
-    this.markDirty();
+  get editorInlineError(): string {
+    if (!this.editorDay) {
+      return '';
+    }
+
+    const { from, to } = this.editorDraft;
+
+    const slotError = this._validateSingleSlot(from, to);
+    if (slotError) {
+      return slotError;
+    }
+
+    if (this._hasOverlap(this.editorDay, from, to, this.editorIndex)) {
+      return 'Time slots must not overlap';
+    }
+
+    return '';
   }
 
-  addNextSlot(day: IAvailabilityListView) {
-    const DEFAULT_DURATION_MIN = 60;
-    const BUFFER_MIN = 10;
+  isEditor(day: IAvailabilityListView): boolean {
+    return this.editorDay === day;
+  }
 
-    // If no slots exist, behave like "add first slot"
-    if (day.timeRanges.length === 0) {
-      day.active = true;
-      day.timeRanges.push(this.defaultTimeRange);
-      this.markDirty();
+  dayError(day: IAvailabilityListView): string | null {
+    return this._validateDay(day);
+  }
+
+  openAddSlot(day: IAvailabilityListView) {
+    const suggestion = this._suggestNextSlot(day);
+    this.editorDay = day;
+    this.editorIndex = null;
+    this.editorDraft = suggestion ? { ...suggestion } : { ...this.defaultTimeRange };
+  }
+
+  startEditSlot(day: IAvailabilityListView, index: number) {
+    const slot = day.timeRanges[index];
+    this.editorDay = day;
+    this.editorIndex = index;
+    this.editorDraft = { ...slot };
+  }
+
+  closeEditor() {
+    this.editorDay = null;
+    this.editorIndex = null;
+    this.editorDraft = { from: '', to: '' };
+  }
+
+  confirmEditor() {
+    const day = this.editorDay;
+    if (!day) {
       return;
     }
 
-    const lastSlot = day.timeRanges[day.timeRanges.length - 1];
+    if (this.editorInlineError) {
+      this._toastr.error(this.editorInlineError);
+      return;
+    }
 
-    const lastEndMinutes = timeToMinutes(lastSlot.to);
-    const nextStartMinutes = lastEndMinutes + BUFFER_MIN;
-    const nextEndMinutes = nextStartMinutes + DEFAULT_DURATION_MIN;
+    const { from, to } = this.editorDraft;
 
-    day.timeRanges.push({
-      from: minutesToTime(nextStartMinutes),
-      to: minutesToTime(nextEndMinutes),
-    });
+    if (this.editorIndex === null) {
+      if (day.timeRanges.length === 0) {
+        day.active = true;
+      }
+      day.timeRanges.push({ from, to });
+    } else {
+      const slot = day.timeRanges[this.editorIndex];
+      slot.from = from;
+      slot.to = to;
+    }
 
     this.markDirty();
+    this.closeEditor();
+  }
+
+  previewSegments(day: IAvailabilityListView): { left: number; width: number }[] {
+    const startPct = (minutes: number) => Math.min(100, (minutes / this.minutesInDay) * 100);
+
+    return day.timeRanges.map(range => {
+      const startMin = timeToMinutes(range.from);
+      const endMin = timeToMinutes(range.to);
+      const start = startPct(startMin);
+      const width = Math.max(0, Math.min(100 - start, startPct(endMin) - start));
+      return { left: start, width };
+    });
   }
 
   saveWorkHours() {
@@ -91,17 +153,21 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.isSaving = true;
+
     const weekData = this._mapUiToWeeklyAvailability();
 
     this._availabilityService.updateAvailability(weekData)
       .pipe(
         takeUntil(this._destroy$),
+        finalize(() => (this.isSaving = false)),
         map(res => res?.data?.week ?? this._emptyWeek()),
       )
       .subscribe({
         next: (week) => {
           this.weeklyAvailability = this._initializeAvailability(week);
           this.isDirty = false;
+          this.closeEditor();
           this._toastr.success('Work hours updated successfully');
         },
       });
@@ -113,6 +179,26 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
       event.preventDefault();
       event.returnValue = '';
     }
+  }
+
+  private _suggestNextSlot(day: IAvailabilityListView): { from: string; to: string } | null {
+    const lastSlot = day.timeRanges[day.timeRanges.length - 1];
+
+    if (!lastSlot) {
+      return null;
+    }
+
+    const DEFAULT_DURATION_MIN = 60;
+    const BUFFER_MIN = 10;
+
+    const lastEndMinutes = timeToMinutes(lastSlot.to);
+    const nextStartMinutes = lastEndMinutes + BUFFER_MIN;
+    const nextEndMinutes = nextStartMinutes + DEFAULT_DURATION_MIN;
+
+    return {
+      from: minutesToTime(nextStartMinutes),
+      to: minutesToTime(nextEndMinutes),
+    };
   }
 
   private _mapUiToWeeklyAvailability(): IWeeklyAvailability['week'] {
@@ -137,7 +223,6 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
       sat: mapDay(getDay(WeekEnum.SAT)),
     };
   }
-
 
   private _initializeAvailability(week: IWeeklyAvailability['week']): IAvailabilityListView[] {
     const mapDay = (label: WeekEnum, day: IDayAvailability): IAvailabilityListView => ({
@@ -178,62 +263,106 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
         takeUntil(this._destroy$),
         map(res => res?.data?.week ?? this._emptyWeek()),
       )
-      .subscribe((week) => {
-        this.weeklyAvailability = this._initializeAvailability(week);
-        this.isDirty = false;
+      .subscribe({
+        next: (week) => {
+          this.weeklyAvailability = this._initializeAvailability(week);
+          this.isDirty = false;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.isLoading = false;
+        },
       });
+  }
+
+  private _hasOverlap(day: IAvailabilityListView, from: string, to: string, excludeIndex: number | null): boolean {
+    const newStart = timeToMinutes(from);
+    const newEnd = timeToMinutes(to);
+
+    for (let i = 0; i < day.timeRanges.length; i++) {
+      if (i === excludeIndex) {
+        continue;
+      }
+
+      const start = timeToMinutes(day.timeRanges[i].from);
+      const end = timeToMinutes(day.timeRanges[i].to);
+
+      if (newStart < end && newEnd > start) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private _validateSingleSlot(from: string, to: string): string | null {
+    if (!from || !to) {
+      return 'Start and end time are required';
+    }
+
+    const start = timeToMinutes(from);
+    const end = timeToMinutes(to);
+
+    if (start >= end) {
+      return 'Start time must be before end time';
+    }
+
+    return null;
+  }
+
+  private _validateDay(day: IAvailabilityListView): string | null {
+    const slots = day.timeRanges;
+
+    if (!slots || slots.length === 0) {
+      return null;
+    }
+
+    const intervals: [number, number][] = [];
+
+    for (const slot of slots) {
+      if (!slot.from || !slot.to) {
+        return 'Start and end time are required';
+      }
+
+      const start = timeToMinutes(slot.from);
+      const end = timeToMinutes(slot.to);
+
+      if (start >= end) {
+        return 'Start time must be before end time';
+      }
+
+      intervals.push([start, end]);
+    }
+
+    intervals.sort((a, b) => a[0] - b[0]);
+
+    for (let i = 1; i < intervals.length; i++) {
+      const prevEnd = intervals[i - 1][1];
+      const currStart = intervals[i][0];
+
+      if (currStart < prevEnd) {
+        return 'Time slots must not overlap';
+      }
+    }
+
+    return null;
   }
 
   private _validateWeeklyAvailability(): boolean {
     for (const day of this.weeklyAvailability) {
+      const error = this._validateDay(day);
 
-      const slots = day.timeRanges;
-
-      if (!slots || slots.length === 0) {
-        continue;
-      }
-
-      const intervals: [number, number][] = [];
-
-      for (const slot of slots) {
-        if (!slot.from || !slot.to) {
-          this._toastr.error(`${day.label}: Start and end time are required`);
-          return false;
-        }
-
-        const start = timeToMinutes(slot.from);
-        const end = timeToMinutes(slot.to);
-
-        if (start >= end) {
-          this._toastr.error(`${day.label}: Start time must be before end time`);
-          return false;
-        }
-
-        intervals.push([start, end]);
-      }
-
-      // Sort by start time
-      intervals.sort((a, b) => a[0] - b[0]);
-
-      // Check overlaps
-      for (let i = 1; i < intervals.length; i++) {
-        const prevEnd = intervals[i - 1][1];
-        const currStart = intervals[i][0];
-
-        if (currStart < prevEnd) {
-          this._toastr.error(`${day.label}: Time slots must not overlap`);
-          return false;
-        }
+      if (error) {
+        this._toastr.error(`${day.label}: ${error}`);
+        return false;
       }
     }
 
     return true;
   }
 
-
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
   }
-
 }

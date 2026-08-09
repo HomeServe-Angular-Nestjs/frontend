@@ -1,100 +1,166 @@
-<section class="bg-white rounded-lg border p-4 space-y-4 text-sm">
+<section class="card space-y-6">
 
     <!-- HEADER -->
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div class="space-y-1">
-            <h2 class="text-xl font-bold text-gray-900 tracking-tight">
-                Work Hours
-            </h2>
-            <p class="text-sm text-gray-500">
-                Set when you’re available for bookings
-            </p>
+            <h2 class="section-title">Work Hours</h2>
+            <p class="section-subtext">Set when you're available for bookings</p>
         </div>
 
         <!-- MODE TOGGLE -->
-        <div class="inline-flex rounded-lg border border-green-200 bg-green-50 p-1 text-xs font-medium">
-            <button type="button" (click)="setMode('manage')" class="px-4 py-1.5 rounded-md transition-all" [ngClass]="mode === 'manage'
-          ? 'bg-white text-green-700 shadow-sm'
-          : 'text-green-700/70 hover:text-green-800'">
-                Manage
+        <div class="segmented">
+            <button type="button" (click)="setMode('manage')" class="segmented-btn"
+                [ngClass]="mode === 'manage' ? 'segmented-btn--active' : ''">
+                Edit
             </button>
-
-            <button type="button" (click)="setMode('preview')" class="px-4 py-1.5 rounded-md transition-all" [ngClass]="mode === 'preview'
-          ? 'bg-white text-green-700 shadow-sm'
-          : 'text-green-700/70 hover:text-green-800'">
+            <button type="button" (click)="setMode('preview')" class="segmented-btn"
+                [ngClass]="mode === 'preview' ? 'segmented-btn--active' : ''">
                 Preview
             </button>
         </div>
     </div>
 
-    <!-- WEEKLY AVAILABILITY -->
-    <div class="bg-white rounded-xl border border-gray-200 divide-y">
+    <!-- SKELETON LOADING -->
+    <div *ngIf="isLoading" class="space-y-3">
+        <div *ngFor="let i of [0,1,2,3,4,5,6]"
+            class="flex items-center gap-3 p-4 rounded-lg border border-neutral-200">
+            <div class="skeleton h-4 w-24"></div>
+            <div class="skeleton h-4 w-32 ml-auto"></div>
+            <div class="skeleton h-8 w-40"></div>
+        </div>
+    </div>
 
-        <div *ngFor="let day of weeklyAvailability" class="px-4 py-3 bg-gray-50/50 hover:bg-white transition-all">
+    <!-- DIRTY STATE BANNER -->
+    <div *ngIf="isDirty && mode === 'manage' && !isLoading" class="dirty-banner animate-fadeIn">
+        <p class="text-sm font-medium text-amber-800 flex items-center gap-2">
+            <i class="fas fa-circle-exclamation"></i>
+            You have unsaved changes
+        </p>
+        <button class="btn-primary" [disabled]="isSaving" (click)="saveWorkHours()">
+            <i *ngIf="isSaving" class="fas fa-circle-notch fa-spin"></i>
+            {{ isSaving ? 'Saving…' : 'Save changes' }}
+        </button>
+    </div>
 
-            <!-- DAY HEADER -->
-            <div class="flex items-center">
-                <span class="w-24 font-medium text-gray-700">
-                    {{ day.label }}
-                </span>
+    <!-- PREVIEW: TIMELINE VIEW -->
+    <div *ngIf="mode === 'preview' && !isLoading" class="space-y-4 animate-fadeIn">
 
-                <!-- NO AVAILABILITY -->
-                <span *ngIf="!day.active" class="text-gray-400 italic text-xs">
-                    No availability
-                </span>
+        <div *ngFor="let day of weeklyAvailability" class="rounded-lg border border-neutral-200 p-3 space-y-2"
+            [ngClass]="day.active ? 'bg-white' : 'bg-neutral-50'">
 
-                <!-- ADD FIRST SLOT -->
-                <button *ngIf="!day.active && mode === 'manage'"
-                    class="ml-auto text-green-600 hover:text-green-700 text-xs font-medium" (click)="addFirstSlot(day)">
-                    + Add
-                </button>
+            <div class="flex items-center gap-3">
+                <span class="w-24 font-semibold text-gray-700">{{ day.label | titlecase }}</span>
+                <span *ngIf="!day.active" class="badge badge-gray">Unavailable</span>
+                <span *ngIf="day.active" class="badge badge-green">{{ day.timeRanges.length }} slot{{ day.timeRanges.length === 1 ? '' : 's' }}</span>
             </div>
 
-            <!-- TIME RANGES -->
-            <div *ngIf="day.active" class="pl-24 space-y-1">
+            <!-- BAR -->
+            <div class="relative h-10 rounded-lg bg-neutral-200/40 overflow-hidden">
+                <div *ngFor="let seg of previewSegments(day)"
+                    class="absolute top-0 bottom-0 bg-green-500/80 rounded-sm"
+                    [style.left]="seg.left + '%'" [style.width]="seg.width + '%'"></div>
+            </div>
 
-                <div *ngFor="let slot of day.timeRanges; let i = index"
-                    class="flex items-center gap-2 text-xs leading-none">
-
-                    <ng-container *ngIf="mode === 'manage'; else previewSlot">
-                        <input type="time" [(ngModel)]="slot.from" (ngModelChange)="markDirty()"
-                            class="border rounded px-2 py-0.5 h-7 text-xs">
-
-                        <span class="text-gray-400">–</span>
-
-                        <input type="time" [(ngModel)]="slot.to" (ngModelChange)="markDirty()"
-                            class="border rounded px-2 py-0.5 h-7 text-xs">
-
-                        <button class="text-gray-400 hover:text-red-500" title="Remove slot"
-                            (click)="removeSlot(day, i)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </ng-container>
-
-                    <ng-template #previewSlot>
-                        <span class="text-gray-700">
-                            {{ slot.from }} – {{ slot.to }}
-                        </span>
-                    </ng-template>
-                </div>
-
-                <button *ngIf="mode === 'manage'"
-                    class="text-green-600 hover:text-green-700 text-[11px] font-medium mt-1" (click)="addNextSlot(day)">
-                    + Add another slot
-                </button>
+            <!-- TIME SCALE -->
+            <div class="flex justify-between text-[10px] text-neutral-400 font-medium">
+                <span>00:00</span>
+                <span>06:00</span>
+                <span>12:00</span>
+                <span>18:00</span>
+                <span>24:00</span>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <div class="flex justify-end pt-3 border-t">
-        <button [disabled]="!isDirty" (click)="saveWorkHours()" class="px-5 py-2 text-sm font-semibold rounded-md
-             bg-green-600 text-white
-             hover:bg-green-500
-             disabled:bg-gray-300 disabled:cursor-not-allowed
-             focus:outline-none focus:ring-2 focus:ring-green-600">
-            Save changes
-        </button>
+    <!-- MANAGE VIEW -->
+    <div *ngIf="mode === 'manage' && !isLoading" class="space-y-3">
+
+        <div *ngFor="let day of weeklyAvailability"
+            class="flex flex-col gap-3 p-4 rounded-lg border transition-colors duration-150"
+            [ngClass]="day.active ? 'bg-white border-neutral-200' : 'bg-neutral-50 border-neutral-200'">
+
+            <!-- DAY HEADER -->
+            <div class="flex items-center gap-3 flex-wrap">
+                <span class="font-semibold text-gray-700">{{ day.label | titlecase }}</span>
+
+                <span *ngIf="!day.active" class="badge badge-gray">Unavailable</span>
+                <span *ngIf="day.active && day.timeRanges.length" class="badge badge-green">
+                    {{ day.timeRanges.length }} slot{{ day.timeRanges.length === 1 ? '' : 's' }}
+                </span>
+
+                <div class="ml-auto flex items-center gap-2">
+                    <button *ngIf="!day.active" type="button"
+                        class="text-sm font-medium text-green-600 hover:text-green-700 transition"
+                        (click)="openAddSlot(day)">
+                        <i class="fas fa-plus mr-1"></i>Set availability
+                    </button>
+
+                    <button *ngIf="day.active && !isEditor(day)" type="button"
+                        class="btn-primary !px-3 !py-1.5 text-xs"
+                        (click)="openAddSlot(day)">
+                        <i class="fas fa-plus"></i> Add time slot
+                    </button>
+                </div>
+            </div>
+
+            <!-- SLOT PILLS -->
+            <div *ngIf="day.active" class="flex flex-wrap items-center gap-2">
+                <div *ngFor="let slot of day.timeRanges; let i = index" class="slot-pill">
+                    <span class="font-semibold text-gray-800">{{ slot.from }} – {{ slot.to }}</span>
+
+                    <button type="button" class="icon-btn" title="Edit slot"
+                        (click)="startEditSlot(day, i)">
+                        <i class="fas fa-pen text-[11px]"></i>
+                    </button>
+
+                    <button type="button" class="icon-btn icon-btn--danger" title="Remove slot"
+                        (click)="removeSlot(day, i)">
+                        <i class="fas fa-trash text-[11px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- INLINE DAY ERROR -->
+            <p *ngIf="dayError(day) && !isEditor(day)" class="error-inline">
+                <i class="fas fa-circle-exclamation mr-1"></i>{{ dayError(day) }}
+            </p>
+
+            <!-- INLINE SLOT EDITOR -->
+            <div *ngIf="isEditor(day)"
+                class="rounded-lg border border-green-200 bg-green-50/50 p-3 space-y-3 animate-fadeIn">
+
+                <div class="flex items-center gap-3 flex-wrap">
+                    <label class="flex items-center gap-2 text-xs font-medium text-gray-600">
+                        <span>From</span>
+                        <input type="time" class="time-input !px-3 !py-1.5" [(ngModel)]="editorDraft.from">
+                    </label>
+
+                    <span class="text-gray-400 text-sm">–</span>
+
+                    <label class="flex items-center gap-2 text-xs font-medium text-gray-600">
+                        <span>To</span>
+                        <input type="time" class="time-input !px-3 !py-1.5" [(ngModel)]="editorDraft.to">
+                    </label>
+
+                    <p *ngIf="editorIndex === null" class="text-xs text-gray-400 italic">
+                        Suggested: {{ editorDraft.from }} – {{ editorDraft.to }}
+                    </p>
+                </div>
+
+                <p *ngIf="editorInlineError" class="error-inline">
+                    <i class="fas fa-circle-exclamation mr-1"></i>{{ editorInlineError }}
+                </p>
+
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn-primary !px-4 !py-1.5 text-sm" (click)="confirmEditor()">
+                        <i class="fas fa-check mr-1"></i> Confirm
+                    </button>
+                    <button type="button" class="btn-secondary !px-4 !py-1.5 text-sm" (click)="closeEditor()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
 </section>
