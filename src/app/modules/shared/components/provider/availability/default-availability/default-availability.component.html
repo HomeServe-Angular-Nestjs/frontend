@@ -43,31 +43,72 @@
     </div>
 
     <!-- PREVIEW: TIMELINE VIEW -->
-    <div *ngIf="mode === 'preview' && !isLoading" class="space-y-4 animate-fadeIn">
+    <div *ngIf="mode === 'preview' && !isLoading" class="space-y-3 animate-fadeIn">
 
-        <div *ngFor="let day of weeklyAvailability" class="rounded-lg border border-neutral-200 p-3 space-y-2"
+        <div *ngFor="let day of weeklyAvailability" class="rounded-lg border border-neutral-200 p-4"
             [ngClass]="day.active ? 'bg-white' : 'bg-neutral-50'">
 
+            <!-- SUMMARY ROW -->
             <div class="flex items-center gap-3">
-                <span class="w-24 font-semibold text-gray-700">{{ day.label | titlecase }}</span>
+                <span class="w-28 shrink-0 font-semibold text-gray-700">{{ day.label | titlecase }}</span>
+
                 <span *ngIf="!day.active" class="badge badge-gray">Unavailable</span>
-                <span *ngIf="day.active" class="badge badge-green">{{ day.timeRanges.length }} slot{{ day.timeRanges.length === 1 ? '' : 's' }}</span>
+                <span *ngIf="day.active" class="badge badge-green">
+                    {{ day.timeRanges.length }} range{{ day.timeRanges.length === 1 ? '' : 's' }}
+                </span>
+
+                <span class="min-w-0 truncate text-sm text-neutral-700">
+                    <ng-container *ngFor="let slot of visibleSummaryRanges(day); let first = first">
+                        <span *ngIf="!first"> • </span>{{ slot.from }}–{{ slot.to }}
+                    </ng-container>
+                    <span *ngIf="summaryExtraCount(day) > 0" class="group relative inline-flex align-middle cursor-help">
+                        <span class="ml-2 font-medium text-neutral-500">+{{ summaryExtraCount(day) }} more</span>
+                        <span role="tooltip"
+                            class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 hidden whitespace-nowrap rounded bg-neutral-900 px-2 py-1 text-xs text-white shadow-lg group-hover:block">
+                            {{ summaryText(day) }}
+                        </span>
+                    </span>
+                </span>
             </div>
 
-            <!-- BAR -->
-            <div class="relative h-10 rounded-lg bg-neutral-200/40 overflow-hidden">
-                <div *ngFor="let seg of previewSegments(day)"
-                    class="absolute top-0 bottom-0 bg-green-500/80 rounded-sm"
-                    [style.left]="seg.left + '%'" [style.width]="seg.width + '%'"></div>
-            </div>
+            <!-- INACTIVE DAY MESSAGE -->
+            <p *ngIf="!day.active" class="mt-1 text-xs text-neutral-400">No working hours set</p>
 
-            <!-- TIME SCALE -->
-            <div class="flex justify-between text-[10px] text-neutral-400 font-medium">
-                <span>00:00</span>
-                <span>06:00</span>
-                <span>12:00</span>
-                <span>18:00</span>
-                <span>24:00</span>
+            <!-- TIMELINE BAR (active days only) -->
+            <div *ngIf="day.active" class="relative mt-2">
+
+                <!-- TRACK -->
+                <div class="relative h-12 rounded-lg bg-neutral-200/40">
+
+                    <!-- GRID LINES (every 6h) -->
+                    <div *ngFor="let pos of gridLinePositions"
+                        class="absolute top-0 bottom-0 border-l border-neutral-200"
+                        [style.left]="pos + '%'"></div>
+
+                    <!-- SEGMENTS / DOTS -->
+                    <div *ngFor="let seg of previewRanges(day)" class="group absolute top-0 bottom-0"
+                        [style.left]="seg.isDot ? (seg.left + seg.width / 2) + '%' : seg.left + '%'"
+                        [style.width]="seg.isDot ? '8px' : seg.width + '%'">
+
+                        <div *ngIf="!seg.isDot" class="absolute inset-0 rounded-md bg-green-400/80"
+                            [attr.aria-label]="rangeAriaLabel(seg)"></div>
+
+                        <div *ngIf="seg.isDot" class="absolute inset-0 flex items-center">
+                            <div class="h-2.5 w-2.5 rounded-full bg-green-400/80" [attr.aria-label]="rangeAriaLabel(seg)"></div>
+                        </div>
+
+                        <div role="tooltip"
+                            class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 hidden whitespace-nowrap rounded bg-neutral-900 px-2 py-1 text-xs text-white shadow-lg group-hover:block">
+                            <div class="font-medium">{{ seg.from }} – {{ seg.to }}</div>
+                            <div>Duration: {{ seg.durationLabel }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIME SCALE -->
+                <div class="pointer-events-none mt-1 flex justify-between text-xs text-neutral-500 font-medium">
+                    <span *ngFor="let marker of timeScaleMarkers">{{ marker.label }}</span>
+                </div>
             </div>
         </div>
     </div>

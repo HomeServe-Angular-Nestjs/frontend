@@ -235,7 +235,7 @@
                 Cancel
             </button>
 
-            <button type="button" (click)="saveChanges()" [disabled]="saveDisabled" class="btn-primary">
+            <button type="button" (click)="saveChanges()" [disabled]="saveDisabled || isSaving()" class="btn-primary">
                 Save Changes
             </button>
         </div>

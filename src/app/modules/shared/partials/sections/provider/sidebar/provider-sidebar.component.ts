@@ -1,10 +1,11 @@
-import { Component, EventEmitter, HostListener, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, HostListener, inject, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { authActions } from '../../../../../../store/auth/auth.actions';
-import { ProviderService } from '../../../../../../core/services/provider.service';
-import { map } from 'rxjs';
+import { providerActions } from '../../../../../../store/provider/provider.action';
+import { selectProvider } from '../../../../../../store/provider/provider.selector';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-provider-sidebar',
@@ -12,18 +13,23 @@ import { map } from 'rxjs';
   templateUrl: './provider-sidebar.component.html',
 })
 export class ProviderSidebarComponent implements OnInit {
-  private readonly _providerService = inject(ProviderService);
-  constructor(private store: Store) { }
+  private readonly store = inject(Store);
 
   @Output() collapsedChange = new EventEmitter<'expanded' | 'collapsed' | 'hidden'>();
 
-  providerInfo$ = this._providerService.getOneProvider().pipe(map(res => res.data));
+  providerInfo$ = this.store.select(selectProvider);
 
   sidebarMode: 'expanded' | 'collapsed' | 'hidden' = 'expanded';
   isMobileOpen = false;
   innerWidth = window.innerWidth;
 
   ngOnInit() {
+    this.store.select(selectProvider).pipe(take(1)).subscribe((provider) => {
+      if (!provider) {
+        this.store.dispatch(providerActions.fetchOneProvider());
+      }
+    });
+
     this.updateSidebarMode();
   }
 

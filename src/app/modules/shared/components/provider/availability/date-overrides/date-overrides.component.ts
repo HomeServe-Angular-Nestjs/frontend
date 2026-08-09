@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { timeToMinutes } from '../../../../../../core/utils/date.util';
 import { IDateOverrideViewList } from '../../../../../../core/models/availability.model';
-import { filter, map, Subject, takeUntil } from 'rxjs';
+import { filter, finalize, map, Subject, takeUntil } from 'rxjs';
 import { AvailabilityService } from '../../../../../../core/services/availability.service';
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
@@ -36,6 +36,7 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
   today = new Date().toISOString().split('T')[0];
   modal = false;
   isLoading = true;
+  isSaving = signal(false);
 
   overrides = signal<IDateOverrideViewList[]>([]);
 
@@ -75,6 +76,10 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
 
     if (this._hasDateOverride(date)) {
       return 'This date already has an override';
+    }
+
+    if (this._isPastDate(date)) {
+      return 'Past dates cannot be scheduled';
     }
 
     return '';
@@ -165,6 +170,8 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
   }
 
   saveChanges() {
+    if (this.isSaving()) return;
+
     const { date, reason } = this.form.value;
 
     if (this.dateError) {
@@ -182,11 +189,8 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
       return;
     }
 
-    const dateFormat = new Date(date);
-    dateFormat.setHours(0, 0, 0, 0);
-
     const payload = {
-      date: dateFormat.toString(),
+      date: `${date}T00:00:00.000Z`,
       timeRanges:
         this.availability() === 'custom'
           ? this.timeRanges.value.map((t: any) => ({
@@ -198,10 +202,13 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
       isAvailable: this.availability() === 'custom',
     };
 
+    this.isSaving.set(true);
+
     this._availabilityService.createDateOverride(payload)
       .pipe(
         takeUntil(this._destroy$),
-        map(res => res.data || null)
+        map(res => res.data || null),
+        finalize(() => this.isSaving.set(false))
       )
       .subscribe({
         next: (override) => {
@@ -220,26 +227,33 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
           this.overrides.update(overrides => [...overrides, overrideData]);
           this._toastr.success('Override created successfully');
           this.closeModal();
+        },
+        error: () => {
+          this._toastr.error('Failed to create override. Please try again.');
         }
       });
   }
 
   deleteOverride(date: string) {
-    const formatDate = new Date(date)
-    formatDate.setHours(0, 0, 0, 0)
-    date = formatDate.toISOString();
+    const parsed = new Date(date.includes('T') ? date : `${date}T00:00:00.000Z`);
 
-    this._availabilityService.deleteOverride(date)
+    if (Number.isNaN(parsed.getTime())) {
+      this._toastr.error('Invalid override date.');
+      return;
+    }
+
+    const target = parsed.toISOString();
+
+    this._availabilityService.deleteOverride(target)
       .pipe(
         takeUntil(this._destroy$),
         filter(res => res.success)
       )
       .subscribe({
         next: () => {
+          const targetDay = target.split('T')[0];
           this.overrides.update(overrides => overrides.filter(override => {
-            const overrideDate = new Date(override.date);
-            overrideDate.setHours(0, 0, 0, 0);
-            return overrideDate.toISOString() !== date;
+            return new Date(override.date).toISOString().split('T')[0] !== targetDay;
           }));
           this._toastr.success('Override deleted successfully');
         }
@@ -270,13 +284,22 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
   }
 
   private _hasDateOverride(date: string): boolean {
-    const selectedTime = new Date(date).setHours(0, 0, 0, 0);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return false;
+    }
 
-    return this.overrides().some(override => {
-      const existing = new Date(override.date);
-      existing.setHours(0, 0, 0, 0);
-      return existing.getTime() === selectedTime;
-    });
+    const day = new Date(`${date}T00:00:00.000Z`).toISOString().split('T')[0];
+
+    return this.overrides().some(override =>
+      new Date(override.date).toISOString().split('T')[0] === day
+    );
+  }
+
+  private _isPastDate(date: string): boolean {
+    const today = new Date();
+    const todayYmd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    return date < todayYmd;
   }
 
   private _hasOverlap(newFrom: string, newTo: string): boolean {

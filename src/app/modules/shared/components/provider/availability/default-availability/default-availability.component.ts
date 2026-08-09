@@ -8,6 +8,17 @@ import { WeekEnum } from '../../../../../../core/enums/enums';
 import { minutesToTime, timeToMinutes } from '../../../../../../core/utils/date.util';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
 
+interface DailyPreviewRange {
+  from: string;
+  to: string;
+  startMin: number;
+  endMin: number;
+  left: number;
+  width: number;
+  isDot: boolean;
+  durationLabel: string;
+}
+
 @Component({
   selector: 'app-provider-default-availability',
   templateUrl: './default-availability.component.html',
@@ -26,9 +37,21 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
 
   readonly minutesInDay = 24 * 60;
 
+  readonly summaryCollapseThreshold = 3;
+  readonly summaryVisibleRangeMax = 2;
+  readonly minRangeMinutesForDot = 30;
+  readonly timeScaleMarkers = [
+    { label: '12 AM', pct: 0 },
+    { label: '6 AM', pct: 25 },
+    { label: '12 PM', pct: 50 },
+    { label: '6 PM', pct: 75 },
+  ];
+  readonly gridLinePositions = [25, 50, 75];
+
   editorDay: IAvailabilityListView | null = null;
   editorIndex: number | null = null;
   editorDraft = { from: '', to: '' };
+  private editingSlot: { from: string; to: string } | null = null;
 
   weeklyAvailability: IAvailabilityListView[] = [
     { label: WeekEnum.SUN, active: false, timeRanges: [] },
@@ -53,6 +76,10 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
   }
 
   removeSlot(day: IAvailabilityListView, index: number) {
+    if (!day.timeRanges[index]) {
+      return;
+    }
+
     day.timeRanges.splice(index, 1);
 
     if (day.timeRanges.length === 0) {
@@ -92,19 +119,25 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
     const suggestion = this._suggestNextSlot(day);
     this.editorDay = day;
     this.editorIndex = null;
+    this.editingSlot = null;
     this.editorDraft = suggestion ? { ...suggestion } : { ...this.defaultTimeRange };
   }
 
   startEditSlot(day: IAvailabilityListView, index: number) {
     const slot = day.timeRanges[index];
+    if (!slot) {
+      return;
+    }
     this.editorDay = day;
     this.editorIndex = index;
+    this.editingSlot = slot;
     this.editorDraft = { ...slot };
   }
 
   closeEditor() {
     this.editorDay = null;
     this.editorIndex = null;
+    this.editingSlot = null;
     this.editorDraft = { from: '', to: '' };
   }
 
@@ -127,9 +160,23 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
       }
       day.timeRanges.push({ from, to });
     } else {
-      const slot = day.timeRanges[this.editorIndex];
-      slot.from = from;
-      slot.to = to;
+      const editedSlot = this.editingSlot;
+      if (!editedSlot) {
+        this.closeEditor();
+        return;
+      }
+
+      const editedIndex = day.timeRanges.indexOf(editedSlot);
+
+      if (editedIndex === -1) {
+        this._toastr.warning('The slot you were editing no longer exists.');
+        this.closeEditor();
+        return;
+      }
+
+      this.editorIndex = editedIndex;
+      editedSlot.from = from;
+      editedSlot.to = to;
     }
 
     this.markDirty();
@@ -146,6 +193,61 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
       const width = Math.max(0, Math.min(100 - start, startPct(endMin) - start));
       return { left: start, width };
     });
+  }
+
+  previewRanges(day: IAvailabilityListView): DailyPreviewRange[] {
+    const segments = this.previewSegments(day);
+
+    return day.timeRanges.map((range, i) => {
+      const startMin = timeToMinutes(range.from);
+      const endMin = timeToMinutes(range.to);
+      const duration = endMin - startMin;
+      const seg = segments[i];
+      return {
+        from: range.from,
+        to: range.to,
+        startMin,
+        endMin,
+        left: seg.left,
+        width: seg.width,
+        isDot: duration < this.minRangeMinutesForDot,
+        durationLabel: this.formatDuration(duration),
+      };
+    });
+  }
+
+  formatDuration(minutes: number): string {
+    const total = Math.max(0, Math.round(minutes));
+    const h = Math.floor(total / 60);
+    const m = total % 60;
+    if (h === 0) {
+      return `${m}m`;
+    }
+    if (m === 0) {
+      return `${h}h`;
+    }
+    return `${h}h ${m}m`;
+  }
+
+  summaryText(day: IAvailabilityListView): string {
+    return day.timeRanges.map(r => `${r.from}–${r.to}`).join(' • ');
+  }
+
+  visibleSummaryRanges(day: IAvailabilityListView): { from: string; to: string }[] {
+    const visibleCount = day.timeRanges.length > this.summaryCollapseThreshold
+      ? this.summaryVisibleRangeMax
+      : day.timeRanges.length;
+    return day.timeRanges.slice(0, visibleCount);
+  }
+
+  summaryExtraCount(day: IAvailabilityListView): number {
+    return day.timeRanges.length > this.summaryCollapseThreshold
+      ? day.timeRanges.length - this.summaryVisibleRangeMax
+      : 0;
+  }
+
+  rangeAriaLabel(seg: DailyPreviewRange): string {
+    return `${seg.from} to ${seg.to}, duration ${seg.durationLabel}`;
   }
 
   saveWorkHours() {
@@ -169,6 +271,9 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
           this.isDirty = false;
           this.closeEditor();
           this._toastr.success('Work hours updated successfully');
+        },
+        error: () => {
+          this._toastr.error('Failed to update work hours. Please try again.');
         },
       });
   }
@@ -194,6 +299,10 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
     const lastEndMinutes = timeToMinutes(lastSlot.to);
     const nextStartMinutes = lastEndMinutes + BUFFER_MIN;
     const nextEndMinutes = nextStartMinutes + DEFAULT_DURATION_MIN;
+
+    if (nextEndMinutes > this.minutesInDay) {
+      return null;
+    }
 
     return {
       from: minutesToTime(nextStartMinutes),
@@ -307,6 +416,10 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
       return 'Start time must be before end time';
     }
 
+    if (start >= this.minutesInDay || end > this.minutesInDay) {
+      return 'Time slots must be within the same day';
+    }
+
     return null;
   }
 
@@ -329,6 +442,10 @@ export class ProviderDefaultAvailabilityComponent implements OnInit, OnDestroy {
 
       if (start >= end) {
         return 'Start time must be before end time';
+      }
+
+      if (start >= this.minutesInDay || end > this.minutesInDay) {
+        return 'Time slots must be within the same day';
       }
 
       intervals.push([start, end]);

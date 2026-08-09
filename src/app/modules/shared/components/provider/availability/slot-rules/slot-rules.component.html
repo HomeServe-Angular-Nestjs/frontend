@@ -20,13 +20,13 @@
         <!-- Stepper input -->
         <div class="flex items-center gap-3">
             <button type="button" class="stepper-btn" aria-label="Decrease buffer"
-                [disabled]="canDecrement() || isSaving()" (click)="applyStep(-5)">
+                [disabled]="!canDecrement() || isSaving()" (click)="applyStep(-5)">
                 <i class="fas fa-minus text-sm"></i>
             </button>
 
             <div class="relative flex-1">
-                <input type="number" min="0" [value]="bufferTime()"
-                    (input)="bufferTime.set($any($event.target).valueAsNumber)"
+                <input type="number" min="0" [max]="MAX_BUFFER_MINUTES" [value]="bufferTime()"
+                    (input)="onBufferInput($event)"
                     class="input-field block w-full !pr-11 !py-3" aria-label="Buffer duration in minutes" />
                 <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-gray-400">
                     min
@@ -38,6 +38,12 @@
                 <i class="fas fa-plus text-sm"></i>
             </button>
         </div>
+
+        <!-- Max-limit hint -->
+        <p *ngIf="limitReached()" class="text-xs text-amber-700 flex items-center gap-1.5" role="status">
+            <i class="fas fa-circle-exclamation"></i>
+            Maximum buffer time is {{ MAX_BUFFER_MINUTES }} minutes (24 hours). Value has been adjusted.
+        </p>
 
         <!-- Example feedback -->
         <div class="rounded-lg border border-green-200 bg-green-50/50 px-3 py-2.5 text-xs text-gray-700 flex items-center gap-2">
