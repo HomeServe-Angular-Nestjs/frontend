@@ -2,8 +2,12 @@ import { Component, computed, inject, OnDestroy, signal, effect } from '@angular
 import { CommonModule } from '@angular/common';
 import { ProviderService } from '../../../../../../core/services/provider.service';
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
+import { Store } from '@ngrx/store';
+import { Actions, ofType } from '@ngrx/effects';
+import { selectProvider } from '../../../../../../store/provider/provider.selector';
+import { providerActions } from '../../../../../../store/provider/provider.action';
 import { FormsModule } from '@angular/forms';
-import { Subject, finalize, map, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -14,32 +18,85 @@ import { toSignal } from '@angular/core/rxjs-interop';
 })
 export class ProviderAvailabilityComponentSlotRulesComponent implements OnDestroy {
   private readonly _providerService = inject(ProviderService);
+  private readonly _store = inject(Store);
   private readonly _toastr = inject(ToastNotificationService);
+  private readonly _actions$ = inject(Actions);
   private readonly _destroy$ = new Subject<void>();
 
-  readonly providerData = toSignal(
-    this._providerService.providerData$,
+  readonly provider = toSignal(
+    this._store.select(selectProvider),
     { initialValue: null }
   );
 
   readonly isSaving = signal(false);
+  readonly isLoading = signal(true);
+  readonly limitReached = signal(false);
 
   readonly originalBufferTime = computed(
-    () => this.providerData()?.bufferTime ?? 0
+    () => this.provider()?.bufferTime ?? 0
   );
 
   readonly bufferTime = signal<number>(0);
+
+  readonly MAX_BUFFER_MINUTES = 1440;
 
   readonly isDirty = computed(
     () => this.bufferTime() !== this.originalBufferTime()
   );
 
-  readonly providerId = computed(() => this.providerData()?.id);
+  readonly providerId = computed(() => this.provider()?.id);
+
+  readonly exampleUnavailableUntil = computed(() => {
+    const buffer = Math.max(0, this.bufferTime() ?? 0);
+    const totalMinutes = 600 + 60 + buffer;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const format = (value: number) => String(value).padStart(2, '0');
+    return `${format(hours)}:${format(minutes)}`;
+  });
+
+  readonly canDecrement = computed(() => (this.bufferTime() ?? 0) > 0);
 
   constructor() {
     effect(() => {
       this.bufferTime.set(this.originalBufferTime());
     });
+
+    effect(() => {
+      if (this.provider()) {
+        this.isLoading.set(false);
+      }
+    });
+
+    this._actions$
+      .pipe(
+        ofType(providerActions.failureAction),
+        takeUntil(this._destroy$)
+      )
+      .subscribe(() => {
+        this.isLoading.set(false);
+      });
+  }
+
+  applyStep(delta: number) {
+    this.updateBuffer((this.bufferTime() ?? 0) + delta);
+  }
+
+  updateBuffer(value: number) {
+    if (!Number.isFinite(value)) {
+      value = 0;
+    }
+
+    this.limitReached.set(value > this.MAX_BUFFER_MINUTES);
+    this.bufferTime.set(Math.min(this.MAX_BUFFER_MINUTES, Math.max(0, value)));
+  }
+
+  onBufferInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const value = Number.isFinite(input.valueAsNumber) ? input.valueAsNumber : 0;
+
+    this.updateBuffer(value);
+    input.value = String(this.bufferTime());
   }
 
   onSubmit() {
@@ -49,6 +106,11 @@ export class ProviderAvailabilityComponentSlotRulesComponent implements OnDestro
 
     if (bufferTime == null || Number.isNaN(bufferTime) || bufferTime < 0) {
       this._toastr.error('Buffer time must be a positive number.');
+      return;
+    }
+
+    if (bufferTime > this.MAX_BUFFER_MINUTES) {
+      this._toastr.error(`Buffer time cannot exceed ${this.MAX_BUFFER_MINUTES} minutes.`);
       return;
     }
 
@@ -67,7 +129,11 @@ export class ProviderAvailabilityComponentSlotRulesComponent implements OnDestro
           }
 
           this._providerService.setProviderData(res.data);
+          this._store.dispatch(providerActions.successAction({ provider: res.data }));
           this._toastr.success(res.message);
+        },
+        error: () => {
+          this._toastr.error('Failed to update buffer time.');
         },
       });
   }

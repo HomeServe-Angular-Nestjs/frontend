@@ -1,9 +1,9 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { formatTimeRanges, timeToMinutes } from '../../../../../../core/utils/date.util';
+import { timeToMinutes } from '../../../../../../core/utils/date.util';
 import { IDateOverrideViewList } from '../../../../../../core/models/availability.model';
-import { filter, map, Subject, takeUntil } from 'rxjs';
+import { filter, finalize, map, Subject, takeUntil } from 'rxjs';
 import { AvailabilityService } from '../../../../../../core/services/availability.service';
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { ToastNotificationService } from '../../../../../../core/services/public/toastr.service';
@@ -35,8 +35,8 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
   availability = signal<ModalAvailabilityType | null>(null);
   today = new Date().toISOString().split('T')[0];
   modal = false;
-  draftFrom = '';
-  draftTo = '';
+  isLoading = true;
+  isSaving = signal(false);
 
   overrides = signal<IDateOverrideViewList[]>([]);
 
@@ -46,6 +46,82 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
 
   ngOnInit(): void {
     this._fetchOverrides();
+  }
+
+  get slotDraftError(): string {
+    const { from, to } = this.slotDraftForm.value;
+
+    if (!from || !to) {
+      return '';
+    }
+
+    const error = this._validateSlot(from, to);
+    if (error) {
+      return error;
+    }
+
+    if (this._hasOverlap(from, to)) {
+      return 'This time slot overlaps an existing slot';
+    }
+
+    return '';
+  }
+
+  get dateError(): string {
+    const date = this.form.get('date')?.value;
+
+    if (!date) {
+      return 'Date is required';
+    }
+
+    if (this._hasDateOverride(date)) {
+      return 'This date already has an override';
+    }
+
+    if (this._isPastDate(date)) {
+      return 'Past dates cannot be scheduled';
+    }
+
+    return '';
+  }
+
+  get reasonError(): string {
+    const reason = this.form.get('reason')?.value;
+
+    if (reason && (reason.length < 10 || reason.length > 100)) {
+      return 'Reason must be between 10 and 100 characters';
+    }
+
+    return '';
+  }
+
+  get slotsRequiredError(): string {
+    if (this.availability() === 'custom' && this.timeRanges.length === 0) {
+      return 'At least one time slot is required';
+    }
+
+    return '';
+  }
+
+  get saveDisabled(): boolean {
+    if (!this.availability()) {
+      return true;
+    }
+
+    if (!this.form.get('date')?.value || this.form.get('date')?.invalid) {
+      return true;
+    }
+
+    if (this.dateError || this.reasonError || this.slotsRequiredError) {
+      return true;
+    }
+
+    return false;
+  }
+
+  get addSlotDisabled(): boolean {
+    const { from, to } = this.slotDraftForm.value;
+    return !from || !to || !!this.slotDraftError;
   }
 
   removeTimeRange(index: number) {
@@ -61,20 +137,14 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
   }
 
   addDraftSlot() {
+    if (this.addSlotDisabled || this.slotDraftError) {
+      if (this.slotDraftError) {
+        this._toastr.error(this.slotDraftError);
+      }
+      return;
+    }
+
     const { from, to } = this.slotDraftForm.value;
-
-    // basic slot validation
-    const error = this._validateSlot(from, to);
-    if (error) {
-      this._toastr.error(error);
-      return;
-    }
-
-    // overlap validation
-    if (this._hasOverlap(from, to)) {
-      this._toastr.error('This time slot overlaps an existing slot');
-      return;
-    }
 
     this.timeRanges.push(
       this._fb.group({
@@ -100,45 +170,27 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
   }
 
   saveChanges() {
+    if (this.isSaving()) return;
+
     const { date, reason } = this.form.value;
 
-    // Date required
-    if (!date) {
-      this._toastr.error('Date is required');
+    if (this.dateError) {
+      this._toastr.error(this.dateError);
       return;
     }
 
-    const dateFormat = new Date(date);
-    dateFormat.setHours(0, 0, 0, 0);
-
-    // Duplicate date check
-    const selectedTime = dateFormat.getTime();
-
-    const isDuplicateDate = this.overrides().some(override => {
-      const existing = new Date(override.date);
-      existing.setHours(0, 0, 0, 0);
-      return existing.getTime() === selectedTime;
-    });
-
-    if (isDuplicateDate) {
-      this._toastr.error('This date already has an override');
+    if (this.slotsRequiredError) {
+      this._toastr.error(this.slotsRequiredError);
       return;
     }
 
-    // Custom availability must have slots
-    if (this.availability() === 'custom' && this.timeRanges.length === 0) {
-      this._toastr.error('At least one time slot is required');
-      return;
-    }
-
-    // Reason length validation
-    if (reason && (reason.length < 10 || reason.length > 100)) {
-      this._toastr.error('Reason must be between 10 and 100 characters');
+    if (this.reasonError) {
+      this._toastr.error(this.reasonError);
       return;
     }
 
     const payload = {
-      date: dateFormat.toString(),
+      date: `${date}T00:00:00.000Z`,
       timeRanges:
         this.availability() === 'custom'
           ? this.timeRanges.value.map((t: any) => ({
@@ -150,10 +202,13 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
       isAvailable: this.availability() === 'custom',
     };
 
+    this.isSaving.set(true);
+
     this._availabilityService.createDateOverride(payload)
       .pipe(
         takeUntil(this._destroy$),
-        map(res => res.data || null)
+        map(res => res.data || null),
+        finalize(() => this.isSaving.set(false))
       )
       .subscribe({
         next: (override) => {
@@ -172,34 +227,43 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
           this.overrides.update(overrides => [...overrides, overrideData]);
           this._toastr.success('Override created successfully');
           this.closeModal();
+        },
+        error: () => {
+          this._toastr.error('Failed to create override. Please try again.');
         }
       });
   }
 
   deleteOverride(date: string) {
-    const formatDate = new Date(date)
-    formatDate.setHours(0, 0, 0, 0)
-    date = formatDate.toISOString();
+    const parsed = new Date(date.includes('T') ? date : `${date}T00:00:00.000Z`);
 
-    this._availabilityService.deleteOverride(date)
+    if (Number.isNaN(parsed.getTime())) {
+      this._toastr.error('Invalid override date.');
+      return;
+    }
+
+    const target = parsed.toISOString();
+
+    this._availabilityService.deleteOverride(target)
       .pipe(
         takeUntil(this._destroy$),
         filter(res => res.success)
       )
       .subscribe({
         next: () => {
+          const targetDay = target.split('T')[0];
           this.overrides.update(overrides => overrides.filter(override => {
-            console.log(override.date)
-            console.log(date)
-            return override.date !== date
+            return new Date(override.date).toISOString().split('T')[0] !== targetDay;
           }));
           this._toastr.success('Override deleted successfully');
         }
       });
   }
 
-  formatTimeRanges(ranges: { startTime: string; endTime: string }[]): string {
-    return formatTimeRanges(ranges);
+  reasonFallback(override: IDateOverrideViewList): string {
+    return override.isAvailable
+      ? 'Custom availability for this date.'
+      : 'No bookings allowed on this date.';
   }
 
   private _fetchOverrides() {
@@ -209,13 +273,33 @@ export class ProviderAvailabilityDateOverridesComponent implements OnInit, OnDes
         map(res => res.data || [])
       )
       .subscribe({
-        next: (overrides) => this.overrides.set(overrides)
+        next: (overrides) => {
+          this.overrides.set(overrides);
+          this.isLoading = false;
+        },
+        error: () => {
+          this.isLoading = false;
+        }
       })
   }
 
-  get reason(): string {
-    return this.availability() === 'custom' ? 'Custom availability for this date.'
-      : 'No bookings allowed on this date.'
+  private _hasDateOverride(date: string): boolean {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return false;
+    }
+
+    const day = new Date(`${date}T00:00:00.000Z`).toISOString().split('T')[0];
+
+    return this.overrides().some(override =>
+      new Date(override.date).toISOString().split('T')[0] === day
+    );
+  }
+
+  private _isPastDate(date: string): boolean {
+    const today = new Date();
+    const todayYmd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    return date < todayYmd;
   }
 
   private _hasOverlap(newFrom: string, newTo: string): boolean {

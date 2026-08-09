@@ -1,25 +1,75 @@
-<section class="bg-white rounded-lg border p-4 text-sm">
-    <form class="max-w-sm" (submit)="onSubmit()">
-        <label class="block text-xs font-medium text-gray-500 mb-1">
-            Buffer duration
-        </label>
+<section class="card space-y-6">
 
-        <div class="flex items-center gap-2">
+    <div class="space-y-1">
+        <h2 class="section-title">Buffer time</h2>
+        <p class="section-subtext">Buffer time adds a gap between bookings to avoid overlap.</p>
+    </div>
+
+    <!-- SKELETON LOADING -->
+    <div *ngIf="isLoading()" class="max-w-md space-y-5">
+        <div class="flex items-center gap-3">
+            <div class="skeleton !rounded-lg h-11 w-9"></div>
+            <div class="skeleton h-11 flex-1"></div>
+            <div class="skeleton !rounded-lg h-11 w-9"></div>
+        </div>
+        <div class="skeleton h-10 w-full"></div>
+    </div>
+
+    <form *ngIf="!isLoading()" class="max-w-md space-y-5" (submit)="onSubmit()">
+
+        <!-- Stepper input -->
+        <div class="flex items-center gap-3">
+            <button type="button" class="stepper-btn" aria-label="Decrease buffer"
+                [disabled]="!canDecrement() || isSaving()" (click)="applyStep(-5)">
+                <i class="fas fa-minus text-sm"></i>
+            </button>
+
             <div class="relative flex-1">
-                <input type="number" min="0" [value]="bufferTime()"
-                    (input)="bufferTime.set($any($event.target).valueAsNumber)" class="block w-full rounded-lg border-gray-200 bg-white py-3 pl-3 pr-10
-                 text-sm text-gray-900
-                 focus:border-green-500 focus:ring-green-500" />
-
+                <input type="number" min="0" [max]="MAX_BUFFER_MINUTES" [value]="bufferTime()"
+                    (input)="onBufferInput($event)"
+                    class="input-field block w-full !pr-11 !py-3" aria-label="Buffer duration in minutes" />
                 <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-gray-400">
                     min
                 </span>
             </div>
 
-            <button type="submit" [disabled]="!isDirty() || isSaving()" class="flex items-center justify-center text-green-600
-               disabled:opacity-40 disabled:cursor-not-allowed">
-                <i class="fa-solid" [ngClass]="isSaving() ? 'fa-circle-notch fa-spin' : 'fa-check'"></i>
+            <button type="button" class="stepper-btn" aria-label="Increase buffer"
+                [disabled]="isSaving()" (click)="applyStep(5)">
+                <i class="fas fa-plus text-sm"></i>
             </button>
         </div>
+
+        <!-- Max-limit hint -->
+        <p *ngIf="limitReached()" class="text-xs text-amber-700 flex items-center gap-1.5" role="status">
+            <i class="fas fa-circle-exclamation"></i>
+            Maximum buffer time is {{ MAX_BUFFER_MINUTES }} minutes (24 hours). Value has been adjusted.
+        </p>
+
+        <!-- Example feedback -->
+        <div class="rounded-lg border border-green-200 bg-green-50/50 px-3 py-2.5 text-xs text-gray-700 flex items-center gap-2">
+            <i class="fas fa-circle-info text-green-600"></i>
+            <span>
+                A <strong>10:00 – 11:00</strong> booking stays blocked until
+                <strong>{{ exampleUnavailableUntil() }}</strong>
+            </span>
+        </div>
+
+        <!-- Save -->
+        <div class="flex items-center gap-3 pt-2">
+            <button type="submit" [disabled]="!isDirty() || isSaving()" class="btn-primary">
+                <i class="fas" [ngClass]="isSaving() ? 'fa-circle-notch fa-spin' : 'fa-check mr-1'"></i>
+                {{ isSaving() ? 'Saving…' : 'Save buffer' }}
+            </button>
+
+            <span *ngIf="isDirty() && !isSaving()" class="text-xs text-amber-700 flex items-center gap-1.5">
+                <i class="fas fa-circle-exclamation"></i>
+                You have unsaved changes
+            </span>
+
+            <span *ngIf="!isDirty() && !isSaving()" class="text-xs text-gray-400">
+                Current: {{ bufferTime() }} min
+            </span>
+        </div>
     </form>
+
 </section>
