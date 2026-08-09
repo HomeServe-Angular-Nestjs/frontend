@@ -8,7 +8,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'landing_page'
+    redirectTo: 'landing_page',
   },
   {
     path: 'provider',

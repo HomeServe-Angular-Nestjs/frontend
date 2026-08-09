@@ -77,17 +77,45 @@
                                 ₹{{bookingDetails.breakup.tax | number:'1.2-2'}}
                             </span>
                         </div>
+                        <div *ngIf="bookingDetails.breakup.coupon"
+                            class="flex items-center justify-between p-3 rounded-lg bg-emerald-50/60 border border-emerald-100">
+                            <span class="flex items-center gap-2">
+                                <i class="fas fa-tag text-[11px] text-emerald-600"></i>
+                                <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">Coupon
+                                    Applied</span>
+                            </span>
+                            <span class="flex items-center gap-2">
+                                <span class="text-xs font-black text-emerald-700 uppercase tracking-wider">
+                                    {{ bookingDetails.breakup.coupon.couponCode }}
+                                </span>
+                                <span class="text-[10px] font-semibold text-emerald-600">
+                                    (Saved ₹{{ bookingDetails.breakup.discount | number:'1.2-2' }})
+                                </span>
+                            </span>
+                        </div>
+                        <div *ngIf="bookingDetails.breakup.discount" class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Discount</span>
+                            <span class="text-sm font-bold text-emerald-600">
+                                -₹{{ bookingDetails.breakup.discount | number:'1.2-2' }}
+                            </span>
+                        </div>
                         <div class="flex justify-between items-center pt-3 border-t border-gray-200">
                             <span class="text-xs font-black text-gray-900 uppercase tracking-widest">Total Charge</span>
-                            <span class="text-2xl font-black text-indigo-600">
-                                ₹{{bookingDetails.breakup.total | number:'1.2-2'}}
+                            <span class="flex items-center gap-2">
+                                <span *ngIf="bookingDetails.breakup.discount"
+                                    class="text-sm font-bold text-gray-400 line-through">
+                                    ₹{{ bookingDetails.breakup.originalTotal | number:'1.2-2' }}
+                                </span>
+                                <span class="text-2xl font-black text-indigo-600">
+                                    ₹{{bookingDetails.breakup.total | number:'1.2-2'}}
+                                </span>
                             </span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Transaction History -->
-                <div *ngIf="bookingDetails.transactionHistory?.length"
+                <div *ngIf="bookingDetails.transactionHistory.length"
                     class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mt-6">
                     <div class="px-6 py-4 border-b border-gray-50 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">

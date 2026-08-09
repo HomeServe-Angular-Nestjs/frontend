@@ -25,6 +25,13 @@ export interface IPriceBreakupData {
   total: number;
   discount?: number;
   originalTotal?: number;
+  coupon?: {
+    couponId: string | null;
+    couponCode: string | null;
+    couponName: string | null;
+    discountType: string | null;
+    discountValue: number | null;
+  };
 }
 
 export type CustomerLocationType = Omit<ILocation, 'type'> & { phone: string };
@@ -210,6 +217,13 @@ export interface IBookingDetailProvider extends IBookingDetailsBase {
     phone: string;
     location: string;
   };
+  breakup: IPriceBreakupData;
+  settlement: {
+    customerPaid: number;
+    providerAmount: number;
+    commissionEarned: number;
+    gst: number;
+  } | null;
 }
 
 

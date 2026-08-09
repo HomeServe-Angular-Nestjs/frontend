@@ -95,8 +95,9 @@ export class BookingService {
     return this._http.get<IResponseProviderBookingLists>(`${this._providerApi}/bookings`, { params });
   }
 
-  getBookingOverviewData(): Observable<IBookingOverviewData> {
-    return this._http.get<IBookingOverviewData>(`${this._providerApi}/bookings/overview_data`)
+  getBookingOverviewData(scope: 'month' | 'total' = 'month'): Observable<IBookingOverviewData> {
+    const params = new HttpParams().set('scope', scope);
+    return this._http.get<IBookingOverviewData>(`${this._providerApi}/bookings/overview_data`, { params })
   }
 
   getBookingDetails(bookingId: string): Observable<IBookingDetailProvider> {
