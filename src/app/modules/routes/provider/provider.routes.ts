@@ -5,6 +5,7 @@ import { ProfilesLayoutComponent } from "../../pages/provider/profiles/profiles-
 import { ProviderResolver } from "../../../core/resolver/providerState.resolver";
 import { ProfileAuthGuard } from "../../../core/guards/profile-auth.guard";
 import { SubscriptionGuard } from "../../../core/guards/subscription-guard.guard";
+import { AnalyticsFeatureGuard } from "../../../core/guards/analytics-feature.guard";
 
 export const providerRoutes: Routes = [
   {
@@ -120,21 +121,21 @@ export const providerRoutes: Routes = [
       },
       {
         path: 'performance',
-        canActivate: [AuthGuard, SubscriptionGuard],
+        canActivate: [AuthGuard, AnalyticsFeatureGuard],
         loadComponent: () => import('../../pages/provider/analytics/performance/performance-page.component')
           .then(c => c.ProviderPerformanceLayoutComponent),
         data: { breadcrumb: 'Performance' }
       },
       {
         path: 'area-analytics',
-        canActivate: [AuthGuard, SubscriptionGuard],
+        canActivate: [AuthGuard, AnalyticsFeatureGuard],
         loadComponent: () => import('../../pages/provider/analytics/area/area-page.component')
           .then(c => c.ProviderAreaAnalyticsComponent),
         data: { breadcrumb: 'Area Analytics' }
       },
       {
         path: 'revenue-analytics',
-        canActivate: [AuthGuard, SubscriptionGuard],
+        canActivate: [AuthGuard, AnalyticsFeatureGuard],
         loadComponent: () => import('../../pages/provider/analytics/revenue/revenue-page.component')
           .then(c => c.ProviderRevenueAnalyticsComponent),
         data: { breadcrumb: 'Revenue Analytics' }

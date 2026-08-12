@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, inject, OnInit, Output } from '@angular/core';
+import { Component, computed, EventEmitter, HostListener, inject, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -6,6 +6,8 @@ import { authActions } from '../../../../../../store/auth/auth.actions';
 import { providerActions } from '../../../../../../store/provider/provider.action';
 import { selectProvider } from '../../../../../../store/provider/provider.selector';
 import { take } from 'rxjs';
+import { SubscriptionService } from '../../../../../../core/services/subscription.service';
+import { FEATURE_REGISTRY } from '../../../../../../core/models/plan.model';
 
 @Component({
   selector: 'app-provider-sidebar',
@@ -14,10 +16,17 @@ import { take } from 'rxjs';
 })
 export class ProviderSidebarComponent implements OnInit {
   private readonly store = inject(Store);
+  private readonly _subscriptionService = inject(SubscriptionService);
 
   @Output() collapsedChange = new EventEmitter<'expanded' | 'collapsed' | 'hidden'>();
 
   providerInfo$ = this.store.select(selectProvider);
+
+  isAnalyticsEnabled = computed(() => {
+    const subscription = this._subscriptionService.getSubscription;
+    return subscription?.isActive === true &&
+      subscription?.features?.[FEATURE_REGISTRY['ANALYTICS_DASHBOARD'].key] === true;
+  });
 
   sidebarMode: 'expanded' | 'collapsed' | 'hidden' = 'expanded';
   isMobileOpen = false;
@@ -38,7 +47,7 @@ export class ProviderSidebarComponent implements OnInit {
     this.innerWidth = window.innerWidth;
     this.updateSidebarMode();
   }
-
+  
   updateSidebarMode() {
     // if (this.innerWidth < 768) {
     //   // MOBILE → Hidden drawer
