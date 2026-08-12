@@ -68,13 +68,19 @@
   <!-- Navigation -->
   <nav class="flex-1 overflow-y-auto p-4 space-y-4">
 
-    <div *ngFor="let item of menuItems" class="space-y-2" [hidden]="item.title === 'Analytics' && !isAnalyticsEnabled()">
+    <div *ngFor="let item of menuItems" class="space-y-2">
       <h2 class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1"
         [ngClass]="{ 'hidden': sidebarMode === 'collapsed' }">
         {{ item.title }}
-        <span *ngIf="item.title === 'Analytics'"
-          class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">
-          Premium
+        <span *ngIf="item.title === 'Analytics'" title="Premium feature"
+          class="ml-1.5 inline-flex items-center justify-center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g fill="#D97706">
+              <path
+                d="M12 2.75a4.75 4.75 0 0 0-4.75 4.75v2h-.75A2.5 2.5 0 0 0 4 12v6a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-6a2.5 2.5 0 0 0-2.5-2.5h-.75v-2A4.75 4.75 0 0 0 12 2.75Zm-3.25 4.75A3.25 3.25 0 0 1 12 4.25a3.25 3.25 0 0 1 3.25 3.25v2H8.75v-2Zm-2.5 3.5h11.5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6.25a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"
+              />
+            </g>
+          </svg>
         </span>
       </h2>
 
