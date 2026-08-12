@@ -15,7 +15,7 @@ export class ServiceManagementService {
   }
 
   updateService(serviceId: string, formData: FormData): Observable<IResponse<IProviderService>> {
-    return this._http.put<IResponse<IProviderService>>(`${this._apiUrl}/${serviceId}`, formData);
+    return this._http.patch<IResponse<IProviderService>>(`${this._apiUrl}/${serviceId}`, formData);
   }
 
   deleteService(serviceId: string): Observable<IResponse<IProviderService>> {

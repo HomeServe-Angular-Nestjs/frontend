@@ -18,6 +18,7 @@ export class ErrorHandlerService {
 
         // ── Subscription ───────────────────────────────────────────────────
         [ErrorCodes.NO_ACTIVE_SUBSCRIPTION]: 'You need an active subscription to access this feature.',
+        [ErrorCodes.SERVICE_LIMIT_EXCEEDED]: 'You’ve reached your service listing limit. Upgrade your plan to add more services.',
 
         // ── Booking ────────────────────────────────────────────────────────
         [ErrorCodes.BOOKING_NOT_FOUND_ERROR]: 'Booking not found. It may have been removed.',

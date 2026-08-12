@@ -11,7 +11,7 @@
             <app-admin-overview-card title="Cancelled Bookings" [value]="bundle.statistics.cancelledBookings"
                 icon="fa-solid fa-ban" iconBg="bg-red-100 text-red-600"></app-admin-overview-card>
             <app-admin-overview-card title="Total Spent"
-                [value]="'$' + bundle.statistics.totalAmountSpent.toLocaleString()"
+                [value]="'₹' + bundle.statistics.totalAmountSpent.toLocaleString('en-IN')"
                 icon="fa-solid fa-dollar-sign" iconBg="bg-emerald-100 text-emerald-600"></app-admin-overview-card>
             <app-admin-overview-card title="Reviews Written" [value]="bundle.statistics.reviewsWritten"
                 icon="fa-solid fa-comments" iconBg="bg-pink-100 text-pink-600"></app-admin-overview-card>

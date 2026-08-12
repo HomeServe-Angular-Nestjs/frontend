@@ -36,6 +36,8 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
   providerData!: IProvider | null;
   allServices: IProviderService[] = [];
   serviceData: IProviderService[] = [];
+  isLoading = false;
+  skeletonCards = Array.from({ length: 4 }, (_, i) => i);
 
   serviceDurations: Record<ServiceDurationKey, IServiceDurationRange> = {
     "Quick Service": { minHours: 0, maxHours: 2 },
@@ -145,6 +147,7 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
   }
 
   loadProviderServices(providerId: string) {
+    this.isLoading = true;
     this._serviceManagementService.getServicesByProviderId(providerId).subscribe({
       next: (res) => {
         if (res.data) {
@@ -152,8 +155,12 @@ export class CustomerProviderProfileServicesComponent implements OnInit {
           this.serviceData = [...this.allServices];
           this._emitFilters();
         }
+        this.isLoading = false;
       },
-      error: (err) => this._toastr.error(err.message || 'Failed to load services')
+      error: (err) => {
+        this.isLoading = false;
+        this._toastr.error(err.message || 'Failed to load services')
+      }
     });
   }
 

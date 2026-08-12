@@ -11,7 +11,10 @@ export interface IVerifyTokenResponse {
 export interface IResponse<T = any> {
     success: boolean,
     message: string,
-    data?: T
+    data?: T,
+    meta?: {
+        total?: number;
+    } | null
 }
 
 export interface ResponseInterface {

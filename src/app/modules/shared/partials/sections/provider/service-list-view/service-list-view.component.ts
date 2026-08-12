@@ -24,6 +24,7 @@ export class ServiceListViewComponent {
     @Output() updateSubServiceEvent = new EventEmitter<IUpdateSubservice>();
 
     expandedSubServices: Record<string, boolean> = {};
+    deletingId: string | null = null;
 
     updateService(updateData: IToggleServiceStatus) {
         this.updateEvent.emit(updateData);
@@ -76,8 +77,10 @@ export class ServiceListViewComponent {
         ).afterClosed()
             .subscribe(confirm => {
                 if (!confirm) return;
+                this.deletingId = id;
                 this._serviceService.removeService(id).subscribe({
                     next: (response) => {
+                        this.deletingId = null;
                         if (response.success) {
                             this.offeredServices = this.offeredServices.filter(service => service.id !== id);
                             this._toastr.success(response.message);
@@ -86,6 +89,7 @@ export class ServiceListViewComponent {
                         }
                     },
                     error: (err) => {
+                        this.deletingId = null;
                         this._toastr.error('Oops, something went wrong.');
                         console.error(err);
                     }

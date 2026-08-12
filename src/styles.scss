@@ -136,11 +136,11 @@ body {
   pointer-events: auto !important;
   width: auto !important;
   min-width: 260px !important;
-  max-width: 420px !important;
+  max-width: 480px !important;
   min-height: 38px !important;
   /* Sleek & Thin */
-  padding: 0 36px 0 42px !important;
-  border-radius: 99px !important;
+  padding: 8px 36px 8px 42px !important;
+  border-radius: 16px !important;
   /* Pill shape for sleekness */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
   position: relative !important;
@@ -181,11 +181,11 @@ body {
   .toast-message {
     font-size: 0.8rem !important;
     color: rgba(255, 255, 255, 0.95) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 1.2 !important;
-    display: inline-flex !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    line-height: 1.4 !important;
+    display: inline !important;
     align-items: center !important;
   }
 

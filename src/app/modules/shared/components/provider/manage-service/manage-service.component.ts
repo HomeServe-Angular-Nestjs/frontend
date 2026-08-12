@@ -84,10 +84,14 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   editingService = signal<IProviderService | null>(null);
   serviceForm!: FormGroup;
   categorySearchControl = new FormControl('');
+  imageError = signal<string | null>(null);
+  submitted = signal(false);
 
   services = signal<IProviderService[]>([]);
   loading = signal(false);
   isCreating = signal(false);
+  deletingId = signal<string | null>(null);
+  skeletonCards = Array.from({ length: 6 }, (_, i) => i);
 
   professions = signal<IProfession[]>([]);
   serviceCategories = signal<IServiceCategory[]>([]);
@@ -142,6 +146,11 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     return cats.filter(c => c.name.toLowerCase().includes(searchText));
   }
 
+  showError(field: string): boolean {
+    const control = this.serviceForm.get(field);
+    return !!(control && control.touched && control.invalid);
+  }
+
   selectCategory(cat: IServiceCategory) {
     this.serviceForm.patchValue({
       categoryId: cat.id,
@@ -152,13 +161,29 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   }
 
   onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      const reader = new FileReader();
-      reader.onload = () => this.imagePreview = reader.result as string;
-      reader.readAsDataURL(file);
+    this.imageError.set(null);
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    const maxSize = 2 * 1024 * 1024;
+
+    if (!allowedTypes.includes(file.type)) {
+      this.imageError.set('Only JPG, JPEG or PNG images are allowed.');
+      event.target.value = '';
+      return;
     }
+
+    if (file.size > maxSize) {
+      this.imageError.set('Image size must be 2MB or less.');
+      event.target.value = '';
+      return;
+    }
+
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = () => this.imagePreview = reader.result as string;
+    reader.readAsDataURL(file);
   }
 
   toggleView(mode: 'list' | 'form', service?: IProviderService) {
@@ -185,13 +210,18 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
       .afterClosed()
       .subscribe(confirm => {
         if (!confirm) return;
+        this.deletingId.set(id);
         this._providerServiceManagementService.deleteService(id)
           .pipe(takeUntil(this._destroy$))
           .subscribe({
             next: () => {
               this.services.update(prev => prev.filter(s => s.id !== id));
+              this.deletingId.set(null);
               this._updateStats();
               this._toastr.success('Service deleted successfully');
+            },
+            error: () => {
+              this.deletingId.set(null);
             }
           });
       });
@@ -256,15 +286,22 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
+    this.imageError.set(null);
     if (this.serviceForm.invalid) {
+      this.submitted.set(true);
       this.serviceForm.markAllAsTouched();
+      return;
+    }
+
+    if (!this.isEditing() && !this.selectedFile && !this.imagePreview) {
+      this.imageError.set('Please add a service thumbnail.');
       return;
     }
 
     const val = this.serviceForm.value;
     const formData = new FormData();
     Object.keys(val).forEach(key => {
-      if (key !== 'categoryName' && val[key] !== null && val[key] !== undefined) {
+      if (!['categoryName', 'id'].includes(key) && val[key] !== null && val[key] !== undefined) {
         formData.append(
           key,
           typeof val[key] === 'object' ? JSON.stringify(val[key]) : val[key]
@@ -293,7 +330,12 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.services.update(services => [newService, ...services]);
+        this.services.update(services => {
+          if (this.isEditing()) {
+            return services.map(s => s.id === newService.id ? newService : s);
+          }
+          return [newService, ...services];
+        });
         this._toastr.success(this.isEditing() ? 'Service updated' : 'Service created');
         this.viewMode.set('list');
       }
@@ -324,7 +366,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
         next: (res) => {
           if (res.data) {
             this.services.set(res.data);
-            this.pagination.update(prev => ({ ...prev, total: res.data?.length || 0 }));
+            this.pagination.update(prev => ({ ...prev, total: res.meta?.total ?? (res.data?.length || 0) }));
             this._updateStats();
           }
         },
@@ -366,7 +408,6 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   private _loadCategoriesByProf(profId: string) {
     if (!profId) {
       this.serviceCategories.set([]);
-      this.professions.set([]);
       return;
     }
 
@@ -380,17 +421,14 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   }
 
   private _attemptCreateForm(): void {
-    // this._providerServiceManagementService // todo
-    //   .canCreateService()
-    //   .subscribe({
-    //     next: (res) => {
-    //       if (!res.success) {
-    //         return;
-    //       }
-    //     }
-    //   });
-      this._openCreateForm();
-    }
+    this._providerServiceManagementService.canCreateService()
+      .pipe(takeUntil(this._destroy$))
+      .subscribe({
+        next: () => {
+          this._openCreateForm();
+        }
+      });
+  }
 
   private _openCreateForm(): void {
     this.viewMode.set('form');
@@ -400,6 +438,8 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     this.categorySearchControl.setValue('');
     this.selectedFile = null;
     this.imagePreview = null;
+    this.imageError.set(null);
+    this.submitted.set(false);
 
     this.serviceForm.reset({
       pricingUnit: 'hour',
@@ -419,6 +459,8 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     this.categorySearchControl.setValue('');
     this.selectedFile = null;
     this.imagePreview = service.image || null;
+    this.imageError.set(null);
+    this.submitted.set(false);
 
     this.serviceForm.patchValue({
       id: service.id,
