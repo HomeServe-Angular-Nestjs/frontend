@@ -14,7 +14,7 @@ import { RevenueEarningsForecastChartComponent } from "../../../../shared/compon
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
 import { AnalyticService } from "../../../../../core/services/analytics.service";
 import { IRevenueAnalyticsBundle, RevenueChartView } from "../../../../../core/models/analytics.model";
-import { map, shareReplay } from "rxjs";
+import { catchError, map, of, shareReplay, startWith } from "rxjs";
 
 echarts.use([
     TooltipComponent,
@@ -29,6 +29,15 @@ echarts.use([
     HeatmapChart,
     CanvasRenderer
 ]);
+
+const EMPTY_REVENUE: IRevenueAnalyticsBundle = {
+    summary: { revenueOverview: { totalRevenue: 0, revenueGrowth: 0, completedTransactions: 0, avgTransactionValue: 0 } },
+    trends: { trend: { labels: [], providerRevenue: [], platformAvg: [] } },
+    growth: { monthlyGrowth: [], composition: [], topServices: [] },
+    clients: { newAndReturning: [] },
+};
+
+type RevenueVM = { status: 'loading' | 'error' | 'success'; data: IRevenueAnalyticsBundle };
 
 @Component({
     selector: 'app-revenue-analytics-page',
@@ -48,19 +57,38 @@ export class ProviderRevenueAnalyticsComponent implements OnInit {
     private readonly _sharedService = inject(SharedDataService);
     private readonly _analyticService = inject(AnalyticService);
 
-    bundle$ = this._analyticService.getRevenueBundle().pipe(
-        map(res => res?.data ?? null),
-        shareReplay(1)
-    );
+    vm$ = this._load('monthly');
+
+    private _load(view: RevenueChartView) {
+        return this._analyticService.getRevenueBundle(view).pipe(
+            map(res => ({ status: 'success' as const, data: res?.data ?? EMPTY_REVENUE })),
+            catchError(() => of({ status: 'error' as const, data: EMPTY_REVENUE })),
+            startWith({ status: 'loading' as const, data: EMPTY_REVENUE }),
+            shareReplay(1)
+        );
+    }
+
+    retry(): void {
+        this.vm$ = this._load(this._currentView);
+    }
+
+    private _currentView: RevenueChartView = 'monthly';
+
+    hasData(vm: RevenueVM): boolean {
+        return vm.data.summary.revenueOverview.totalRevenue > 0
+            || vm.data.trends.trend.providerRevenue.length > 0
+            || vm.data.growth.monthlyGrowth.length > 0
+            || vm.data.growth.composition.length > 0
+            || vm.data.growth.topServices.length > 0
+            || vm.data.clients.newAndReturning.length > 0;
+    }
 
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Revenue Analytics');
     }
 
     onViewChange(view: RevenueChartView) {
-        this.bundle$ = this._analyticService.getRevenueBundle(view).pipe(
-            map(res => res?.data ?? null),
-            shareReplay(1)
-        );
+        this._currentView = view;
+        this.vm$ = this._load(view);
     }
 }

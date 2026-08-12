@@ -16,7 +16,8 @@ import { ProviderPerformanceDisputesChartComponent } from "../../../../shared/co
 import { ProviderPerformanceComparisonOverviewComponent } from "../../../../shared/components/provider/performance-analytics/comparison-chart/comparison-overview.component";
 import { AnalyticService } from "../../../../../core/services/analytics.service";
 import { IPerformanceAnalyticsBundle } from "../../../../../core/models/analytics.model";
-import { map, shareReplay } from "rxjs";
+import { catchError, map, of, shareReplay, startWith } from "rxjs";
+
 
 
 echarts.use([
@@ -33,6 +34,21 @@ echarts.use([
     CanvasRenderer
 ]);
 
+const EMPTY_PERFORMANCE: IPerformanceAnalyticsBundle = {
+    summary: { performanceAnalytics: { avgResponseTime: 0, onTimePercent: 0, avgRating: 0, completionRate: 0 } },
+    bookings: { bookingOverview: [], trends: { distributions: [], reviews: [] } },
+    quality: { responseTimeDistribution: [], onTimeArrival: [], monthlyDisputeStats: [] },
+    comparison: {
+        comparisonOverview: {
+            growthRate: 0,
+            monthlyTrend: { previousMonth: 0, currentMonth: 0, previousRevenue: 0, currentRevenue: 0, growthPercentage: 0 },
+            providerRank: 0
+        },
+        comparisonStats: []
+    },
+};
+
+type PerformanceVM = { status: 'loading' | 'error' | 'success'; data: IPerformanceAnalyticsBundle };
 @Component({
     selector: 'app-performance-page',
     templateUrl: './performance-page.component.html',
@@ -53,10 +69,28 @@ export class ProviderPerformanceLayoutComponent implements OnInit {
     private readonly _sharedService = inject(SharedDataService);
     private readonly _analyticService = inject(AnalyticService);
 
-    bundle$ = this._analyticService.getPerformanceBundle().pipe(
-        map(res => res?.data ?? null),
-        shareReplay(1)
-    );
+    vm$ = this._load();
+
+    private _load() {
+        return this._analyticService.getPerformanceBundle().pipe(
+            map(res => ({ status: 'success' as const, data: res?.data ?? EMPTY_PERFORMANCE })),
+            catchError(() => of({ status: 'error' as const, data: EMPTY_PERFORMANCE })),
+            startWith({ status: 'loading' as const, data: EMPTY_PERFORMANCE }),
+            shareReplay(1)
+        );
+    }
+
+    retry(): void {
+        this.vm$ = this._load();
+    }
+
+    hasData(vm: PerformanceVM): boolean {
+        return vm.data.bookings.bookingOverview.length > 0
+            || vm.data.bookings.trends.distributions.length > 0
+            || vm.data.bookings.trends.reviews.length > 0
+            || vm.data.quality.responseTimeDistribution.length > 0
+            || vm.data.comparison.comparisonStats.length > 0;
+    }
 
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Performance Analytics');

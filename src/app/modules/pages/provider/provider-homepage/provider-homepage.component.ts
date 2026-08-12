@@ -5,23 +5,7 @@ import { ProviderOverviewCardsComponent } from '../../../shared/partials/section
 import { IProviderDashboardOverview, OverviewCardData } from '../../../../core/models/dashboard.model';
 import { ProviderService } from '../../../../core/services/provider.service';
 import { Subject, takeUntil } from 'rxjs';
-import { provideEchartsCore } from 'ngx-echarts';
-import * as echarts from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
-import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components';
-import { RevenueTrendChartComponent } from '../../../shared/components/provider/revenue-analytics/trends-chart.component';
-import { BarChart, LineChart } from 'echarts/charts';
-import { ProviderPerformanceBookingChartComponent } from '../../../shared/components/provider/performance-analytics/booking-chart/booking-chart.component';
 import { ProviderBookingRecentComponent } from '../../../shared/components/provider/bookings/bookings-recent/booking-recent.component';
-
-echarts.use([
-  CanvasRenderer,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
-  LineChart,
-  BarChart
-]);
 
 @Component({
   selector: 'app-provider-homepage',
@@ -29,11 +13,8 @@ echarts.use([
   imports: [
     CommonModule,
     ProviderOverviewCardsComponent,
-    RevenueTrendChartComponent,
-    ProviderPerformanceBookingChartComponent,
     ProviderBookingRecentComponent
-  ],
-  providers: [provideEchartsCore({ echarts })]
+  ]
 })
 export class ProviderHomepageComponent implements OnInit, OnDestroy {
   private readonly _sharedService = inject(SharedDataService);

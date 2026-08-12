@@ -2,18 +2,20 @@ import { CommonModule, KeyValuePipe } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Router } from "@angular/router";
-import { selectAuthUserType } from "../../../../store/auth/auth.selector";
+import { selectAuthUserType } from "../../../../../store/auth/auth.selector";
 import { catchError, combineLatest, filter, map, Observable, of, pairwise, shareReplay, Subject, switchMap, takeUntil, throwError } from "rxjs";
-import { FEATURE_REGISTRY, IPlan } from "../../../../core/models/plan.model";
-import { PlanService } from "../../../../core/services/plans.service";
-import { PaymentService } from "../../../../core/services/payment.service";
-import { RazorpayWrapperService } from "../../../../core/services/public/razorpay-wrapper.service";
-import { ToastNotificationService } from "../../../../core/services/public/toastr.service";
-import { SubscriptionService } from "../../../../core/services/subscription.service";
-import { ISubscriptionOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../core/models/payment.model";
-import { ICreateSubscription, ISubscription } from "../../../../core/models/subscription.model";
-import { PaymentDirection, PaymentSource, PlanDuration, TransactionStatus, TransactionType } from "../../../../core/enums/enums";
-import { SharedDataService } from "../../../../core/services/public/shared-data.service";
+import { FEATURE_REGISTRY, IPlan, SERVICE_LISTING_UNLIMITED } from "../../../../../core/models/plan.model";
+import { PlanService } from "../../../../../core/services/plans.service";
+import { PaymentService } from "../../../../../core/services/payment.service";
+import { RazorpayWrapperService } from "../../../../../core/services/public/razorpay-wrapper.service";
+import { ToastNotificationService } from "../../../../../core/services/public/toastr.service";
+import { SubscriptionService } from "../../../../../core/services/subscription.service";
+import { ISubscriptionOrder, RazorpayOrder, RazorpayPaymentResponse } from "../../../../../core/models/payment.model";
+import { ICreateSubscription, ISubscription } from "../../../../../core/models/subscription.model";
+import { PaymentDirection, PaymentSource, PlanDuration, TransactionStatus, TransactionType } from "../../../../../core/enums/enums";
+import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
+import { MatDialog, MatDialogModule } from "@angular/material/dialog";
+import { UpgradeModalComponent } from "../upgrade-modal/upgrade-modal.component";
 
 interface PlanBenefit {
   icon: string;
@@ -24,7 +26,7 @@ interface PlanBenefit {
 @Component({
   selector: 'app-subscription-plan-page',
   templateUrl: './subscription-plan.component.html',
-  imports: [CommonModule, KeyValuePipe],
+  imports: [CommonModule, KeyValuePipe, MatDialogModule ],
   providers: [PaymentService, RazorpayWrapperService]
 })
 export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
@@ -36,8 +38,10 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   private readonly _razorpayWrapper = inject(RazorpayWrapperService);
   private readonly _subscriptionService = inject(SubscriptionService);
   private readonly _paymentService = inject(PaymentService);
+  private readonly _dialog = inject(MatDialog);
 
   readonly featureRegistry = FEATURE_REGISTRY;
+  readonly unlimited = SERVICE_LISTING_UNLIMITED;
 
   getFeatureLabel(key: string): string {
     const feature = Object.values(this.featureRegistry).find(f => f.key === key);
@@ -86,8 +90,8 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
         return plans.filter(plan => {
           const isRoleMatched = plan.role.toLowerCase() === this.userType.toLowerCase();
-          const isLifetimeConflict = !!this.currentPlanId && plan.duration.toLowerCase() === PlanDuration.LIFETIME;
-          return isRoleMatched && !isLifetimeConflict;
+          const isFreeTierConflict = !!this.currentPlanId && plan.duration.toLowerCase() === PlanDuration.FreeTier;
+          return isRoleMatched && !isFreeTierConflict;
         });
       }),
       shareReplay(1)
@@ -221,9 +225,23 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     );
   }
 
-  private _handleFreePlan() {
-    const url = this.userType === 'provider' ? ['provider', 'dashboard'] : ['homepage'];
-    this._router.navigate(url);
+  private _handleFreePlan(plan: IPlan) {
+    const subscriptionData: ICreateSubscription = {
+      planId: plan.id,
+      duration: plan.duration,
+    };
+
+    this._subscriptionService.createSubscription(subscriptionData)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe({
+        next: () => {
+          this._toastr.success('Free tier activated successfully.');
+          this._afterSuccessfulSubscription();
+        },
+        error: () => {
+          this._toastr.error('Failed to activate the free tier.');
+        },
+      });
   }
 
   private _handleUpgrade(plan: IPlan): Observable<'success' | 'dismissed'> {
@@ -234,22 +252,25 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
         switchMap(subscription => this._subscriptionService.getUpgradeAmount(subscription.id)),
         map(res => res.data),
         filter(Boolean),
-        switchMap(({ upgradeAmount, creditAmount, monthlyPrice, yearlyPrice }) => {
-          const confirmed = confirm(
-            `Upgrade to Yearly Plan\n\n` +
-            `Yearly price: ₹${yearlyPrice}\n` +
-            `Monthly paid: ₹${monthlyPrice}\n` +
-            `Prorated credit: ₹${creditAmount.toFixed(2)}\n\n` +
-            `Amount due: ₹${upgradeAmount}\n\n` +
-            `Your current monthly plan stays active until the payment is confirmed.`
-          );
-
-          if (!confirmed) {
-            return of('dismissed' as const);
-          }
-
-          return this._initializeUpgrade(upgradeAmount, plan);
-        }),
+        switchMap(({ upgradeAmount, creditAmount, monthlyPrice, yearlyPrice, daysUsed }) =>
+          this._dialog.open(UpgradeModalComponent, {
+            maxWidth: 'calc(100vw - 2rem)',
+            panelClass: 'upgrade-modal-panel',
+            disableClose: false,
+            data: {
+              upgradeAmount,
+              creditAmount,
+              monthlyPrice,
+              yearlyPrice,
+              daysUsed,
+              userType: this.userType,
+            },
+          }).afterClosed().pipe(
+            switchMap(confirmed => confirmed
+              ? this._initializeUpgrade(upgradeAmount, plan)
+              : of('dismissed' as const))
+          )
+        ),
         catchError(err => {
           this._toastr.error('Upgrade failed.');
           return throwError(() => err);
@@ -258,8 +279,8 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   }
 
   proceedSub(plan: IPlan): void {
-    if (plan.duration === PlanDuration.LIFETIME) {
-      this._handleFreePlan();
+    if (this.isFreePlan(plan)) {
+      this._handleFreePlan(plan);
       return;
     }
 
@@ -300,6 +321,10 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
     return this.currentPlanId === plan.id;
   }
 
+  isFreePlan(plan: any): boolean {
+    return plan?.duration?.toLowerCase() === PlanDuration.FreeTier;
+  }
+
   isYearly(): boolean {
     return this.currentPlanDuration === 'yearly';
   }
@@ -324,7 +349,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
       return 'Upgrade to Yearly';
     }
 
-    if (planDuration === PlanDuration.LIFETIME) {
+    if (planDuration === PlanDuration.FreeTier) {
       return 'Get Started';
     }
 
@@ -336,10 +361,9 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   }
 
   getPlanTagline(plan: any): string {
-    const name = plan.name?.toLowerCase();
     const yearly = plan.duration?.toLowerCase() === 'yearly';
 
-    if (name === 'free') {
+    if (this.isFreePlan(plan)) {
       return 'Everything you need to get started — at no cost.';
     }
 
@@ -356,6 +380,10 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
 
   getPerMonthPrice(plan: any): number {
     return Math.round((plan.price || 0) / 12);
+  }
+
+  formatPrice(value: number): string {
+    return value.toLocaleString('en-IN', { maximumFractionDigits: 2 });
   }
 
   getSavingsPercent(plans: IPlan[], plan: any): number {

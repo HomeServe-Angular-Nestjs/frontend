@@ -38,7 +38,7 @@ export class ProviderSidebarComponent implements OnInit {
     this.innerWidth = window.innerWidth;
     this.updateSidebarMode();
   }
-
+  
   updateSidebarMode() {
     // if (this.innerWidth < 768) {
     //   // MOBILE → Hidden drawer

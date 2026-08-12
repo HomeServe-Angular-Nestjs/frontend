@@ -18,6 +18,7 @@ export class ErrorHandlerService {
 
         // ── Subscription ───────────────────────────────────────────────────
         [ErrorCodes.NO_ACTIVE_SUBSCRIPTION]: 'You need an active subscription to access this feature.',
+        [ErrorCodes.FEATURE_NOT_INCLUDED]: 'Analytics is not included in your plan. Upgrade to unlock it.',
         [ErrorCodes.SERVICE_LIMIT_EXCEEDED]: 'You’ve reached your service listing limit. Upgrade your plan to add more services.',
 
         // ── Booking ────────────────────────────────────────────────────────

@@ -18,9 +18,11 @@ export class ProviderResolver implements Resolve<boolean> {
         return this.store.select(selectProvider).pipe(
             take(1),
             switchMap((provider) => {
-                if (!provider) {
-                    this.store.dispatch(providerActions.fetchOneProvider());
+                if (provider) {
+                    return of(true);
                 }
+
+                this.store.dispatch(providerActions.fetchOneProvider());
 
                 return this.actions$.pipe(
                     ofType(

@@ -3,6 +3,7 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular
 import { Subject, switchMap, takeUntil } from 'rxjs';
 import { SubscriptionService } from '../../../../../../core/services/subscription.service';
 import { IAdminSubscriptionList, ISubscriptionFilters } from '../../../../../../core/models/subscription.model';
+import { PlanDuration } from '../../../../../../core/enums/enums';
 import { SharedDataService } from '../../../../../../core/services/public/shared-data.service';
 import { AdminPaginationComponent } from "../../../../partials/sections/admin/pagination/pagination.component";
 import { SubscriptionFiltersComponent } from "../subscription-filters/subscription-filters.component";
@@ -68,6 +69,13 @@ export class AdminSubscriptionsListComponent implements OnInit, OnDestroy {
 
   changePage(page: number) {
     this.filters.update(f => ({ ...f, page }));
+  }
+
+  planDurationLabel(duration: PlanDuration): string {
+    if (duration === PlanDuration.FreeTier) return 'Free Tier';
+    if (duration === PlanDuration.MONTHLY) return 'Monthly';
+    if (duration === PlanDuration.YEARLY) return 'Yearly';
+    return duration;
   }
 
   updateSubscriptionStatus(event: Event, sub: IAdminSubscriptionList) {

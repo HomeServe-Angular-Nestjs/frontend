@@ -132,7 +132,7 @@
                                     <p *ngIf="feature.value !== true && feature.value !== false"
                                         class="text-[10px] font-black mt-0.5"
                                         [ngClass]="userType === 'customer' ? 'text-indigo-600' : 'text-emerald-600'">
-                                        Limit: {{ feature.value }}
+                                        Limit: {{ feature.value === unlimited ? 'Unlimited' : feature.value }}
                                     </p>
                                 </div>
                             </div>

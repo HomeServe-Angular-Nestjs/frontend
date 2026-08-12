@@ -5,6 +5,7 @@ import { IAdminSettings } from "../../../../../core/models/admin-settings.model"
 import { IResponse } from "../../../models/response.model";
 import { CommonModule } from "@angular/common";
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { SERVICE_LISTING_UNLIMITED } from "../../../../../core/models/plan.model";
 
 @Component({
     selector: 'admin-settings',
@@ -18,11 +19,15 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
 
     settings$!: Observable<IAdminSettings>;
     form!: FormGroup;
+    readonly unlimited = SERVICE_LISTING_UNLIMITED;
+    isDefaultLimitUnlimited = false;
+    private _lastDefaultLimit: number = 1;
 
     isEditing = {
         gstPercentage: false,
         providerCommission: false,
         customerCommission: false,
+        defaultServiceLimit: false,
     };
 
     ngOnInit(): void {
@@ -42,7 +47,11 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
                     customerCommission: new FormControl(
                         { value: res.data.customerCommission, disabled: true }
                     ),
+                    defaultServiceLimit: new FormControl(
+                        { value: res.data.defaultServiceLimit, disabled: true }
+                    ),
                 });
+                this.isDefaultLimitUnlimited = res.data.defaultServiceLimit === this.unlimited;
                 return res.data;
             })
         );
@@ -72,7 +81,24 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
 
         const originalValue = this.originalSettings[field];
         this.form.get(field)?.setValue(originalValue, { emitEvent: false });
+        this.isDefaultLimitUnlimited = originalValue === this.unlimited;
 
         this.form.get(field)?.disable();
+    }
+
+    onDefaultLimitToggle(checked: boolean) {
+        const control = this.form.get('defaultServiceLimit');
+        if (!control) return;
+
+        if (checked) {
+            this._lastDefaultLimit = typeof control.value === 'number' && control.value > 0
+                ? control.value
+                : 1;
+            control.setValue(this.unlimited, { emitEvent: false });
+            this.isDefaultLimitUnlimited = true;
+        } else {
+            control.setValue(this._lastDefaultLimit ?? 1, { emitEvent: false });
+            this.isDefaultLimitUnlimited = false;
+        }
     }
 }
