@@ -13,7 +13,8 @@ import { PeakServiceTimesComponent } from "../../../../shared/components/provide
 import { AreaKpiComponent } from "../../../../shared/components/provider/area-analytics/summary.component";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
 import { AnalyticService } from "../../../../../core/services/analytics.service";
-import { map, shareReplay } from "rxjs";
+import { IAreaAnalyticsBundle } from "../../../../../core/models/analytics.model";
+import { catchError, map, of, shareReplay, startWith } from "rxjs";
 
 echarts.use([
     TooltipComponent,
@@ -30,6 +31,15 @@ echarts.use([
     ScatterChart,
     GeoComponent
 ]);
+
+const EMPTY_AREA: IAreaAnalyticsBundle = {
+    summary: { areaSummary: { totalBookings: 0, topPerformingArea: 'N/A', underperformingArea: 'N/A', peakBookingHour: 'N/A' } },
+    demand: { serviceDemand: [], byLocation: [] },
+    revenue: { topAreas: [], underperforming: [] },
+    peak: { peakServiceTime: [] },
+};
+
+type AreaVM = { status: 'loading' | 'error' | 'success'; data: IAreaAnalyticsBundle };
 
 @Component({
     selector: 'app-area-analytics-page',
@@ -49,10 +59,29 @@ export class ProviderAreaAnalyticsComponent implements OnInit {
     private readonly _sharedService = inject(SharedDataService);
     private readonly _analyticService = inject(AnalyticService);
 
-    bundle$ = this._analyticService.getAreaBundle().pipe(
-        map(res => res?.data ?? null),
-        shareReplay(1)
-    );
+    vm$ = this._load();
+
+    private _load() {
+        return this._analyticService.getAreaBundle().pipe(
+            map(res => ({ status: 'success' as const, data: res?.data ?? EMPTY_AREA })),
+            catchError(() => of({ status: 'error' as const, data: EMPTY_AREA })),
+            startWith({ status: 'loading' as const, data: EMPTY_AREA }),
+            shareReplay(1)
+        );
+    }
+
+    retry(): void {
+        this.vm$ = this._load();
+    }
+
+    hasData(vm: AreaVM): boolean {
+        return vm.data.summary.areaSummary.totalBookings > 0
+            || vm.data.demand.serviceDemand.length > 0
+            || vm.data.demand.byLocation.length > 0
+            || vm.data.revenue.topAreas.length > 0
+            || vm.data.revenue.underperforming.length > 0
+            || vm.data.peak.peakServiceTime.length > 0;
+    }
 
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Area Analytics');

@@ -1,67 +1,10 @@
 <div class="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-lime-50">
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
 
-        <ng-container *ngIf="bundle$ | async as bundle; else loadingState">
+        <ng-container *ngIf="vm$ | async as vm">
 
-            <!-- KPI Overview -->
-            <section>
-                <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Key Performance Metrics</h2>
-                <p class="text-sm text-gray-500 mb-6">
-                    A summary of your key financial indicators and operational highlights
-                </p>
-
-                <app-revenue-overview [revenueStats]="bundle.summary.revenueOverview"></app-revenue-overview>
-            </section>
-
-            <!-- Revenue Trends -->
-            <section>
-                <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Revenue Trends</h2>
-                <p class="text-sm text-gray-500 mb-6">
-                    Track how your revenue evolves over time and analyze monthly growth
-                </p>
-
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <app-revenue-trend-chart [data]="bundle.trends.trend" (viewChange)="onViewChange($event)"></app-revenue-trend-chart>
-                    <app-revenue-composition-chart [data]="bundle.growth.composition"></app-revenue-composition-chart>
-                </div>
-            </section>
-
-            <!-- Monthly Growth Forecast -->
-            <section>
-                <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Monthly Growth & Forecast</h2>
-                <p class="text-sm text-gray-500 mb-6">
-                    Track your monthly revenue growth rate and projected performance
-                </p>
-
-                <div class="grid grid-cols-1 gap-6">
-                    <app-revenue-earnings-forecast-chart [data]="bundle.growth.monthlyGrowth"></app-revenue-earnings-forecast-chart>
-                </div>
-            </section>
-
-            <!-- Top Clients / Services -->
-            <section>
-                <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Top Revenue Sources</h2>
-                <p class="text-sm text-gray-500 mb-6">
-                    Identify your most profitable clients or services
-                </p>
-
-                <app-revenue-top-services-chart [data]="bundle.growth.topServices"></app-revenue-top-services-chart>
-            </section>
-
-            <!-- Client Loyalty -->
-            <section>
-                <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Customer Loyalty & Retention</h2>
-                <p class="text-sm text-gray-500 mb-6">
-                    Compare repeat versus new clients to assess loyalty and retention trends
-                </p>
-
-                <app-revenue-repeat-vs-new-customers-chart [data]="bundle.clients.newAndReturning"></app-revenue-repeat-vs-new-customers-chart>
-            </section>
-
-        </ng-container>
-
-        <ng-template #loadingState>
-            <div class="flex items-center justify-center h-96">
+            <!-- Loading -->
+            <div *ngIf="vm.status === 'loading'" class="flex items-center justify-center h-96">
                 <div class="text-center">
                     <div
                         class="w-14 h-14 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4">
@@ -69,7 +12,92 @@
                     <p class="text-sm font-medium text-emerald-800">Loading revenue analytics...</p>
                 </div>
             </div>
-        </ng-template>
+
+            <!-- Error -->
+            <div *ngIf="vm.status === 'error'"
+                class="flex flex-col items-center justify-center h-96 text-center px-6">
+                <div class="text-4xl mb-4">⚠️</div>
+                <h2 class="text-lg font-semibold text-slate-900 mb-2">Something went wrong</h2>
+                <p class="text-sm text-slate-500 mb-6">Your revenue analytics could not be loaded. Please try again.
+                </p>
+                <button (click)="retry()"
+                    class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors">
+                    Try Again
+                </button>
+            </div>
+
+            <!-- Empty -->
+            <ng-container *ngIf="vm.status === 'success'">
+                <div *ngIf="!hasData(vm)" class="flex flex-col items-center justify-center h-96 text-center px-6">
+                    <div class="text-4xl mb-4">💰</div>
+                    <h2 class="text-lg font-semibold text-slate-900 mb-2">No data yet</h2>
+                    <p class="text-sm text-slate-500">Once you complete bookings, your revenue analytics will appear
+                        here.</p>
+                </div>
+
+                <ng-container *ngIf="hasData(vm)">
+                    <ng-container *ngIf="vm.data as bundle">
+
+                    <!-- KPI Overview -->
+                    <section>
+                        <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Key Performance Metrics</h2>
+                        <p class="text-sm text-gray-500 mb-6">
+                            A summary of your key financial indicators and operational highlights
+                        </p>
+
+                        <app-revenue-overview [revenueStats]="bundle.summary.revenueOverview"></app-revenue-overview>
+                    </section>
+
+                    <!-- Revenue Trends -->
+                    <section>
+                        <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Revenue Trends</h2>
+                        <p class="text-sm text-gray-500 mb-6">
+                            Track how your revenue evolves over time and analyze monthly growth
+                        </p>
+
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                            <app-revenue-trend-chart [data]="bundle.trends.trend" (viewChange)="onViewChange($event)"></app-revenue-trend-chart>
+                            <app-revenue-composition-chart [data]="bundle.growth.composition"></app-revenue-composition-chart>
+                        </div>
+                    </section>
+
+                    <!-- Monthly Growth Forecast -->
+                    <section>
+                        <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Monthly Growth &amp; Forecast</h2>
+                        <p class="text-sm text-gray-500 mb-6">
+                            Track your monthly revenue growth rate and projected performance
+                        </p>
+
+                        <div class="grid grid-cols-1 gap-6">
+                            <app-revenue-earnings-forecast-chart [data]="bundle.growth.monthlyGrowth"></app-revenue-earnings-forecast-chart>
+                        </div>
+                    </section>
+
+                    <!-- Top Clients / Services -->
+                    <section>
+                        <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Top Revenue Sources</h2>
+                        <p class="text-sm text-gray-500 mb-6">
+                            Identify your most profitable clients or services
+                        </p>
+
+                        <app-revenue-top-services-chart [data]="bundle.growth.topServices"></app-revenue-top-services-chart>
+                    </section>
+
+                    <!-- Client Loyalty -->
+                    <section>
+                        <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Customer Loyalty &amp; Retention</h2>
+                        <p class="text-sm text-gray-500 mb-6">
+                            Compare repeat versus new clients to assess loyalty and retention trends
+                        </p>
+
+                        <app-revenue-repeat-vs-new-customers-chart [data]="bundle.clients.newAndReturning"></app-revenue-repeat-vs-new-customers-chart>
+                    </section>
+
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+
+        </ng-container>
 
     </main>
 </div>
