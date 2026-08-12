@@ -12,7 +12,7 @@
             <app-admin-overview-card title="Completed Jobs" [value]="bundle.statistics.completedJobs"
                 icon="fa-solid fa-circle-check" iconBg="bg-green-100 text-green-600"></app-admin-overview-card>
             <app-admin-overview-card title="Total Revenue"
-                [value]="'$' + bundle.statistics.totalRevenue.toLocaleString()"
+                [value]="'₹' + bundle.statistics.totalRevenue.toLocaleString('en-IN')"
                 icon="fa-solid fa-dollar-sign" iconBg="bg-emerald-100 text-emerald-600"></app-admin-overview-card>
             <app-admin-overview-card title="Avg Rating" [value]="bundle.statistics.averageRating"
                 icon="fa-solid fa-star" iconBg="bg-amber-100 text-amber-600"

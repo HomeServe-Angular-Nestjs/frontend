@@ -56,16 +56,56 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-                <!-- Loading State -->
-                <div *ngIf="loading()" class="col-span-full py-20 text-center">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-                    <p class="mt-4 text-gray-500 font-medium">Loading services...</p>
+                <!-- Loading Skeleton -->
+                <div *ngIf="loading()" class="col-span-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div *ngFor="let item of skeletonCards"
+                        class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row gap-6">
+
+                        <!-- Image -->
+                        <div class="flex-shrink-0">
+                            <div class="skeleton w-full sm:w-32 h-32 rounded-xl"></div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-grow space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div class="space-y-2 flex-1 pr-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="skeleton h-4 w-16"></div>
+                                        <div class="skeleton h-4 w-14"></div>
+                                    </div>
+                                    <div class="skeleton h-6 w-3/4"></div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="skeleton h-8 w-8 rounded-full"></div>
+                                    <div class="skeleton h-8 w-8 rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2 pt-1">
+                                <div class="skeleton h-4 w-full"></div>
+                                <div class="skeleton h-4 w-2/3"></div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2">
+                                <div class="skeleton h-5 w-28"></div>
+                                <div class="skeleton h-5 w-9 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Service Card -->
                 <ng-container *ngIf="!loading()">
                     <div *ngFor="let service of services()"
-                        class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row gap-6 hover:shadow-md transition-shadow">
+                        class="relative bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row gap-6 hover:shadow-md transition-shadow">
+
+                        <!-- Deleting Overlay -->
+                        <div *ngIf="deletingId() === service.id"
+                            class="absolute inset-0 z-10 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 rounded-2xl">
+                            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-red-500"></div>
+                            <p class="text-sm font-medium text-gray-600">Deleting service...</p>
+                        </div>
 
                         <!-- Image -->
                         <div class="flex-shrink-0">
@@ -124,7 +164,7 @@
                             <div class="flex items-center justify-between pt-2">
                                 <div class="flex items-center gap-4 text-sm font-medium">
                                     <span class="text-green-600 font-bold">
-                                        ${{ service.price }}/{{ service.pricingUnit }}
+                                        ₹{{ service.price }}/{{ service.pricingUnit }}
                                     </span>
 
                                     <span class="text-gray-400 flex items-center gap-1">
@@ -189,6 +229,13 @@
                     </div>
                 </ng-container>
 
+                <!-- Form validation summary -->
+                <div *ngIf="submitted() && serviceForm.invalid"
+                    class="flex items-start gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700">
+                    <i class="fas fa-circle-exclamation mt-1"></i>
+                    <p class="text-sm font-medium">Please fix the highlighted fields below before submitting.</p>
+                </div>
+
                 <!-- SECTION: Classification -->
                 <section class="space-y-5">
                     <h3 class="text-lg font-semibold text-gray-900 border-b pb-2">
@@ -200,11 +247,15 @@
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-gray-700">Profession</label>
                             <select formControlName="professionId"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all">
+                                [ngClass]="showError('professionId') ? 'border-red-400 focus:ring-red-200' : 'border-gray-300'"
+                                class="w-full border rounded-md px-3 py-2.5 text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all">
                                 <option value="" disabled>Select profession</option>
                                 <option *ngFor="let prof of professions()" [value]="prof.id">{{ prof.name }}
                                 </option>
                             </select>
+                            <p *ngIf="showError('professionId')" class="text-xs text-red-500 mt-1">
+                                Please select a profession.
+                            </p>
                         </div>
 
                         <!-- Category Dropdown -->
@@ -213,7 +264,8 @@
                             <div class="relative">
                                 <input type="text" formControlName="categoryName"
                                     (focus)="showCategoryDropdown.set(true)" readonly placeholder="Select service"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm cursor-pointer focus:ring-2 focus:ring-green-500 outline-none bg-white">
+                                    [ngClass]="showError('categoryName') ? 'border-red-400 focus:ring-red-200' : 'border-gray-300'"
+                                    class="w-full border rounded-md px-3 py-2.5 text-sm cursor-pointer focus:ring-2 focus:ring-green-500 outline-none bg-white">
                                 <i
                                     class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                             </div>
@@ -242,6 +294,9 @@
                             </div>
                             <div *ngIf="showCategoryDropdown()" (click)="showCategoryDropdown.set(false)"
                                 class="fixed inset-0 z-40 bg-transparent"></div>
+                            <p *ngIf="showError('categoryName')" class="text-xs text-red-500 mt-1">
+                                Please select a service category.
+                            </p>
                         </div>
                     </div>
                 </section>
@@ -271,6 +326,9 @@
                                         Image</span>
                                 </div>
                             </div>
+                            <p *ngIf="imageError()" class="text-xs text-red-500 mt-1">
+                                <i class="fas fa-circle-exclamation mr-1"></i>{{ imageError() }}
+                            </p>
                         </div>
 
                         <!-- Description -->
@@ -278,10 +336,13 @@
                             <label class="text-sm font-medium text-gray-700">Detailed Description</label>
                             <textarea rows="8" formControlName="description"
                                 placeholder="What does your service include? Be specific to help customers choose you..."
-                                class="flex-grow border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 outline-none resize-none shadow-sm"></textarea>
+                                [ngClass]="showError('description') ? 'border-red-400 focus:ring-red-200' : 'border-gray-300'"
+                                class="flex-grow border rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 outline-none resize-none shadow-sm"></textarea>
                             <div class="flex justify-between items-center mt-1">
-                                <p class="text-[10px] font-bold uppercase tracking-wider transition-colors"
-                                    [class]="serviceForm.get('description')?.touched && serviceForm.get('description')?.invalid ? 'text-red-500' : 'text-gray-400'">
+                                <p *ngIf="showError('description')" class="text-[10px] font-bold uppercase tracking-wider text-red-500">
+                                    Minimum 20 characters required
+                                </p>
+                                <p *ngIf="!showError('description')" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                                     Minimum 20 characters required
                                 </p>
                                 <p class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
@@ -298,12 +359,17 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div class="space-y-1.5">
-                            <label class="text-sm font-medium text-gray-700">Price ($)</label>
+                            <label class="text-sm font-medium text-gray-700">Price (₹)</label>
                             <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
                                 <input type="number" formControlName="price"
-                                    class="w-full border border-gray-300 rounded-md pl-7 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-green-500 outline-none shadow-sm">
+                                    [ngClass]="showError('price') ? 'border-red-400 focus:ring-red-200' : 'border-gray-300'"
+                                    class="w-full border rounded-md pl-7 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-green-500 outline-none shadow-sm">
                             </div>
+                            <p *ngIf="showError('price')" class="text-xs text-red-500 mt-1">
+                                <span *ngIf="serviceForm.get('price')?.hasError('required')">Price is required.</span>
+                                <span *ngIf="!serviceForm.get('price')?.hasError('required')">Price must be 0 or greater.</span>
+                            </p>
                         </div>
 
                         <div class="space-y-1.5">
@@ -319,10 +385,15 @@
                             <label class="text-sm font-medium text-gray-700">Duration (Minutes)</label>
                             <div class="relative">
                                 <input type="number" formControlName="estimatedTimeInMinutes"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:ring-2 focus:ring-green-500 outline-none shadow-sm">
+                                    [ngClass]="showError('estimatedTimeInMinutes') ? 'border-red-400 focus:ring-red-200' : 'border-gray-300'"
+                                    class="w-full border rounded-md px-3 py-2.5 text-sm focus:ring-2 focus:ring-green-500 outline-none shadow-sm">
                                 <span
                                     class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] font-bold uppercase tracking-tighter">Min</span>
                             </div>
+                            <p *ngIf="showError('estimatedTimeInMinutes')" class="text-xs text-red-500 mt-1">
+                                <span *ngIf="serviceForm.get('estimatedTimeInMinutes')?.hasError('required')">Duration is required.</span>
+                                <span *ngIf="!serviceForm.get('estimatedTimeInMinutes')?.hasError('required')">Duration must be at least 1 minute.</span>
+                            </p>
                         </div>
                     </div>
                 </section>

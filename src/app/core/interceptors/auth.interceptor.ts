@@ -63,6 +63,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
                         return throwError(() => new Error(userMessage));
                     }
+
+                    if (errorCode === ErrorCodes.SERVICE_LIMIT_EXCEEDED) {
+                        toastr.warning(userMessage);
+                        return throwError(() => new Error(userMessage));
+                    }
+
                     toastr.error(userMessage);
                     return throwError(() => new Error(userMessage));
                 })

@@ -29,6 +29,9 @@ export class ServiceViewComponent implements OnInit, OnDestroy {
 
   offeredServices$!: Observable<IOfferedService[]>;
   filters: IServiceFilter = {};
+  isLoading = true;
+  skeletonCards = Array.from({ length: 3 }, (_, i) => i);
+  skeletonRows = Array.from({ length: 2 }, (_, i) => i);
 
   pagination: IPagination = {
     page: 1,
@@ -96,12 +99,15 @@ export class ServiceViewComponent implements OnInit, OnDestroy {
   }
 
   private _loadServices(filters: IServiceFilter = {}, page: number = 1) {
+    this.isLoading = true;
     this._serviceManagementService.fetchOfferedServices(filters, page).subscribe({
       next: (serviceData) => {
         this._serviceManagementService.setServiceData(serviceData.services);
         this.pagination = serviceData.pagination;
+        this.isLoading = false;
       },
       error: (err) => {
+        this.isLoading = false;
         const msg = err?.error?.message || 'Failed to fetch services';
         this._toastr.error(msg);
       }

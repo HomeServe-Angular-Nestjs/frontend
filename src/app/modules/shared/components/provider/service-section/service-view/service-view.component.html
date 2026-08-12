@@ -22,12 +22,67 @@
 
         <!-- Service List -->
         <section>
-            <ng-container *ngIf="(offeredServices$ | async) as services; else emptyService">
-                <ng-container *ngIf="services.length > 0; else emptyService">
-                    <app-service-list-view [offeredServices]="services | filterDeletedSubServices"
-                        (updateEvent)="toggleStatus($event)" (updateSubServiceEvent)="updateSubservice($event)">
-                    </app-service-list-view>
+            <!-- Loading Skeleton -->
+            <div *ngIf="isLoading" class="space-y-4">
+                <div *ngFor="let card of skeletonCards" class="bg-white rounded-xl shadow-sm border border-gray-100">
+                    <div class="p-6 border-b">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="skeleton w-12 h-12 rounded-xl"></div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="skeleton h-5 w-40"></div>
+                                        <div class="skeleton h-4 w-16 rounded-full"></div>
+                                    </div>
+                                    <div class="skeleton h-4 w-64"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="skeleton h-8 w-8 rounded-lg"></div>
+                                <div class="skeleton h-8 w-8 rounded-lg"></div>
+                                <div class="skeleton h-6 w-11 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="skeleton h-4 w-32"></div>
+                            <div class="skeleton h-4 w-24"></div>
+                        </div>
+
+                        <div class="overflow-hidden border border-gray-100 rounded-lg">
+                            <div class="bg-gray-50 px-6 py-3 grid grid-cols-12 gap-4">
+                                <div class="skeleton h-3 w-16 col-span-2"></div>
+                                <div class="skeleton h-3 w-24 col-span-3"></div>
+                                <div class="skeleton h-3 w-12 col-span-2 justify-self-end"></div>
+                                <div class="skeleton h-3 w-12 col-span-2 justify-self-center"></div>
+                                <div class="skeleton h-3 w-12 col-span-3 justify-self-end"></div>
+                            </div>
+                            <div *ngFor="let row of skeletonRows" class="px-6 py-4 flex items-center gap-4 border-t border-gray-50">
+                                <div class="skeleton h-8 w-8 rounded-lg"></div>
+                                <div class="skeleton h-4 w-32"></div>
+                                <div class="skeleton h-4 w-48"></div>
+                                <div class="skeleton h-4 w-16 ml-auto"></div>
+                                <div class="skeleton h-5 w-9 rounded-full"></div>
+                                <div class="skeleton h-8 w-14"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <ng-container *ngIf="!isLoading">
+                <ng-container *ngIf="(offeredServices$ | async) as services; else emptyService">
+                    <ng-container *ngIf="services.length > 0; else emptyService">
+                        <app-service-list-view [offeredServices]="services | filterDeletedSubServices"
+                            (updateEvent)="toggleStatus($event)" (updateSubServiceEvent)="updateSubservice($event)">
+                        </app-service-list-view>
+                    </ng-container>
                 </ng-container>
+
+                <app-provider-pagination [pagination]="pagination"
+                    (pageChange)="changePage($event)"></app-provider-pagination>
             </ng-container>
 
             <!-- Empty State -->
@@ -45,9 +100,6 @@
                     </div>
                 </div>
             </ng-template>
-
-            <app-provider-pagination [pagination]="pagination"
-                (pageChange)="changePage($event)"></app-provider-pagination>
         </section>
     </div>
 </div>
