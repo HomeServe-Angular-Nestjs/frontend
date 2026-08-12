@@ -264,7 +264,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
     const val = this.serviceForm.value;
     const formData = new FormData();
     Object.keys(val).forEach(key => {
-      if (key !== 'categoryName' && val[key] !== null && val[key] !== undefined) {
+      if (!['categoryName', 'id'].includes(key) && val[key] !== null && val[key] !== undefined) {
         formData.append(
           key,
           typeof val[key] === 'object' ? JSON.stringify(val[key]) : val[key]
@@ -293,7 +293,12 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.services.update(services => [newService, ...services]);
+        this.services.update(services => {
+          if (this.isEditing()) {
+            return services.map(s => s.id === newService.id ? newService : s);
+          }
+          return [newService, ...services];
+        });
         this._toastr.success(this.isEditing() ? 'Service updated' : 'Service created');
         this.viewMode.set('list');
       }
@@ -324,7 +329,7 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
         next: (res) => {
           if (res.data) {
             this.services.set(res.data);
-            this.pagination.update(prev => ({ ...prev, total: res.data?.length || 0 }));
+            this.pagination.update(prev => ({ ...prev, total: res.meta?.total ?? (res.data?.length || 0) }));
             this._updateStats();
           }
         },
@@ -366,7 +371,6 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   private _loadCategoriesByProf(profId: string) {
     if (!profId) {
       this.serviceCategories.set([]);
-      this.professions.set([]);
       return;
     }
 
@@ -380,17 +384,20 @@ export class ProviderManageServiceComponent implements OnInit, OnDestroy {
   }
 
   private _attemptCreateForm(): void {
-    // this._providerServiceManagementService // todo
-    //   .canCreateService()
-    //   .subscribe({
-    //     next: (res) => {
-    //       if (!res.success) {
-    //         return;
-    //       }
-    //     }
-    //   });
-      this._openCreateForm();
-    }
+    this._providerServiceManagementService.canCreateService()
+      .pipe(takeUntil(this._destroy$))
+      .subscribe({
+        next: () => {
+          this._openCreateForm();
+        },
+        error: (err) => {
+          const message = err?.error?.message;
+          this._toastr.error(
+            Array.isArray(message) ? message.join(', ') : (message || 'Service creation is not allowed right now.')
+          );
+        }
+      });
+  }
 
   private _openCreateForm(): void {
     this.viewMode.set('form');
