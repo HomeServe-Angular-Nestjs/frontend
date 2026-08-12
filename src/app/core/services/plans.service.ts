@@ -1,6 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { ICreatePlan, IPlan, IUpdatePlanStatus } from "../models/plan.model";
+import { ICreatePlan, IPlan, IUpdatePlanStatus, PlanFeatures } from "../models/plan.model";
 import { API_ENV } from "../../../environments/env";
 import { IResponse } from "../../modules/shared/models/response.model";
 import { HttpClient, HttpParams } from "@angular/common/http";
@@ -27,6 +27,10 @@ export class PlanService {
         return this._http.get<IResponse<IPlan[]>>(`${this._planApi}`);
     }
 
+    fetchFreeTierDefaults(): Observable<IResponse<{ price: number; features: PlanFeatures }>> {
+        return this._http.get<IResponse<{ price: number; features: PlanFeatures }>>(`${this._planApi}/free-tier-defaults`);
+    }
+
     fetchOnePlan(planId: string): Observable<IResponse<IPlan>> {
         const params = new HttpParams().set('planId', planId);
         return this._http.get<IResponse<IPlan>>(`${this._planApi}/one`, { params });
@@ -41,7 +45,7 @@ export class PlanService {
     }
 
     updatePlan(plan: Partial<IPlan>): Observable<IResponse<IPlan>> {
-        return this._http.put<IResponse<IPlan>>(`${this._planApi}/update`, plan);
+        return this._http.patch<IResponse<IPlan>>(`${this._planApi}/update`, plan);
     }
 
     deletePlan(planId: string): Observable<IResponse> {

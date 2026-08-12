@@ -136,7 +136,7 @@ export enum UploadType {
 export enum PlanDuration {
   MONTHLY = 'monthly',
   YEARLY = 'yearly',
-  LIFETIME = 'lifetime'
+  FreeTier = 'freetier'
 }
 
 export enum WeekEnum {

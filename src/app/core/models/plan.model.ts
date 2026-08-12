@@ -9,6 +9,9 @@ export type FeatureKey = keyof typeof FEATURE_REGISTRY;
 export type PlanFeatures = Partial<Record<string, FeatureValue>>;
 export type ICreatePlan = Omit<IPlan, 'id' | 'createdAt'>;
 
+export const SERVICE_LISTING_UNLIMITED = -1;
+export const SERVICE_LISTING_LIMIT_KEY = 'service_listing_limit';
+
 export interface IPlan {
     id: string;
     name: string | PlanName;

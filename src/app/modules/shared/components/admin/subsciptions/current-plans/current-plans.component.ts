@@ -3,7 +3,7 @@ import { filter, map, Subject, takeUntil } from "rxjs";
 import { CommonModule } from "@angular/common";
 import { PlanService } from "../../../../../../core/services/plans.service";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
-import { IPlan, ICreatePlan, FEATURE_REGISTRY } from "../../../../../../core/models/plan.model";
+import { IPlan, ICreatePlan, FEATURE_REGISTRY, SERVICE_LISTING_UNLIMITED } from "../../../../../../core/models/plan.model";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../../partials/shared/confirm-dialog-box/confirm-dialog.component";
 import { AdminPlanDetailsComponent } from "../plans-details/plans-details.component";
@@ -28,6 +28,7 @@ export class CurrentPlansComponent implements OnInit, OnDestroy {
     isViewPlanModalOpen = false;
     planToView?: IPlan;
     isEditMode = false;
+    readonly unlimited = SERVICE_LISTING_UNLIMITED;
     isCreateMode = false;
 
     readonly featureRegistry = Object.values(FEATURE_REGISTRY);

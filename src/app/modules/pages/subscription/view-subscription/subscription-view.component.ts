@@ -7,7 +7,7 @@ import { selectAuthUserType } from "../../../../store/auth/auth.selector";
 import { Router } from "@angular/router";
 import { SharedDataService } from "../../../../core/services/public/shared-data.service";
 import { SubscriptionService } from "../../../../core/services/subscription.service";
-import { FEATURE_REGISTRY } from "../../../../core/models/plan.model";
+import { FEATURE_REGISTRY, SERVICE_LISTING_UNLIMITED } from "../../../../core/models/plan.model";
 
 @Component({
     selector: 'app-subscription-view-page',
@@ -27,6 +27,7 @@ export class ProviderViewSubscriptionPage implements OnInit, OnDestroy {
     latest$!: Observable<ISubscription | null>;
     userType = 'customer';
     readonly featureRegistry = FEATURE_REGISTRY;
+    readonly unlimited = SERVICE_LISTING_UNLIMITED;
 
     ngOnInit(): void {
         this._sharedService.setProviderHeader('Subscription');

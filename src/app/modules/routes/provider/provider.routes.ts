@@ -28,7 +28,7 @@ export const providerRoutes: Routes = [
       },
       {
         path: 'plans',
-        loadComponent: () => import('../../pages/subscription/plans/subscription-plan.component')
+        loadComponent: () => import('../../pages/subscription/plans/subscription-plan/subscription-plan.component')
           .then(c => c.ProviderSubscriptionPlansPage),
         canActivate: [AuthGuard],
         data: { breadcrumb: 'Plans' }

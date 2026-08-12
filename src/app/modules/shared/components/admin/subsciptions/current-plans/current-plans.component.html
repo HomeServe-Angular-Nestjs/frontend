@@ -55,7 +55,7 @@
                         </div>
                         <span class="text-gray-600 font-medium truncate">{{ featureConfig.label }}</span>
                         <span *ngIf="featureConfig.type === 'number'" class="ml-auto font-bold text-gray-900">
-                            {{ plan.features[featureConfig.key] }}
+                            {{ plan.features[featureConfig.key] === unlimited ? 'Unlimited' : plan.features[featureConfig.key] }}
                         </span>
                         <span *ngIf="featureConfig.type === 'enum'" class="ml-auto font-bold text-gray-900 capitalize">
                             {{ plan.features[featureConfig.key] }}

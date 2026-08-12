@@ -87,6 +87,42 @@
                 </div>
                 <p class="text-xs text-gray-400 mt-1">Amount charged from customers per transaction.</p>
             </div>
+
+            <!-- Default Service Limit (Free Tier) Setting -->
+            <div class="flex flex-col">
+                <label for="defaultServiceLimit" class="text-sm text-gray-600 mb-2">Default Service Limit (Free Tier)</label>
+                <div class="relative flex items-center gap-2">
+                    <input id="defaultServiceLimit" type="number" min="1" formControlName="defaultServiceLimit"
+                        [disabled]="isDefaultLimitUnlimited" class="no-number-spinner w-full px-4 py-2 border rounded-lg text-gray-800 font-medium
+            disabled:bg-gray-100 disabled:text-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+
+                    <label class="flex items-center gap-1.5 text-xs font-semibold text-gray-600 cursor-pointer whitespace-nowrap">
+                        <input type="checkbox" class="accent-blue-600"
+                            [checked]="isDefaultLimitUnlimited"
+                            (change)="onDefaultLimitToggle($any($event.target).checked)">
+                        Unlimited
+                    </label>
+
+                    <!-- Action Buttons -->
+                    <div class="absolute right-2 flex items-center space-x-2">
+                        <button *ngIf="!isEditing.defaultServiceLimit" (click)="enableEdit('defaultServiceLimit')"
+                            type="button" class="text-gray-500 hover:text-blue-600" title="Edit Default Service Limit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <ng-container *ngIf="isEditing.defaultServiceLimit">
+                            <button type="button" (click)="save('defaultServiceLimit')"
+                                class="text-green-600 hover:text-green-700" title="Save">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button type="button" (click)="cancel('defaultServiceLimit')"
+                                class="text-red-500 hover:text-red-600" title="Cancel">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Max services a free-tier provider can list.</p>
+            </div>
         </form>
     </ng-container>
 </section>
