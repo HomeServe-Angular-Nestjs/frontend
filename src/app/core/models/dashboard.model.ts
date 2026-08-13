@@ -37,4 +37,42 @@ export interface IProviderDashboardOverview {
     time: { from: string; to: string };
   };
   activeServiceCount: number;
+  nextBooking: IUpcomingBooking | null;
+  upcomingBookingCount: number;
+  recentBookings: IDashboardRecentBooking[];
+  wallet: { balance: number } | null;
+}
+
+export interface IUpcomingBooking {
+  bookingId: string;
+  amount: number;
+  status: string;
+  slot: { from: string; to: string; date: string };
+  customer: {
+    id: string;
+    username: string;
+    fullname: string;
+    avatar: string;
+  };
+  service: {
+    name: string;
+    category: string;
+  };
+}
+
+export interface IDashboardRecentBooking {
+  bookingId: string;
+  amount: number;
+  status: string;
+  date: string;
+  customer: {
+    id: string;
+    username: string;
+    fullname: string;
+    avatar: string;
+  };
+  service: {
+    name: string;
+    category: string;
+  };
 }

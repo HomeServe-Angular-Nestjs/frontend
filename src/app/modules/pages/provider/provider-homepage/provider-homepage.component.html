@@ -1,20 +1,99 @@
-<main class="space-y-8 px-2 py-4">
+<main class="space-y-6 px-2 py-4">
 
-  <!-- Overview Section -->
-  <section>
-    <h2 class="text-lg sm:text-xl font-semibold text-gray-800 mb-5">
-      Overview
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-      <ng-container *ngFor="let card of overviewCards">
-        <app-provider-overview-cards [data]="card"></app-provider-overview-cards>
-      </ng-container>
+  <!-- Loading -->
+  <app-dashboard-skeleton *ngIf="loading"></app-dashboard-skeleton>
+
+  <!-- Error -->
+  <ng-container *ngIf="!loading && error">
+    <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-500">
+          <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+        </div>
+        <h2 class="mb-2 text-lg font-semibold text-slate-900">Unable to load dashboard</h2>
+        <p class="mb-6 text-sm text-slate-500">Something went wrong while loading your dashboard.</p>
+        <button type="button" (click)="retry()"
+          class="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+          Try Again
+        </button>
+      </div>
     </div>
-  </section>
+  </ng-container>
 
-  <!-- Recent Bookings Section -->
-  <section>
-    <app-provider-booking-recent [showFilters]="false" [actionable]="false"></app-provider-booking-recent>
-  </section>
+  <!-- Success -->
+  <ng-container *ngIf="!loading && !error && data">
+
+    <!-- Welcome / Today Header -->
+    <app-dashboard-header [providerName]="providerName" [upcomingCount]="data!.upcomingBookingCount"
+      [nextBookingTime]="nextBookingTime">
+    </app-dashboard-header>
+
+    <!-- New Provider Onboarding -->
+    <section *ngIf="isNewProvider" aria-label="Get started"
+      class="overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-sm ring-1 ring-emerald-700">
+      <div class="p-6 sm:p-8">
+        <div class="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
+          <i class="fa-solid fa-sparkles"></i> Welcome to Homeserve
+        </div>
+        <h2 class="text-xl font-bold sm:text-2xl">Let's set up your business, {{ providerName }}</h2>
+        <p class="mt-1 max-w-2xl text-sm text-emerald-50">
+          A few quick steps and you'll be ready to accept your first booking. Here's what to do next:
+        </p>
+
+        <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div *ngFor="let step of welcomeSteps"
+            class="flex flex-col rounded-xl bg-white/10 p-4 ring-1 ring-white/20 backdrop-blur-sm">
+            <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-white/15">
+              <i [class]="step.icon" class="text-base"></i>
+            </div>
+            <p class="text-sm font-semibold">{{ step.title }}</p>
+            <p class="mt-1 flex-1 text-xs text-emerald-50/90">{{ step.description }}</p>
+            <a [routerLink]="step.link"
+              class="mt-4 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50">
+              {{ step.cta }}
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Primary KPI Snapshot -->
+    <section aria-label="Key metrics">
+      <app-kpi-card-grid>
+        <app-kpi-card *ngFor="let kpi of kpis" [label]="kpi.label" [value]="kpi.value" [unit]="kpi.unit"
+          [icon]="kpi.icon" [tone]="kpi.tone" [description]="kpi.description">
+        </app-kpi-card>
+      </app-kpi-card-grid>
+    </section>
+
+    <!-- Today's Activity / Next Booking + Availability -->
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-3" aria-label="Today's activity">
+      <div class="lg:col-span-2">
+        <app-next-booking-card [nextBooking]="data!.nextBooking" [nextAvailableSlot]="data!.nextAvailableSlot">
+        </app-next-booking-card>
+      </div>
+      <app-dashboard-availability-card [workingHours]="data!.workingHours"
+        [activeServiceCount]="data!.activeServiceCount" [nextBookingTime]="nextBookingTime">
+      </app-dashboard-availability-card>
+    </section>
+
+    <!-- Recent Bookings -->
+    <section aria-label="Recent bookings">
+      <app-recent-bookings-preview [bookings]="data!.recentBookings"></app-recent-bookings-preview>
+    </section>
+
+    <!-- Performance + Attention -->
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-2" aria-label="Performance and attention">
+      <app-dashboard-performance-card [avgRating]="data!.avgRating" [completionRate]="data!.completionRate">
+      </app-dashboard-performance-card>
+      <app-dashboard-attention-card [pendingCount]="data!.revenue.pendingCount"
+        [cancelledCount]="data!.bookings.cancelledBookings" [upcomingCount]="data!.bookings.upcomingBookings"
+        [activeServiceCount]="data!.activeServiceCount" [verificationVerified]="verificationVerified"
+        [hasSubscription]="hasSubscription">
+      </app-dashboard-attention-card>
+    </section>
+
+  </ng-container>
 
 </main>
