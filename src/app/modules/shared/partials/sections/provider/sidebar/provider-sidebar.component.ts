@@ -168,12 +168,6 @@ export class ProviderSidebarComponent implements OnInit {
           icon: 'fas fa-wallet',
           route: 'wallet',
           active: false
-        },
-        {
-          name: 'Settings',
-          icon: 'fas fa-cog',
-          route: 'settings',
-          active: false
         }
       ]
     }

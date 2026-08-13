@@ -1,0 +1,22 @@
+<ng-container *ngIf="!(googleLogin$ | async)">
+    <app-provider-passwords></app-provider-passwords>
+</ng-container>
+
+<ng-container *ngIf="googleLogin$ | async">
+    <section class="bg-white rounded-xl shadow-sm p-6 mt-4">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
+                <i class="fa-brands fa-google"></i>
+            </div>
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800">Security</h2>
+                <p class="text-sm text-gray-500">You signed in with Google</p>
+            </div>
+        </div>
+        <div class="flex items-start gap-2 text-xs text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-100">
+            <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+            <span>Your account is linked to Google, so changing your password isn't available. Manage your sign-in
+                security from your Google account.</span>
+        </div>
+    </section>
+</ng-container>
