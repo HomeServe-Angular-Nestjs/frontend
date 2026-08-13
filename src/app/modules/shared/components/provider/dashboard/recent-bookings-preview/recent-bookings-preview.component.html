@@ -1,0 +1,88 @@
+<div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+    <div class="mb-4 flex items-center justify-between">
+        <div>
+            <h2 class="text-base font-semibold text-slate-900">Recent Bookings</h2>
+            <p class="text-xs text-slate-500">Your latest booking activity</p>
+        </div>
+        <a routerLink="/provider/bookings"
+            class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 hover:text-emerald-800 focus:outline-none focus:underline">
+            View all
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+
+    <ng-container *ngIf="hasBookings; else empty">
+        <!-- Desktop table -->
+        <div class="hidden overflow-x-auto md:block">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-slate-100 text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <th class="py-3 pr-4">Customer / Service</th>
+                        <th class="py-3 pr-4">Date</th>
+                        <th class="py-3 pr-4">Amount</th>
+                        <th class="py-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    <tr *ngFor="let booking of bookings" class="transition-colors hover:bg-slate-50/50">
+                        <td class="py-3 pr-4">
+                            <div class="flex items-center gap-3">
+                                <img [src]="booking.customer.avatar || 'assets/images/profile_placeholder.jpg'"
+                                    alt="Customer" class="h-9 w-9 rounded-full object-cover ring-2 ring-slate-100" loading="lazy"
+                                    (error)="onAvatarError($event)" />
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">{{ customerName(booking) }}</p>
+                                    <p class="text-xs text-slate-500">{{ serviceName(booking) }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 pr-4">
+                            <p class="text-sm font-medium text-slate-700">{{ getDate(booking.date) }}</p>
+                            <p class="text-xs text-slate-500">{{ getTime(booking.date) }}</p>
+                        </td>
+                        <td class="py-3 pr-4 text-sm font-semibold text-slate-900">₹{{ booking.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 }) }}</td>
+                        <td class="py-3">
+                            <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold" [ngClass]="statusClass(booking.status)">
+                                {{ booking.status.replace('_', ' ') }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile stacked cards -->
+        <div class="space-y-3 md:hidden">
+            <div *ngFor="let booking of bookings" class="rounded-lg border border-slate-100 bg-slate-50/40 p-3">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <img [src]="booking.customer.avatar || 'assets/images/profile_placeholder.jpg'"
+                            alt="Customer" class="h-8 w-8 rounded-full object-cover ring-2 ring-slate-100" loading="lazy"
+                            (error)="onAvatarError($event)" />
+                        <div>
+                            <p class="text-sm font-semibold text-slate-900">{{ customerName(booking) }}</p>
+                            <p class="text-xs text-slate-500">{{ serviceName(booking) }}</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold" [ngClass]="statusClass(booking.status)">
+                        {{ booking.status.replace('_', ' ') }}
+                    </span>
+                </div>
+                <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+                    <span><i class="fa-solid fa-calendar-day mr-1"></i>{{ getDate(booking.date) }} · {{ getTime(booking.date) }}</span>
+                    <span class="font-semibold text-slate-700">₹{{ booking.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 }) }}</span>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #empty>
+        <div class="flex flex-col items-center justify-center py-10 text-center">
+            <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                <i class="fa-solid fa-calendar-xmark text-xl"></i>
+            </div>
+            <p class="text-sm font-semibold text-slate-700">No bookings yet</p>
+            <p class="mt-1 text-xs text-slate-500">Your recent bookings will appear here.</p>
+        </div>
+    </ng-template>
+</div>

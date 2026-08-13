@@ -1,197 +1,198 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedDataService } from '../../../../core/services/public/shared-data.service';
-import { ProviderOverviewCardsComponent } from '../../../shared/partials/sections/provider/overview-cards/overview-cards.component';
-import { IProviderDashboardOverview, OverviewCardData } from '../../../../core/models/dashboard.model';
-import { ProviderService } from '../../../../core/services/provider.service';
+import { RouterLink } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
-import { ProviderBookingRecentComponent } from '../../../shared/components/provider/bookings/bookings-recent/booking-recent.component';
+import { SharedDataService } from '../../../../core/services/public/shared-data.service';
+import { ProviderService } from '../../../../core/services/provider.service';
+import { SubscriptionService } from '../../../../core/services/subscription.service';
+import { IProviderDashboardOverview } from '../../../../core/models/dashboard.model';
+import { selectProvider } from '../../../../store/provider/provider.selector';
+import { DashboardHeaderComponent } from '../../../shared/components/provider/dashboard/dashboard-header/dashboard-header.component';
+import { NextBookingCardComponent } from '../../../shared/components/provider/dashboard/next-booking-card/next-booking-card.component';
+import { DashboardAvailabilityCardComponent } from '../../../shared/components/provider/dashboard/dashboard-availability-card/dashboard-availability-card.component';
+import { RecentBookingsPreviewComponent } from '../../../shared/components/provider/dashboard/recent-bookings-preview/recent-bookings-preview.component';
+import { DashboardPerformanceCardComponent } from '../../../shared/components/provider/dashboard/dashboard-performance-card/dashboard-performance-card.component';
+import { DashboardAttentionCardComponent } from '../../../shared/components/provider/dashboard/dashboard-attention-card/dashboard-attention-card.component';
+import { DashboardSkeletonComponent } from '../../../shared/components/provider/dashboard/dashboard-skeleton/dashboard-skeleton.component';
+import { KpiCardComponent, KpiTone } from '../../../shared/components/analytics/kpi-card/kpi-card.component';
+import { KpiCardGridComponent } from '../../../shared/components/analytics/kpi-card-grid/kpi-card-grid.component';
 
 @Component({
   selector: 'app-provider-homepage',
   templateUrl: './provider-homepage.component.html',
   imports: [
     CommonModule,
-    ProviderOverviewCardsComponent,
-    ProviderBookingRecentComponent
-  ]
+    RouterLink,
+    DashboardHeaderComponent,
+    NextBookingCardComponent,
+    DashboardAvailabilityCardComponent,
+    RecentBookingsPreviewComponent,
+    DashboardPerformanceCardComponent,
+    DashboardAttentionCardComponent,
+    DashboardSkeletonComponent,
+    KpiCardComponent,
+    KpiCardGridComponent,
+  ],
 })
 export class ProviderHomepageComponent implements OnInit, OnDestroy {
   private readonly _sharedService = inject(SharedDataService);
   private readonly _providerService = inject(ProviderService);
-
+  private readonly _subscriptionService = inject(SubscriptionService);
+  private readonly _store = inject(Store);
   private _destroy$ = new Subject<void>();
 
-  overviewCards: OverviewCardData[] = [];
+  loading = true;
+  error = false;
+  data: IProviderDashboardOverview | null = null;
+
+  providerName = 'Provider';
+  verificationVerified = true;
+  hasSubscription = true;
 
   ngOnInit(): void {
     this._sharedService.setProviderHeader('Dashboard');
 
+    this._store.select(selectProvider)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe((provider) => {
+        this.providerName = provider?.fullname || provider?.username || 'Provider';
+        this.verificationVerified = provider?.verificationStatus === 'verified';
+      });
+
+    this._subscriptionService.hasActiveSubscription()
+      .pipe(takeUntil(this._destroy$))
+      .subscribe({
+        next: (res) => (this.hasSubscription = !!res?.success),
+        error: () => (this.hasSubscription = false),
+      });
+
+    this._load();
+  }
+
+  private _load(): void {
+    this.loading = true;
+    this.error = false;
+
     this._providerService.getDashboardOverview()
       .pipe(takeUntil(this._destroy$))
       .subscribe({
-        next: (res) => {
-          this.overviewCards = this._buildOverviewCards(res.data);
+        next: (res: any) => {
+          this.data = res?.data ?? null;
+          this.loading = false;
         },
-        error: (err) => {
-          console.error('Error fetching dashboard overview:', err);
+        error: () => {
+          this.data = null;
+          this.loading = false;
+          this.error = true;
         },
       });
   }
 
-  private _buildOverviewCards(data: IProviderDashboardOverview): OverviewCardData[] {
+  retry(): void {
+    this._load();
+  }
+
+  // ---- Derived values passed to children ----
+
+  get nextBookingTime(): string {
+    const slot = this.data?.nextBooking?.slot;
+    if (slot?.from) return this._fmtTime(slot.from);
+    const fallback = this.data?.nextAvailableSlot;
+    return fallback?.from ? this._fmtTime(fallback.from) : '';
+  }
+
+  get isNewProvider(): boolean {
+    const d = this.data;
+    if (!d) return false;
+    const totalBookings = d.bookings?.totalBookings ?? 0;
+    return d.activeServiceCount === 0 && totalBookings === 0 && d.recentBookings.length === 0;
+  }
+
+  get welcomeSteps(): { icon: string; title: string; description: string; link: string[]; cta: string }[] {
+    const steps = [];
+    if (!this.verificationVerified) {
+      steps.push({
+        icon: 'fa-solid fa-id-card',
+        title: 'Get verified',
+        description: 'Complete your document verification to win customer trust.',
+        link: ['/provider/profiles'],
+        cta: 'Verify now',
+      });
+    }
+    if (!this.hasSubscription) {
+      steps.push({
+        icon: 'fa-solid fa-crown',
+        title: 'Pick a plan',
+        description: 'Choose a subscription plan to start accepting bookings.',
+        link: ['/provider/plans'],
+        cta: 'View plans',
+      });
+    }
+    steps.push(
+      {
+        icon: 'fa-solid fa-layer-group',
+        title: 'Add your services',
+        description: 'List what you offer so customers can find and book you.',
+        link: ['/provider/manage-services'],
+        cta: 'Add services',
+      },
+      {
+        icon: 'fa-solid fa-calendar-days',
+        title: 'Set your availability',
+        description: 'Tell customers when you are free to take bookings.',
+        link: ['/provider/availability'],
+        cta: 'Set availability',
+      },
+    );
+    return steps;
+  }
+
+  get kpis(): { label: string; value: string | number; unit?: string; icon: string; tone: KpiTone; description?: string }[] {
+    const d = this.data;
+    if (!d) return [];
+    const revenue = d.revenue ?? {};
+    const bookings = d.bookings ?? {};
+    const walletBalance = d.wallet?.balance ?? null;
     return [
       {
-        heading: 'Earnings Overview',
-        boxes: [
-          {
-            title: 'Total Earnings',
-            icon: 'fa-dollar-sign',
-            iconColorClass: 'text-green-600',
-            value: `₹${data.revenue.totalEarnings.toFixed(2)}`,
-            valueColorClass: 'text-gray-800',
-            bgColorClass: 'bg-green-50',
-            borderColorClass: 'border-green-100',
-          },
-          {
-            title: 'Pending',
-            icon: 'fa-clock',
-            iconColorClass: 'text-orange-600',
-            value: data.revenue.pendingCount,
-            valueColorClass: 'text-orange-600',
-            bgColorClass: 'bg-orange-50',
-            borderColorClass: 'border-orange-100',
-          },
-          {
-            title: 'Completed',
-            icon: 'fa-check',
-            iconColorClass: 'text-blue-600',
-            value: data.revenue.completedCount,
-            valueColorClass: 'text-blue-600',
-            bgColorClass: 'bg-blue-50',
-            borderColorClass: 'border-blue-100',
-          },
-        ],
-        detailsText: 'View Details',
-        detailsLinkOrCallback: '/earnings/details',
+        label: 'Total Earnings',
+        value: (revenue.totalEarnings ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 2 }),
+        unit: '₹',
+        icon: 'fa-solid fa-indian-rupee-sign',
+        tone: 'positive',
+        description: walletBalance != null && !this.isNewProvider ? `Wallet balance ₹${walletBalance.toLocaleString('en-IN')}` : undefined,
       },
       {
-        heading: 'Bookings Overview',
-        boxes: [
-          {
-            title: 'Total Bookings',
-            icon: 'fa-calendar-alt',
-            iconColorClass: 'text-green-700',
-            value: data.bookings?.totalBookings ?? 0,
-            valueColorClass: 'text-gray-800',
-            bgColorClass: 'bg-green-50',
-            borderColorClass: 'border-green-100',
-          },
-          {
-            title: 'Upcoming',
-            icon: 'fa-hourglass-half',
-            iconColorClass: 'text-yellow-500',
-            value: data.bookings?.upcomingBookings ?? 0,
-            valueColorClass: 'text-yellow-600',
-            bgColorClass: 'bg-yellow-50',
-            borderColorClass: 'border-yellow-100',
-          },
-          {
-            title: 'Cancelled',
-            icon: 'fa-times-circle',
-            iconColorClass: 'text-red-600',
-            value: data.bookings?.cancelledBookings ?? 0,
-            valueColorClass: 'text-red-600',
-            bgColorClass: 'bg-red-50',
-            borderColorClass: 'border-red-100',
-          },
-        ],
-        detailsText: 'View All',
-        detailsLinkOrCallback: '/bookings/details',
+        label: 'Pending',
+        value: revenue.pendingCount ?? 0,
+        icon: 'fa-solid fa-hourglass-half',
+        tone: 'warning',
       },
       {
-        heading: 'Performance Overview',
-        boxes: [
-          {
-            title: 'Average Rating',
-            icon: 'fa-star',
-            iconColorClass: 'text-yellow-500',
-            value: data.avgRating,
-            valueColorClass: 'text-yellow-600',
-            bgColorClass: 'bg-yellow-50',
-            borderColorClass: 'border-yellow-100',
-          },
-          {
-            title: 'Completion Rate',
-            icon: 'fa-chart-line',
-            iconColorClass: 'text-blue-600',
-            value: data.completionRate.toFixed(2) + '%',
-            valueColorClass: 'text-blue-600',
-            bgColorClass: 'bg-blue-50',
-            borderColorClass: 'border-blue-100',
-          },
-        ],
-        detailsText: 'View Details',
-        detailsLinkOrCallback: '/reviews',
+        label: 'Upcoming Bookings',
+        value: bookings.upcomingBookings ?? 0,
+        icon: 'fa-solid fa-calendar-check',
+        tone: 'info',
       },
       {
-        heading: 'Availability Overview',
-        boxes: [
-          {
-            title: 'Next Booking',
-            icon: 'fa-bell',
-            iconColorClass: 'text-purple-600',
-            value: this._formatNextSlot(data.nextAvailableSlot),
-            valueColorClass: 'text-purple-600',
-            bgColorClass: 'bg-purple-50',
-            borderColorClass: 'border-purple-100',
-          },
-          {
-            title: 'Working Hours',
-            icon: 'fa-clock',
-            iconColorClass: 'text-green-600',
-            value: data.workingHours ? `${data.workingHours?.time?.from || 0} - ${data.workingHours?.time?.to || 0}` : 'N/A',
-            valueColorClass: 'text-gray-800',
-            bgColorClass: 'bg-green-50',
-            borderColorClass: 'border-green-100',
-          },
-          {
-            title: 'Active Services',
-            icon: 'fa-briefcase',
-            iconColorClass: 'text-blue-600',
-            value: `${data.activeServiceCount || 0} Active`,
-            valueColorClass: 'text-blue-600',
-            bgColorClass: 'bg-blue-50',
-            borderColorClass: 'border-blue-100',
-          },
-        ],
-        detailsText: 'Manage All',
-        detailsLinkOrCallback: '/availability',
+        label: 'Avg Booking Value',
+        value: (bookings.averageBookingValue ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }),
+        unit: '₹',
+        icon: 'fa-solid fa-receipt',
+        tone: 'neutral',
       },
-
     ];
   }
 
-  private _formatNextSlot(slot: { from: string; to: string, date: string }): string {
-    if (!slot?.from || !slot?.to || !slot?.date) return 'No upcoming slot';
-
-    const baseDate = new Date(slot.date);
-
-    // Extract LOCAL date parts
-    const year = baseDate.getFullYear();
-    const month = String(baseDate.getMonth() + 1).padStart(2, '0');
-    const day = String(baseDate.getDate()).padStart(2, '0');
-
-    const from = new Date(`${year}-${month}-${day}T${slot.from}`);
-    const to = new Date(`${year}-${month}-${day}T${slot.to}`);
-
-    if (isNaN(from.getTime()) || isNaN(to.getTime())) {
-      return 'Invalid slot time';
-    }
-
-    return `${baseDate.toDateString()}, 7${from.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  private _fmtTime(value: string): string {
+    if (!value) return '';
+    const [h, m] = value.split(':');
+    if (!h) return value;
+    const date = new Date();
+    date.setHours(Number(h), Number(m || 0), 0, 0);
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   }
-
 
   ngOnDestroy(): void {
     this._destroy$.next();

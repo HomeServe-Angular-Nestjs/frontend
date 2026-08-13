@@ -19,6 +19,8 @@ export class ProviderSidebarComponent implements OnInit {
 
   providerInfo$ = this.store.select(selectProvider);
 
+  avatarError = false;
+
   sidebarMode: 'expanded' | 'collapsed' | 'hidden' = 'expanded';
   isMobileOpen = false;
   innerWidth = window.innerWidth;

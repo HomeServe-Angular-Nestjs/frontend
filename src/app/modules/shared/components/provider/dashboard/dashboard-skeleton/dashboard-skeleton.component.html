@@ -1,0 +1,67 @@
+<div class="animate-pulse space-y-6" aria-busy="true" aria-label="Loading dashboard">
+    <!-- Header -->
+    <div class="space-y-2">
+        <div class="h-8 w-64 rounded-md bg-slate-200"></div>
+        <div class="h-4 w-48 rounded-md bg-slate-200"></div>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <div *ngFor="let k of kpis" class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+            <div class="mb-4 h-11 w-11 rounded-xl bg-slate-200"></div>
+            <div class="mb-3 h-3 w-24 rounded bg-slate-200"></div>
+            <div class="h-8 w-28 rounded bg-slate-200"></div>
+        </div>
+    </div>
+
+    <!-- Next booking / availability -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100 lg:col-span-2">
+            <div class="mb-4 h-4 w-32 rounded bg-slate-200"></div>
+            <div class="mb-4 h-6 w-40 rounded bg-slate-200"></div>
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-slate-200"></div>
+                <div class="space-y-2">
+                    <div class="h-3 w-32 rounded bg-slate-200"></div>
+                    <div class="h-3 w-24 rounded bg-slate-200"></div>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+            <div class="mb-4 h-4 w-24 rounded bg-slate-200"></div>
+            <div class="space-y-3">
+                <div class="h-3 w-32 rounded bg-slate-200"></div>
+                <div class="h-3 w-28 rounded bg-slate-200"></div>
+                <div class="h-3 w-36 rounded bg-slate-200"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent bookings -->
+    <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+        <div class="mb-4 h-4 w-36 rounded bg-slate-200"></div>
+        <div class="space-y-3">
+            <div *ngFor="let _ of [0, 1, 2, 3]" class="flex items-center gap-3">
+                <div class="h-9 w-9 rounded-full bg-slate-200"></div>
+                <div class="flex-1 space-y-2">
+                    <div class="h-3 w-40 rounded bg-slate-200"></div>
+                    <div class="h-3 w-24 rounded bg-slate-200"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance / actions -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+            <div class="mb-4 h-4 w-24 rounded bg-slate-200"></div>
+            <div class="h-8 w-32 rounded bg-slate-200"></div>
+        </div>
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+            <div class="mb-4 h-4 w-28 rounded bg-slate-200"></div>
+            <div class="grid grid-cols-2 gap-3">
+                <div *ngFor="let a of actions" class="h-16 rounded-lg bg-slate-200"></div>
+            </div>
+        </div>
+    </div>
+</div>

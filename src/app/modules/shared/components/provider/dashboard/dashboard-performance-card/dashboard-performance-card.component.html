@@ -1,0 +1,33 @@
+<div class="h-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+    <div class="mb-5 flex items-center justify-between">
+        <h2 class="text-base font-semibold text-slate-900">Performance</h2>
+        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+            <i class="fa-solid fa-chart-line"></i>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1 text-amber-500">
+            <i class="fa-solid fa-star"></i>
+            <span class="text-2xl font-bold text-slate-900">{{ avgRating.toFixed(1) }}<span class="text-base font-semibold text-slate-400">★</span></span>
+        </div>
+    </div>
+    <p class="mt-1 text-xs text-slate-500">{{ ratingLabel }}</p>
+    <p *ngIf="totalReviews > 0" class="text-xs text-slate-400">{{ totalReviews }} review{{ totalReviews > 1 ? 's' : '' }}</p>
+
+    <div class="mt-5 border-t border-slate-100 pt-4">
+        <div class="flex items-end justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Completion rate</p>
+                <p class="mt-1 text-2xl font-bold text-emerald-700">{{ completionRate.toFixed(1) }}%</p>
+            </div>
+        </div>
+        <p class="mt-1 text-xs text-slate-500">{{ completionLabel }}</p>
+    </div>
+
+    <a routerLink="/provider/performance"
+        class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+        View Analytics
+        <i class="fa-solid fa-arrow-right"></i>
+    </a>
+</div>

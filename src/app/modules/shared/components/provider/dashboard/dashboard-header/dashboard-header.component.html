@@ -1,0 +1,22 @@
+<div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <h1 class="text-3xl font-bold text-slate-900">{{ greeting }}, {{ providerName }}</h1>
+        <p class="mt-1 text-sm text-slate-500">{{ formattedDate }}</p>
+        <p class="mt-2 text-sm text-slate-600">
+            <ng-container *ngIf="upcomingCount > 0">
+                You have <span class="font-semibold text-emerald-700">{{ upcomingCount }}</span> upcoming
+                booking{{ upcomingCount > 1 ? 's' : '' }}.
+            </ng-container>
+            <ng-container *ngIf="nextBookingTime; else clearSchedule">
+                Next booking at <span class="font-semibold text-emerald-700">{{ nextBookingTime }}</span>.
+            </ng-container>
+            <ng-template #clearSchedule>Your schedule is currently clear.</ng-template>
+        </p>
+    </div>
+
+    <a routerLink="/provider/bookings"
+        class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+        <i class="fa-solid fa-calendar-check"></i>
+        View Bookings
+    </a>
+</div>
