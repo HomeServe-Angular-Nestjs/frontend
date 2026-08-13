@@ -1,22 +1,31 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { ITopServicesByRevenue } from '../../../../../core/models/analytics.model';
+import { InrCurrencyPipe } from '../../../../../core/pipes/inr-currency.pipe';
+import { AnalyticsChartCardComponent } from '../../analytics/analytics-chart-card/analytics-chart-card.component';
+import { ANALYTICS_COLORS } from '../../analytics/analytics.tokens';
 
 @Component({
     selector: 'app-revenue-top-services-chart',
-    imports: [CommonModule, NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
+    providers: [InrCurrencyPipe],
     template: `
-    <div class="bg-white p-5 rounded-2xl shadow-md">
-      <h2 class="text-lg font-semibold mb-3 text-gray-800">
-        Top Services by Revenue
-      </h2>
-      <div echarts [options]="chartOptions" class="h-80 w-full"></div>
-    </div>
-  `
+        <app-analytics-chart-card
+            title="Top Services by Revenue"
+            subtitle="Best performing services ranked by revenue"
+            [height]="'small'"
+            [hasData]="chartData.length > 0"
+            emptyTitle="No service data"
+            emptyMessage="Top services will appear here once bookings are recorded.">
+            <div echarts [options]="chartOptions" class="h-full w-full"></div>
+        </app-analytics-chart-card>
+    `,
 })
 export class RevenueTopServicesChartComponent {
+    private readonly _currency = inject(InrCurrencyPipe);
+
     @Input()
     set data(value: ITopServicesByRevenue[]) {
         this.chartData = value ?? [];
@@ -27,7 +36,6 @@ export class RevenueTopServicesChartComponent {
     chartData: ITopServicesByRevenue[] = [];
 
     private setChartOptions() {
-
         this.chartOptions = {
             tooltip: {
                 trigger: 'item',
@@ -36,31 +44,31 @@ export class RevenueTopServicesChartComponent {
                     return `
             <div>
               <strong>${service.service}</strong><br/>
-              Revenue: ₹${service.revenue.toLocaleString()}<br/>
+              Revenue: ${this._currency.transform(service.revenue)}<br/>
               Bookings: ${service.totalBookings}<br/>
-              Avg. Value: ₹${service.avgRevenue}
+              Avg. Value: ${this._currency.transform(service.avgRevenue)}
             </div>
           `;
                 }
             },
             grid: {
                 left: '3%',
-                right: '5%',
+                right: '10%',
                 bottom: '3%',
                 containLabel: true
             },
             xAxis: {
                 type: 'value',
-                axisLine: { lineStyle: { color: '#ccc' } },
-                splitLine: { lineStyle: { color: '#eee' } }
+                axisLine: { lineStyle: { color: ANALYTICS_COLORS.axis } },
+                splitLine: { lineStyle: { color: ANALYTICS_COLORS.grid } }
             },
             yAxis: {
                 type: 'category',
                 data: this.chartData.map(s => s.service),
-                axisLine: { lineStyle: { color: '#ccc' } },
+                axisLine: { lineStyle: { color: ANALYTICS_COLORS.axis } },
                 axisTick: { show: false },
                 axisLabel: {
-                    color: '#374151',
+                    color: ANALYTICS_COLORS.text,
                     fontWeight: 500,
                     formatter: function (value) {
                         const maxLength = 12;
@@ -76,13 +84,13 @@ export class RevenueTopServicesChartComponent {
                     barWidth: 18,
                     itemStyle: {
                         borderRadius: [0, 8, 8, 0],
-                        color: '#16A34A'
+                        color: ANALYTICS_COLORS.provider
                     },
                     label: {
                         show: true,
                         position: 'right',
-                        formatter: (params: any) => `₹${params.value.toLocaleString()}`,
-                        color: '#374151',
+                        formatter: (params: any) => `${this._currency.transform(params.value)}`,
+                        color: ANALYTICS_COLORS.text,
                         fontWeight: 500
                     }
                 }

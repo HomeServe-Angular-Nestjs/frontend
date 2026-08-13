@@ -1,23 +1,26 @@
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { EChartsOption } from 'echarts';
 import { IResponseTimeChartData } from '../../../../../../core/models/analytics.model';
+import { AnalyticsChartCardComponent } from "../../../analytics/analytics-chart-card/analytics-chart-card.component";
+import { ANALYTICS_COLORS } from '../../../analytics/analytics.tokens';
 
 @Component({
     selector: 'app-performance-response-time',
     standalone: true,
-    imports: [NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
     template: `
-           <div class="bg-white rounded-lg shadow-md p-6 border border-slate-100 ">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-2xl font-semibold text-slate-900">Response Time Distribution</h2>
-                        <p class="text-sm text-slate-500 mt-1">Monthly performance metrics</p>
-                    </div>
-                </div>
-                <div echarts [options]="responseTimeOptions" class="h-80"></div>
-            </div>
-  `
+        <app-analytics-chart-card
+            title="Response Time Distribution"
+            subtitle="Monthly performance metrics"
+            [height]="'small'"
+            [hasData]="responseTimeData.length > 0"
+            emptyTitle="No response data"
+            emptyMessage="Response time distribution will appear here once requests are recorded.">
+            <div echarts [options]="responseTimeOptions" class="h-full w-full"></div>
+        </app-analytics-chart-card>
+    `,
 })
 export class ProviderPerformanceResponseTimeChartComponent {
     @Input()
@@ -32,11 +35,11 @@ export class ProviderPerformanceResponseTimeChartComponent {
     private _setResponseTimeOptions() {
         const labels = ["< 1 min", "1–10 min", "10–60 min", "1–24 hrs", "> 1 day"];
         const colorMap: Record<string, string> = {
-            "< 1 min": "#10b981",
-            "1–10 min": "#22c55e",
+            "< 1 min": ANALYTICS_COLORS.provider,
+            "1–10 min": ANALYTICS_COLORS.newCustomers,
             "10–60 min": "#a3e635",
             "1–24 hrs": "#84cc16",
-            "> 1 day": "#166534",
+            "> 1 day": ANALYTICS_COLORS.providerDeep,
         };
 
         const dataMap = Object.fromEntries(this.responseTimeData.map(d => [d.name, d.count]));
@@ -68,11 +71,7 @@ export class ProviderPerformanceResponseTimeChartComponent {
                 radius: ['45%', '75%'],
                 center: ['40%', '50%'],
                 avoidLabelOverlap: this.responseTimeData.length === 5,
-                itemStyle: {
-                    borderRadius: 8,
-                    borderColor: '#fff',
-                    borderWidth: 3
-                },
+                itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 3 },
                 label: {
                     show: true,
                     position: 'outside',

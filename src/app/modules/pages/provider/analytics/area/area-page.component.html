@@ -1,85 +1,68 @@
-<div class="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-lime-50">
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+<app-analytics-page
+    [status]="(vm$ | async)?.status ?? 'loading'"
+    [isEmpty]="(vm$ | async) ? !hasData(vm$ | async) : true"
+    emptyIcon="fa-solid fa-location-dot"
+    emptyTitle="No data yet"
+    emptyMessage="Once you complete bookings across your service areas, analytics will appear here."
+    (retry)="retry()">
 
-        <ng-container *ngIf="vm$ | async as vm">
+    <ng-container *ngIf="vm$ | async as vm">
+        <ng-container *ngIf="vm.data as bundle">
 
-            <!-- Loading -->
-            <div *ngIf="vm.status === 'loading'" class="flex items-center justify-center h-96">
-                <div class="text-center">
-                    <div
-                        class="w-14 h-14 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4">
+            <!-- KPI Overview -->
+            <section role="region" aria-label="Key Area Metrics">
+                <app-analytics-section-header
+                    eyebrow="Overview"
+                    title="Key Area Metrics"
+                    subtitle="Overview of top-performing and underperforming areas">
+                </app-analytics-section-header>
+
+                <app-area-analytics-summary [areaSummary]="bundle.summary.areaSummary"></app-area-analytics-summary>
+            </section>
+
+            <!-- Insights -->
+            <ng-container *ngIf="buildInsights(bundle) as insights">
+                <section *ngIf="insights.length" role="region" aria-label="Insights">
+                    <app-analytics-section-header
+                        eyebrow="Insights"
+                        title="What your areas say"
+                        subtitle="Automated takeaways derived from this month's area performance">
+                    </app-analytics-section-header>
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <app-analytics-insight-card
+                            *ngFor="let insight of insights"
+                            [text]="insight.text"
+                            [icon]="insight.icon"
+                            [tone]="insight.tone">
+                        </app-analytics-insight-card>
                     </div>
-                    <p class="text-sm font-medium text-emerald-800">Loading area analytics...</p>
-                </div>
-            </div>
-
-            <!-- Error -->
-            <div *ngIf="vm.status === 'error'"
-                class="flex flex-col items-center justify-center h-96 text-center px-6">
-                <div class="text-4xl mb-4">⚠️</div>
-                <h2 class="text-lg font-semibold text-slate-900 mb-2">Something went wrong</h2>
-                <p class="text-sm text-slate-500 mb-6">Your area analytics could not be loaded. Please try again.</p>
-                <button (click)="retry()"
-                    class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors">
-                    Try Again
-                </button>
-            </div>
-
-            <!-- Empty -->
-            <ng-container *ngIf="vm.status === 'success'">
-                <div *ngIf="!hasData(vm)" class="flex flex-col items-center justify-center h-96 text-center px-6">
-                    <div class="text-4xl mb-4">📍</div>
-                    <h2 class="text-lg font-semibold text-slate-900 mb-2">No data yet</h2>
-                    <p class="text-sm text-slate-500">Once you complete bookings across your service areas, analytics
-                        will appear here.</p>
-                </div>
-
-                <ng-container *ngIf="hasData(vm)">
-                    <ng-container *ngIf="vm.data as bundle">
-
-                    <!-- KPI Overview -->
-                    <section>
-                        <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Key Area Metrics</h2>
-                        <p class="text-sm text-gray-500 mb-6">
-                            Overview of top-performing and underperforming areas
-                        </p>
-
-                        <app-area-analytics-summary [areaSummary]="bundle.summary.areaSummary"></app-area-analytics-summary>
-                    </section>
-
-                    <!-- Service Demand -->
-                    <section>
-                        <h2 class="text-2xl font-semibold text-emerald-800 mb-3">Service Demand by Area</h2>
-                        <p class="text-sm text-gray-500 mb-6">
-                            Visualize which areas have the highest demand for your services
-                        </p>
-
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                            <app-area-service-demand-chart [data]="bundle.demand.serviceDemand"></app-area-service-demand-chart>
-                            <app-top-areas-revenue [data]="bundle.revenue.topAreas"></app-top-areas-revenue>
-                        </div>
-                    </section>
-
-                    <!-- Revenue by Location -->
-                    <section>
-                        <app-area-by-revenue [data]="bundle.demand.byLocation"></app-area-by-revenue>
-                    </section>
-
-                    <!-- Underperforming Areas -->
-                    <section>
-                        <app-underperforming-areas [data]="bundle.revenue.underperforming"></app-underperforming-areas>
-                    </section>
-
-                    <!-- Peak Service Times -->
-                    <section>
-                        <app-peak-service-times [data]="bundle.peak.peakServiceTime"></app-peak-service-times>
-                    </section>
-
-                    </ng-container>
-                </ng-container>
+                </section>
             </ng-container>
 
-        </ng-container>
+            <!-- Service Demand -->
+            <section role="region" aria-label="Service Demand by Area">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <app-area-service-demand-chart [data]="bundle.demand.serviceDemand"></app-area-service-demand-chart>
+                    <app-top-areas-revenue [data]="bundle.revenue.topAreas"></app-top-areas-revenue>
+                </div>
+            </section>
 
-    </main>
-</div>
+            <!-- Revenue by Location -->
+            <section role="region" aria-label="Revenue by Location">
+                <app-area-by-revenue [data]="bundle.demand.byLocation"></app-area-by-revenue>
+            </section>
+
+            <!-- Underperforming Areas -->
+            <section role="region" aria-label="Underperforming Areas">
+                <app-underperforming-areas [data]="bundle.revenue.underperforming"></app-underperforming-areas>
+            </section>
+
+            <!-- Peak Service Times -->
+            <section role="region" aria-label="Peak Service Times">
+                <app-peak-service-times [data]="bundle.peak.peakServiceTime"></app-peak-service-times>
+            </section>
+
+        </ng-container>
+    </ng-container>
+
+</app-analytics-page>

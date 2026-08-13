@@ -1,44 +1,45 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { ITopAreaRevenue } from '../../../../../core/models/analytics.model';
+import { InrCurrencyPipe } from '../../../../../core/pipes/inr-currency.pipe';
+import { AnalyticsChartCardComponent } from '../../analytics/analytics-chart-card/analytics-chart-card.component';
+import { ANALYTICS_COLORS } from '../../analytics/analytics.tokens';
 
 @Component({
     selector: 'app-top-areas-revenue',
-    imports: [CommonModule, NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
+    providers: [InrCurrencyPipe],
     template: `
-    <section class="bg-white rounded-2xl shadow-lg p-6 w-full">
-      <header class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-xl font-semibold text-gray-800">Top Performing Areas</h2>
-          <p class="text-sm text-gray-500 mt-1">
-            Ranked by total revenue for quick decision-making.
-          </p>
-        </div>
-      </header>
-
-      <div *ngIf="chartOption" echarts [options]="chartOption" class="h-[500px] w-full"></div>
-
-      <div *ngIf="!chartOption" class="flex items-center justify-center h-[500px] text-gray-400 text-sm">
-        Loading chart data...
-      </div>
-    </section>
-  `
+        <app-analytics-chart-card
+            title="Top Performing Areas"
+            subtitle="Ranked by total revenue for quick decision-making"
+            [height]="'large'"
+            [hasData]="topAreaData.length > 0"
+            emptyTitle="No area data"
+            emptyMessage="Top performing areas will appear here once bookings are recorded.">
+            <div echarts [options]="chartOption" class="h-full w-full"></div>
+        </app-analytics-chart-card>
+    `,
 })
 export class TopAreasRevenueComponent {
+    private readonly _currency = inject(InrCurrencyPipe);
+
     @Input()
     set data(value: ITopAreaRevenue[]) {
-        this.chartOption = this.getChartOption(value ?? []);
+        this.topAreaData = value ?? [];
+        this.chartOption = this.getChartOption(this.topAreaData);
     }
 
+    topAreaData: ITopAreaRevenue[] = [];
     chartOption!: EChartsOption;
 
     getChartOption(data: ITopAreaRevenue[]): EChartsOption {
         const locations = data.map(d => d.locationName);
         const revenues = data.map(d => d.totalRevenue);
         const growthIcons = data.map(d => d.changePct >= 0 ? '↑' : '↓');
-        const growthColors = data.map(d => d.changePct >= 0 ? '#16A34A' : '#DC2626');
+        const growthColors = data.map(d => d.changePct >= 0 ? ANALYTICS_COLORS.positive : ANALYTICS_COLORS.negative);
 
         return {
             tooltip: {
@@ -47,7 +48,7 @@ export class TopAreasRevenueComponent {
                 formatter: (params: any) => {
                     const idx = params[0].dataIndex;
                     return `<strong>${locations[idx]}</strong><br/>
-                  Revenue: ₹${revenues[idx].toLocaleString()}<br/>
+                  Revenue: ${this._currency.transform(revenues[idx])}<br/>
                   Change: <span style="color:${growthColors[idx]}">${growthIcons[idx]} ${Math.abs(data[idx].changePct)}%</span>`;
                 },
                 backgroundColor: '#333',
@@ -58,23 +59,19 @@ export class TopAreasRevenueComponent {
             xAxis: {
                 type: 'value',
                 name: 'Revenue (₹)',
-                axisLine: { lineStyle: { color: '#ccc' } },
-                axisLabel: { color: '#374151', fontWeight: 500 },
-                splitLine: { lineStyle: { type: 'dashed', color: '#E5E7EB' } },
-
-
+                axisLine: { lineStyle: { color: ANALYTICS_COLORS.axis } },
+                axisLabel: { color: ANALYTICS_COLORS.text, fontWeight: 500 },
+                splitLine: { lineStyle: { type: 'dashed', color: ANALYTICS_COLORS.grid } },
             },
             yAxis: {
                 type: 'category',
                 data: locations,
                 inverse: true,
-                axisLine: { lineStyle: { color: '#ccc' } },
+                axisLine: { lineStyle: { color: ANALYTICS_COLORS.axis } },
                 axisLabel: {
-                    color: '#374151',
+                    color: ANALYTICS_COLORS.text,
                     fontWeight: 500,
-                    formatter: (text: string) => {
-                        return text.split(',')[3] ?? text
-                    }
+                    formatter: (text: string) => text.split(',')[3] ?? text
                 },
             },
             series: [
@@ -87,7 +84,7 @@ export class TopAreasRevenueComponent {
                         position: 'right',
                         formatter: (params: any) => {
                             const idx = params.dataIndex;
-                            return `₹${params.value.toLocaleString()} ${growthIcons[idx]}`;
+                            return `${this._currency.transform(params.value)} ${growthIcons[idx]}`;
                         },
                         color: '#111',
                         fontWeight: 600

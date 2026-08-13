@@ -3,48 +3,42 @@ import { Component, Input } from "@angular/core";
 import { EChartsOption } from "echarts";
 import { NgxEchartsModule } from 'ngx-echarts';
 import { IReviewChartData } from "../../../../../../core/models/analytics.model";
+import { AnalyticsChartCardComponent } from "../../../analytics/analytics-chart-card/analytics-chart-card.component";
+import { CARD_CLASS } from "../../../analytics/analytics.tokens";
 
 @Component({
-  selector: 'app-performance-ratings',
-  imports: [CommonModule, NgxEchartsModule],
-  styles: [`
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
+    selector: 'app-performance-ratings',
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
+    styles: [`
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   `],
-  template: `
-    <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-100 hover:shadow-xl transition-shadow duration-300">
-      <div>
-        <h2 class="text-2xl font-semibold text-slate-900">Customer Satisfaction</h2>
-        <p class="text-sm text-slate-500 mt-1">Rating distribution & trends</p>
-      </div>
-    
-      <!-- Rating Distribution -->
-      <div echarts [options]="barChartOptions" class="h-64 mb-4"></div>
-    
+    template: `
+    <div class="{{ CARD_CLASS }} p-6">
+      <app-analytics-chart-card
+        title="Customer Satisfaction"
+        subtitle="Rating distribution & trends"
+        [height]="'small'"
+        [hasData]="ratingStats.distributions.length > 0"
+        emptyTitle="No ratings yet"
+        emptyMessage="Rating distribution will appear here once customers rate your service.">
+        <div echarts [options]="barChartOptions" class="h-full w-full"></div>
+      </app-analytics-chart-card>
+
       <!-- Recent Reviews -->
       <div class="mt-6 pt-6 border-t border-slate-100">
         <h3 class="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">Recent Reviews</h3>
         <div class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
           <ng-container *ngIf="ratingStats.reviews.length; else noReviews">
-            <div *ngFor="let review of ratingStats.reviews" 
+            <div *ngFor="let review of ratingStats.reviews"
               class="p-3 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 hover:from-emerald-50 hover:to-green-100 transition-all duration-200 border border-green-200">
               <div class="flex items-center justify-between mb-1">
-                <span class="font-semibold text-slate-800 text-sm">{{review.name}}</span>
-                <span class="text-green-600 font-bold text-sm">{{review.rating}}★</span>
+                <span class="font-semibold text-slate-800 text-sm">{{ review.name }}</span>
+                <span class="text-green-600 font-bold text-sm">{{ review.rating }}★</span>
               </div>
-              <p class="text-xs text-slate-600 line-clamp-2">{{review.desc}}</p>
+              <p class="text-xs text-slate-600 line-clamp-2">{{ review.desc }}</p>
             </div>
           </ng-container>
 
@@ -52,81 +46,84 @@ import { IReviewChartData } from "../../../../../../core/models/analytics.model"
             <p class="text-sm text-slate-400 italic">No reviews yet.</p>
           </ng-template>
         </div>
+      </div>
     </div>
-  `
+  `,
 })
 export class ProviderPerformanceRatingChartComponent {
-  @Input()
-  set data(value: IReviewChartData) {
-    this.ratingStats = value ?? this.ratingStats;
-    this._setChartOption();
-  }
+    CARD_CLASS = CARD_CLASS;
 
-  barChartOptions: EChartsOption = {};
-  ratingStats: IReviewChartData = {
-    distributions: [],
-    reviews: []
-  };
+    @Input()
+    set data(value: IReviewChartData) {
+        this.ratingStats = value ?? this.ratingStats;
+        this._setChartOption();
+    }
 
-  private _setChartOption() {
-    const yAxisRatings = [5, 4, 3, 2, 1];
-    const seriesData = yAxisRatings.map(rating => {
-      const found = this.ratingStats.distributions.find(d => d.rating === rating);
-      return found ? found.count : 0;
-    });
-
-    this.barChartOptions = {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-        formatter: '{b}<br/>{c} reviews',
-        backgroundColor: 'rgba(255,255,255,0.95)',
-        borderColor: '#e5e7eb',
-        borderWidth: 1,
-        textStyle: { color: '#374151' }
-      },
-      grid: { left: '15%', right: '5%', top: '10%', bottom: '10%' },
-      xAxis: {
-        type: 'value',
-        axisLine: { show: false },
-        splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
-        axisLabel: { color: '#64748b' }
-      },
-      yAxis: {
-        type: 'category',
-        data: ['5★', '4★', '3★', '2★', '1★'],
-        inverse: true,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: { fontWeight: 'bold', fontSize: 13, color: '#475569' }
-      },
-      series: [{
-        name: 'Reviews',
-        type: 'bar',
-        data: seriesData,
-        barWidth: 18,
-        label: {
-          show: true,
-          position: 'right',
-          color: '#475569',
-          fontWeight: 'bold',
-          fontSize: 12,
-          formatter: '{c}'
-        },
-        itemStyle: {
-          borderRadius: [0, 10, 10, 0],
-          color: (params) => {
-            const colors = [
-              { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#22c55e' }, { offset: 1, color: '#16a34a' }] }, // 5★
-              { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#16a34a' }, { offset: 1, color: '#15803d' }] }, // 4★
-              { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#4ade80' }, { offset: 1, color: '#22c55e' }] }, // 3★
-              { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#a7f3d0' }, { offset: 1, color: '#22c55e' }] }, // 2★
-              { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#bbf7d0' }, { offset: 1, color: '#16a34a' }] }  // 1★
-            ];
-            return colors[params.dataIndex] as any;
-          }
-        }
-      }]
+    barChartOptions: EChartsOption = {};
+    ratingStats: IReviewChartData = {
+        distributions: [],
+        reviews: []
     };
-  }
+
+    private _setChartOption() {
+        const yAxisRatings = [5, 4, 3, 2, 1];
+        const seriesData = yAxisRatings.map(rating => {
+            const found = this.ratingStats.distributions.find(d => d.rating === rating);
+            return found ? found.count : 0;
+        });
+
+        this.barChartOptions = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: '{b}<br/>{c} reviews',
+                backgroundColor: 'rgba(255,255,255,0.95)',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                textStyle: { color: '#374151' }
+            },
+            grid: { left: '15%', right: '5%', top: '10%', bottom: '10%' },
+            xAxis: {
+                type: 'value',
+                axisLine: { show: false },
+                splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
+                axisLabel: { color: '#64748b' }
+            },
+            yAxis: {
+                type: 'category',
+                data: ['5★', '4★', '3★', '2★', '1★'],
+                inverse: true,
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: { fontWeight: 'bold', fontSize: 13, color: '#475569' }
+            },
+            series: [{
+                name: 'Reviews',
+                type: 'bar',
+                data: seriesData,
+                barWidth: 18,
+                label: {
+                    show: true,
+                    position: 'right',
+                    color: '#475569',
+                    fontWeight: 'bold',
+                    fontSize: 12,
+                    formatter: '{c}'
+                },
+                itemStyle: {
+                    borderRadius: [0, 10, 10, 0],
+                    color: (params) => {
+                        const colors = [
+                            { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#22c55e' }, { offset: 1, color: '#16a34a' }] },
+                            { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#16a34a' }, { offset: 1, color: '#15803d' }] },
+                            { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#4ade80' }, { offset: 1, color: '#22c55e' }] },
+                            { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#a7f3d0' }, { offset: 1, color: '#22c55e' }] },
+                            { type: 'linear', x: 0, y: 0, x2: 1, y2: 0, colorStops: [{ offset: 0, color: '#bbf7d0' }, { offset: 1, color: '#16a34a' }] }
+                        ];
+                        return colors[params.dataIndex] as any;
+                    }
+                }
+            }]
+        };
+    }
 }

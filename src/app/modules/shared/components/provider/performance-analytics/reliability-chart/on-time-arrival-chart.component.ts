@@ -1,22 +1,25 @@
 import { Component, Input } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { EChartsOption } from "echarts";
 import { NgxEchartsModule } from "ngx-echarts";
 import { IOnTimeArrivalChartData } from "../../../../../../core/models/analytics.model";
+import { AnalyticsChartCardComponent } from "../../../analytics/analytics-chart-card/analytics-chart-card.component";
+import { ANALYTICS_COLORS } from "../../../analytics/analytics.tokens";
 
 @Component({
     selector: 'app-performance-on-time-arrival',
-    imports: [NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
     template: `
-           <div class="bg-white rounded-lg shadow-md p-6 border border-slate-100">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-2xl font-semibold text-slate-900">On-Time Arrival Rate</h2>
-                        <p class="text-sm text-slate-500 mt-1">Monthly performance metrics</p>
-                    </div>
-                </div>
-                <div echarts [options]="onTimeArrivalOptions" class="h-80"></div>
-            </div>
-    `
+        <app-analytics-chart-card
+            title="On-Time Arrival Rate"
+            subtitle="Monthly performance metrics"
+            [height]="'small'"
+            [hasData]="onTimeArrivalOptionsData.length > 0"
+            emptyTitle="No arrival data"
+            emptyMessage="On-time arrival rate will appear here once bookings are recorded.">
+            <div echarts [options]="onTimeArrivalOptions" class="h-full w-full"></div>
+        </app-analytics-chart-card>
+    `,
 })
 export class ProviderPerformanceOnTimeArrivalChartComponent {
     @Input()
@@ -63,8 +66,8 @@ export class ProviderPerformanceOnTimeArrivalChartComponent {
                 type: 'line',
                 smooth: true,
                 data: seriesData,
-                lineStyle: { width: 3, color: '#10b981' },
-                itemStyle: { color: '#10b981' },
+                lineStyle: { width: 3, color: ANALYTICS_COLORS.provider },
+                itemStyle: { color: ANALYTICS_COLORS.provider },
                 areaStyle: {
                     color: {
                         type: 'linear',
@@ -79,6 +82,4 @@ export class ProviderPerformanceOnTimeArrivalChartComponent {
             }]
         };
     }
-
-
 }

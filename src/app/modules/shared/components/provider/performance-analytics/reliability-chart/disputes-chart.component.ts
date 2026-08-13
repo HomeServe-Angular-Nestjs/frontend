@@ -5,22 +5,24 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { IDisputeAnalyticsChartData } from "../../../../../../core/models/analytics.model";
 import { ComplaintReason } from "../../../../../../core/enums/enums";
 import { CapitalizeFirstPipe } from "../../../../../../core/pipes/capitalize-first.pipe";
+import { AnalyticsChartCardComponent } from "../../../analytics/analytics-chart-card/analytics-chart-card.component";
+import { ANALYTICS_COLORS } from "../../../analytics/analytics.tokens";
 
 @Component({
     selector: 'app-performance-disputes',
-    imports: [CommonModule, NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
     providers: [CapitalizeFirstPipe],
     template: `
-        <div class="bg-white rounded-lg shadow-md p-6 border border-slate-100">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-2xl font-semibold text-slate-900">Disputes</h2>
-                    <p class="text-sm text-slate-500 mt-1">Disputes by Type (Last 10 Days)</p>
-                </div>
-            </div>
-            <div echarts [options]="disputesOptions" class="h-80"></div>
-        </div>
-    `
+        <app-analytics-chart-card
+            title="Disputes"
+            subtitle="Disputes by type, monthly"
+            [height]="'small'"
+            [hasData]="disputesOptionsData.length > 0"
+            emptyTitle="No dispute data"
+            emptyMessage="Dispute analytics will appear here once disputes are recorded.">
+            <div echarts [options]="disputesOptions" class="h-full w-full"></div>
+        </app-analytics-chart-card>
+    `,
 })
 export class ProviderPerformanceDisputesChartComponent {
     private readonly _capitalizeFirstPipe = inject(CapitalizeFirstPipe);
@@ -37,35 +39,29 @@ export class ProviderPerformanceDisputesChartComponent {
     private _setDisputesOptions() {
         const months: string[] = [
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"
-        ];
-
-        const spamData = new Array(12).fill(0);
-        const inappropriateData = new Array(12).fill(0);
-        const harassmentData = new Array(12).fill(0);
-        const otherData = new Array(12).fill(0);
-
-        this.disputesOptionsData.forEach(d => {
-            const monthIndex = months.findIndex(m => m === d.month);
-            spamData[monthIndex] = d.spam;
-            inappropriateData[monthIndex] = d.inappropriate;
-            harassmentData[monthIndex] = d.harassment;
-            otherData[monthIndex] = d.other;
-        });
-
-        // Distinct greenish tones for each category
-        const greenShades = [
-            { start: '#166534', end: '#14532d' }, 
-            { start: '#22c55e', end: '#16a34a' }, 
-            { start: '#a3e635', end: '#84cc16' }, 
-            { start: '#2dd4bf', end: '#0d9488' }  
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         ];
 
         const seriesData = [
-            { name: 'Spam', data: spamData },
-            { name: 'Inappropriate', data: inappropriateData },
-            { name: 'Harassment', data: harassmentData },
-            { name: 'Other', data: otherData }
+            { name: 'Spam', data: new Array(12).fill(0) as number[] },
+            { name: 'Inappropriate', data: new Array(12).fill(0) as number[] },
+            { name: 'Harassment', data: new Array(12).fill(0) as number[] },
+            { name: 'Other', data: new Array(12).fill(0) as number[] }
+        ];
+
+        this.disputesOptionsData.forEach(d => {
+            const monthIndex = months.findIndex(m => m === d.month);
+            seriesData[0].data[monthIndex] = d.spam;
+            seriesData[1].data[monthIndex] = d.inappropriate;
+            seriesData[2].data[monthIndex] = d.harassment;
+            seriesData[3].data[monthIndex] = d.other;
+        });
+
+        const greenShades = [
+            { start: ANALYTICS_COLORS.providerDeep, end: '#14532d' },
+            { start: ANALYTICS_COLORS.provider, end: ANALYTICS_COLORS.providerStrong },
+            { start: '#a3e635', end: '#84cc16' },
+            { start: '#2dd4bf', end: '#0d9488' }
         ];
 
         this.disputesOptions = {
@@ -74,7 +70,7 @@ export class ProviderPerformanceDisputesChartComponent {
                 axisPointer: { type: 'shadow' },
                 backgroundColor: 'rgba(255,255,255,0.95)',
                 borderColor: '#e5e7eb',
-                borderWidth: 1,
+                borderWidth: 1
             },
             legend: {
                 data: Object.values(ComplaintReason).map(reason => this._capitalizeFirstPipe.transform(reason)),
@@ -113,14 +109,9 @@ export class ProviderPerformanceDisputesChartComponent {
                     }
                 },
                 emphasis: {
-                    itemStyle: {
-                        opacity: 1,
-                        shadowBlur: 6,
-                        shadowColor: 'rgba(0, 0, 0, 0.2)'
-                    }
+                    itemStyle: { opacity: 1, shadowBlur: 6, shadowColor: 'rgba(0, 0, 0, 0.2)' }
                 }
             }))
         };
     }
-
 }

@@ -1,40 +1,41 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { ILocationRevenue } from '../../../../../core/models/analytics.model';
+import { InrCurrencyPipe } from '../../../../../core/pipes/inr-currency.pipe';
+import { AnalyticsChartCardComponent } from '../../analytics/analytics-chart-card/analytics-chart-card.component';
+import { ANALYTICS_COLORS } from '../../analytics/analytics.tokens';
 
 @Component({
     selector: 'app-area-by-revenue',
     standalone: true,
-    imports: [CommonModule, NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
+    providers: [InrCurrencyPipe],
     template: `
-    <section class="bg-white rounded-2xl shadow-lg p-6 w-full">
-      <header class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-xl font-semibold text-gray-800">Revenue by Location</h2>
-          <p class="text-sm text-gray-500 mt-1">
-            Identifies where your revenue originates geographically.
-          </p>
-        </div>
-      </header>
-
-      <div *ngIf="chartOption" echarts [options]="chartOption" class="h-[550px] w-full"></div>
-
-      <div *ngIf="!chartOption" class="flex items-center justify-center h-[550px] text-gray-400 text-sm">
-        Loading map data...
-      </div>
-    </section>
-  `
+        <app-analytics-chart-card
+            title="Revenue by Location"
+            subtitle="Identifies where your revenue originates geographically"
+            [height]="'large'"
+            [hasData]="locationData.length > 0"
+            emptyTitle="No location data"
+            emptyMessage="Revenue by location will appear here once bookings are recorded.">
+            <div echarts [options]="chartOption" class="h-full w-full"></div>
+        </app-analytics-chart-card>
+    `,
 })
 export class RevenueByLocationComponent {
+    private readonly _currency = inject(InrCurrencyPipe);
+
     @Input()
     set data(value: ILocationRevenue[]) {
-        if (value?.length) {
-            this.chartOption = this.getChartOption(value);
+        this.locationData = value ?? [];
+        if (this.locationData.length) {
+            this.chartOption = this.getChartOption(this.locationData);
         }
     }
 
+    locationData: ILocationRevenue[] = [];
     chartOption!: EChartsOption;
 
     getChartOption(data: ILocationRevenue[]): EChartsOption {
@@ -42,7 +43,7 @@ export class RevenueByLocationComponent {
 
         const locations = sorted.map(d => d.locationName);
         const revenues = sorted.map(d => d.totalRevenue);
-        const growthColors = sorted.map(d => d.changePct >= 0 ? '#16A34A' : '#DC2626');
+        const growthColors = sorted.map(d => d.changePct >= 0 ? ANALYTICS_COLORS.positive : ANALYTICS_COLORS.negative);
         const growthIcons = sorted.map(d => d.changePct >= 0 ? '↑' : '↓');
 
         return {
@@ -60,7 +61,7 @@ export class RevenueByLocationComponent {
                     return `
           <div style="line-height:1.4">
             <strong>${d.locationName.split(',')[3] ?? d.locationName}</strong><br/>
-            ₹${d.totalRevenue.toLocaleString()}<br/>
+            ${this._currency.transform(d.totalRevenue)}<br/>
             <span style="color:${growthColors[idx]}">${growthIcons[idx]} ${Math.abs(d.changePct)}%</span>
           </div>
         `;
@@ -97,7 +98,7 @@ export class RevenueByLocationComponent {
                         position: 'right',
                         formatter: (params: any) => {
                             const idx = params.dataIndex;
-                            return `₹${params.value.toLocaleString()} ${growthIcons[idx]}`;
+                            return `${this._currency.transform(params.value)} ${growthIcons[idx]}`;
                         },
                         color: '#111',
                         fontWeight: 500,

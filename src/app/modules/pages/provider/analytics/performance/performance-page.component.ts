@@ -15,10 +15,11 @@ import { ProviderPerformanceOnTimeArrivalChartComponent } from "../../../../shar
 import { ProviderPerformanceDisputesChartComponent } from "../../../../shared/components/provider/performance-analytics/reliability-chart/disputes-chart.component";
 import { ProviderPerformanceComparisonOverviewComponent } from "../../../../shared/components/provider/performance-analytics/comparison-chart/comparison-overview.component";
 import { AnalyticService } from "../../../../../core/services/analytics.service";
-import { IPerformanceAnalyticsBundle } from "../../../../../core/models/analytics.model";
+import { IPerformanceAnalyticsBundle, IProviderPerformanceOverview } from "../../../../../core/models/analytics.model";
 import { catchError, map, of, shareReplay, startWith } from "rxjs";
-
-
+import { AnalyticsPageComponent } from "../../../../shared/components/analytics/analytics-page/analytics-page.component";
+import { AnalyticsSectionHeaderComponent } from "../../../../shared/components/analytics/analytics-section-header/analytics-section-header.component";
+import { AnalyticsInsightCardComponent, InsightTone } from "../../../../shared/components/analytics/analytics-insight-card/analytics-insight-card.component";
 
 echarts.use([
     TooltipComponent,
@@ -49,6 +50,9 @@ const EMPTY_PERFORMANCE: IPerformanceAnalyticsBundle = {
 };
 
 type PerformanceVM = { status: 'loading' | 'error' | 'success'; data: IPerformanceAnalyticsBundle };
+
+interface InsightVM { text: string; icon: string; tone: InsightTone; }
+
 @Component({
     selector: 'app-performance-page',
     templateUrl: './performance-page.component.html',
@@ -60,7 +64,10 @@ type PerformanceVM = { status: 'loading' | 'error' | 'success'; data: IPerforman
         ProviderPerformanceResponseTimeChartComponent,
         ProviderPerformanceOnTimeArrivalChartComponent,
         ProviderPerformanceDisputesChartComponent,
-        ProviderPerformanceComparisonOverviewComponent
+        ProviderPerformanceComparisonOverviewComponent,
+        AnalyticsPageComponent,
+        AnalyticsSectionHeaderComponent,
+        AnalyticsInsightCardComponent
     ],
     providers: [provideEchartsCore({ echarts })],
 
@@ -84,12 +91,38 @@ export class ProviderPerformanceLayoutComponent implements OnInit {
         this.vm$ = this._load();
     }
 
-    hasData(vm: PerformanceVM): boolean {
+    hasData(vm: PerformanceVM | null): boolean {
+        if (!vm) return true;
         return vm.data.bookings.bookingOverview.length > 0
             || vm.data.bookings.trends.distributions.length > 0
             || vm.data.bookings.trends.reviews.length > 0
             || vm.data.quality.responseTimeDistribution.length > 0
             || vm.data.comparison.comparisonStats.length > 0;
+    }
+
+    buildInsights(bundle: IPerformanceAnalyticsBundle): InsightVM[] {
+        const s: IProviderPerformanceOverview = bundle.summary.performanceAnalytics;
+        const insights: InsightVM[] = [];
+
+        if (s.completionRate >= 90) {
+            insights.push({ text: `Your ${s.completionRate}% completion rate is excellent and exceeds typical benchmarks.`, icon: 'fa-solid fa-circle-check', tone: 'positive' });
+        } else if (s.completionRate > 0) {
+            insights.push({ text: `Your completion rate is ${s.completionRate}%. Consider optimizing scheduling to push it past 90%.`, icon: 'fa-solid fa-circle-check', tone: 'info' });
+        }
+
+        if (s.avgRating >= 4.5) {
+            insights.push({ text: `An average rating of ${s.avgRating}/5 reflects strong customer satisfaction.`, icon: 'fa-solid fa-star', tone: 'positive' });
+        } else if (s.avgRating > 0) {
+            insights.push({ text: `Your average rating of ${s.avgRating}/5 leaves room to grow. Respond to feedback to improve.`, icon: 'fa-solid fa-star', tone: 'info' });
+        }
+
+        if (s.onTimePercent >= 95) {
+            insights.push({ text: `On-time arrival of ${s.onTimePercent}% keeps your customers happy and builds trust.`, icon: 'fa-solid fa-location-dot', tone: 'positive' });
+        } else if (s.onTimePercent > 0) {
+            insights.push({ text: `On-time arrival is ${s.onTimePercent}%. Tighten scheduling to reduce delays.`, icon: 'fa-solid fa-location-dot', tone: 'negative' });
+        }
+
+        return insights;
     }
 
     ngOnInit(): void {
