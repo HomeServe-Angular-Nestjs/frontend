@@ -114,7 +114,6 @@ export interface IDocumentDetail {
     label: string;
     fileUrl: string;
     uploadedAt: string | Date;
-    verificationStatus: VerificationStatusType;
 }
 
 export interface ICustomerDetailsBundle {

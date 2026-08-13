@@ -3,6 +3,6 @@
         <ng-content select="[table-header]"></ng-content>
     </thead>
     <tbody>
-        <app-table-row *ngFor="let r of row" [row]="r"></app-table-row>
+        <app-table-row *ngFor="let r of row" [row]="r" [cellTemplates]="cellTemplates"></app-table-row>
     </tbody>
 </table>

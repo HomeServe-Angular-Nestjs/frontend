@@ -132,21 +132,6 @@
                 <div class="space-y-1">
                     <div class="font-semibold text-green-800">{{ cert.label }}</div>
                     <div class="text-sm text-gray-600">Uploaded: {{ cert.uploadedAt | date: 'mediumDate' }}</div>
-                    <div class="text-sm">
-                        Status:
-                        <span [ngClass]="{
-                            'text-yellow-600': cert.verificationStatus === 'pending',
-                            'text-green-600': cert.verificationStatus === 'verified',
-                            'text-red-500': cert.verificationStatus === 'rejected'
-                            }">
-                            {{ cert.verificationStatus | titlecase }}
-                        </span>
-                    </div>
-
-                    <div *ngIf="cert.verificationStatus === 'verified' && cert.verifiedAt"
-                        class="text-xs text-gray-500">
-                        Verified on {{ cert.verifiedAt | date: 'shortDate' }}
-                    </div>
                 </div>
 
                 <!-- Optional Delete/Edit buttons -->

@@ -37,7 +37,8 @@ export const appConfig: ApplicationConfig = {
         positionClass: 'toast-top-center',
         timeOut: 3000,
         progressBar: true,
-        closeButton: true
+        closeButton: true,
+        preventDuplicates: true
       }),
       NgxSpinnerModule.forRoot()
     ),

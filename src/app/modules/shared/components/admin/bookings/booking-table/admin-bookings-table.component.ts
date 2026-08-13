@@ -11,4 +11,9 @@ import { RouterLink } from "@angular/router";
 })
 export class AdminBookingTableComponent {
     @Input({ required: true }) bookings: IAdminBookingForTable[] = [];
+
+    avatarFallback(event: Event, name: string): void {
+        const img = event.target as HTMLImageElement;
+        img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent((name || 'U').charAt(0).toUpperCase())}&background=0D8ABC&color=fff`;
+    }
 }

@@ -7,10 +7,11 @@ import { TableColComponent } from "../column/table-column.component";
     imports: [CommonModule, TableColComponent],
     template: `
     <tr class="border-b hover:bg-blue-50/30 transition-shadow">
-      <app-table-col *ngFor="let cell of row" [cell]="cell"></app-table-col>
+      <app-table-col *ngFor="let cell of row" [cell]="cell" [cellTemplates]="cellTemplates"></app-table-col>
     </tr>
   `,
 })
 export class TableRowComponent {
     @Input() row: any = [];
+    @Input() cellTemplates: { [key: string]: TemplateRef<any> } = {};
 }

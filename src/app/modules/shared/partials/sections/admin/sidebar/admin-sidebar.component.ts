@@ -21,6 +21,7 @@ export class AdminSidebarComponent {
       route: 'admin/dashboard'
     },
     { name: 'User Management', icon: 'fa-users', route: 'admin/users' },
+    { name: 'Approvals', icon: 'fa-user-check', route: 'admin/approvals' },
     { name: 'Ratings & Reviews', icon: 'fa-star', route: 'admin/ratings&reviews' },
     {
       name: 'Category Management',

@@ -1,9 +1,9 @@
 <div class="bg-white rounded-2xl shadow-sm p-6 md:p-8">
     <h3 class="text-lg font-semibold text-gray-800 mb-4">Documents</h3>
-    <div *ngIf="documents.length > 0; else empty" class="space-y-3">
+    <div *ngIf="documents.length > 0; else empty" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         <div *ngFor="let doc of documents"
-            class="flex items-center justify-between rounded-xl border border-gray-100 p-4 hover:bg-gray-50/50 transition-colors">
-            <div class="flex items-center gap-3 min-w-0">
+            class="flex flex-col justify-between rounded-xl border border-gray-100 p-4 hover:bg-gray-50/50 hover:border-blue-200 transition-colors">
+            <div class="flex items-center gap-3 min-w-0 mb-3">
                 <div class="w-10 h-10 shrink-0 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                     <i class="fa-solid fa-file"></i>
                 </div>
@@ -12,12 +12,10 @@
                     <p class="text-xs text-gray-400">Uploaded {{ doc.uploadedAt | date: 'MMM d, y' }}</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 shrink-0">
-                <span class="px-3 py-1 rounded-full text-xs font-medium capitalize"
-                    [ngClass]="statusPillClass(doc.verificationStatus)">{{ doc.verificationStatus }}</span>
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
                 <a [href]="doc.fileUrl" target="_blank" rel="noopener"
-                    class="text-blue-600 hover:text-blue-800 text-sm">
-                    <i class="fa-solid fa-external-link"></i>
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 text-sm font-medium transition-colors">
+                    <i class="fa-solid fa-external-link"></i> View
                 </a>
             </div>
         </div>

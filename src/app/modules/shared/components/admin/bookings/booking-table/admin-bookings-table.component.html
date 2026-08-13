@@ -20,7 +20,9 @@
                 </td>
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">
-                        <img [src]="booking.customer.avatar" class="w-9 h-9 rounded-full border object-cover shadow-sm"
+                        <img [src]="booking.customer.avatar"
+                            (error)="avatarFallback($event, booking.customer.username)"
+                            class="w-9 h-9 rounded-full border object-cover shadow-sm"
                             alt="Customer avatar" />
                         <div>
                             <div class="font-semibold">{{ booking.customer.username }}</div>
@@ -30,7 +32,9 @@
                 </td>
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">
-                        <img [src]="booking.provider.avatar" class="w-9 h-9 rounded-full border object-cover shadow-sm"
+                        <img [src]="booking.provider.avatar"
+                            (error)="avatarFallback($event, booking.provider.username)"
+                            class="w-9 h-9 rounded-full border object-cover shadow-sm"
                             alt="Provider avatar" />
                         <div>
                             <div class="font-semibold">{{ booking.provider.username }}</div>

@@ -8,6 +8,6 @@ import { TableRowComponent } from "../row/table-row.component";
     imports: [CommonModule, TableRowComponent]
 })
 export class TableWrapperComponent {
-    // @Input() columns: any[] = [];
     @Input() row: any[] = [];
+    @Input() cellTemplates: { [key: string]: TemplateRef<any> } = {};
 }

@@ -1,31 +1,34 @@
-<div class="flex flex-wrap gap-6 items-end">
-
+<div class="flex flex-wrap items-center gap-3">
     <!-- Search -->
-    <div class="flex items-center gap-3">
-        <label for="searchInput" class="text-sm font-medium text-gray-400 mb-1">Search:</label>
-        <div class="relative">
-            <input id="searchInput" type="text" placeholder="Email or Name" [(ngModel)]="searchTerm"
-                class="w-64 pl-10 pr-4 py-2 text-sm bg-gray-50 text-gray-700 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition" />
-            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-        </div>
+    <div class="relative">
+        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+        <input type="text" placeholder="Search name, email or ID" [(ngModel)]="search" (ngModelChange)="emit()"
+            class="w-72 pl-9 pr-4 py-2.5 text-sm bg-gray-50 text-gray-700 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition" />
     </div>
 
-    <!-- Verification Status -->
-    <div class="flex items-center gap-3">
-        <label for="verificationStatus" class="text-sm font-medium text-gray-400 mb-1">Status:</label>
-        <select id="verificationStatus" [(ngModel)]="verificationStatus"
-            class="w-48 px-4 py-2 text-sm bg-gray-50 text-gray-700 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
-            <option value="">All</option>
+    <!-- Status -->
+    <div class="relative">
+        <i class="fas fa-filter absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+        <select [(ngModel)]="status" (ngModelChange)="emit()"
+            class="pl-9 pr-10 py-2.5 text-sm bg-gray-50 text-gray-700 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition appearance-none cursor-pointer">
+            <option value="">All Status</option>
             <option value="pending">Pending</option>
             <option value="verified">Verified</option>
             <option value="rejected">Rejected</option>
         </select>
+        <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
     </div>
 
-    <!-- Date Picker -->
-    <div class="flex items-center gap-3">
-        <label for="datePicker" class="text-sm font-medium text-gray-400 mb-1">Date:</label>
-        <input id="datePicker" type="date" [(ngModel)]="selectedDate"
-            class="w-48 px-4 py-2 text-sm bg-gray-50 text-gray-700 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition" />
+    <!-- Date -->
+    <div class="relative">
+        <i class="fas fa-calendar-day absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+        <input type="date" [(ngModel)]="date" (ngModelChange)="emit()"
+            class="pl-9 pr-3 py-2.5 text-sm bg-gray-50 text-gray-700 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition" />
     </div>
+
+    <!-- Clear -->
+    <button type="button" (click)="clear()"
+        class="px-4 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors">
+        <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+    </button>
 </div>

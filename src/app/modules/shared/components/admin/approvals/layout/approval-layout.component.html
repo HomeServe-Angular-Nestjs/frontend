@@ -1,45 +1,99 @@
-<div class="px-6 pt-6 pb-10 bg-gray-50 min-h-full space-y-5">
+<div class="px-6 pt-6 pb-10 bg-gray-50 min-h-full space-y-6">
 
-    <!-- Overview Cards Section -->
-    <section class="mb-8">
-        <app-admin-approval-overview></app-admin-approval-overview>
+    <!-- Metadata + Filters -->
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4 flex flex-col lg:flex-row lg:items-center gap-4">
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-current"></span> {{ summary.pending }} Pending
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-current"></span> {{ summary.verified }} Verified
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-current"></span> {{ summary.rejected }} Rejected
+            </span>
+        </div>
+
+        <div class="lg:ml-auto">
+            <app-admin-approval-filter (filterChange)="onFilterChange($event)"></app-admin-approval-filter>
+        </div>
     </section>
 
-    <!-- Filters Section -->
-    <section class="bg-white rounded-lg flex justify-end w-full">
-        <app-admin-approval-filter></app-admin-approval-filter>
-    </section>
+    <!-- Approvals Table -->
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 pt-5 pb-4 flex items-center justify-between border-b border-gray-100">
+            <div>
+                <h3 class="text-base font-semibold text-gray-900">Approval Requests</h3>
+                <p class="text-xs text-gray-500 mt-0.5">{{ approvals.length }} result(s)</p>
+            </div>
+        </div>
 
-    <section class="bg-white rounded-xl shadow">
-        <ng-template #textCell let-cell="cell">
-            <app-table-cell-text [text]="cell.value"></app-table-cell-text>
-        </ng-template>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Provider</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Documents</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Registered</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
+                        <th class="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                    <tr *ngFor="let approval of approvals" class="hover:bg-gray-50/70 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-gray-400">
+                            {{ sliceId(approval.id) }}
+                        </td>
 
-        <ng-template #imageTwoTextCell let-cell="cell">
-            <app-table-cell-image-two-text [image]="cell.value.image" [title]="cell.value.title"
-                [subtitle]="cell.value.subtitle"></app-table-cell-image-two-text>
-        </ng-template>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <img *ngIf="approval.avatar" [src]="approval.avatar" alt="avatar"
+                                    (error)="avatarFallback($event, approval.name)"
+                                    class="w-9 h-9 rounded-full object-cover ring-1 ring-gray-200" />
+                                <div *ngIf="!approval.avatar"
+                                    class="w-9 h-9 shrink-0 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-semibold">
+                                    {{ initials(approval.name) }}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">{{ approval.name }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ approval.email }}</p>
+                                </div>
+                            </div>
+                        </td>
 
-        <ng-template #dateCell let-cell="cell">
-            <app-table-cell-text [text]="cell.value"></app-table-cell-text>
-        </ng-template>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {{ approval.documentCount }} {{ approval.documentCount === 1 ? 'doc' : 'docs' }}
+                        </td>
 
-        <ng-template #badgeCell let-cell="cell">
-            <span class="badge">{{ cell.value }}</span>
-        </ng-template>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {{ approval.date | date: 'MMM d, y' }}
+                        </td>
 
-        <ng-template #actionsCell let-cell="cell">
-            <button>Edit</button> | <button>Delete</button>
-        </ng-template>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ring-1 ring-inset"
+                                [ngClass]="badgeClass(approval.verificationStatus)">
+                                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                                {{ badgeLabel(approval.verificationStatus) }}
+                            </span>
+                        </td>
 
-        <app-table-wrapper [row]="rows">
-            <!-- Headers slot -->
-            <tr table-header>
-                <th class="px-5 py-3" *ngFor="let col of columns">{{ col }}</th>
-            </tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <button (click)="openProvider(approval.id)"
+                                class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors">
+                                <i class="fa-solid fa-eye mr-0.5"></i> Review
+                            </button>
+                        </td>
+                    </tr>
 
-            <!-- Rows slot -->
-        </app-table-wrapper>
-
+                    <tr *ngIf="approvals.length === 0">
+                        <td colspan="6" class="px-6 py-16 text-center">
+                            <i class="fa-solid fa-folder-open text-4xl text-gray-300 mb-3"></i>
+                            <p class="text-sm text-gray-500">No providers to review yet</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </section>
 </div>

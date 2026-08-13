@@ -23,6 +23,7 @@ export class UserDetailsHeaderComponent {
 
     @Input() profile!: IUserDetailsProfile | IProviderDetailsProfile;
     @Input() role: UType = 'customer';
+    @Input() hasDocuments = false;
 
     @Output() statusChanged = new EventEmitter<boolean>();
     @Output() verificationChanged = new EventEmitter<VerificationStatusType>();
@@ -41,6 +42,11 @@ export class UserDetailsHeaderComponent {
 
     get initial(): string {
         return (this.profile.fullname || this.profile.username || '?').charAt(0).toUpperCase();
+    }
+
+    avatarFallback(event: Event, name: string): void {
+        const img = event.target as HTMLImageElement;
+        img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent((name || 'U').charAt(0).toUpperCase())}&background=0D8ABC&color=fff`;
     }
 
     goBack(): void {
@@ -68,30 +74,36 @@ export class UserDetailsHeaderComponent {
                         this._toastr.success(`User ${isActive ? 'blocked' : 'unblocked'}`);
                         this.statusChanged.emit(!isActive);
                     }
-                },
-                error: () => this._toastr.error('Something went wrong. Please try again.')
+                }
             });
         });
     }
 
     onVerify(): void {
+        this._updateVerification('verified', 'verify', 'Provider verified successfully');
+    }
+
+    onReject(): void {
+        this._updateVerification('rejected', 'reject', 'Provider rejected successfully');
+    }
+
+    private _updateVerification(status: VerificationStatusType, action: string, successMessage: string): void {
         const dialogRef = this._dialog.open(ConfirmDialogComponent, {
             data: {
-                title: 'Verify Provider',
-                message: 'Are you sure you want to mark this provider as verified?'
+                title: action === 'verify' ? 'Verify Provider' : 'Reject Provider',
+                message: `Are you sure you want to ${action} this provider?`
             }
         });
 
         dialogRef.afterClosed().subscribe(confirmed => {
             if (!confirmed) return;
-            this._adminService.verifyProvider({ providerId: this.profile.id, status: 'verified' }).subscribe({
+            this._adminService.verifyProvider({ providerId: this.profile.id, status }).subscribe({
                 next: (res) => {
                     if (res.success) {
-                        this._toastr.success('Provider verified successfully');
-                        this.verificationChanged.emit('verified');
+                        this._toastr.success(successMessage);
+                        this.verificationChanged.emit(status);
                     }
-                },
-                error: () => this._toastr.error('Something went wrong. Please try again.')
+                }
             });
         });
     }

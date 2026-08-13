@@ -17,10 +17,4 @@ export class ImageTwoTextCellComponent {
     @Input({ required: true }) image!: string;
     @Input({ required: true }) title!: string;
     @Input({ required: true }) subtitle!: string;
-
-    ngOnInit() {
-        console.log(this.image)
-        console.log(this.title)
-        console.log(this.subtitle)
-    }
 }

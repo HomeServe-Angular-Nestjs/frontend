@@ -14,8 +14,6 @@ export interface IDocs {
     label: string;
     fileUrl: string;
     uploadedAt: Date;
-    verificationStatus: 'pending' | 'verified' | 'rejected';
-    verifiedAt?: Date;
     isDeleted: boolean;
 };
 

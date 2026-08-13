@@ -1,27 +1,33 @@
 import { CommonModule } from "@angular/common";
-import { Component, } from "@angular/core";
+import { Component, EventEmitter, Output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { DebounceService } from "../../../../../../core/services/public/debounce.service";
+
+export interface ApprovalFilter {
+    search: string;
+    status: string;
+    date: string;
+}
 
 @Component({
     selector: 'app-admin-approval-filter',
     templateUrl: './approval-filter.component.html',
     imports: [CommonModule, FormsModule],
-    providers: [DebounceService]
 })
 export class AdminApprovalFilterComponent {
-    searchTerm: string = '';
-    verificationStatus: string = '';
-    selectedSpecialization: string = '';
-    certifiedOnly: boolean = false;
-    languageFilter: string = '';
-    selectedDate: string = '';
+    @Output() filterChange = new EventEmitter<ApprovalFilter>();
 
-    specializationOptions: string[] = [
-        'Electrical Maintenance and Repair',
-        'Residential Electrical Services',
-        'Commercial Electrical Solutions',
-        'Smart Home Electrical Integration',
-        'Electrical Safety Auditing'
-    ];
+    search: string = '';
+    status: string = '';
+    date: string = '';
+
+    emit(): void {
+        this.filterChange.emit({ search: this.search, status: this.status, date: this.date });
+    }
+
+    clear(): void {
+        this.search = '';
+        this.status = '';
+        this.date = '';
+        this.emit();
+    }
 }
