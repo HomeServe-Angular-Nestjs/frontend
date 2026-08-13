@@ -94,6 +94,12 @@ export const providerRoutes: Routes = [
             loadComponent: () => import('../../shared/components/provider/gallery/provider-gallery.component')
               .then(c => c.ProviderGalleryComponent),
             data: { breadcrumb: 'Gallery' }
+          },
+          {
+            path: 'accounts',
+            loadComponent: () => import('../../shared/components/provider/accounts/accounts.component')
+              .then(c => c.ProviderAccountsComponent),
+            data: { breadcrumb: 'Accounts' }
           }
         ],
       },
@@ -153,13 +159,6 @@ export const providerRoutes: Routes = [
         loadComponent: () => import('../../pages/provider/wallet/wallet.component')
           .then(c => c.ProviderWalletComponent),
         data: { breadcrumb: 'Wallet' }
-      },
-      {
-        path: 'settings',
-        canActivate: [AuthGuard],
-        loadComponent: () => import('../../pages/provider/settings/settings.component')
-          .then(c => c.ProviderSettingsComponent),
-        data: { breadcrumb: 'Settings' }
       },
       {
         path: 'notifications',

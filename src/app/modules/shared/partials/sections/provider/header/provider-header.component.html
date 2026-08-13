@@ -10,28 +10,42 @@
 
       <!-- Right Side - Quick Actions -->
       <div class="flex items-center gap-4">
-        <a [routerLink]="['subscriptions']" class="p-2 text-green-600 hover:text-green-700" aria-label="Settings">
+        <a [routerLink]="['subscriptions']" class="p-2 text-green-600 hover:text-green-700" aria-label="Subscriptions">
           <i class="fa-brands fa-square-web-awesome-stroke text-2xl"></i>
         </a>
 
         <!-- Search -->
         <div class="relative">
           <label for="searchInput" class="sr-only">Search</label>
-          <input id="searchInput" type="text" placeholder="Search..." aria-label="Search"
+          <input id="searchInput" type="text" placeholder="Search pages..." aria-label="Search" autocomplete="off"
+            [formControl]="searchControl" (focus)="onSearchFocus()" (input)="onSearchInput()" (keydown)="onSearchKeydown($event)"
             class="w-64 px-4 py-2 text-sm text-gray-700 bg-gray-50 rounded-md border border-gray-200 focus:outline-none focus:border-[#16A34A]" />
           <i class="fas fa-search absolute right-3 top-2.5 text-gray-400" aria-hidden="true"></i>
+
+          <!-- Click-away backdrop -->
+          <div *ngIf="searchOpen && filteredResults.length > 0"
+            class="fixed inset-0 z-10" (click)="closeSearch()"></div>
+
+          <!-- Search Results -->
+          <div *ngIf="searchOpen && filteredResults.length > 0"
+            class="absolute right-0 mt-2 w-72 max-h-72 overflow-auto bg-white rounded-md shadow-lg border border-gray-200 z-20">
+            <a *ngFor="let item of filteredResults; let i = index"
+              (mouseenter)="selectSearchItem(i)"
+              (mousedown)="navigateToSearchItem()"
+              class="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
+              [ngClass]="{ 'bg-green-50 text-[#16A34A]': i === selectedIndex }">
+              {{ item.name }}
+            </a>
+          </div>
         </div>
 
         <!-- Notifications -->
-        <button class="p-2 text-gray-600 hover:text-gray-800 relative" aria-label="Notifications">
+        <a [routerLink]="['/provider/notifications']" class="p-2 text-gray-600 hover:text-gray-800 relative" aria-label="Notifications">
           <i class="fas fa-bell" aria-hidden="true"></i>
-          <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
-
-        <!-- Settings -->
-        <button class="p-2 text-gray-600 hover:text-gray-800" aria-label="Settings">
-          <i class="fas fa-cog" aria-hidden="true"></i>
-        </button>
+          <span *ngIf="(unreadCount$ | async) as count" class="absolute top-0 right-0 min-w-4 h-4 px-1 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center">
+            {{ count > 9 ? '9+' : count }}
+          </span>
+        </a>
       </div>
     </div>
   </div>

@@ -29,6 +29,12 @@ export class ProfileBreadcrumbsComponent implements OnInit {
             active: false,
             route: 'gallery'
         },
+        {
+            name: 'Accounts',
+            icon: 'fa-user-shield',
+            active: false,
+            route: 'accounts'
+        },
     ];
 
     ngOnInit() {
