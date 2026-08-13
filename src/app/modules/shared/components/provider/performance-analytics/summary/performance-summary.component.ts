@@ -1,15 +1,38 @@
-import { Component, Input } from "@angular/core";
-import { TimeFormatterPipe } from "../../../../../../core/pipes/time-formatter.pipe";
+import { Component, inject, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { TimeFormatterPipe } from "../../../../../../core/pipes/time-formatter.pipe";
 import { MetricPerformanceBadgePipe } from "../../../../../../core/pipes/performance-label.pipe";
 import { IOverviewCard, IProviderPerformanceOverview } from "../../../../../../core/models/analytics.model";
+import { KpiCardComponent, KpiTone } from "../../../analytics/kpi-card/kpi-card.component";
+import { KpiCardGridComponent } from "../../../analytics/kpi-card-grid/kpi-card-grid.component";
+
+type PerformanceKey = keyof IProviderPerformanceOverview;
 
 @Component({
     selector: 'app-performance-summary',
-    templateUrl: './performance-summary.component.html',
-    imports: [CommonModule, TimeFormatterPipe, MetricPerformanceBadgePipe],
+    imports: [CommonModule, KpiCardComponent, KpiCardGridComponent],
+    providers: [TimeFormatterPipe, MetricPerformanceBadgePipe],
+    template: `
+        <app-kpi-card-grid>
+            <app-kpi-card
+                *ngFor="let card of overviewCards"
+                [label]="card.label"
+                [value]="getCardValue(card)"
+                [unit]="getCardUnit(card)"
+                [icon]="card.icon"
+                [iconColor]="card.iconColor"
+                [badge]="getBadge(card).label"
+                [badgeClass]="getBadge(card).classes"
+                [description]="card.description"
+                [tone]="card.tone">
+            </app-kpi-card>
+        </app-kpi-card-grid>
+    `,
 })
 export class ProviderPerformanceSummaryComponent {
+    private readonly _timeFormatter = inject(TimeFormatterPipe);
+    private readonly _badge = inject(MetricPerformanceBadgePipe);
+
     @Input() performanceOverviewStats: IProviderPerformanceOverview = {
         avgRating: 0,
         avgResponseTime: 0,
@@ -17,46 +40,64 @@ export class ProviderPerformanceSummaryComponent {
         onTimePercent: 0
     };
 
-    overviewCards: IOverviewCard<IProviderPerformanceOverview>[] = [
+    overviewCards: (IOverviewCard<IProviderPerformanceOverview> & { tone: KpiTone })[] = [
         {
             label: 'Completion Rate',
             valueKey: 'completionRate',
-            icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+            icon: 'fa-solid fa-circle-check',
             iconColor: 'from-green-400 to-emerald-600',
-            badge: 'Excellent',
-            badgeColor: 'bg-green-100 text-green-700',
-            unit: '%',
-            description: 'Completed jobs ÷ Total bookings'
+            description: 'Completed jobs ÷ Total bookings',
+            tone: 'positive',
         },
         {
             label: 'Average Rating',
             valueKey: 'avgRating',
-            icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+            icon: 'fa-solid fa-star',
             iconColor: 'from-green-300 to-green-500',
-            badge: 'Top Rated',
-            badgeColor: 'bg-green-100 text-green-700',
-            unit: '★',
-            description: 'Based on customer feedback'
+            description: 'Based on customer feedback',
+            tone: 'positive',
         },
         {
             label: 'Response Time',
             valueKey: 'avgResponseTime',
-            icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+            icon: 'fa-solid fa-clock',
             iconColor: 'from-green-200 to-green-400',
-            badge: 'Fast',
-            badgeColor: 'bg-green-100 text-green-700',
-            unit: 'min',
-            description: 'Average time to reply'
+            description: 'Average time to reply',
+            tone: 'info',
         },
         {
             label: 'On-Time Arrival',
             valueKey: 'onTimePercent',
-            icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z',
+            icon: 'fa-solid fa-location-dot',
             iconColor: 'from-green-400 to-green-600',
-            badge: 'Reliable',
-            badgeColor: 'bg-green-100 text-green-700',
-            unit: '%',
-            description: 'Punctuality performance'
+            description: 'Punctuality performance',
+            tone: 'positive',
         }
     ];
+
+    private get stats() {
+        return this.performanceOverviewStats;
+    }
+
+    getCardValue(card: IOverviewCard<IProviderPerformanceOverview>): string {
+        const v = this.stats[card.valueKey];
+        if (card.valueKey === 'avgResponseTime') {
+            return String(this._timeFormatter.transform(v, 'value'));
+        }
+        return String(v);
+    }
+
+    getCardUnit(card: IOverviewCard<IProviderPerformanceOverview>): string {
+        if (card.valueKey === 'avgResponseTime') {
+            return this._timeFormatter.transform(this.stats.avgResponseTime, 'unit') as string;
+        }
+        if (card.valueKey === 'avgRating') return '★';
+        if (card.valueKey === 'completionRate') return '%';
+        if (card.valueKey === 'onTimePercent') return '%';
+        return '';
+    }
+
+    getBadge(card: IOverviewCard<IProviderPerformanceOverview>) {
+        return this._badge.transform(this.stats[card.valueKey], card.valueKey as PerformanceKey);
+    }
 }

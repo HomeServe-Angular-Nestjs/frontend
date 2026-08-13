@@ -1,9 +1,10 @@
 import { Component, Input } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { IComparisonOverviewData } from "../../../../../../core/models/analytics.model";
 
 @Component({
   selector: 'app-performance-comparison-overview',
-  imports: [],
+  imports: [CommonModule],
   template: `
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 my-6">
 
@@ -15,8 +16,8 @@ import { IComparisonOverviewData } from "../../../../../../core/models/analytics
                     <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
                 </svg>
             </div>
-            <div class="text-3xl font-bold text-green-700">+{{overViewData.growthRate.toFixed(0)}}%</div>
-            <p class="text-xs text-green-600 mt-1">Above platform average</p> 
+            <div [ngClass]="growthRateClass()"> {{growthRateLabel()}}%</div>
+            <p class="text-xs mt-1" [ngClass]="growthRateSubtextClass()">{{growthRateSubtext()}}</p> 
         </div>
 
         <!-- Monthly Trend -->
@@ -27,9 +28,9 @@ import { IComparisonOverviewData } from "../../../../../../core/models/analytics
                     <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
                 </svg>
             </div>
-            <div class="text-3xl font-bold text-green-700">↗ {{overViewData.monthlyTrend.growthPercentage.toFixed(0)}}%</div>
+            <div [ngClass]="trendClass()"> {{trendArrows()}} {{monthlyTrend.growthPercentage.toFixed(0)}}%</div>
             <p class="text-xs text-green-600 mt-1">
-                Increase from {{monthNames[overViewData.monthlyTrend.previousMonth - 1]}} to {{monthNames[overViewData.monthlyTrend.currentMonth - 1]}}
+                {{trendVerb()}} from {{monthNames[overViewData.monthlyTrend.previousMonth - 1]}} to {{monthNames[overViewData.monthlyTrend.currentMonth - 1]}}
             </p>
         </div>
 
@@ -64,5 +65,47 @@ export class ProviderPerformanceComparisonOverviewComponent {
       growthPercentage: 0,
     },
     providerRank: 0,
+  }
+
+  private get isGrowthNegative(): boolean {
+    return this.overViewData.growthRate < 0;
+  }
+
+  get monthlyTrend() {
+    return this.overViewData.monthlyTrend;
+  }
+
+  growthRateLabel(): string {
+    return `${this.isGrowthNegative ? '−' : '+'}${Math.abs(this.overViewData.growthRate).toFixed(0)}`;
+  }
+
+  growthRateClass(): string {
+    return this.isGrowthNegative
+      ? 'text-3xl font-bold text-red-600'
+      : 'text-3xl font-bold text-green-700';
+  }
+
+  growthRateSubtext(): string {
+    return this.isGrowthNegative
+      ? 'Below platform average'
+      : 'Above platform average';
+  }
+
+  growthRateSubtextClass(): string {
+    return this.isGrowthNegative ? 'text-xs text-red-500' : 'text-xs text-green-600';
+  }
+
+  trendClass(): string {
+    return this.monthlyTrend.growthPercentage < 0
+      ? 'text-3xl font-bold text-red-600'
+      : 'text-3xl font-bold text-green-700';
+  }
+
+  trendArrows(): string {
+    return this.monthlyTrend.growthPercentage < 0 ? '↘' : '↗';
+  }
+
+  trendVerb(): string {
+    return this.monthlyTrend.growthPercentage < 0 ? 'Decrease' : 'Increase';
   }
 }

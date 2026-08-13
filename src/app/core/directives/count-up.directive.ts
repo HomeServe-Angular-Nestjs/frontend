@@ -60,7 +60,7 @@ export class CountUpDirective implements AfterViewInit {
     private _format(value: number): string {
         const rounded = this.decimals > 0
             ? value.toFixed(this.decimals)
-            : Math.round(value).toLocaleString('en-US');
+            : Math.round(value).toLocaleString('en-IN');
         return `${this.prefix}${rounded}${this.suffix}`;
     }
 }

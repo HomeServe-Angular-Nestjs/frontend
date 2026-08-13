@@ -3,40 +3,36 @@ import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { IServiceDemandData } from '../../../../../core/models/analytics.model';
+import { AnalyticsChartCardComponent } from '../../analytics/analytics-chart-card/analytics-chart-card.component';
 
 @Component({
     selector: 'app-area-service-demand-chart',
     standalone: true,
-    imports: [CommonModule, NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
     template: `
-    <section class="bg-white rounded-2xl shadow-lg p-6 w-full">
-      <header class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-xl font-semibold text-gray-800">Service Demand Heatmap</h2>
-          <p class="text-sm text-gray-500 mt-1">
-            Visualizes when services are most in demand throughout the week.
-          </p>
-        </div>
-      </header>
-
-      <div *ngIf="chartOption" echarts [options]="chartOption" class="h-[500px] w-full"></div>
-
-      <div *ngIf="!chartOption" class="flex items-center justify-center h-[500px] text-gray-400 text-sm">
-        Loading heatmap data...
-      </div>
-    </section>
-  `
+        <app-analytics-chart-card
+            title="Service Demand Heatmap"
+            subtitle="Visualizes when services are most in demand throughout the week"
+            [height]="'large'"
+            [hasData]="serviceDemandData.length > 0"
+            emptyTitle="No demand data"
+            emptyMessage="Service demand will appear here once bookings are recorded.">
+            <div echarts [options]="chartOption" class="h-full w-full"></div>
+        </app-analytics-chart-card>
+    `,
 })
 export class ServiceDemandHeatmapComponent {
     @Input()
     set data(value: IServiceDemandData[]) {
-        this.setupChart(value ?? []);
+        this.serviceDemandData = value ?? [];
+        this.setupChart(this.serviceDemandData);
     }
 
+    serviceDemandData: IServiceDemandData[] = [];
     chartOption!: EChartsOption;
 
     private readonly days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    private readonly hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`); // 6 AM to 11 PM
+    private readonly hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`);
 
     private setupChart(rawData: { day: string; hour: string; count: number }[]) {
         const data = rawData.map(d => [

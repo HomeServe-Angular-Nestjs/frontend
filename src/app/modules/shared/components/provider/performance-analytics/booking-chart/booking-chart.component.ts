@@ -1,26 +1,25 @@
 import { Component, Input } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { NgxEchartsModule } from "ngx-echarts";
 import { EChartsOption } from 'echarts';
 import { IBookingPerformanceData } from "../../../../../../core/models/analytics.model";
 import { CallbackDataParams } from "echarts/types/dist/shared";
+import { AnalyticsChartCardComponent } from "../../../analytics/analytics-chart-card/analytics-chart-card.component";
+import { ANALYTICS_COLORS } from "../../../analytics/analytics.tokens";
 
 @Component({
     selector: 'app-performance-bookings',
-    imports: [NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
     template: `
-      <div class="bg-white rounded-2xl shadow-md p-6 border border-slate-100">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h2 class="text-2xl font-semibold text-slate-900">
-              Bookings Overview
-            </h2>
-            <p class="text-sm text-slate-500 mt-1">
-              Monthly performance metrics
-            </p>
-          </div>
-        </div>
-        <div echarts [options]="barChartOptions" class="h-80"></div>
-      </div>
+        <app-analytics-chart-card
+            title="Bookings Overview"
+            subtitle="Monthly performance metrics"
+            [height]="'small'"
+            [hasData]="bookingStats.length > 0"
+            emptyTitle="No booking data"
+            emptyMessage="Bookings overview will appear here once data is available.">
+            <div echarts [options]="barChartOptions" class="h-full w-full"></div>
+        </app-analytics-chart-card>
     `,
 })
 export class ProviderPerformanceBookingChartComponent {
@@ -34,7 +33,7 @@ export class ProviderPerformanceBookingChartComponent {
     barChartOptions: EChartsOption = {};
 
     private updateChartOptions(): void {
-        const allMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+        const allMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const dataMap = new Map(this.bookingStats.map(s => [s.month, s]));
 
         const months: string[] = [];
@@ -55,10 +54,7 @@ export class ProviderPerformanceBookingChartComponent {
                 borderColor: '#d1fae5',
                 borderWidth: 1,
                 textStyle: { color: '#065f46' },
-                axisPointer: {
-                    type: 'shadow',
-                    shadowStyle: { color: 'rgba(16,185,129,0.08)' }
-                },
+                axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(16,185,129,0.08)' } },
                 formatter: (params: CallbackDataParams[] | any) => {
                     const paramArr = Array.isArray(params) ? params : [params];
                     const completed = paramArr.find((p: CallbackDataParams) => p.seriesName === 'Completed')?.value ?? 0;
@@ -76,15 +72,9 @@ export class ProviderPerformanceBookingChartComponent {
             legend: {
                 data: ['Completed', 'Cancelled'],
                 bottom: 0,
-                textStyle: { fontSize: 13, color: '#065f46' },
+                textStyle: { fontSize: 13, color: '#065f46' }
             },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '15%',
-                top: '3%',
-                containLabel: true
-            },
+            grid: { left: '3%', right: '4%', bottom: '20%', top: '3%', containLabel: true },
             xAxis: {
                 type: 'category',
                 data: months,
@@ -109,8 +99,8 @@ export class ProviderPerformanceBookingChartComponent {
                             type: 'linear',
                             x: 0, y: 0, x2: 0, y2: 1,
                             colorStops: [
-                                { offset: 0, color: '#34d399' },
-                                { offset: 1, color: '#059669' }
+                                { offset: 0, color: ANALYTICS_COLORS.newCustomers },
+                                { offset: 1, color: ANALYTICS_COLORS.providerStrong }
                             ]
                         },
                         borderRadius: [8, 8, 0, 0]
@@ -122,8 +112,8 @@ export class ProviderPerformanceBookingChartComponent {
                     type: 'line',
                     data: cancelledData,
                     smooth: true,
-                    lineStyle: { width: 3, color: '#ef4444' },
-                    itemStyle: { color: '#ef4444' },
+                    lineStyle: { width: 3, color: ANALYTICS_COLORS.negative },
+                    itemStyle: { color: ANALYTICS_COLORS.negative },
                     symbolSize: 8,
                     symbol: 'circle'
                 }

@@ -1,22 +1,32 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { EChartsOption } from 'echarts';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { TopLevelFormatterParams } from 'echarts/types/dist/shared';
 import { IRevenueMonthlyGrowthRateData } from '../../../../../core/models/analytics.model';
+import { InrCurrencyPipe } from '../../../../../core/pipes/inr-currency.pipe';
+import { AnalyticsChartCardComponent } from '../../analytics/analytics-chart-card/analytics-chart-card.component';
+import { ANALYTICS_COLORS } from '../../analytics/analytics.tokens';
 
 @Component({
     selector: 'app-revenue-earnings-forecast-chart',
-    imports: [NgxEchartsModule],
+    imports: [CommonModule, NgxEchartsModule, AnalyticsChartCardComponent],
+    providers: [InrCurrencyPipe],
     template: `
-    <div class="p-4 bg-white rounded-2xl shadow-md">
-      <h2 class="text-lg font-semibold mb-3 text-gray-800">
-        Monthly Revenue Growth 
-      </h2>
-      <div echarts [options]="chartOptions" class="h-96 w-full"></div>
-    </div>
-  `
+        <app-analytics-chart-card
+            title="Monthly Revenue Growth"
+            subtitle="Revenue and month-over-month growth rate"
+            [height]="'standard'"
+            [hasData]="chartData.length > 0"
+            emptyTitle="No growth data"
+            emptyMessage="Monthly growth will appear here once data is available.">
+            <div echarts [options]="chartOptions" class="h-full w-full"></div>
+        </app-analytics-chart-card>
+    `,
 })
 export class RevenueEarningsForecastChartComponent {
+    private readonly _currency = inject(InrCurrencyPipe);
+
     @Input()
     set data(value: IRevenueMonthlyGrowthRateData[]) {
         this.chartData = value ?? [];
@@ -31,9 +41,9 @@ export class RevenueEarningsForecastChartComponent {
         const revenue = this.chartData.map(d => d.totalRevenue);
         const growth = this.chartData.map(d => d.growthRate);
 
-        const primaryGreen = '#16A34A';
-        const growthPositive = '#22C55E';
-        const growthNegative = '#DC2626';
+        const primaryGreen = ANALYTICS_COLORS.provider;
+        const growthPositive = ANALYTICS_COLORS.positive;
+        const growthNegative = ANALYTICS_COLORS.negative;
 
         this.chartOptions = {
             tooltip: {
@@ -49,30 +59,32 @@ export class RevenueEarningsForecastChartComponent {
                     return `
                     <div>
                         <strong>${axis}</strong><br/>
-                        Revenue: ₹${rev.toLocaleString()}<br/>
+                        Revenue: ${this._currency.transform(rev)}<br/>
                         ${!isNaN(grNum) ? `<span style="color:${grColor}">Growth: ${grNum}%</span>` : ''}
                     </div>
                 `;
                 }
             },
-            legend: {
-                data: ['Revenue', 'Growth Rate'],
-                top: 10
-            },
+            legend: { data: ['Revenue', 'Growth Rate'], top: 10 },
             grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-            xAxis: { type: 'category', data: months, axisLine: { lineStyle: { color: '#ccc' } } },
+            xAxis: {
+                type: 'category',
+                data: months,
+                axisLine: { lineStyle: { color: ANALYTICS_COLORS.axis } },
+                axisLabel: { color: ANALYTICS_COLORS.text },
+            },
             yAxis: [
                 {
                     type: 'value',
                     name: 'Revenue (₹)',
                     position: 'left',
-                    splitLine: { lineStyle: { type: 'dashed', color: '#eee' } }
+                    splitLine: { lineStyle: { type: 'dashed', color: ANALYTICS_COLORS.grid } }
                 },
                 {
                     type: 'value',
                     name: 'Growth (%)',
                     position: 'right',
-                    splitLine: { lineStyle: { type: 'dashed', color: '#eee' } }
+                    splitLine: { lineStyle: { type: 'dashed', color: ANALYTICS_COLORS.grid } }
                 }
             ],
             series: [

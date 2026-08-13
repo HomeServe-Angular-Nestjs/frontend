@@ -15,6 +15,9 @@ import { SharedDataService } from "../../../../../core/services/public/shared-da
 import { AnalyticService } from "../../../../../core/services/analytics.service";
 import { IRevenueAnalyticsBundle, RevenueChartView } from "../../../../../core/models/analytics.model";
 import { catchError, map, of, shareReplay, startWith } from "rxjs";
+import { AnalyticsPageComponent } from "../../../../shared/components/analytics/analytics-page/analytics-page.component";
+import { AnalyticsSectionHeaderComponent } from "../../../../shared/components/analytics/analytics-section-header/analytics-section-header.component";
+import { AnalyticsInsightCardComponent, InsightTone } from "../../../../shared/components/analytics/analytics-insight-card/analytics-insight-card.component";
 
 echarts.use([
     TooltipComponent,
@@ -39,6 +42,8 @@ const EMPTY_REVENUE: IRevenueAnalyticsBundle = {
 
 type RevenueVM = { status: 'loading' | 'error' | 'success'; data: IRevenueAnalyticsBundle };
 
+interface InsightVM { text: string; icon: string; tone: InsightTone; }
+
 @Component({
     selector: 'app-revenue-analytics-page',
     templateUrl: './revenue-page.component.html',
@@ -49,7 +54,10 @@ type RevenueVM = { status: 'loading' | 'error' | 'success'; data: IRevenueAnalyt
         RevenueCompositionChartsComponent,
         RevenueTopServicesChartComponent,
         RevenueRepeatVsNewCustomersChartComponent,
-        RevenueEarningsForecastChartComponent
+        RevenueEarningsForecastChartComponent,
+        AnalyticsPageComponent,
+        AnalyticsSectionHeaderComponent,
+        AnalyticsInsightCardComponent
     ],
     providers: [provideEchartsCore({ echarts })]
 })
@@ -69,12 +77,11 @@ export class ProviderRevenueAnalyticsComponent implements OnInit {
     }
 
     retry(): void {
-        this.vm$ = this._load(this._currentView);
+        this.vm$ = this._load('monthly');
     }
 
-    private _currentView: RevenueChartView = 'monthly';
-
-    hasData(vm: RevenueVM): boolean {
+    hasData(vm: RevenueVM | null): boolean {
+        if (!vm) return true;
         return vm.data.summary.revenueOverview.totalRevenue > 0
             || vm.data.trends.trend.providerRevenue.length > 0
             || vm.data.growth.monthlyGrowth.length > 0
@@ -83,12 +90,36 @@ export class ProviderRevenueAnalyticsComponent implements OnInit {
             || vm.data.clients.newAndReturning.length > 0;
     }
 
-    ngOnInit(): void {
-        this._sharedService.setProviderHeader('Revenue Analytics');
+    buildInsights(bundle: IRevenueAnalyticsBundle): InsightVM[] {
+        const o = bundle.summary.revenueOverview;
+        const insights: InsightVM[] = [];
+
+        if (o.totalRevenue > 0) {
+            insights.push({
+                text: `Total revenue of ₹${this._format(o.totalRevenue.toFixed(0))} this month reflects healthy demand for your services.`,
+                icon: 'fa-solid fa-money-bill-wave',
+                tone: 'info'
+            });
+        }
+
+        if (o.revenueGrowth > 0) {
+            insights.push({ text: `Revenue grew ${o.revenueGrowth}% — great momentum to build on.`, icon: 'fa-solid fa-chart-line', tone: 'positive' });
+        } else if (o.revenueGrowth < 0) {
+            insights.push({ text: `Revenue declined ${Math.abs(o.revenueGrowth)}%. Consider promos or expanding service areas.`, icon: 'fa-solid fa-chart-line', tone: 'negative' });
+        }
+
+        if (o.avgTransactionValue > 0 && o.avgTransactionValue >= 1000) {
+            insights.push({ text: `Your average transaction value of ₹${o.avgTransactionValue.toFixed(0)} is strong — consider premium add-ons.`, icon: 'fa-solid fa-coins', tone: 'positive' });
+        }
+
+        return insights;
     }
 
-    onViewChange(view: RevenueChartView) {
-        this._currentView = view;
-        this.vm$ = this._load(view);
+    private _format(n: string): string {
+        return n.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    ngOnInit(): void {
+        this._sharedService.setProviderHeader('Revenue Analytics');
     }
 }
