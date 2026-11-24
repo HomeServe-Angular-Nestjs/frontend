@@ -10,6 +10,7 @@ import { ErrorCodes } from "../enums/enums";
 import { Router } from "@angular/router";
 
 export const USE_CREDENTIALS = new HttpContextToken(() => true);
+export const SKIP_AUTH_ERROR_HANDLING = new HttpContextToken(() => false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const store = inject(Store);
@@ -31,6 +32,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
             return next(modifiedRequest).pipe(
                 catchError((error: HttpErrorResponse) => {
+                    if (req.context.get(SKIP_AUTH_ERROR_HANDLING)) {
+                        return throwError(() => error);
+                    }
+
                     const errorCode = error?.error?.code ?? error?.error?.error ?? '';
                     const backendMessage = error?.error?.message;
 

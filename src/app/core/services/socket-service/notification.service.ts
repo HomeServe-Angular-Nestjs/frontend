@@ -3,12 +3,17 @@ import { BaseSocketService, ISocketError } from "./base-socket.service";
 import { API_ENV } from "../../../../environments/env";
 import { INotification, INotificationPage, ISendNewNotification } from "../../models/notification.model";
 import { lastValueFrom, Observable } from "rxjs";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpContext, HttpParams } from "@angular/common/http";
 import { Store } from "@ngrx/store";
 import { authActions } from "../../../store/auth/auth.actions";
 import { IResponse } from "../../../modules/shared/models/response.model";
 import { notificationAction } from "../../../store/notification/notification.action";
 import { NotificationTemplateId, NotificationType } from "../../enums/enums";
+import { SKIP_AUTH_ERROR_HANDLING } from "../../interceptors/auth.interceptor";
+import {
+    isUnauthorizedSocketRefreshError,
+    retryTransientSocketRefresh,
+} from "../../utils/socket-refresh.utils";
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSocketService extends BaseSocketService {
@@ -20,6 +25,7 @@ export class NotificationSocketService extends BaseSocketService {
     private readonly NEW_NOTIFICATION = 'notification:new';
     private readonly MARK_AS_READ = 'notification:read';
     private readonly REMOVE_NOTIFICATION = 'notification:remove';
+    private _refreshInProgress = false;
 
 
     constructor(private readonly _http: HttpClient) {
@@ -50,18 +56,31 @@ export class NotificationSocketService extends BaseSocketService {
     }
 
     private async _refreshTokensAndReconnect(): Promise<void> {
+        if (this._refreshInProgress) return;
+        this._refreshInProgress = true;
+
         try {
-            await lastValueFrom(this._refreshAccessToken());
+            await retryTransientSocketRefresh(() => lastValueFrom(this._refreshAccessToken()));
             console.log('[NotificationSocket] Token refreshed successfully. Reconnecting socket...');
             this.socket?.connect();
         } catch (error) {
             console.error('[NotificationSocket] Token refresh failed:', error);
             this.socket?.disconnect();
-            this._store.dispatch(authActions.logout({ fromInterceptor: false, message: `${error}` }));
+            if (isUnauthorizedSocketRefreshError(error)) {
+                this._store.dispatch(authActions.logout({
+                    fromInterceptor: true,
+                    message: error.message,
+                }));
+            } else {
+                this._toastr.warning('Notifications are temporarily unavailable. Your account is still signed in.');
+            }
+        } finally {
+            this._refreshInProgress = false;
         }
     }
 
     private _setupAuthErrorHandler(): void {
+        this.socket?.off('token:expired');
         this.socket?.on('token:expired', async () => {
             console.warn('[NotificationSocket] Server token:expired event received');
             await this._refreshTokensAndReconnect();
@@ -101,7 +120,10 @@ export class NotificationSocketService extends BaseSocketService {
     }
 
     private _refreshAccessToken(): Observable<void> {
-        return this._http.post<void>(`${this._notificationApi}/new_access_token`, {}, { withCredentials: true });
+        return this._http.post<void>(`${this._notificationApi}/new_access_token`, {}, {
+            withCredentials: true,
+            context: new HttpContext().set(SKIP_AUTH_ERROR_HANDLING, true),
+        });
     }
 
     // ------------------------------------------------------------------------------------------------------------------------------

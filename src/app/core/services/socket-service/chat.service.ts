@@ -1,5 +1,5 @@
 import { inject, Injectable } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpContext, HttpParams } from "@angular/common/http";
 import { Store } from "@ngrx/store";
 import { lastValueFrom, Observable, Subject } from "rxjs";
 import { BaseSocketService, ISocketError } from "./base-socket.service";
@@ -8,6 +8,11 @@ import { IResponse } from "../../../modules/shared/models/response.model";
 import { API_ENV } from "../../../../environments/env";
 import { chatActions } from "../../../store/chat/chat.action";
 import { authActions } from "../../../store/auth/auth.actions";
+import { SKIP_AUTH_ERROR_HANDLING } from "../../interceptors/auth.interceptor";
+import {
+    isUnauthorizedSocketRefreshError,
+    retryTransientSocketRefresh,
+} from "../../utils/socket-refresh.utils";
 
 @Injectable({ providedIn: 'root' })
 export class ChatSocketService extends BaseSocketService {
@@ -17,6 +22,7 @@ export class ChatSocketService extends BaseSocketService {
     private readonly _chatApi = API_ENV.chat;
     private readonly _messageApi = API_ENV.message;
     readonly presenceUpdates$ = this._presenceUpdates.asObservable();
+    private _refreshInProgress = false;
 
     protected override namespace: string = '/chat';
 
@@ -52,14 +58,26 @@ export class ChatSocketService extends BaseSocketService {
     }
 
     private async _refreshTokensAndReconnect(): Promise<void> {
+        if (this._refreshInProgress) return;
+        this._refreshInProgress = true;
+
         try {
-            await lastValueFrom(this._refreshAccessToken());
+            await retryTransientSocketRefresh(() => lastValueFrom(this._refreshAccessToken()));
             console.log('[ChatSocket] Token refreshed successfully. Reconnecting socket...');
             this.socket?.connect();
         } catch (error) {
             console.error('[ChatSocket] Token refresh failed:', error);
             this.socket?.disconnect();
-            this._store.dispatch(authActions.logout({ fromInterceptor: false, message: `${error}` }));
+            if (isUnauthorizedSocketRefreshError(error)) {
+                this._store.dispatch(authActions.logout({
+                    fromInterceptor: true,
+                    message: error.message,
+                }));
+            } else {
+                this._toastr.warning('Chat is temporarily unavailable. Your account is still signed in.');
+            }
+        } finally {
+            this._refreshInProgress = false;
         }
     }
 
@@ -93,7 +111,10 @@ export class ChatSocketService extends BaseSocketService {
     }
 
     private _refreshAccessToken(): Observable<void> {
-        return this._http.post<void>(`${this._chatApi}/new_access_token`, {}, { withCredentials: true });
+        return this._http.post<void>(`${this._chatApi}/new_access_token`, {}, {
+            withCredentials: true,
+            context: new HttpContext().set(SKIP_AUTH_ERROR_HANDLING, true),
+        });
     }
 
     // ------------------------------------------------------------------------------------------------------------------------------

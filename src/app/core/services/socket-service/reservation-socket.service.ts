@@ -1,11 +1,16 @@
 import { inject, Injectable } from "@angular/core";
 import { BaseSocketService } from "./base-socket.service";
 import { BehaviorSubject, lastValueFrom, Observable, Subject } from "rxjs";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
 import { authActions } from "../../../store/auth/auth.actions";
 import { Store } from "@ngrx/store";
 import { API_ENV } from "../../../../environments/env";
 import { ISendReservation } from "../../models/reservation.model";
+import { SKIP_AUTH_ERROR_HANDLING } from "../../interceptors/auth.interceptor";
+import {
+  isUnauthorizedSocketRefreshError,
+  retryTransientSocketRefresh,
+} from "../../utils/socket-refresh.utils";
 
 @Injectable({ providedIn: 'root' })
 export class ReservationSocketService extends BaseSocketService {
@@ -24,6 +29,7 @@ export class ReservationSocketService extends BaseSocketService {
   private readonly JOIN_PROVIDER_ROOM = 'provider_room:join';
   private readonly LEAVE_PROVIDER_ROOM = 'provider_room:leave';
   private readonly reservationApi = API_ENV.reservation;
+  private _refreshInProgress = false;
 
   private _initiatePaymentSource = new BehaviorSubject<boolean>(false);
 
@@ -72,6 +78,7 @@ export class ReservationSocketService extends BaseSocketService {
   }
 
   private _setupAuthErrorHandler(): void {
+    this.socket?.off('token:expired');
     this.socket?.on('token:expired', async () => {
       console.warn('[ReservationSocket] Server token:expired event received');
       await this._refreshTokensAndReconnect();
@@ -79,14 +86,26 @@ export class ReservationSocketService extends BaseSocketService {
   }
 
   private async _refreshTokensAndReconnect(): Promise<void> {
+    if (this._refreshInProgress) return;
+    this._refreshInProgress = true;
+
     try {
-      await lastValueFrom(this._refreshAccessToken());
+      await retryTransientSocketRefresh(() => lastValueFrom(this._refreshAccessToken()));
       console.log('[ReservationSocket] Token refreshed successfully. Reconnecting socket...');
       this.socket?.connect();
     } catch (error) {
       console.error('[ReservationSocket] Token refresh failed:', error);
       this.socket?.disconnect();
-      this._store.dispatch(authActions.logout({ fromInterceptor: false, message: `${error}` }));
+      if (isUnauthorizedSocketRefreshError(error)) {
+        this._store.dispatch(authActions.logout({
+          fromInterceptor: true,
+          message: error.message,
+        }));
+      } else {
+        this._toastr.warning('Reservations are temporarily unavailable. Your account is still signed in.');
+      }
+    } finally {
+      this._refreshInProgress = false;
     }
   }
 
@@ -103,7 +122,10 @@ export class ReservationSocketService extends BaseSocketService {
   }
 
   private _refreshAccessToken(): Observable<void> {
-    return this._http.post<void>(`${this.reservationApi}/new_access_token`, {}, { withCredentials: true });
+    return this._http.post<void>(`${this.reservationApi}/new_access_token`, {}, {
+      withCredentials: true,
+      context: new HttpContext().set(SKIP_AUTH_ERROR_HANDLING, true),
+    });
   }
 
   createReservation(slot: ISendReservation) {
