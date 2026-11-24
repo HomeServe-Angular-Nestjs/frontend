@@ -6,17 +6,17 @@ import { catchError, combineLatest, debounceTime, of, switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { selectSavedProviders } from '../../../../store/customer/customer.selector';
+import { customerActions } from '../../../../store/customer/customer.actions';
 import { ProviderService } from '../../../../core/services/provider.service';
 import { ToastNotificationService } from '../../../../core/services/public/toastr.service';
 import { IProviderCardWithPagination } from '../../../../core/models/user.model';
 import { IPagination } from '../../../../core/models/booking.model';
 import { IResponse } from '../../../shared/models/response.model';
-import { CustomerProviderViewCardComponent } from '../../../shared/components/customer/provider-view-card/customer-provider-view-card.component';
 import { CustomerPaginationComponent } from '../../../shared/partials/sections/customer/pagination/pagination.component';
 
 @Component({
   selector: 'app-customer-saved-providers',
-  imports: [CommonModule, FormsModule, RouterLink, CustomerProviderViewCardComponent, CustomerPaginationComponent],
+  imports: [CommonModule, FormsModule, RouterLink, CustomerPaginationComponent],
   templateUrl: './customer-saved-providers.component.html',
   styles: [`
     .float-heart { animation: floatHeart 3s ease-in-out infinite; }
@@ -125,6 +125,10 @@ export class CustomerSavedProvidersComponent {
 
   changePage(newPage: number) {
     this.page.set(newPage);
+  }
+
+  removeSavedProvider(providerId: string) {
+    this._store.dispatch(customerActions.updateAddToSaved({ providerId }));
   }
 
   private _buildResponse(page: number): IResponse<IProviderCardWithPagination> {
