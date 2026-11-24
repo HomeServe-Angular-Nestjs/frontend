@@ -39,18 +39,25 @@
     </div>
 </div>
 
-<div *ngIf="showBadges" class="mt-4 space-y-3 border-t border-slate-200 pt-4">
-    <div class="flex gap-2 items-start text-slate-500">
-        <i class="fas fa-info mt-0.5 text-[10px]"></i>
-        <p class="text-xs leading-snug">
-            Prices are inclusive of all applied taxes and fees.
-        </p>
+<div *ngIf="showBadges" class="mt-4 grid grid-cols-1 sm:grid-cols-2 border border-slate-200 bg-slate-100"
+    role="note" aria-label="Booking information">
+    <div class="flex items-start gap-3 p-4">
+        <i class="fas fa-receipt mt-0.5 text-sm text-indigo-700" aria-hidden="true"></i>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Tax-inclusive pricing</h3>
+            <p class="mt-1 text-sm leading-relaxed text-slate-700">
+                Prices include all applicable taxes and fees.
+            </p>
+        </div>
     </div>
 
-    <div class="flex gap-2 items-start text-slate-500">
-        <i class="fas fa-undo mt-0.5 text-[10px]"></i>
-        <p class="text-xs leading-snug">
-            Cancellation is only possible within 24 hours of booking.
-        </p>
+    <div class="flex items-start gap-3 border-t border-slate-300 p-4 sm:border-l sm:border-t-0">
+        <i class="fas fa-undo mt-0.5 text-sm text-indigo-700" aria-hidden="true"></i>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Cancellation policy</h3>
+            <p class="mt-1 text-sm leading-relaxed text-slate-700">
+                Cancellation is only possible within 24 hours of booking.
+            </p>
+        </div>
     </div>
 </div>

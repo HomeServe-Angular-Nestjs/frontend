@@ -19,6 +19,8 @@ import { ISendReservation } from '../../../../../../core/models/reservation.mode
 import { CouponService } from '../../../../../../core/services/coupon.service';
 import { ICoupon } from '../../../../../../core/models/coupon.model';
 import { DiscountSymbolPipe } from '../../../../../../core/pipes/discount-symbol.pipe';
+import { ProviderService } from '../../../../../../core/services/provider.service';
+import { ICustomerProviderDetails } from '../../../../../../core/models/user.model';
 
 @Component({
   selector: 'app-customer-schedule-order-summary',
@@ -39,6 +41,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   private readonly _paymentService = inject(PaymentService);
   private readonly _couponService = inject(CouponService);
   private readonly _cartService = inject(CartService);
+  private readonly _providerService = inject(ProviderService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private _destroy$ = new Subject<void>();
@@ -48,6 +51,7 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
   @Input({ required: true }) selectedServiceData: SelectedServiceType[] = [];
 
   providerId: string | null = null;
+  providerData: ICustomerProviderDetails | null = null;
   selectedSlot = signal<ISelectedSlot | null>(null);
   selectedPaymentSource!: PaymentSource;
   availableCoupons: ICoupon[] = [];
@@ -77,9 +81,50 @@ export class CustomerScheduleOrderSummaryComponent implements OnInit, OnDestroy 
         takeUntil(this._destroy$),
         tap(params => {
           this.providerId = params.get('id')!;
+          if (this.providerId) this._fetchProvider(this.providerId);
         })
       )
       .subscribe(() => this._fetchPriceBreakup());
+  }
+
+  get totalDuration(): string {
+    const totalMinutes = this.selectedServiceData.reduce(
+      (total, category) => total + category.services.reduce(
+        (categoryTotal, service) => categoryTotal + (service.estimatedTimeInMinutes || 0),
+        0
+      ),
+      0
+    );
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours === 0) return `${minutes} min`;
+    if (minutes === 0) return `${hours} hr`;
+    return `${hours} hr ${minutes} min`;
+  }
+
+  private _fetchProvider(providerId: string): void {
+    this._providerService.getOneProvider(providerId)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.providerData = response.data;
+          } else {
+            this._toastr.error('Unable to load provider information.');
+          }
+        },
+        error: (error) => {
+          console.error('[Checkout] failed to load provider information:', error);
+          this._toastr.error('Unable to load provider information.');
+        },
+      });
+  }
+
+  viewProvider(): void {
+    if (this.providerId) {
+      this._router.navigate(['provider_details', this.providerId, 'about']);
+    }
   }
 
   initiatePayment() {

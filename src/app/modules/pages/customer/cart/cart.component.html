@@ -11,7 +11,7 @@
                             <h2 class="text-sm font-semibold text-slate-800">Items in your cart</h2>
                             <p class="mt-1 text-xs text-slate-500">
                                 {{ cartItems().length }} {{ cartItems().length === 1 ? 'service' : 'services' }}
-                                · Total estimated duration: {{ totalDuration() }}
+                                · {{ totalDuration() }} total
                             </p>
                         </div>
                         <button id="clear-cart-btn" (click)="clearCart()"
@@ -22,23 +22,13 @@
 
                     <section class="bg-white border border-slate-200 divide-y divide-slate-200" aria-label="Cart items">
                         <div *ngIf="providerData() as provider"
-                            class="flex items-center gap-3 px-3 sm:px-5 py-3">
-                            <img *ngIf="provider.avatar" [src]="provider.avatar"
-                                [alt]="provider.fullname || provider.username"
-                                class="h-9 w-9 shrink-0 rounded-full object-cover" />
-                            <div *ngIf="!provider.avatar"
-                                class="h-9 w-9 shrink-0 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-medium">
-                                {{ (provider.fullname || provider.username || '?').charAt(0) | uppercase }}
-                            </div>
-                            <div class="min-w-0">
-                                <span class="block text-xs text-slate-500">Provider</span>
-                                <button type="button" (click)="viewProvider()"
-                                    class="block max-w-full truncate text-left text-sm font-medium text-slate-800 hover:underline underline-offset-2"
-                                    [title]="provider.fullname || provider.username">
-                                    {{ provider.fullname || provider.username }}
-                                </button>
-                                <span class="block truncate text-xs text-slate-500">{{ provider.profession }}</span>
-                            </div>
+                            class="flex items-center gap-1.5 px-3 sm:px-5 py-2.5 text-xs text-slate-500">
+                            <span>Provider:</span>
+                            <button type="button" (click)="viewProvider()"
+                                class="max-w-full truncate text-left font-medium text-slate-800 hover:underline underline-offset-2"
+                                [title]="provider.fullname || provider.username">
+                                {{ provider.fullname || provider.username }}
+                            </button>
                         </div>
 
                         <article *ngFor="let service of cartItems()"
@@ -73,26 +63,25 @@
                                     </button>
                                 </div>
                         </article>
-                    </section>
-
-                    <section class="grid grid-cols-1 sm:grid-cols-2 border border-slate-200 bg-white"
-                        aria-label="Cart information">
-                        <div class="flex items-start gap-3 p-4 sm:p-5">
-                            <i class="fas fa-receipt mt-0.5 text-sm text-slate-600" aria-hidden="true"></i>
-                            <div>
-                                <h3 class="text-sm font-medium text-slate-900">Tax-inclusive pricing</h3>
-                                <p class="mt-1 text-xs leading-relaxed text-slate-600">
-                                    Prices include all applicable taxes and fees.
-                                </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 bg-slate-100" role="note"
+                            aria-label="Cart information">
+                            <div class="flex items-start gap-3 p-4 sm:p-5">
+                                <i class="fas fa-receipt mt-0.5 text-sm text-indigo-700" aria-hidden="true"></i>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-slate-900">Tax-inclusive pricing</h3>
+                                    <p class="mt-1 text-sm leading-relaxed text-slate-700">
+                                        Prices include all applicable taxes and fees.
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex items-start gap-3 border-t border-slate-200 p-4 sm:border-l sm:border-t-0 sm:p-5">
-                            <i class="fas fa-undo mt-0.5 text-sm text-slate-600" aria-hidden="true"></i>
-                            <div>
-                                <h3 class="text-sm font-medium text-slate-900">Cancellation policy</h3>
-                                <p class="mt-1 text-xs leading-relaxed text-slate-600">
-                                    Cancellation is available within 24 hours of booking.
-                                </p>
+                            <div class="flex items-start gap-3 border-t border-slate-300 p-4 sm:border-l sm:border-t-0 sm:p-5">
+                                <i class="fas fa-undo mt-0.5 text-sm text-indigo-700" aria-hidden="true"></i>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-slate-900">Cancellation policy</h3>
+                                    <p class="mt-1 text-sm leading-relaxed text-slate-700">
+                                        Cancellation is only possible within 24 hours of booking.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </section>

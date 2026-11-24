@@ -82,7 +82,10 @@ export const customerRoutes: Routes = [
         loadComponent: () => import('../../pages/customer/booking-2-schedule/customer-service-schedule.component')
           .then(c => c.CustomerServiceScheduleComponent),
         canActivate: [AuthGuard],
-        data: { breadcrumb: 'Schedule Service' }
+        data: {
+          breadcrumb: 'Checkout',
+          breadcrumbParent: { label: 'Cart', path: '/cart' }
+        }
       },
       {
         path: 'profile',

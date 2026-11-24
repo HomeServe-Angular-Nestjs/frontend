@@ -1,17 +1,39 @@
-<div class="sticky top-8 space-y-6">
+<div class="space-y-4 sm:space-y-5 lg:sticky lg:top-6">
     <ng-container *ngIf="!isLoading; else loading">
 
         <!-- Simplified Service List -->
         <div *ngIf="selectedServiceData.length"
-            class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-3">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Selected Services</h3>
-            <div class="space-y-3">
+            class="bg-white border border-slate-200 p-4 sm:p-5">
+            <div class="flex flex-wrap items-start justify-between gap-x-3 gap-y-1 border-b border-slate-200 pb-3">
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-900">Selected services</h3>
+                    <p *ngIf="providerData" class="mt-1 text-xs text-slate-500">
+                        Provider:
+                        <button type="button" (click)="viewProvider()"
+                            class="font-medium text-slate-800 hover:underline underline-offset-2">
+                            {{ providerData.fullname || providerData.username }}
+                        </button>
+                    </p>
+                </div>
+                <p class="text-xs text-slate-500">
+                    Total duration: <span class="font-medium text-slate-800">{{ totalDuration }}</span>
+                </p>
+            </div>
+            <div class="divide-y divide-slate-200">
                 <ng-container *ngFor="let category of selectedServiceData">
-                    <div *ngFor="let service of category.services"
-                        class="flex justify-between items-center text-sm group">
-                        <span class="font-medium text-slate-700 group-hover:text-black transition-colors">{{
-                            service.category.name }}</span>
-                        <span class="font-bold text-black">₹{{ service.price | number:'1.2-2' }}</span>
+                    <div *ngFor="let service of category.services" class="flex min-w-0 items-start gap-3 py-3">
+                        <img *ngIf="service.image" [src]="service.image" [alt]="service.category.name"
+                            class="h-12 w-12 shrink-0 object-cover bg-slate-100" />
+                        <div class="min-w-0 flex-1">
+                            <p class="break-words text-sm font-medium text-slate-900">{{ service.category.name }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ service.profession.name }}</p>
+                            <p class="mt-1 text-xs text-slate-500">
+                                {{ service.estimatedTimeInMinutes }} min
+                            </p>
+                        </div>
+                        <span class="shrink-0 whitespace-nowrap text-sm font-medium text-slate-900">
+                            ₹{{ service.price | number:'1.2-2' }}
+                        </span>
                     </div>
                 </ng-container>
             </div>
@@ -26,7 +48,7 @@
 
             <div *ngIf="priceBreakup.discount" class="flex items-center gap-3">
                 <span
-                    class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider border border-emerald-100">
+                    class="text-xs font-medium text-emerald-700">
                     Coupon Applied
                 </span>
                 <button type="button" (click)="removeCoupon()"
@@ -52,41 +74,47 @@
 </div>
 
 <!-- Backdrop -->
-<div *ngIf="isCouponModalOpen" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+<div *ngIf="isCouponModalOpen"
+    class="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-6">
 
     <!-- Modal -->
-    <div class="bg-white w-full max-w-md max-h-[80vh] rounded-lg shadow-lg flex flex-col">
+    <div class="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-lg min-h-0 flex-col overflow-hidden border border-slate-200 bg-white sm:max-h-[80vh]">
 
         <!-- Header -->
-        <div class="p-5 border-b">
-            <h2 class="text-lg font-semibold">Available Coupons</h2>
+        <div class="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 px-4 py-3 sm:px-5">
+            <h2 class="text-base font-semibold text-slate-900 sm:text-lg">Available coupons</h2>
+            <button type="button" (click)="closeCouponModal()"
+                class="shrink-0 px-2 py-1 text-sm text-slate-600 hover:text-slate-900"
+                aria-label="Close coupons">
+                Close
+            </button>
         </div>
 
         <ng-container *ngIf="isCouponLoading; else afterCouponFetched">
-            <div class="min-h-[300px] flex items-center justify-center">
+            <div class="flex min-h-40 flex-1 items-center justify-center p-4">
                 <app-loading-circle-animation></app-loading-circle-animation>
             </div>
         </ng-container>
 
         <ng-template #afterCouponFetched>
             <!-- Scrollable Content -->
-            <div class="p-5 overflow-y-auto flex-1">
+            <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5">
 
                 <!-- Coupon Card -->
-                <div *ngFor="let coupon of availableCoupons" class="border rounded-lg p-4 mb-3">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="font-semibold text-gray-800 uppercase">{{coupon.couponCode}}</p>
-                            <p class="text-sm text-gray-600">
+                <div *ngFor="let coupon of availableCoupons" class="border border-slate-200 p-3 sm:p-4 mb-3 last:mb-0">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="min-w-0">
+                            <p class="break-words font-semibold text-slate-900 uppercase">{{coupon.couponCode}}</p>
+                            <p class="break-words text-sm text-slate-600">
                                 {{coupon.couponName}}
                             </p>
                         </div>
                         <button (click)="applyCoupon(coupon.id, priceBreakup.total)"
-                            class="text-sm text-blue-600 font-medium hover:underline">
+                            class="self-start text-sm font-medium text-blue-700 hover:underline sm:shrink-0">
                             Apply
                         </button>
                     </div>
-                    <div class="text-xs text-gray-500 mt-2">
+                    <div class="mt-2 text-xs leading-relaxed text-slate-600">
                         {{ coupon.discountType | discountSymbol: coupon.discountValue }}
                         <ng-container *ngIf="isUsageTypeOneTime(coupon.usageType); else isTypeExpiry">
                             One time use only.
@@ -96,15 +124,11 @@
                         </ng-template>
                     </div>
                 </div>
+                <p *ngIf="availableCoupons.length === 0" class="py-8 text-center text-sm text-slate-600">
+                    No coupons are currently available.
+                </p>
             </div>
         </ng-template>
-
-        <!-- Footer -->
-        <div class="p-4 border-t">
-            <button type="button" (click)="closeCouponModal()" class="w-full text-sm text-gray-600 hover:text-gray-800">
-                Close
-            </button>
-        </div>
 
     </div>
 </div>
