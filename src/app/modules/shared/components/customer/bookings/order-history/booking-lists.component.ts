@@ -19,6 +19,7 @@ import { ISubmitReview } from "../../../../../../core/models/reviews.model";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { chatActions } from "../../../../../../store/chat/chat.action";
 import { Store } from "@ngrx/store";
+import { PageScrollService } from "../../../../../../core/services/public/page-scroll.service";
 
 @Component({
   selector: 'app-customer-booking-lists',
@@ -34,6 +35,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   private readonly _chatService = inject(ChatSocketService);
   private readonly _store = inject(Store);
   private readonly _router = inject(Router);
+  private readonly _pageScrollService = inject(PageScrollService);
 
   private _destroy$ = new Subject<void>();
   private _bookingsData$ = new BehaviorSubject<IBookingResponse[] | null>(null);
@@ -60,6 +62,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
 
   private _fetchBookings(page: number) {
     this._bookingsData$.next(null);
+    this._pageScrollService.scrollToTop('smooth');
     this._bookingService.fetchBookings(page)
       .pipe(
         takeUntil(this._destroy$),
@@ -178,13 +181,13 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
           const updatedBooking = bookings.map(booking =>
             booking.bookingId === this.selectedBookingIdForReview
               ? {
-                  ...booking,
-                  review: {
-                    desc: reviewData.description,
-                    rating: reviewData.ratings,
-                    writtenAt: new Date(),
-                  } as IReview
-                }
+                ...booking,
+                review: {
+                  desc: reviewData.description,
+                  rating: reviewData.ratings,
+                  writtenAt: new Date(),
+                } as IReview
+              }
               : booking
           );
 

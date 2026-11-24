@@ -5,7 +5,6 @@ import { BehaviorSubject, filter, map, Observable, Subject, switchMap, takeUntil
 import { BookingService } from "../../../../../../core/services/booking.service";
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { IBookingDetailCustomer, IOrderedServiceUI, IRescheduleData } from "../../../../../../core/models/booking.model";
-import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { BookingStatus, CancelStatus, PaymentStatus } from "../../../../../../core/enums/enums";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { chatActions } from "../../../../../../store/chat/chat.action";
@@ -18,7 +17,7 @@ import { SubmitCancellationComponent } from "../../../../partials/shared/submit-
 @Component({
     selector: 'app-customer-view-booking-details',
     templateUrl: './booking-details.component.html',
-    imports: [CommonModule, ButtonComponent, RouterLink, RescheduleBookingModalComponent, TransactionHistoryTimelineComponent, SubmitCancellationComponent]
+    imports: [CommonModule, RouterLink, RescheduleBookingModalComponent, TransactionHistoryTimelineComponent, SubmitCancellationComponent]
 })
 export class CustomerViewBookingDetailsComponent implements OnInit, OnDestroy {
     private readonly _toastr = inject(ToastNotificationService);

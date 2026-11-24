@@ -140,10 +140,11 @@ export interface IBookingWithPagination {
 export interface IBookingDetailCustomer extends IBookingDetailsBase {
   provider: {
     id: string;
-    name: string;
+    fullname?: string;
+    username: string;
     email: string;
     phone: string;
-    location: string;
+    address: string;
   };
   breakup: IPriceBreakupData;
 }
