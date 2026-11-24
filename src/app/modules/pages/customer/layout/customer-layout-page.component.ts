@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { CustomerHeaderComponent } from '../../../shared/partials/sections/customer/header/header.component';
 import { CustomerFooterComponent } from "../../../shared/partials/sections/customer/footer/customer-footer.component";
 import { distinctUntilChanged, filter, map, Subject, takeUntil } from 'rxjs';
@@ -12,6 +12,7 @@ import { ChatSocketService } from '../../../../core/services/socket-service/chat
 import { VideoCallSocketService } from '../../../../core/services/socket-service/video-socket.service';
 import { NotificationSocketService } from '../../../../core/services/socket-service/notification.service';
 import { selectCustomer } from '../../../../store/customer/customer.selector';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NotificationTemplateId, NotificationType } from '../../../../core/enums/enums';
 import { ReservationSocketService } from '../../../../core/services/socket-service/reservation-socket.service';
 import { VideoCallService } from '../../../../core/services/video-call.service';
@@ -19,7 +20,7 @@ import { VideoCallService } from '../../../../core/services/video-call.service';
 @Component({
   selector: 'app-customer-landing-page',
   standalone: true,
-  imports: [CommonModule, CustomerHeaderComponent, RouterOutlet, CustomerFooterComponent, BreadcrumbsComponent],
+  imports: [CommonModule, CustomerHeaderComponent, RouterOutlet, RouterLink, RouterLinkActive, CustomerFooterComponent, BreadcrumbsComponent],
 
   templateUrl: './customer-layout-page.component.html',
 })
@@ -32,10 +33,26 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
   private readonly _router = inject(Router);
 
   private readonly _store = inject(Store);
+  readonly userStatus = toSignal(this._store.select(selectCheckStatus));
 
   private _destroy$ = new Subject<void>();
 
   isHomepage = false;
+  isMobileMoreOpen = false;
+
+  mobilePrimaryItems = [
+    { label: 'Home', icon: 'fas fa-home', route: '/homepage', exact: true },
+    { label: 'Bookings', icon: 'fas fa-calendar-alt', route: '/profile/bookings', exact: false },
+    { label: 'Cart', icon: 'fas fa-shopping-cart', route: '/cart', exact: true },
+    { label: 'Profile', icon: 'fas fa-user-circle', route: '/profile', exact: false },
+  ];
+
+  mobileMoreItems = [
+    { label: 'Saved Providers', icon: 'fas fa-heart', route: '/profile/saved' },
+    { label: 'Notifications', icon: 'fas fa-bell', route: '/profile/notifications' },
+    { label: 'Wallet & Payments', icon: 'fas fa-wallet', route: '/profile/wallet' },
+    { label: 'Settings', icon: 'fas fa-cog', route: '/settings' },
+  ];
 
   ngOnInit(): void {
     // Check homepage status
@@ -111,6 +128,14 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
   private checkHomepage() {
     const url = this._router.url;
     this.isHomepage = url === '/' || url === '/homepage' || url.startsWith('/homepage?');
+  }
+
+  toggleMoreMenu(): void {
+    this.isMobileMoreOpen = !this.isMobileMoreOpen;
+  }
+
+  closeMoreMenu(): void {
+    this.isMobileMoreOpen = false;
   }
 
   ngOnDestroy(): void {

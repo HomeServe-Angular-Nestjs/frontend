@@ -1,19 +1,4 @@
 <div class="min-h-[calc(100vh-4rem)] bg-gray-50/30">
-  <!-- Mobile Navigation -->
-  <div class="md:hidden sticky top-[4.5rem] z-10 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
-    <nav class="flex items-center gap-1 overflow-x-auto px-3 py-2" aria-label="Profile sections">
-      <ng-container *ngFor="let section of menuSections">
-        <a *ngFor="let item of section.items" [routerLink]="item.route"
-          routerLinkActive="bg-indigo-50 text-indigo-600 font-semibold shadow-sm"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50 hover:text-indigo-600 hover:shadow-sm group whitespace-nowrap text-sm">
-          <i [class]="item.icon" class="transition-colors group-hover:text-indigo-500"></i>
-          <span>{{ item.label }}</span>
-        </a>
-      </ng-container>
-    </nav>
-  </div>
-
   <div class="flex min-h-[calc(100vh-4rem)]">
     <!-- Sidebar -->
     <div class="w-72 sticky top-[4.5rem] h-[calc(100vh-5rem)] py-6 pl-4 hidden md:block">

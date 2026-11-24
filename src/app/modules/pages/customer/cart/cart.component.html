@@ -8,7 +8,7 @@
                 <ng-container *ngIf="cartItems().length > 0; else emptyCart">
                     <div class="flex items-center justify-between gap-3">
                         <div>
-                            <h2 class="text-sm font-semibold text-slate-800">Items in your cart</h2>
+                            <h2 class="hidden text-sm font-semibold text-slate-800 sm:block">Items in your cart</h2>
                             <p class="mt-1 text-xs text-slate-500">
                                 {{ cartItems().length }} {{ cartItems().length === 1 ? 'service' : 'services' }}
                                 · {{ totalDuration() }} total
