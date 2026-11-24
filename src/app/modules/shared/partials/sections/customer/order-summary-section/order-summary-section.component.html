@@ -1,5 +1,5 @@
-<div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
-    <h2 class="text-xs font-bold text-black uppercase tracking-widest mb-8 border-b border-slate-100 pb-4">
+<div class="bg-white border border-slate-200 p-4 sm:p-6">
+    <h2 class="text-sm font-semibold text-slate-900 mb-5 border-b border-slate-200 pb-4">
         Order Summary
     </h2>
 
@@ -18,19 +18,19 @@
             <span class="text-rose-600 font-bold">-₹{{ priceBreakup.discount | number:'1.2-2' }}</span>
         </div>
 
-        <div class="pt-6 mt-6 border-t border-slate-100">
+        <div class="pt-5 mt-5 border-t border-slate-200">
             <div *ngIf="priceBreakup.originalTotal" class="flex justify-between items-center mb-2">
                 <span class="text-xs font-medium text-slate-400 uppercase">Original Total</span>
                 <span class="text-sm font-bold text-slate-400 line-through">₹{{ priceBreakup.originalTotal |
                     number:'1.2-2' }}</span>
             </div>
-            <div class="flex justify-between items-center mb-8">
-                <span class="text-sm font-bold text-black uppercase tracking-tight">Total Payable</span>
-                <span class="text-2xl font-black text-black">₹{{ priceBreakup.total | number:'1.2-2' }}</span>
+            <div class="flex justify-between items-center gap-3 mb-6">
+                <span class="text-sm font-semibold text-slate-900">Total payable</span>
+                <span class="text-xl font-bold text-slate-900">₹{{ priceBreakup.total | number:'1.2-2' }}</span>
             </div>
 
             <button (click)="onAction()" [disabled]="disabled || processing"
-                class="w-full py-4 bg-black text-white rounded-2xl font-bold hover:bg-slate-900 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="w-full py-3 bg-slate-900 text-white font-medium hover:bg-slate-700 transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                 <span *ngIf="!processing">{{ buttonText }}</span>
                 <span *ngIf="processing">Processing...</span>
                 <i *ngIf="!processing" class="fas fa-arrow-right text-[10px]"></i>
@@ -39,21 +39,17 @@
     </div>
 </div>
 
-<div *ngIf="showBadges" class="mt-6 space-y-2">
-    <div class="flex gap-3 items-center p-3 bg-slate-50 rounded-2xl">
-        <div class="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm text-slate-400">
-            <i class="fas fa-info text-[10px]"></i>
-        </div>
-        <p class="text-[10px] text-slate-500 font-semibold leading-tight">
+<div *ngIf="showBadges" class="mt-4 space-y-3 border-t border-slate-200 pt-4">
+    <div class="flex gap-2 items-start text-slate-500">
+        <i class="fas fa-info mt-0.5 text-[10px]"></i>
+        <p class="text-xs leading-snug">
             Prices are inclusive of all applied taxes and fees.
         </p>
     </div>
 
-    <div class="flex gap-3 items-center p-3 bg-slate-50 rounded-2xl">
-        <div class="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm text-slate-400">
-            <i class="fas fa-undo text-[10px]"></i>
-        </div>
-        <p class="text-[10px] text-slate-500 font-semibold leading-tight">
+    <div class="flex gap-2 items-start text-slate-500">
+        <i class="fas fa-undo mt-0.5 text-[10px]"></i>
+        <p class="text-xs leading-snug">
             Cancellation is only possible within 24 hours of booking.
         </p>
     </div>

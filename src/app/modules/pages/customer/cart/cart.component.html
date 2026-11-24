@@ -1,82 +1,112 @@
-<div class="cart-container">
+<div class="min-w-0 pb-8">
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div class="flex flex-col lg:flex-row gap-10">
+    <main class="w-full min-w-0 py-4 sm:py-8">
+        <div class="flex min-w-0 flex-col lg:flex-row gap-6 lg:gap-8">
 
-            <!-- Left Side: Flat Services List -->
-            <div class="flex-1 space-y-8">
+            <!-- Cart items -->
+            <div class="flex-1 min-w-0 space-y-5 sm:space-y-6">
                 <ng-container *ngIf="cartItems().length > 0; else emptyCart">
-                    <div class="flex items-center justify-between px-2">
-                        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Items in your cart</h2>
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-sm font-semibold text-slate-800">Items in your cart</h2>
+                            <p class="mt-1 text-xs text-slate-500">
+                                {{ cartItems().length }} {{ cartItems().length === 1 ? 'service' : 'services' }}
+                                · Total estimated duration: {{ totalDuration() }}
+                            </p>
+                        </div>
                         <button id="clear-cart-btn" (click)="clearCart()"
-                            class="text-[10px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-widest transition-colors">
+                            class="shrink-0 text-xs text-slate-500 hover:text-rose-600 underline underline-offset-2 transition-colors">
                             Clear All
                         </button>
                     </div>
 
-                    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                        <div class="divide-y divide-slate-50">
-                            <div *ngFor="let service of cartItems()"
-                                class="service-item p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 group">
-
-                                <!-- Image -->
-                                <div
-                                    class="w-24 h-24 rounded-2xl overflow-hidden bg-slate-50 flex-shrink-0 border border-slate-100 shadow-sm">
-                                    <img [src]="service.image" [alt]="service.category.name"
-                                        class="w-full h-full object-cover" />
-                                </div>
-
-                                <!-- Info -->
-                                <div class="flex-1 min-w-0 text-center md:text-left">
-                                    <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
-                                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                                            {{ service.profession.name }}
-                                        </span>
-                                    </div>
-                                    <h3
-                                        class="text-lg font-bold text-black group-hover:underline decoration-slate-200 underline-offset-4">
-                                        {{ service.category.name }}
-                                    </h3>
-                                    <div class="mt-2 flex items-center justify-center md:justify-start gap-3">
-                                        <span class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
-                                            <i class="far fa-clock text-slate-400"></i>
-                                            {{ service.estimatedTimeInMinutes }} mins
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Price & Actions -->
-                                <div class="flex items-center gap-8 w-full md:w-auto justify-center md:justify-end">
-                                    <div class="text-right">
-                                        <p
-                                            class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">
-                                            Price</p>
-                                        <span class="text-xl font-black text-black">{{ service.price | currency:
-                                            'INR':'symbol':'1.2-2' }}</span>
-                                    </div>
-                                    <button id="remove-item-{{service.id}}" (click)="removeFromList(service.id)"
-                                        class="w-10 h-10 rounded-xl hover:bg-rose-50 text-slate-300 hover:text-rose-500 transition-all flex items-center justify-center">
-                                        <i class="fas fa-trash-alt text-sm"></i>
-                                    </button>
-                                </div>
+                    <section class="bg-white border border-slate-200 divide-y divide-slate-200" aria-label="Cart items">
+                        <div *ngIf="providerData() as provider"
+                            class="flex items-center gap-3 px-3 sm:px-5 py-3">
+                            <img *ngIf="provider.avatar" [src]="provider.avatar"
+                                [alt]="provider.fullname || provider.username"
+                                class="h-9 w-9 shrink-0 rounded-full object-cover" />
+                            <div *ngIf="!provider.avatar"
+                                class="h-9 w-9 shrink-0 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-medium">
+                                {{ (provider.fullname || provider.username || '?').charAt(0) | uppercase }}
+                            </div>
+                            <div class="min-w-0">
+                                <span class="block text-xs text-slate-500">Provider</span>
+                                <button type="button" (click)="viewProvider()"
+                                    class="block max-w-full truncate text-left text-sm font-medium text-slate-800 hover:underline underline-offset-2"
+                                    [title]="provider.fullname || provider.username">
+                                    {{ provider.fullname || provider.username }}
+                                </button>
+                                <span class="block truncate text-xs text-slate-500">{{ provider.profession }}</span>
                             </div>
                         </div>
-                    </div>
+
+                        <article *ngFor="let service of cartItems()"
+                            class="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-3 sm:gap-5 px-3 sm:px-5 py-4 sm:py-5">
+                                <div class="h-14 w-14 sm:h-16 sm:w-16 overflow-hidden bg-slate-100">
+                                    <img [src]="service.image" [alt]="service.category.name"
+                                        class="h-full w-full object-cover" />
+                                </div>
+
+                                <div class="min-w-0">
+                                    <p class="truncate text-xs text-slate-500">{{ service.profession.name }}</p>
+                                    <h3 class="break-words text-sm sm:text-base font-medium text-slate-900">
+                                        {{ service.category.name }}
+                                    </h3>
+                                    <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                                        <i class="far fa-clock text-slate-400" aria-hidden="true"></i>
+                                        <span>{{ service.estimatedTimeInMinutes }} mins</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2 sm:gap-4">
+                                    <div class="text-right">
+                                        <span class="block text-xs text-slate-500">Price</span>
+                                        <span class="whitespace-nowrap text-sm sm:text-base font-semibold text-slate-900">
+                                            {{ service.price | currency: 'INR':'symbol':'1.2-2' }}
+                                        </span>
+                                    </div>
+                                    <button id="remove-item-{{service.id}}" (click)="removeFromList(service.id)"
+                                        type="button" [attr.aria-label]="'Remove ' + service.category.name + ' from cart'"
+                                        class="flex h-8 w-8 shrink-0 items-center justify-center text-slate-400 hover:text-rose-600 transition-colors">
+                                        <i class="fas fa-trash-alt text-xs" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                        </article>
+                    </section>
+
+                    <section class="grid grid-cols-1 sm:grid-cols-2 border border-slate-200 bg-white"
+                        aria-label="Cart information">
+                        <div class="flex items-start gap-3 p-4 sm:p-5">
+                            <i class="fas fa-receipt mt-0.5 text-sm text-slate-600" aria-hidden="true"></i>
+                            <div>
+                                <h3 class="text-sm font-medium text-slate-900">Tax-inclusive pricing</h3>
+                                <p class="mt-1 text-xs leading-relaxed text-slate-600">
+                                    Prices include all applicable taxes and fees.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 border-t border-slate-200 p-4 sm:border-l sm:border-t-0 sm:p-5">
+                            <i class="fas fa-undo mt-0.5 text-sm text-slate-600" aria-hidden="true"></i>
+                            <div>
+                                <h3 class="text-sm font-medium text-slate-900">Cancellation policy</h3>
+                                <p class="mt-1 text-xs leading-relaxed text-slate-600">
+                                    Cancellation is available within 24 hours of booking.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
                 </ng-container>
 
                 <ng-template #emptyCart>
-                    <div
-                        class="py-32 flex flex-col items-center justify-center text-center px-10 bg-white rounded-[3rem] border border-dashed border-slate-200 shadow-sm">
-                        <div
-                            class="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mb-8 shadow-inner">
-                            <i class="fas fa-shopping-basket text-3xl text-slate-200"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-black">Your bag is empty</h3>
-                        <p class="text-slate-400 text-sm mt-2 max-w-sm mx-auto font-medium leading-relaxed">
+                    <div class="border border-slate-200 bg-white px-5 py-12 sm:py-16 text-center">
+                        <i class="fas fa-shopping-basket text-2xl text-slate-300" aria-hidden="true"></i>
+                        <h3 class="mt-4 text-lg font-semibold text-slate-900">Your cart is empty</h3>
+                        <p class="mx-auto mt-2 max-w-sm text-sm text-slate-500 leading-relaxed">
                             Looks like you haven't added any services yet. Check out our services to get started.
                         </p>
                         <button (click)="goBack()"
-                            class="mt-10 px-8 py-4 bg-black text-white rounded-2xl font-bold hover:bg-slate-900 transition-all text-xs uppercase tracking-widest">
+                            class="mt-6 px-4 py-2.5 bg-slate-900 text-white text-sm font-medium hover:bg-slate-700 transition-colors">
                             Browse Services
                         </button>
                     </div>
@@ -84,9 +114,9 @@
             </div>
 
             <!-- Right Side: Order Summary -->
-            <div class="w-full lg:w-[380px]">
+            <div class="w-full min-w-0 lg:w-[360px] lg:shrink-0">
                 <app-customer-order-summary-section [priceBreakup]="priceBreakup()" [buttonText]="'Checkout'"
-                    [disabled]="cartItems().length === 0" (actionClick)="scheduleTime()">
+                    [disabled]="cartItems().length === 0" [showBadges]="false" (actionClick)="scheduleTime()">
                 </app-customer-order-summary-section>
             </div>
         </div>

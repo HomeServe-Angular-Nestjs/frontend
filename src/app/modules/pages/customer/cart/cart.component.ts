@@ -9,13 +9,14 @@ import { CartService } from '../../../../core/services/cart.service';
 import { BookingService } from '../../../../core/services/booking.service';
 import { IPriceBreakupData } from '../../../../core/models/booking.model';
 import { OrderSummarySectionComponent } from '../../../shared/partials/sections/customer/order-summary-section/order-summary-section.component';
+import { ProviderService } from '../../../../core/services/provider.service';
+import { ICustomerProviderDetails } from '../../../../core/models/user.model';
 
 
 @Component({
     selector: 'app-customer-cart',
     standalone: true,
     templateUrl: './cart.component.html',
-    styleUrl: './cart.component.scss',
     imports: [
         CommonModule,
         OrderSummarySectionComponent
@@ -25,6 +26,7 @@ export class CartComponent implements OnInit, OnDestroy {
     private readonly _sharedDataService = inject(SharedDataService);
     private readonly _toastr = inject(ToastNotificationService);
     private readonly _bookingService = inject(BookingService);
+    private readonly _providerService = inject(ProviderService);
     public readonly _cartService = inject(CartService);
     private readonly _router = inject(Router);
 
@@ -37,6 +39,19 @@ export class CartComponent implements OnInit, OnDestroy {
         subTotal: 0.00,
         tax: 0.00,
         total: 0.00,
+    });
+    providerData = signal<ICustomerProviderDetails | null>(null);
+    totalDuration = computed(() => {
+        const totalMinutes = this.cartItems().reduce(
+            (total, service) => total + (service.estimatedTimeInMinutes || 0),
+            0
+        );
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        if (hours === 0) return `${minutes} min`;
+        if (minutes === 0) return `${hours} hr`;
+        return `${hours} hr ${minutes} min`;
     });
 
     // Grouped list for UI
@@ -60,6 +75,32 @@ export class CartComponent implements OnInit, OnDestroy {
     });
 
     providerId = computed(() => this.cartItems().length > 0 ? this.cartItems()[0].providerId : null);
+
+    constructor() {
+        effect((onCleanup) => {
+            const providerId = this.providerId();
+            this.providerData.set(null);
+            if (!providerId) return;
+
+            const subscription = this._providerService.getOneProvider(providerId)
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: (response) => {
+                        if (response.success && response.data) {
+                            this.providerData.set(response.data);
+                        } else {
+                            this._toastr.error('Unable to load provider information.');
+                        }
+                    },
+                    error: (error) => {
+                        console.error('[Cart] failed to load provider information:', error);
+                        this._toastr.error('Unable to load provider information.');
+                    },
+                });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
+    }
 
     ngOnInit() {
         this._fetchCart();
@@ -121,6 +162,13 @@ export class CartComponent implements OnInit, OnDestroy {
         if (selectedData.length <= 0) return;
         this._sharedDataService.setSelectedServiceData(selectedData);
         this._router.navigate(['schedule_service', pId]);
+    }
+
+    viewProvider(): void {
+        const providerId = this.providerId();
+        if (providerId) {
+            this._router.navigate(['provider_details', providerId, 'about']);
+        }
     }
 
     isScrolled = signal(false);
