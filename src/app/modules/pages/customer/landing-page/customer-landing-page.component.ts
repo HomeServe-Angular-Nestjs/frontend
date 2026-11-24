@@ -24,7 +24,7 @@ import { LandingFooterComponent } from '../../../shared/components/customer/land
         CommonModule,
         LandingNavComponent,
         LandingHeroComponent,
-        LandingSearchComponent,
+        // LandingSearchComponent,
         LandingCategoriesComponent,
         LandingWhyChooseComponent,
         LandingHowItWorksComponent,

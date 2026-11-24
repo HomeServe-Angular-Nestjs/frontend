@@ -1,13 +1,13 @@
-<div *ngIf="providerData" class="min-h-screen bg-transparent">
+<div *ngIf="providerData" class="min-w-0 bg-transparent">
     <!-- Header & Filter Section -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
-            <div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-5 sm:mb-8">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div class="min-w-0">
                 <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Services Offered</h2>
                 <p class="text-gray-500 mt-1">Discover expert solutions tailored to your needs</p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full lg:w-auto">
                 <div class="relative flex-1 lg:flex-none lg:w-72">
                     <input type="text" placeholder="Search services..." [(ngModel)]="searchTerm"
                         (ngModelChange)="triggerSearch()"
@@ -17,9 +17,9 @@
                     </span>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="w-full sm:w-auto flex items-center gap-2">
                     <select
-                        class="bg-gray-50 border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none cursor-pointer"
+                        class="w-full sm:w-auto max-w-full bg-gray-50 border-none rounded-xl px-3 sm:px-4 py-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500/20 outline-none cursor-pointer"
                         [(ngModel)]="sortOption" (ngModelChange)="applySort($event)">
                         <option value="price-asc">Price: Low to High</option>
                         <option value="price-desc">Price: High to Low</option>
@@ -34,7 +34,7 @@
             <!-- Price Range -->
             <div class="md:col-span-2">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">Price Range (₹)</h3>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <div class="relative flex-1">
                         <input type="number" min="0"
                             class="w-full bg-gray-50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
@@ -111,7 +111,7 @@
                 <div class="flex gap-4">
                     <!-- Image with overlay -->
                     <div
-                        class="w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0 relative group-hover:shadow-lg transition-all duration-500">
+                        class="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-2xl overflow-hidden flex-shrink-0 relative group-hover:shadow-lg transition-all duration-500">
                         <img [src]="service.image" [alt]="service.category.name"
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -136,7 +136,7 @@
                     </div>
                 </div>
 
-                <div class="pt-5 border-t border-gray-50 flex items-center justify-between mt-auto">
+                <div class="pt-4 sm:pt-5 border-t border-gray-50 flex flex-wrap items-center justify-between gap-3 mt-auto">
                     <div class="flex flex-col">
                         <span class="text-xs font-bold text-gray-400 uppercase tracking-tighter">Price
                             <!-- {{service.pricingUnit }} -->
@@ -149,7 +149,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 sm:gap-4">
                         <div class="flex flex-col items-end">
                             <div class="flex items-center gap-1.5 text-xs font-bold text-gray-600">
                                 <i class="far fa-clock text-blue-500"></i>
@@ -157,7 +157,7 @@
                             </div>
                         </div>
                         <button (click)="addServiceToCart(service.id)"
-                            class="bg-gray-900 hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-medium transition-all duration-300 transform active:scale-95 hover:shadow-xl hover:shadow-blue-500/30">
+                            class="bg-gray-900 hover:bg-blue-600 text-white px-3 sm:px-6 py-3 rounded-2xl text-xs sm:text-sm font-medium transition-all duration-300 transform active:scale-95 hover:shadow-xl hover:shadow-blue-500/30">
                             &plus; Add to Cart
                         </button>
                     </div>

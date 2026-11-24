@@ -1,38 +1,41 @@
 <ng-container *ngIf="reviewResponse$ | async as reviewResponse; else loadingOrError">
-    <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <div>
                 <h2 class="text-xl font-semibold">Customer Reviews</h2>
-                <p class="text-sm text-gray-600">
+                <p *ngIf="reviewResponse.totalReviews > 0; else noReviewSummary" class="text-sm text-gray-600">
                     {{ reviewResponse.totalReviews }} reviews with an average rating of
                     {{ reviewResponse.avgRating | number:'1.1-1' }}
                 </p>
+                <ng-template #noReviewSummary>
+                    <p class="text-sm text-gray-600">No customer reviews yet</p>
+                </ng-template>
             </div>
         </div>
 
         <!-- Reviews -->
         <div *ngIf="reviewResponse.reviews.length; else emptyReviews" class="space-y-6">
             <div *ngFor="let review of reviewResponse.reviews" class="border-b pb-6">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
+                    <div class="flex min-w-0 items-center gap-2">
                         <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                             <img [src]="review.avatar"
                                 (error)="review.avatar = 'assets/images/profile_placeholder.jpg'"
                                 class="w-full h-full object-cover" />
                         </div>
-                        <div>
+                        <div class="min-w-0">
                             <p class="font-medium">{{ review.name }}</p>
                             <p class="text-sm text-gray-500">{{ review.email }}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-1">
+                    <div class="flex flex-wrap items-center gap-1 sm:justify-end">
                         <span class="text-yellow-400">⭐</span>
                         <span class="font-medium">{{ review.rating }}</span>
                         <span class="text-gray-500 text-sm pl-2">{{ review.writtenAt | date }}</span>
                     </div>
                 </div>
 
-                <p class="text-gray-600 mb-3">{{ review.desc }}</p>
+                <p class="text-sm sm:text-base text-gray-600 mb-3 break-words">{{ review.desc }}</p>
 
                 <div class="flex justify-end">
                     <button type="button" (click)="reportReview(review.reviewId)"
@@ -54,19 +57,19 @@
 
         <!-- Empty State -->
         <ng-template #emptyReviews>
-            <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
-                <div class="relative mb-6">
-                    <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-400">
-                        <i class="far fa-star text-3xl"></i>
+            <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-indigo-200 bg-indigo-50/40 py-12 sm:py-16 px-5 text-center">
+                <div class="relative mb-5">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full border border-indigo-100 shadow-sm flex items-center justify-center text-indigo-400">
+                        <i class="far fa-star text-2xl sm:text-3xl"></i>
                     </div>
                     <div
-                        class="absolute -bottom-1 -right-1 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow border border-gray-100 text-gray-300">
-                        <i class="fas fa-quote-left text-xs"></i>
+                        class="absolute -bottom-1 -right-1 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow border border-gray-100 text-indigo-300">
+                        <i class="fas fa-comment-dots text-xs"></i>
                     </div>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-1.5">No reviews yet</h3>
+                <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-2">No reviews yet</h3>
                 <p class="text-sm text-gray-500 max-w-md leading-relaxed">
-                    This provider hasn't received any reviews yet. Check back soon to see what customers have to say.
+                    This provider hasn't received a review yet. Customer feedback will appear here after their first completed service.
                 </p>
             </div>
         </ng-template>
@@ -80,7 +83,7 @@
 
 <!-- Loading Skeleton / Error State -->
 <ng-template #loadingOrError>
-    <div *ngIf="loadError" class="bg-white rounded-lg shadow-lg p-6">
+    <div *ngIf="loadError" class="bg-white rounded-lg shadow-lg p-4 sm:p-6">
         <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
             <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-400 mb-4">
                 <i class="fas fa-exclamation-triangle text-2xl"></i>
@@ -96,7 +99,7 @@
         </div>
     </div>
 
-    <div *ngIf="!loadError && isLoading" class="bg-white rounded-lg shadow-lg p-6 animate-pulse" aria-busy="true">
+    <div *ngIf="!loadError && isLoading" class="bg-white rounded-lg shadow-lg p-4 sm:p-6 animate-pulse" aria-busy="true">
         <div class="mb-6">
             <div class="w-40 h-5 bg-gray-200 rounded mb-2"></div>
             <div class="w-64 h-3 bg-gray-200 rounded"></div>

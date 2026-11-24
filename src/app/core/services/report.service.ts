@@ -12,7 +12,7 @@ export interface IReportSubmit {
     targetId: string;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ReportService {
     private readonly _http = inject(HttpClient);
     private readonly _reportAPI = API_ENV.report;

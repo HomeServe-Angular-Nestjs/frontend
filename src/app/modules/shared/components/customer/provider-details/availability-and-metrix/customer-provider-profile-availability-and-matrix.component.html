@@ -7,11 +7,11 @@
 
         <div class="space-y-3">
             <!-- Phone -->
-            <div class="flex items-center gap-3 text-sm">
-                <i class="fas fa-phone text-gray-400 w-4"></i>
+            <div class="flex min-w-0 items-center gap-3 text-sm">
+                <i class="fas fa-phone text-gray-400 w-4 shrink-0"></i>
 
                 <ng-container *ngIf="providerData?.phone; else unavailablePhone">
-                    <span class="font-medium text-gray-800">
+                    <span class="min-w-0 font-medium text-gray-800 break-words">
                         {{ providerData?.phone }}
                     </span>
                 </ng-container>
@@ -22,19 +22,19 @@
             </div>
 
             <!-- Email -->
-            <div class="flex items-center gap-3 text-sm">
-                <i class="fas fa-envelope text-gray-400 w-4"></i>
-                <span class="font-medium text-gray-800">
+            <div class="flex min-w-0 items-center gap-3 text-sm">
+                <i class="fas fa-envelope text-gray-400 w-4 shrink-0"></i>
+                <span class="min-w-0 font-medium text-gray-800 break-words">
                     {{ providerData?.email || 'Unavailable' }}
                 </span>
             </div>
 
             <!-- Address -->
-            <div class="flex items-start gap-3 text-sm">
-                <i class="fas fa-map-marker-alt text-gray-400 w-4 mt-0.5"></i>
+            <div class="flex min-w-0 items-start gap-3 text-sm">
+                <i class="fas fa-map-marker-alt text-gray-400 w-4 mt-0.5 shrink-0"></i>
 
                 <ng-container *ngIf="providerData?.address; else unavailableLocation">
-                    <span class="font-medium text-gray-800 leading-snug">
+                    <span class="min-w-0 font-medium text-gray-800 leading-snug break-words">
                         {{ providerData?.address }}
                     </span>
                 </ng-container>

@@ -101,7 +101,19 @@ export class CustomerReviewListComponent implements OnInit, OnDestroy {
 
   private _fetchReviews(providerId: string, cursor: string | null) {
     return this._providerService.getReviews(providerId, cursor).pipe(
-      map(response => response.data ?? null)
+      map(response => {
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to load provider reviews.');
+        }
+
+        return response.data ?? {
+          reviews: [],
+          avgRating: 0,
+          totalReviews: 0,
+          allFetched: true,
+          nextCursor: null,
+        };
+      })
     );
   }
 

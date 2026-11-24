@@ -1,11 +1,11 @@
 <!-- Profile Overview Section -->
-<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-  <div class="p-6 md:p-8 flex flex-col md:flex-row gap-8">
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-5 sm:mb-8">
+  <div class="p-4 sm:p-6 lg:p-8 flex flex-col md:flex-row gap-5 sm:gap-8">
 
     <!-- Profile Image -->
     <div class="shrink-0">
       <div
-        class="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 ring-4 ring-gray-50/50 mx-auto md:mx-0">
+        class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 ring-4 ring-gray-50/50 mx-auto md:mx-0">
         <!-- Avatar image if exists -->
         @if (providerData; as data) {
           @if (data.avatar) {
@@ -23,12 +23,12 @@
     </div>
 
     <!-- Profile Content -->
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1 min-w-0 flex flex-col">
       <!-- Top Section: Info & Actions -->
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-2">
-        <div class="space-y-2 text-center md:text-left">
-          <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
-            <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6 mb-2">
+      <div class="min-w-0 space-y-2 text-center md:text-left">
+        <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3">
+          <h1 class="max-w-full break-words text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
               {{providerData?.fullname || providerData?.username}}
             </h1>
             <span *ngIf="providerData?.isCertified"
@@ -39,19 +39,19 @@
           </div>
 
           <div
-            class="flex items-center justify-center md:justify-start text-indigo-600 font-bold text-sm tracking-wide">
+            class="flex flex-wrap items-center justify-center md:justify-start text-indigo-600 font-bold text-xs sm:text-sm tracking-wide">
             <i class="fas fa-briefcase mr-2 opacity-60"></i>
             {{providerData?.profession | titlecase}}
           </div>
         </div>
 
-        <div class="flex items-center justify-center gap-3">
+        <div class="flex w-full sm:w-auto items-center justify-center gap-2 sm:gap-3">
           <button (click)="chat()"
-            class="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 active:scale-[0.98] text-sm">
+            class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 active:scale-[0.98] text-xs sm:text-sm">
             Message
           </button>
           <button (click)="addToSaved(providerData?.id)"
-            class="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 font-bold hover:bg-gray-50 transition-all text-sm flex items-center gap-2 group/fav">
+            class="flex-1 sm:flex-none px-3 sm:px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 font-bold hover:bg-gray-50 transition-all text-xs sm:text-sm flex items-center justify-center gap-2 group/fav">
             <i class="fas fa-heart transition-colors" [class.text-red-500]="(providerData?.id | isSaved | async)"
               [class.text-gray-200]="!(providerData?.id | isSaved | async)" [ngClass]="{
                 }"></i>Favorite
@@ -60,39 +60,38 @@
       </div>
 
       <!-- Center Section: Stats Grid -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-gray-50/50 rounded-2xl border border-gray-100/50">
-        <div class="flex flex-col">
-          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Jobs Completed</span>
-          <span class="text-xl font-black text-gray-900">{{providerData?.jobsCompleted ? providerData?.jobsCompleted + '+' : 'No jobs yet'}}</span>
+      <div class="grid grid-cols-2 lg:grid-cols-4 p-2 sm:p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50">
+        <div class="min-w-0 flex flex-col p-2 sm:p-3 border-r border-b lg:border-b-0 border-gray-200/50">
+          <span class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-wide sm:tracking-widest mb-1.5">Jobs Completed</span>
+          <span class="text-lg sm:text-xl font-black text-gray-900">{{providerData?.jobsCompleted ? providerData?.jobsCompleted + '+' : 'No jobs yet'}}</span>
         </div>
 
-        <div class="flex flex-col border-l border-gray-200/50 pl-6">
-          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Success Rate</span>
-          <span class="text-xl font-black text-gray-900">{{providerData?.successRate ? providerData?.successRate + '%' : '–'}}</span>
+        <div class="min-w-0 flex flex-col p-2 sm:p-3 border-b lg:border-b-0 lg:border-r border-gray-200/50">
+          <span class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-wide sm:tracking-widest mb-1.5">Success Rate</span>
+          <span class="text-lg sm:text-xl font-black text-gray-900">{{providerData?.successRate ? providerData?.successRate + '%' : '–'}}</span>
         </div>
 
-        <div class="flex flex-col border-t pt-6 lg:border-t-0 lg:pt-0 lg:border-l lg:pl-6 border-gray-200/50">
-          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Avg Rating</span>
-          <div class="flex items-center gap-2 text-xl font-black text-gray-900">
+        <div class="min-w-0 flex flex-col p-2 sm:p-3 border-r border-gray-200/50">
+          <span class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-wide sm:tracking-widest mb-1.5">Avg Rating</span>
+          <div class="flex flex-wrap items-center gap-2 text-lg sm:text-xl font-black text-gray-900">
             <ng-container *ngIf="providerData?.avgRating as rating; else noReviews">
               <span>{{rating}}</span>
               <i class="fas fa-star text-yellow-400 text-base"></i>
             </ng-container>
             <ng-template #noReviews>
-              <span class="text-sm font-semibold text-gray-400">No reviews yet</span>
+              <span class="text-xs sm:text-sm font-semibold text-gray-400">No reviews yet</span>
             </ng-template>
           </div>
         </div>
 
-        <div
-          class="flex flex-col border-t pt-6 border-l pl-6 lg:border-t-0 lg:pt-0 border-gray-200/50">
-          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Experience</span>
-          <span class="text-xl font-black text-gray-900">{{providerData?.experience || 0}} yrs</span>
+        <div class="min-w-0 flex flex-col p-2 sm:p-3">
+          <span class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-wide sm:tracking-widest mb-1.5">Experience</span>
+          <span class="text-lg sm:text-xl font-black text-gray-900">{{providerData?.experience || 0}} yrs</span>
         </div>
       </div>
 
       <!-- Bottom Section: Footer -->
-      <div class="mt-8 flex flex-wrap items-center justify-between gap-6">
+      <div class="mt-5 sm:mt-8 flex flex-wrap items-center justify-between gap-3 sm:gap-6">
         <div class="flex items-center gap-5">
           <div *ngIf="providerData?.isActive" class="flex items-center px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
             <span class="relative flex h-2 w-2 mr-2.5">

@@ -8,20 +8,20 @@ import { BreadcrumbService } from '../../../../../../core/services/public/breadc
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <nav *ngIf="breadcrumbs().length > 0" class="flex px-4 py-2 text-black bg-white rounded-lg border border-gray-100" aria-label="Breadcrumb">
-      <ol class="inline-flex items-center space-x-1">
-        <li class="inline-flex items-center">
-          <a routerLink="/" class="inline-flex items-center text-sm font-medium text-black hover:underline cursor-pointer">
+    <nav *ngIf="breadcrumbs().length > 0" class="flex w-full min-w-0 px-3 sm:px-4 py-2 text-black bg-white rounded-lg border border-gray-100" aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-x-1 min-w-0">
+        <li class="flex min-w-0 items-center">
+          <a routerLink="/" class="inline-flex max-w-full items-center text-xs sm:text-sm font-medium text-black hover:underline cursor-pointer whitespace-normal break-words">
             Home
           </a>
         </li>
-        <li *ngFor="let breadcrumb of breadcrumbs(); let last = last">
-          <div class="flex items-center">
-            <span class="text-gray-400 mx-2 text-sm">/</span>
+        <li *ngFor="let breadcrumb of breadcrumbs(); let last = last" class="min-w-0">
+          <div class="flex min-w-0 items-center">
+            <span class="shrink-0 text-gray-400 mx-1 sm:mx-2 text-xs sm:text-sm">/</span>
             <ng-container *ngIf="!last">
-              <a [routerLink]="breadcrumb.url" class="text-sm font-medium text-black hover:underline cursor-pointer">{{ breadcrumb.label }}</a>
+              <a [routerLink]="breadcrumb.url" class="max-w-full text-xs sm:text-sm font-medium text-black hover:underline cursor-pointer whitespace-normal break-words">{{ breadcrumb.label }}</a>
             </ng-container>
-            <span *ngIf="last" class="text-sm font-semibold text-black">{{ breadcrumb.label }}</span>
+            <span *ngIf="last" class="max-w-full text-xs sm:text-sm font-semibold text-black whitespace-normal break-words">{{ breadcrumb.label }}</span>
           </div>
         </li>
       </ol>
