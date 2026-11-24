@@ -1,4 +1,4 @@
-<section id="testimonials" class="py-24 bg-[#0a0a0f] relative overflow-hidden">
+<section *ngIf="hasEnoughTestimonials()" id="testimonials" class="py-24 bg-[#0a0a0f] relative overflow-hidden">
     <!-- Dynamic Background Elements -->
     <div class="absolute inset-0 pointer-events-none">
         <div
@@ -27,14 +27,13 @@
                     Homeowners</span>
             </h2>
             <p class="text-slate-400 text-lg max-w-2xl mx-auto font-medium">
-                Don't just take our word for it—see how we've helped thousands of people transform their living spaces
-                with ease and confidence.
+                Real five-star feedback from customers who booked home services through HomeServe.
             </p>
         </div>
 
         <!-- Testimonials Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div *ngFor="let testimonial of testimonials; let i = index"
+            <div *ngFor="let testimonial of testimonials(); let i = index"
                 class="group relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 transition-all duration-500 hover:bg-white/[0.08] hover:-translate-y-4 hover:border-white/20 shadow-2xl overflow-hidden animate-fade-up"
                 [style.animation-delay]="i * 150 + 'ms'">
 
@@ -45,8 +44,9 @@
 
                 <!-- Rating & Quote Icon -->
                 <div class="flex items-center justify-between mb-8">
-                    <div class="flex gap-1">
-                        <i class="fas fa-star text-yellow-400 text-sm" *ngFor="let s of [1,2,3,4,5]"></i>
+                    <div class="flex gap-1" role="img" [attr.aria-label]="testimonial.rating + ' out of 5 stars'">
+                        <i class="fas fa-star text-yellow-400 text-sm" *ngFor="let star of [1,2,3,4,5]"
+                            aria-hidden="true"></i>
                     </div>
                     <div
                         class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/30 group-hover:text-indigo-400 transition-colors">
@@ -64,59 +64,25 @@
 
                 <!-- Customer Profiling -->
                 <div class="flex items-center gap-4 pt-6 border-t border-white/5">
-                    <div class="relative">
-                        <img [src]="testimonial.avatar" [alt]="testimonial.name"
-                            class="w-14 h-14 rounded-2xl object-cover ring-2 ring-white/10 group-hover:ring-indigo-500/50 transition-all duration-500">
-                        <div
-                            class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-4 border-[#12121a] flex items-center justify-center">
-                            <i class="fas fa-check text-[8px] text-white"></i>
+                    <ng-container *ngIf="testimonial.customerAvatar; else avatarFallback">
+                        <img [src]="testimonial.customerAvatar" [alt]="testimonial.customerName || 'Customer'"
+                            referrerpolicy="no-referrer"
+                            class="w-14 h-14 rounded-2xl object-cover ring-2 ring-white/10">
+                    </ng-container>
+                    <ng-template #avatarFallback>
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-lg font-bold text-white"
+                            aria-hidden="true">
+                            {{ (testimonial.customerName || 'C').charAt(0) | uppercase }}
                         </div>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-black tracking-tight text-base mb-0.5">{{ testimonial.name }}</h4>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">{{
-                                testimonial.service }}</span>
-                            <span class="w-1 h-1 rounded-full bg-slate-600"></span>
-                            <span class="text-[10px] font-medium text-slate-500">{{ testimonial.date }}</span>
-                        </div>
-                        <p class="text-[10px] text-slate-600 mt-1 flex items-center gap-1">
-                            <i class="fas fa-map-marker-alt text-[8px]"></i> {{ testimonial.location }}
-                        </p>
+                    </ng-template>
+                    <div class="min-w-0">
+                        <h4 class="text-white font-semibold tracking-tight text-base mb-1 truncate">
+                            {{ testimonial.customerName || 'HomeServe customer' }}
+                        </h4>
+                        <p class="text-xs text-indigo-300 truncate">{{ testimonial.serviceName }}</p>
+                        <p class="text-xs font-medium text-slate-500 mt-1">{{ testimonial.date | date: 'MMM d, yyyy' }}</p>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Social Proof Bar -->
-        <div
-            class="mt-24 pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8 opacity-60 hover:opacity-100 transition-opacity">
-            <div class="flex items-center gap-8 flex-wrap justify-center">
-                <div class="flex flex-col items-center md:items-start">
-                    <span class="text-2xl font-black text-white leading-none">4.9/5</span>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Average
-                        Rating</span>
-                </div>
-                <div class="h-8 w-[1px] bg-white/10 hidden md:block"></div>
-                <div class="flex flex-col items-center md:items-start">
-                    <span class="text-2xl font-black text-white leading-none">12k+</span>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Satisfied
-                        Clients</span>
-                </div>
-                <div class="h-8 w-[1px] bg-white/10 hidden md:block"></div>
-                <div class="flex flex-col items-center md:items-start">
-                    <span class="text-2xl font-black text-white leading-none">98%</span>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Completion
-                        Rate</span>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <button
-                    class="group px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all duration-300 shadow-xl shadow-indigo-900/40 hover:shadow-indigo-600/20 hover:-translate-y-1 flex items-center gap-3">
-                    Join the community
-                    <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                </button>
             </div>
         </div>
     </div>

@@ -1,5 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
+import { ILandingTestimonial } from '../../../../../core/models/landing.model';
+import { LandingService } from '../../../../../core/services/landing.service';
 
 @Component({
   selector: 'app-customer-testimonial-section',
@@ -8,33 +12,16 @@ import { CommonModule } from '@angular/common';
   templateUrl: './customer-testimonial-section.component.html',
 })
 export class CustomerTestimonialSectionComponent {
-  testimonials = [
-    {
-      name: "Sarah Johnson",
-      avatar: "assets/images/testimonials/female-1.jpg",
-      text: "The professional who came for the deep cleaning was absolutely fantastic. No corner was left untouched, and the attention to detail was beyond my expectations!",
-      rating: 5,
-      service: "Deep Cleaning Service",
-      date: "2 days ago",
-      location: "San Francisco, CA"
-    },
-    {
-      name: "Mark Thompson",
-      avatar: "assets/images/testimonials/male-1.jpg",
-      text: "Had a major leak emergency on a Sunday night. Within 45 minutes, a plumber was at my door. Fast, efficient, and very reasonably priced.",
-      rating: 5,
-      service: "Emergency Plumbing",
-      date: "1 week ago",
-      location: "Austin, TX"
-    },
-    {
-      name: "Emily Rodriguez",
-      avatar: "assets/images/testimonials/female-2.jpg",
-      text: "Booking a painter was so easy through HomeServe. The quality of work was top-notch, and they finished the entire living room in just one day!",
-      rating: 5,
-      service: "Professional Painting",
-      date: "3 days ago",
-      location: "Miami, FL"
-    }
-  ];
+  private readonly _landingService = inject(LandingService);
+
+  readonly testimonials = toSignal(
+    this._landingService.getLandingData().pipe(
+      map(response => (response.data?.testimonials ?? [])
+        .filter(testimonial => testimonial.rating === 5)
+        .slice(0, 3))
+    ),
+    { initialValue: [] as ILandingTestimonial[] }
+  );
+
+  readonly hasEnoughTestimonials = computed(() => this.testimonials().length >= 3);
 }
