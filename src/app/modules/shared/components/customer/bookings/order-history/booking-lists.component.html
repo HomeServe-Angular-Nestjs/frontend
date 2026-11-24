@@ -121,9 +121,11 @@
         </div>
 
         <!-- Review Modal -->
-        <div *ngIf="isReviewModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div *ngIf="isReviewModalOpen"
+          class="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-3 sm:p-4"
+          role="presentation">
           <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" (click)="isReviewModalOpen = false"></div>
-          <div class="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl animate-slideUp">
+          <div class="relative w-full max-w-md overflow-y-auto rounded-2xl bg-white shadow-2xl animate-slideUp max-h-[calc(100vh-2rem)]">
             <app-customer-leave-a-review [review]="prevReview" [providerName]="selectedBookingProviderName"
               (submitModalEvent)="submitReview($event)"
               (closeModalEvent)="isReviewModalOpen = false"></app-customer-leave-a-review>
