@@ -1,4 +1,4 @@
-const domainName = 'https://api.homeserve.msajid.space/api';
+const domainName = 'https://api-homeserve.meetsajid.site/api';
 
 export const PRODUCTION = true;
 
@@ -39,7 +39,7 @@ export const API_KEY = {
 
 export const MAPBOX_GEOCODING_URL = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
 
-export const SOCKET_URL = 'https://api.homeserve.msajid.space';
+export const SOCKET_URL = 'https://api-homeserve.meetsajid.site';
 
 export const REGEXP_ENV = {
   password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
