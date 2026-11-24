@@ -71,9 +71,24 @@ export class CustomerExploreSectionComponent {
 
 
   images = [
-    { src: 'assets/images/hero_image1.jpg', alt: 'Home Service 1' },
-    { src: 'assets/images/hero_image2.jpg', alt: 'Home Service 2' },
-    { src: 'assets/images/hero_image3.jpg', alt: 'Home Service 3' },
+    {
+      src: 'assets/images/hero_image1.jpg',
+      alt: 'Home service professional',
+      title: 'Trusted help for your home',
+      description: 'Find the right professional for the jobs that keep your home running.'
+    },
+    {
+      src: 'assets/images/hero_image2.jpg',
+      alt: 'Home maintenance service',
+      title: 'Care for every corner',
+      description: 'Explore dependable services for cleaning, repairs, and regular maintenance.'
+    },
+    {
+      src: 'assets/images/hero_image3.jpg',
+      alt: 'Residential service work',
+      title: 'Book with confidence',
+      description: 'Compare local options and choose the service that works for you.'
+    },
   ];
 
   ngOnInit() {
@@ -213,5 +228,8 @@ export class CustomerExploreSectionComponent {
     this.startCarousel();
   }
 
+  previousSlide() {
+    this.goToSlide((this.currentSlide - 1 + this.images.length) % this.images.length);
+  }
 
 }
