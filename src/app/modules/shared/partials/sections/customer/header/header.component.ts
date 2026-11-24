@@ -3,15 +3,13 @@ import { Component, inject, Input, OnInit, signal, computed } from '@angular/cor
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Subject, takeUntil, filter, finalize } from 'rxjs';
+import { Subject, takeUntil, filter, finalize, debounceTime, distinctUntilChanged } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { authActions } from '../../../../../../store/auth/auth.actions';
 import { selectCheckStatus } from '../../../../../../store/auth/auth.selector';
 import { selectCustomer } from '../../../../../../store/customer/customer.selector';
 import { getColorFromChar } from '../../../../../../core/utils/style.utils';
 import { customerActions } from '../../../../../../store/customer/customer.actions';
-import { DebounceService } from '../../../../../../core/services/public/debounce.service';
-import { CustomerService } from '../../../../../../core/services/customer.service';
 import { selectTotalUnReadNotificationCount } from '../../../../../../store/notification/notification.selector';
 import { CartService } from '../../../../../../core/services/cart.service';
 import { ICustomerSearchCategories } from '../../../../../../core/models/category.model';
@@ -23,18 +21,17 @@ import { PageScrollService } from '../../../../../../core/services/public/page-s
   selector: 'app-customer-header',
   imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './header.component.html',
-  providers: [DebounceService, LocationService]
+  providers: [LocationService]
 })
 export class CustomerHeaderComponent implements OnInit {
-  private readonly _debounceService = inject(DebounceService);
   private readonly _categoryService = inject(CategoryService);
   private readonly _locationService = inject(LocationService);
   public readonly _cartService = inject(CartService);
   private readonly _router = inject(Router);
   private readonly _store = inject(Store);
-  private readonly _pageScrollService = inject(PageScrollService);
-
   private readonly _destroy$ = new Subject<void>();
+  private readonly _categorySearch$ = new Subject<string>();
+  private readonly _locationSearch$ = new Subject<string>();
 
   @Input() isFixed: boolean = true;
   showMobileSearch = false;
@@ -75,17 +72,16 @@ export class CustomerHeaderComponent implements OnInit {
   ngOnInit(): void {
     this._store.dispatch(customerActions.fetchOneCustomer());
 
-    this._debounceService.onSearch(700)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((searchObj: { search: string, type: string }) => {
-        if (searchObj.type === 'location') {
-          this.fetchLocations(searchObj.search);
-        } else if (searchObj.type === 'category') {
-          this.fetchCategories(searchObj.search);
-        } else {
-          this.isLoadingCategories = false;
-          this.isLocationSearchLoading = false;
-        }
+    this._categorySearch$
+      .pipe(debounceTime(700), distinctUntilChanged(), takeUntil(this._destroy$))
+      .subscribe(search => {
+        if (search) this.fetchCategories(search);
+      });
+
+    this._locationSearch$
+      .pipe(debounceTime(700), distinctUntilChanged(), takeUntil(this._destroy$))
+      .subscribe(search => {
+        if (search) this.fetchLocations(search);
       });
 
     this.checkHomepage();
@@ -106,21 +102,37 @@ export class CustomerHeaderComponent implements OnInit {
   }
 
   searchLocations(): void {
-    if (!this.locationSearch.trim()) return;
+    const search = this.locationSearch.trim();
+    if (!search) {
+      this.locationData.set([]);
+      this.isLocationSearchLoading = false;
+      this.isLocationSearchFailed = false;
+      this._locationSearch$.next('');
+      return;
+    }
+
     this.isLocationSearchLoading = true;
-    this._debounceService.delay({ search: this.locationSearch, type: 'location' });
+    this._locationSearch$.next(search);
   }
 
   searchCategories(): void {
-    if (!this.categorySearch.trim()) return;
+    const search = this.categorySearch.trim();
+    if (!search) {
+      this.fetchedCategories = [];
+      this.isLoadingCategories = false;
+      this._categorySearch$.next('');
+      return;
+    }
+
     this.isLoadingCategories = true;
-    this._debounceService.delay({ search: this.categorySearch, type: 'category' });
+    this._categorySearch$.next(search);
   }
 
   handleLocationClick(locationSearch: IGeoLocation): void {
     this.locationSearch = '';
     this.locationData.set([]);
     this.isLocationSearchLoading = false;
+    this._locationSearch$.next('');
 
     const current = this._router.routerState.snapshot.root.queryParams;
 
@@ -138,6 +150,7 @@ export class CustomerHeaderComponent implements OnInit {
     this.categorySearch = '';
     this.fetchedCategories = [];
     this.isLoadingCategories = false;
+    this._categorySearch$.next('');
 
     const current = this._router.routerState.snapshot.root.queryParams;
 
@@ -152,14 +165,6 @@ export class CustomerHeaderComponent implements OnInit {
 
   logout(): void {
     this._store.dispatch(authActions.logout({ fromInterceptor: false }));
-  }
-
-  scrollToSection(sectionId: string): void {
-    if (!this._pageScrollService.scrollToElement(sectionId, 'smooth')) {
-      this._router.navigate(['/']).then(() =>
-        this._pageScrollService.scrollToElementAfterNextRender(sectionId, 'smooth')
-      );
-    }
   }
 
   private fetchLocations(search: string): void {
