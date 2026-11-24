@@ -1,10 +1,10 @@
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" *ngIf="providers.length > 0">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8" *ngIf="providers.length > 0">
 
   <!-- Provider Card -->
   <div *ngFor="let provider of providers"
     class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-neutral-100 overflow-hidden group">
 
-    <div class="p-6">
+    <div class="p-4 sm:p-5 lg:p-6">
       <!-- Provider Header -->
       <div class="flex items-start gap-4 mb-6">
         <!-- Avatar image if exists -->

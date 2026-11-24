@@ -1,18 +1,18 @@
 <section class="bg-gradient-to-br from-neutral-50 via-white to-neutral-50">
-    <div class="container px-4 max-w-7xl py-8">
+    <div class="container w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
         <!-- Page Header -->
-        <div class="mb-8">
-            <div class="flex items-center gap-3 mb-3">
+        <div class="mb-6 sm:mb-8">
+            <div class="flex items-start sm:items-center gap-3 mb-3">
                 <div
-                    class="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    class="h-11 w-11 sm:h-12 sm:w-12 shrink-0 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
                     <i class="fas fa-users text-xl"></i>
                 </div>
-                <div>
-                    <h1 class="text-3xl md:text-4xl font-black text-neutral-900 tracking-tight">
+                <div class="min-w-0">
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-neutral-900 tracking-tight leading-tight">
                         Find Your Service Provider
                     </h1>
-                    <p class="text-sm text-neutral-500 font-medium mt-0.5">
+                    <p class="text-xs sm:text-sm text-neutral-500 font-medium mt-1">
                         Browse through our verified professionals
                     </p>
                 </div>
@@ -30,8 +30,8 @@
             <ng-container *ngIf="providers().length > 0; else emptyState">
 
                 <!-- Results Header -->
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-3">
+                <div class="flex items-center justify-between mb-5 sm:mb-6">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                         <h2 class="text-lg font-bold text-neutral-700">Available Providers</h2>
                         <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold">
                             {{ providers().length }} found
@@ -48,7 +48,7 @@
 
         <!-- Empty State -->
         <ng-template #emptyState>
-            <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-12 text-center">
+            <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 sm:p-12 text-center">
                 <div class="max-w-md mx-auto">
 
                     <div class="h-20 w-20 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-6">
@@ -77,7 +77,7 @@
 
         <!-- Loading State -->
         <ng-template #loadingState>
-            <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-12 text-center">
+            <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 sm:p-12 text-center">
                 <div class="flex flex-col items-center gap-4">
                     <div class="h-12 w-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin">
                     </div>
@@ -87,7 +87,7 @@
         </ng-template>
 
         <!-- Pagination -->
-        <div class="mt-8">
+        <div *ngIf="pagination().total > pagination().limit" class="mt-6 sm:mt-8 overflow-x-auto pb-1">
             <app-customer-pagination [pagination]="pagination()" (pageChanged)="changePage($event)">
             </app-customer-pagination>
         </div>
