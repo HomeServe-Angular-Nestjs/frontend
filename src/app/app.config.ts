@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, inject, provideEnvironmentInitializer, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, RouterConfigOptions, withDebugTracing, withInMemoryScrolling, withRouterConfig, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
@@ -26,6 +26,7 @@ import { ErrorHandlerService } from './core/services/public/error-handler.servic
 import { notificationFeature } from './store/notification/notification.feature';
 import { notificationEffects } from './store/notification/notification.effects';
 import { DatePipe } from '@angular/common';
+import { PageScrollService } from './core/services/public/page-scroll.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -43,11 +44,14 @@ export const appConfig: ApplicationConfig = {
       NgxSpinnerModule.forRoot()
     ),
     provideZoneChangeDetection({ eventCoalescing: true }),
+    provideEnvironmentInitializer(() => {
+      inject(PageScrollService);
+    }),
     provideRouter(routes,
       withViewTransitions(),
       withInMemoryScrolling({
-        scrollPositionRestoration: 'enabled',
-        anchorScrolling: 'enabled',
+        scrollPositionRestoration: 'disabled',
+        anchorScrolling: 'disabled',
       }),
       // withDebugTracing(), //todo
       withRouterConfig({ onSameUrlNavigation: 'reload' })

@@ -40,7 +40,8 @@ export const customerRoutes: Routes = [
         data: {
           role: null,
           breadcrumb: 'Provider Details',
-          breadcrumbParent: { label: 'Service Providers', path: '/view_providers' }
+          breadcrumbParent: { label: 'Service Providers', path: '/view_providers' },
+          pageScroll: 'preserve'
         },
         children: [
           {

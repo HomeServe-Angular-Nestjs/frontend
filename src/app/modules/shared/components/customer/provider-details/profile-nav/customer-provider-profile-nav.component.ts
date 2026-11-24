@@ -2,6 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, Input, OnDestroy, OnInit } from "@angular/core";
 import { Router, Scroll } from "@angular/router";
 import { filter, Subject, takeUntil } from "rxjs";
+import { PageScrollService } from "../../../../../../core/services/public/page-scroll.service";
 
 @Component({
     selector: 'app-customer-provider-profile-nav',
@@ -11,6 +12,7 @@ import { filter, Subject, takeUntil } from "rxjs";
 })
 export class CustomerProviderProfileNavigationComponent implements OnInit, OnDestroy {
     private router = inject(Router);
+    private readonly _pageScrollService = inject(PageScrollService);
 
     private readonly _destroy$ = new Subject<void>();
     private _restoreScrollTo = -1;
@@ -42,6 +44,7 @@ export class CustomerProviderProfileNavigationComponent implements OnInit, OnDes
 
     ngOnInit(): void {
         const currentTab = this.router.url.split('/').pop()?.split('?')[0];
+
         this.items = this.items.map((item) => ({
             ...item,
             active: item.route === currentTab
@@ -51,11 +54,8 @@ export class CustomerProviderProfileNavigationComponent implements OnInit, OnDes
             filter((event): event is Scroll => event instanceof Scroll),
             takeUntil(this._destroy$)
         ).subscribe((event: Scroll) => {
-            if (event.position === null && this._restoreScrollTo >= 0) {
-                requestAnimationFrame(() => {
-                    window.scrollTo(0, this._restoreScrollTo);
-                    this._restoreScrollTo = -1;
-                });
+            if (event.position === null) {
+                this._pageScrollService.scrollToElement('#provider-details-nav', 'smooth');
             }
         });
     }

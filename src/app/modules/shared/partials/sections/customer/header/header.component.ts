@@ -17,6 +17,7 @@ import { CartService } from '../../../../../../core/services/cart.service';
 import { ICustomerSearchCategories } from '../../../../../../core/models/category.model';
 import { CategoryService } from '../../../../../../core/services/category.service';
 import { IGeoLocation, LocationService } from '../../../../../../core/services/public/location.service';
+import { PageScrollService } from '../../../../../../core/services/public/page-scroll.service';
 
 @Component({
   selector: 'app-customer-header',
@@ -31,6 +32,7 @@ export class CustomerHeaderComponent implements OnInit {
   public readonly _cartService = inject(CartService);
   private readonly _router = inject(Router);
   private readonly _store = inject(Store);
+  private readonly _pageScrollService = inject(PageScrollService);
 
   private readonly _destroy$ = new Subject<void>();
 
@@ -153,17 +155,10 @@ export class CustomerHeaderComponent implements OnInit {
   }
 
   scrollToSection(sectionId: string): void {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      // If not on homepage, navigate to homepage first then scroll
-      this._router.navigate(['/']).then(() => {
-        setTimeout(() => {
-          const el = document.getElementById(sectionId);
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      });
+    if (!this._pageScrollService.scrollToElement(sectionId, 'smooth')) {
+      this._router.navigate(['/']).then(() =>
+        this._pageScrollService.scrollToElementAfterNextRender(sectionId, 'smooth')
+      );
     }
   }
 

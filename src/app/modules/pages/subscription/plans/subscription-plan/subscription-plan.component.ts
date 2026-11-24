@@ -14,6 +14,7 @@ import { ISubscriptionOrder, RazorpayOrder, RazorpayPaymentResponse } from "../.
 import { ICreateSubscription, ISubscription } from "../../../../../core/models/subscription.model";
 import { PaymentDirection, PaymentSource, PlanDuration, TransactionStatus, TransactionType } from "../../../../../core/enums/enums";
 import { SharedDataService } from "../../../../../core/services/public/shared-data.service";
+import { PageScrollService } from "../../../../../core/services/public/page-scroll.service";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { UpgradeModalComponent } from "../upgrade-modal/upgrade-modal.component";
 
@@ -39,6 +40,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   private readonly _subscriptionService = inject(SubscriptionService);
   private readonly _paymentService = inject(PaymentService);
   private readonly _dialog = inject(MatDialog);
+  private readonly _pageScrollService = inject(PageScrollService);
 
   readonly featureRegistry = FEATURE_REGISTRY;
   readonly unlimited = SERVICE_LISTING_UNLIMITED;
@@ -436,8 +438,7 @@ export class ProviderSubscriptionPlansPage implements OnInit, OnDestroy {
   }
 
   scrollToPlans(): void {
-    const grid = document.getElementById('plans-grid');
-    grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this._pageScrollService.scrollToElement('plans-grid', 'smooth');
   }
 
 }
