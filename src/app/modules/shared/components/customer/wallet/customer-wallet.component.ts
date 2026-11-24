@@ -34,6 +34,7 @@ export class CustomerWalletComponent implements OnInit, OnDestroy {
     date: 'all',
     method: 'all'
   });
+  filtersExpanded = signal(false);
 
   tnxSignal = toSignal(
     combineLatest([
@@ -92,6 +93,10 @@ export class CustomerWalletComponent implements OnInit, OnDestroy {
     this.options.update((options) => ({ ...options, page: 1 }));
   }
 
+  toggleFilters(): void {
+    this.filtersExpanded.update((expanded) => !expanded);
+  }
+
   displayType(type: TransactionType) {
     switch (type) {
       case TransactionType.BOOKING_PAYMENT:
@@ -101,29 +106,7 @@ export class CustomerWalletComponent implements OnInit, OnDestroy {
       case TransactionType.SUBSCRIPTION_PAYMENT:
         return 'Subscription Payment';
       default:
-        return 'All';
-    }
-  }
-
-  referenceLabel(t: ICustomerTransactionData) {
-    if (t.bookingId) return 'Booking';
-    if (t.subscriptionId) return 'Subscription';
-    return t.gatewayOrderId ? 'Order' : '';
-  }
-
-  description(t: ICustomerTransactionData) {
-    const label = this.referenceLabel(t);
-    const id = t.bookingId ?? t.subscriptionId ?? t.gatewayOrderId ?? '';
-    const ref = label ? `${label} #${id?.toUpperCase()?.slice(0, 8)}` : '';
-    switch (t.transactionType) {
-      case TransactionType.BOOKING_PAYMENT:
-        return ref ? `Paid for ${ref}` : 'Paid for booking';
-      case TransactionType.BOOKING_REFUND:
-        return ref ? `Refund for ${ref}` : 'Booking refund';
-      case TransactionType.SUBSCRIPTION_PAYMENT:
-        return ref ? `Subscription payment for ${ref}` : 'Subscription payment';
-      default:
-        return this.displayType(t.transactionType);
+        return 'Transaction';
     }
   }
 

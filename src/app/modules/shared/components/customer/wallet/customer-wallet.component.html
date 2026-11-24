@@ -1,123 +1,173 @@
-<div class="p-6 space-y-6">
-  <!-- Wallet Balance -->
-  <div class="bg-white shadow-md rounded-2xl p-6 max-w-md mx-auto text-center">
-    <h2 class="text-lg font-medium text-gray-600">Wallet Balance</h2>
-    <p class="text-4xl font-bold text-indigo-600 mt-3">₹ {{ wallet() / 100| number:'1.2-2' }}</p>
-    <p class="text-sm text-gray-400 mt-1">Available Balance</p>
-  </div>
+<div class="mx-auto w-full max-w-6xl space-y-5 p-3 sm:space-y-6 sm:p-6">
+  <section class="flex flex-col gap-2 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
+    <div>
+      <h1 class="text-sm font-semibold text-gray-600">Wallet Balance</h1>
+      <p class="mt-1 text-xs text-gray-400">Available balance</p>
+    </div>
+    <p class="text-3xl font-bold tracking-tight text-indigo-600 sm:text-4xl">
+      {{ wallet() / 100 | currency:'INR':'symbol':'1.2-2' }}
+    </p>
+  </section>
 
-  <!-- Recent Transactions -->
-  <div class="bg-white p-6 rounded-xl shadow-sm">
-
-    <div class="flex justify-between items-center mb-2">
-      <h3 class="text-lg font-semibold text-gray-700">Recent Transactions</h3>
+  <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900">Recent Transactions</h2>
+        <p class="mt-0.5 text-xs text-gray-500">Review wallet activity and payment details.</p>
+      </div>
+      <button type="button" (click)="toggleFilters()" aria-controls="wallet-transaction-filters"
+        [attr.aria-expanded]="filtersExpanded()"
+        class="inline-flex min-h-10 items-center justify-center gap-2 self-start rounded-lg border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:self-auto">
+        <i class="fas fa-filter text-xs text-indigo-600" aria-hidden="true"></i>
+        Filters
+        <i class="fas fa-chevron-down text-xs transition-transform"
+          [ngClass]="{ 'rotate-180': filtersExpanded() }" aria-hidden="true"></i>
+      </button>
     </div>
 
-    <!-- Filters -->
-    <div class="flex justify-end w-full mb-5">
-      <div class="flex flex-wrap items-center gap-3">
-        <input [ngModel]="filters().search" (ngModelChange)="onSearch($event)" type="text"
-          placeholder="Search transactions..."
-          class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200" />
+    <div *ngIf="filtersExpanded()" id="wallet-transaction-filters"
+      class="mt-4 rounded-xl border border-gray-100 bg-gray-50/70 p-3 sm:p-4">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        <label for="wallet-search" class="block sm:col-span-2 lg:col-span-2">
+          <span class="mb-1 block text-xs font-medium text-gray-600">Search</span>
+          <input id="wallet-search" [ngModel]="filters().search" (ngModelChange)="onSearch($event)" type="search"
+            placeholder="Search transactions..."
+            class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
+        </label>
 
-        <select [ngModel]="filters().sort" (ngModelChange)="updateFilter('sort', $event)"
-          class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200">
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-          <option value="high">High</option>
-          <option value="low">Low</option>
-        </select>
+        <label for="wallet-sort" class="block">
+          <span class="mb-1 block text-xs font-medium text-gray-600">Sort by</span>
+          <select id="wallet-sort" [ngModel]="filters().sort" (ngModelChange)="updateFilter('sort', $event)"
+            class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="high">Highest amount</option>
+            <option value="low">Lowest amount</option>
+          </select>
+        </label>
 
-        <select [ngModel]="filters().type" (ngModelChange)="updateFilter('type', $event)"
-          class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200">
-          <option value="all">All Types</option>
-          <option value="booking_payment">Booking Payment</option>
-          <option value="booking_refund">Booking Refund</option>
-          <option value="subscription_payment">Subscription Payment</option>
-        </select>
+        <label for="wallet-type" class="block">
+          <span class="mb-1 block text-xs font-medium text-gray-600">Transaction type</span>
+          <select id="wallet-type" [ngModel]="filters().type" (ngModelChange)="updateFilter('type', $event)"
+            class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100">
+            <option value="all">All types</option>
+            <option value="booking_payment">Booking payment</option>
+            <option value="booking_refund">Booking refund</option>
+            <option value="subscription_payment">Subscription payment</option>
+          </select>
+        </label>
 
-        <select [ngModel]="filters().method" (ngModelChange)="updateFilter('method', $event)"
-          class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200">
-          <option value="all">All Methods</option>
-          <option value="credit">Credit</option>
-          <option value="debit">Debit</option>
-        </select>
+        <label for="wallet-method" class="block">
+          <span class="mb-1 block text-xs font-medium text-gray-600">Direction</span>
+          <select id="wallet-method" [ngModel]="filters().method" (ngModelChange)="updateFilter('method', $event)"
+            class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100">
+            <option value="all">All directions</option>
+            <option value="credit">Credit</option>
+            <option value="debit">Debit</option>
+          </select>
+        </label>
 
-        <select [ngModel]="filters().date" (ngModelChange)="updateFilter('date', $event)"
-          class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200">
-          <option value="all">All Time</option>
-          <option value="last_six_months">Last Six Months</option>
-          <option value="last_year">Last Year</option>
-        </select>
+        <label for="wallet-date" class="block">
+          <span class="mb-1 block text-xs font-medium text-gray-600">Date range</span>
+          <select id="wallet-date" [ngModel]="filters().date" (ngModelChange)="updateFilter('date', $event)"
+            class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100">
+            <option value="all">All time</option>
+            <option value="last_six_months">Last six months</option>
+            <option value="last_year">Last year</option>
+          </select>
+        </label>
       </div>
     </div>
 
-    <!-- Transaction List -->
-    <div class="space-y-4">
-
+    <div class="mt-4 space-y-3">
       <ng-container *ngIf="transactions().length > 0; else noTransactions">
-
-        <div *ngFor="let t of transactions()"
-          class="flex justify-between items-center border rounded-xl p-4 hover:bg-gray-50 transition">
-          <div class="flex items-center gap-3">
-            <span class="flex items-center justify-center w-9 h-9 rounded-full font-bold" [ngClass]="{
-            'bg-green-100 text-green-600': t.method === 'credit',
-            'bg-red-100 text-red-600': t.method === 'debit'
-          }">
-              {{ t.method === 'credit' ? '↓' : '↑' }}
+        <article *ngFor="let t of transactions()"
+          class="grid min-w-0 grid-cols-1 gap-4 rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-gray-300 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-6">
+          <div class="flex min-w-0 items-start gap-3">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+              [ngClass]="{
+                'bg-emerald-50 text-emerald-600': t.method === 'credit',
+                'bg-rose-50 text-rose-600': t.method === 'debit'
+              }">
+              <i class="fas" [ngClass]="t.method === 'credit' ? 'fa-arrow-down' : 'fa-arrow-up'"
+                aria-hidden="true"></i>
             </span>
 
-            <div>
-              <p class="text-sm font-medium text-gray-900">
-                {{ description(t) }}
-              </p>
-              <p class="text-xs text-gray-500">
-                {{ t.createdAt | date:'mediumDate' }} • {{ t.source }}
-              </p>
-              <p class="text-xs text-gray-400 mt-1">
-                <button *ngIf="t.bookingId"
-                  (click)="openBooking(t)"
-                  class="underline text-blue-600 hover:text-blue-800 cursor-pointer">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="break-words text-sm font-semibold text-gray-900">
+                  {{ displayType(t.transactionType) }}
+                </h3>
+                <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                  [ngClass]="{
+                    'bg-emerald-50 text-emerald-700': t.method === 'credit',
+                    'bg-rose-50 text-rose-700': t.method === 'debit'
+                  }">
+                  {{ t.method | titlecase }}
+                </span>
+              </div>
+
+              <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+                <span class="inline-flex items-center gap-1">
+                  <i class="far fa-calendar" aria-hidden="true"></i>
+                  {{ t.createdAt | date:'medium' }}
+                </span>
+                <span class="inline-flex items-center gap-1">
+                  <i class="fas fa-credit-card" aria-hidden="true"></i>
+                  {{ t.source | titlecase }}
+                </span>
+              </div>
+
+              <div *ngIf="t.bookingId || t.subscriptionId || t.gatewayOrderId"
+                class="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                <button *ngIf="t.bookingId" type="button" (click)="openBooking(t)"
+                  class="inline-flex items-center gap-1 font-medium text-indigo-600 hover:text-indigo-800">
                   Booking #{{ t.bookingId | slice:0:8 }}
+                  <i class="fas fa-arrow-up-right-from-square text-[9px]" aria-hidden="true"></i>
                 </button>
-                <span *ngIf="t.subscriptionId">Subscription #{{ t.subscriptionId | slice:0:8 }}</span>
-                <span *ngIf="t.gatewayOrderId">Order #{{ t.gatewayOrderId | slice:0:8 }}</span>
+                <span *ngIf="t.subscriptionId" class="text-gray-500">
+                  Subscription #{{ t.subscriptionId | slice:0:8 }}
+                </span>
+                <span *ngIf="t.gatewayOrderId" class="text-gray-500">
+                  Order #{{ t.gatewayOrderId | slice:0:8 }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-between gap-4 border-t border-gray-100 pt-3 sm:flex-col sm:items-end sm:justify-center sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
+            <div class="sm:text-right">
+              <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Amount</p>
+              <p class="mt-0.5 text-lg font-bold"
+                [ngClass]="{
+                  'text-emerald-600': t.method === 'credit',
+                  'text-rose-600': t.method === 'debit'
+                }">
+                {{ t.method === 'credit' ? '+' : '-' }}{{ t.amount | currency:'INR':'symbol':'1.2-2' }}
               </p>
-              <p class="text-xs text-gray-400" *ngIf="t.paymentId">Txn ID: {{ t.paymentId }}</p>
-              <p class="text-xs text-gray-400" *ngIf="t.gatewayOrderId">Gateway Order ID: {{ t.gatewayOrderId | slice:0:8 }}</p>
             </div>
-
+            <p *ngIf="t.balanceAfter !== null && t.balanceAfter !== undefined"
+              class="text-right text-xs text-gray-500 sm:text-right">
+              Balance after: {{ t.balanceAfter | currency:'INR':'symbol':'1.2-2' }}
+            </p>
           </div>
-
-          <!-- Right -->
-          <div class="text-right">
-            <div [ngClass]="{
-            'text-green-600': t.method === 'credit',
-            'text-red-600': t.method === 'debit'
-          }" class="font-semibold">
-              {{ t.method === 'credit' ? '+' : '-' }} ₹{{ t.amount | number:'1.2-2' }}
-            </div>
-
-            <div class="text-xs rounded px-2 mt-1 inline-block">
-              {{ displayType(t.transactionType) }}
-            </div>
-
-            <div class="text-xs text-gray-400 mt-1" *ngIf="t.balanceAfter !== null && t.balanceAfter !== undefined">
-              Balance after: ₹{{ t.balanceAfter | number:'1.2-2' }}
-            </div>
-          </div>
-        </div>
-
+        </article>
       </ng-container>
 
-      <!-- No Transactions -->
       <ng-template #noTransactions>
-        <p class="text-center text-gray-500 py-6">No transactions found</p>
+        <div class="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-10 text-center">
+          <i class="fas fa-receipt text-xl text-gray-300" aria-hidden="true"></i>
+          <p class="mt-2 text-sm font-medium text-gray-700">No transactions found</p>
+          <p class="mt-1 text-xs text-gray-500">Try changing or clearing the filters.</p>
+        </div>
       </ng-template>
-
     </div>
 
-    <app-customer-pagination [pagination]="pagination()" (pageChanged)="onPageChange($event)"></app-customer-pagination>
-  </div>
-
+    <div *ngIf="pagination().total > pagination().limit"
+      class="mt-5 flex justify-center border-t border-gray-100 pt-4 sm:mt-6 sm:pt-5">
+      <app-customer-pagination [pagination]="pagination()" (pageChanged)="onPageChange($event)">
+      </app-customer-pagination>
+    </div>
+  </section>
 </div>

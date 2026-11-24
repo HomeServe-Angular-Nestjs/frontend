@@ -51,7 +51,7 @@ export class CustomerLayoutPageComponent implements OnInit, OnDestroy {
     { label: 'Saved Providers', icon: 'fas fa-heart', route: '/profile/saved' },
     { label: 'Notifications', icon: 'fas fa-bell', route: '/profile/notifications' },
     { label: 'Wallet & Payments', icon: 'fas fa-wallet', route: '/profile/wallet' },
-    { label: 'Settings', icon: 'fas fa-cog', route: '/settings' },
+    // { label: 'Settings', icon: 'fas fa-cog', route: '/settings' },
   ];
 
   ngOnInit(): void {
