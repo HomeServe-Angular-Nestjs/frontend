@@ -1,136 +1,129 @@
-<main class="w-full px-4 md:px-6 py-6">
-  <div class="mb-8">
-    <div class="flex items-center justify-between mb-6">
+<main class="w-full min-w-0">
+  <div class="mb-5 sm:mb-6">
+    <div class="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Booking History</h1>
-        <p class="text-sm text-gray-500 mt-1">Manage and track your service appointments</p>
+        <h1 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">Booking History</h1>
+        <p class="mt-1 text-sm text-gray-500">Manage and track your service appointments</p>
       </div>
-      <div class="hidden sm:block">
+      <div class="self-start sm:self-auto">
         <div
-          class="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[10px] font-bold uppercase tracking-wider">
-          <i class="fas fa-calendar-check"></i>
+          class="flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-indigo-700">
+          <i class="fas fa-calendar-check" aria-hidden="true"></i>
           <span>{{ pagination.total }} Total Bookings</span>
         </div>
       </div>
     </div>
 
     <ng-container *ngIf="bookingData$ | async as bookingLists; else loading">
-      <div *ngIf="bookingLists && bookingLists.length; else noBookings" class="space-y-4">
+      <div *ngIf="bookingLists && bookingLists.length; else noBookings" class="space-y-3 sm:space-y-4">
         <div *ngFor="let list of bookingLists"
-          class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+          class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
 
           <!-- Booking Header -->
           <div
-            class="px-5 py-3 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4 bg-gray-50/30">
-            <div class="flex items-center gap-3">
-              <i class="fas fa-receipt text-indigo-400"></i>
-              <span class="text-sm font-bold text-gray-900">#{{ list.bookingId.toUpperCase() | slice:0:8 }}</span>
-              <span class="text-xs text-gray-400">{{ list.createdAt | toFullDateWithTime }}</span>
-            </div>
-
-            <div class="flex items-center gap-2">
+            class="border-b border-gray-100 bg-gray-50/40 px-4 py-3 sm:px-5">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="break-words text-base font-semibold leading-snug text-gray-900 sm:text-lg">
+                  {{ list.services[0] || 'Service booking' }}
+                </h2>
+                <p *ngIf="list.services.length > 1" class="mt-1 text-xs text-gray-500">
+                  +{{ list.services.length - 1 }} more {{ list.services.length === 2 ? 'service' : 'services' }}
+                </p>
+              </div>
               <span [ngClass]="{
                   'bg-amber-100 text-amber-700': list.bookingStatus === 'pending',
                   'bg-emerald-100 text-emerald-700': list.bookingStatus === 'completed',
                   'bg-rose-100 text-rose-700': list.bookingStatus === 'cancelled',
                   'bg-indigo-100 text-indigo-700': list.bookingStatus === 'confirmed' || list.bookingStatus === 'in_progress'
-                }" class="px-2.5 py-1 text-[10px] font-bold rounded-md capitalize">
-                {{ list.bookingStatus }}
+                }" class="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold">
+                {{ list.bookingStatus.replace('_', ' ') | titlecase }}
               </span>
+            </div>
+
+            <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
+              <span class="font-medium text-gray-600">
+                Booking #{{ list.bookingId.toUpperCase() | slice:0:8 }}
+              </span>
+              <span>Booked on {{ list.createdAt | toFullDateWithTime }}</span>
               <span [ngClass]="{
-                  'bg-emerald-50 text-emerald-600': list.paymentStatus === 'paid',
-                  'bg-rose-50 text-rose-600': list.paymentStatus === 'failed' || list.paymentStatus === 'refunded',
-                  'bg-gray-100 text-gray-500': list.paymentStatus === 'unpaid'
-                }" class="px-2.5 py-1 text-[10px] font-bold rounded-md capitalize">
-                {{ list.paymentStatus }}
+                  'text-emerald-700': list.paymentStatus === 'paid',
+                  'text-rose-700': list.paymentStatus === 'failed' || list.paymentStatus === 'refunded',
+                  'text-amber-700': list.paymentStatus === 'unpaid'
+                }" class="font-medium">
+                Payment {{ list.paymentStatus | titlecase }}
               </span>
             </div>
           </div>
 
           <!-- Booking Body -->
-          <div class="px-5 py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div class="flex-1 space-y-3">
-              <div class="flex flex-wrap gap-1.5">
-                <span *ngFor="let service of list.services"
-                  class="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[11px] font-semibold rounded border border-indigo-100/50">
+          <div class="flex min-w-0 flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+            <div class="min-w-0 flex-1 space-y-3">
+              <div *ngIf="list.services.length > 1" class="flex flex-wrap gap-1.5">
+                <span *ngFor="let service of list.services.slice(1)"
+                  class="max-w-full break-words rounded border border-indigo-100/50 bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold text-indigo-600">
                   {{ service }}
                 </span>
               </div>
-              <div class="flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500">
-                <div class="flex items-center gap-2">
-                  <i class="far fa-calendar-alt text-gray-400 w-3.5"></i>
-                  <span>{{ list.expectedArrivalTime | toFullDateWithTime }}</span>
+              <div class="flex min-w-0 items-start gap-3 rounded-lg border border-indigo-100 bg-indigo-50/60 p-3 sm:p-4">
+                <i class="far fa-calendar-alt mt-0.5 shrink-0 text-indigo-600" aria-hidden="true"></i>
+                <div class="min-w-0">
+                  <p class="text-[10px] font-bold uppercase tracking-wide text-indigo-700">Scheduled Date &amp; Time</p>
+                  <p class="mt-1 break-words text-sm font-semibold text-gray-900 sm:text-base">
+                    {{ list.expectedArrivalTime | toFullDateWithTime }}
+                  </p>
                 </div>
-                <div class="flex items-center gap-2">
-                  <i class="far fa-user text-gray-400 w-3.5"></i>
-                  <span>{{ list.provider.name }}</span>
-                </div>
+              </div>
+              <div class="flex min-w-0 items-start gap-2 text-xs text-gray-500">
+                <i class="far fa-user mt-0.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true"></i>
+                <span class="break-words">{{ list.provider.name }}</span>
               </div>
             </div>
 
-            <div class="flex items-center self-stretch md:self-auto border-t md:border-t-0 pt-4 md:pt-0">
-              <div class="text-right">
-                <p class="text-[10px] text-gray-400 font-bold uppercase mb-0.5">Total</p>
-                <p class="text-lg font-semibold text-gray-900">{{ list.totalAmount | currency:'INR':'symbol':'1.2-2' }}
-                </p>
-              </div>
+            <div class="flex w-full items-center justify-between border-t border-gray-100 pt-3 lg:w-auto lg:flex-col lg:items-end lg:justify-center lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              <p class="text-[10px] font-bold uppercase text-gray-400">Total</p>
+              <p class="text-base font-semibold text-gray-900 sm:text-lg">
+                {{ list.totalAmount | currency:'INR':'symbol':'1.2-2' }}
+              </p>
             </div>
           </div>
 
           <!-- Bottom Actions -->
-          <div class="px-5 py-3 border-t border-gray-50 flex justify-between items-center bg-gray-50/10">
-            <div class="flex items-center gap-4">
-              <button (click)="goToChat(list.provider.id)"
-                class="text-xs font-bold text-gray-400 hover:text-indigo-600 flex items-center gap-2 transition-colors">
-                <i class="far fa-comment-dots"></i>
-                Chat
-              </button>
-              <button (click)="openReviewModal(list.bookingStatus, list.review, list.bookingId, list.provider.name)"
-                class="text-xs font-bold text-gray-400 hover:text-amber-500 flex items-center gap-2 transition-colors">
-                <i class="far fa-star"></i>
-                {{ list?.review ? 'Edit Review' : 'Rate Service' }}
-              </button>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <div *ngIf="list.cancelStatus === 'in_progress'"
-                class="px-3 py-1 text-[10px] font-bold text-rose-600 bg-rose-50 rounded-md border border-rose-100">
-                Cancelling...
+          <div
+            class="flex flex-wrap items-center justify-end gap-2 border-t border-gray-100 bg-gray-50/20 px-4 py-3 sm:px-5">
+            <ng-container *ngIf="shouldShowCompletePayment(list.paymentStatus, list.cancelStatus); else nonPaymentAction">
+              <div class="min-w-0 flex-1 sm:flex-none">
+                <app-button (clicked)="completePayment(list)" text="Pay Now"
+                  buttonClass="min-h-11 w-full rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 sm:w-auto">
+                </app-button>
               </div>
-
-              <app-button *ngIf="canBeCancelled(list)" text="Cancel" (clicked)="openModal(list.bookingId)"
-                buttonClass="h-8 px-3 text-rose-600 border border-rose-100 hover:bg-rose-50 rounded-lg text-xs font-bold transition-all">
-              </app-button>
-
-              <app-button *ngIf="shouldShowCompletePayment(list.paymentStatus, list.cancelStatus)"
-                (clicked)="completePayment(list)" icon="fa-credit-card mr-1.5" text="Pay Now"
-                buttonClass="h-8 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all">
-              </app-button>
-
-              <button [routerLink]="[list.bookingId]"
-                class="h-8 px-3 text-gray-600 bg-white border border-gray-200 hover:border-indigo-300 hover:text-indigo-600 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
-                <i class="far fa-eye text-[10px]"></i>
-                Details
+            </ng-container>
+            <ng-template #nonPaymentAction>
+              <button *ngIf="list.bookingStatus === 'completed' && !list.review; else chatAction"
+                (click)="openReviewModal(list.bookingStatus, list.review, list.bookingId, list.provider.name)"
+                class="min-h-11 flex-1 rounded-lg bg-indigo-600 px-4 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-700 sm:flex-none">
+                Rate Service
               </button>
-
-              <div class="relative group">
-                <button class="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-gray-500 rounded-lg">
-                  <i class="fas fa-info-circle text-xs"></i>
+              <ng-template #chatAction>
+                <button *ngIf="list.bookingStatus === 'in_progress' || list.bookingStatus === 'confirmed'"
+                  (click)="goToChat(list.provider.id)"
+                  class="min-h-11 flex-1 rounded-lg bg-indigo-600 px-4 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-700 sm:flex-none">
+                  Chat with Provider
                 </button>
-                <div
-                  class="absolute bottom-full right-0 mb-2 w-56 p-2 bg-gray-900 text-white text-[10px] leading-relaxed rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  Cancellations are allowed within 24 hours of booking. Policy restrictions apply thereafter.
-                  <div class="absolute top-full right-4 w-2 h-2 bg-gray-900 rotate-45 -translate-y-1"></div>
-                </div>
-              </div>
-            </div>
+              </ng-template>
+            </ng-template>
+
+            <a [routerLink]="[list.bookingId]"
+              class="inline-flex min-h-11 flex-1 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-50 sm:flex-none">
+              Details
+            </a>
           </div>
         </div>
 
         <!-- Review Modal -->
-        <div *ngIf="isReviewModalOpen" class="fixed inset-0 flex items-center justify-center z-[100]">
+        <div *ngIf="isReviewModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" (click)="isReviewModalOpen = false"></div>
-          <div class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden animate-slideUp">
+          <div class="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl animate-slideUp">
             <app-customer-leave-a-review [review]="prevReview" [providerName]="selectedBookingProviderName"
               (submitModalEvent)="submitReview($event)"
               (closeModalEvent)="isReviewModalOpen = false"></app-customer-leave-a-review>
@@ -141,7 +134,7 @@
   </div>
 
   <!-- Pagination -->
-  <div *ngIf="pagination.total > pagination.limit" class="mt-auto py-10 flex justify-center border-t border-gray-100">
+  <div *ngIf="pagination.total > pagination.limit" class="mt-6 flex justify-center border-t border-gray-100 pt-5 sm:mt-8 sm:pt-6">
     <app-customer-pagination [pagination]="pagination" (pageChanged)="onPageChange($event)"></app-customer-pagination>
   </div>
 </main>
@@ -149,22 +142,22 @@
 <!-- Empty State -->
 <ng-template #noBookings>
   <div
-    class="flex flex-col items-center justify-center py-20 bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200">
-    <div class="relative mb-8">
-      <div class="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500">
-        <i class="fas fa-calendar-alt text-4xl"></i>
+    class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 px-4 py-12 text-center sm:py-16">
+    <div class="relative mb-6 sm:mb-8">
+      <div class="flex h-20 w-20 items-center justify-center rounded-full bg-indigo-100 text-indigo-500 sm:h-24 sm:w-24">
+        <i class="fas fa-calendar-alt text-3xl sm:text-4xl" aria-hidden="true"></i>
       </div>
       <div
-        class="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-100 text-gray-300">
-        <i class="fas fa-slash text-xs"></i>
+        class="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border border-gray-100 bg-white text-gray-300 shadow-sm">
+        <i class="fas fa-slash text-xs" aria-hidden="true"></i>
       </div>
     </div>
-    <h3 class="text-xl font-black text-gray-900 mb-2">No bookings found</h3>
-    <p class="text-gray-500 text-center max-w-md px-6 mb-8 text-sm leading-relaxed">
+    <h3 class="mb-2 text-lg font-bold text-gray-900 sm:text-xl">No bookings found</h3>
+    <p class="mb-6 max-w-md text-sm leading-relaxed text-gray-500 sm:mb-8">
       You haven't made any service bookings yet. Explore our top-rated services and book your first appointment today!
     </p>
     <a routerLink="/homepage"
-      class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 transition-all hover:scale-105 active:scale-95">
+      class="inline-flex min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-6 py-2.5 font-bold text-white shadow-sm transition-colors hover:bg-indigo-700 sm:px-8">
       Browse Services
     </a>
   </div>
@@ -172,57 +165,50 @@
 
 <!-- Loading Skeleton -->
 <ng-template #loading>
-  <div class="space-y-4" aria-busy="true">
+  <div class="space-y-3 sm:space-y-4" aria-busy="true">
     <div *ngFor="let _ of [1,2,3]"
-      class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden animate-pulse">
-      <div class="px-5 py-3 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4 bg-gray-50/50">
-        <div class="flex items-center gap-3">
-          <div class="w-4 h-4 bg-gray-200 rounded"></div>
-          <div class="w-28 h-4 bg-gray-200 rounded"></div>
-          <div class="w-24 h-3 bg-gray-200 rounded"></div>
+      class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm animate-pulse">
+      <div class="border-b border-gray-100 bg-gray-50/40 px-4 py-3 sm:px-5">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0 flex-1 space-y-2">
+            <div class="h-5 w-48 max-w-full rounded bg-gray-200"></div>
+            <div class="h-3 w-28 rounded bg-gray-200"></div>
+          </div>
+          <div class="h-6 w-20 shrink-0 rounded-full bg-gray-200"></div>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="w-16 h-5 bg-gray-200 rounded-md"></div>
-          <div class="w-16 h-5 bg-gray-200 rounded-md"></div>
+        <div class="mt-3 flex flex-wrap gap-3">
+          <div class="h-3 w-28 rounded bg-gray-200"></div>
+          <div class="h-3 w-36 rounded bg-gray-200"></div>
+          <div class="h-3 w-24 rounded bg-gray-200"></div>
         </div>
       </div>
 
-      <div class="px-5 py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div class="flex-1 space-y-3 w-full">
+      <div class="flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+        <div class="w-full min-w-0 flex-1 space-y-3">
           <div class="flex flex-wrap gap-2">
-            <div class="w-20 h-5 bg-gray-200 rounded"></div>
-            <div class="w-16 h-5 bg-gray-200 rounded"></div>
-            <div class="w-24 h-5 bg-gray-200 rounded"></div>
+            <div class="h-5 w-20 rounded bg-gray-200"></div>
+            <div class="h-5 w-16 rounded bg-gray-200"></div>
+            <div class="h-5 w-24 rounded bg-gray-200"></div>
           </div>
-          <div class="space-y-2">
-            <div class="w-48 max-w-full h-3 bg-gray-200 rounded"></div>
-            <div class="w-56 max-w-full h-3 bg-gray-200 rounded"></div>
+          <div class="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50 p-4">
+            <div class="h-4 w-4 shrink-0 rounded bg-gray-200"></div>
+            <div class="min-w-0 flex-1 space-y-2">
+              <div class="h-3 w-32 rounded bg-gray-200"></div>
+              <div class="h-4 w-56 max-w-full rounded bg-gray-200"></div>
+            </div>
           </div>
+          <div class="h-3 w-36 max-w-full rounded bg-gray-200"></div>
         </div>
-        <div class="text-right space-y-2 w-full md:w-24">
-          <div class="w-12 h-3 bg-gray-200 rounded ml-auto"></div>
-          <div class="w-20 h-5 bg-gray-200 rounded ml-auto"></div>
+        <div class="flex w-full justify-between border-t border-gray-100 pt-3 lg:w-24 lg:flex-col lg:items-end lg:border-0 lg:pt-0">
+          <div class="h-3 w-12 rounded bg-gray-200"></div>
+          <div class="h-5 w-20 rounded bg-gray-200"></div>
         </div>
       </div>
 
-      <div class="px-5 py-3 border-t border-gray-50 flex justify-between items-center bg-gray-50/10">
-        <div class="flex items-center gap-3">
-          <div class="w-14 h-4 bg-gray-200 rounded"></div>
-          <div class="w-14 h-4 bg-gray-200 rounded"></div>
-        </div>
-        <div class="w-20 h-8 bg-gray-200 rounded-lg"></div>
+      <div class="flex justify-end gap-2 border-t border-gray-100 px-4 py-3 sm:px-5">
+        <div class="h-11 w-24 rounded-lg bg-gray-200"></div>
+        <div class="h-11 w-24 rounded-lg bg-gray-200"></div>
       </div>
     </div>
   </div>
 </ng-template>
-
-<!-- Cancellation Modal -->
-<ng-container *ngIf="cancellationReasonModal">
-  <div class="fixed inset-0 z-[100] flex items-center justify-center">
-    <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" (click)="cancellationReasonModal = false"></div>
-    <div class="relative w-full max-w-lg mx-4 bg-white rounded-3xl shadow-2xl overflow-hidden">
-      <app-submit-cancellation (close)="cancellationReasonModal = false" (submitCancel)="handleCancellation($event)">
-      </app-submit-cancellation>
-    </div>
-  </div>
-</ng-container>

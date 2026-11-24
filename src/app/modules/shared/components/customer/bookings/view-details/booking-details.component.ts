@@ -6,18 +6,19 @@ import { BookingService } from "../../../../../../core/services/booking.service"
 import { formatFullDateWithTimeHelper } from "../../../../../../core/utils/date.util";
 import { IBookingDetailCustomer, IOrderedServiceUI, IRescheduleData } from "../../../../../../core/models/booking.model";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
-import { BookingStatus } from "../../../../../../core/enums/enums";
+import { BookingStatus, CancelStatus, PaymentStatus } from "../../../../../../core/enums/enums";
 import { ToastNotificationService } from "../../../../../../core/services/public/toastr.service";
 import { chatActions } from "../../../../../../store/chat/chat.action";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { Store } from "@ngrx/store";
 import { RescheduleBookingModalComponent } from "../../../../partials/shared/reschedule-booking/reschedule-booking.component";
 import { TransactionHistoryTimelineComponent } from "../../../../partials/shared/transaction-history-timeline/transaction-history-timeline.component";
+import { SubmitCancellationComponent } from "../../../../partials/shared/submit-cancellation/submit-cancellation.component";
 
 @Component({
     selector: 'app-customer-view-booking-details',
     templateUrl: './booking-details.component.html',
-    imports: [CommonModule, ButtonComponent, RouterLink, RescheduleBookingModalComponent, TransactionHistoryTimelineComponent]
+    imports: [CommonModule, ButtonComponent, RouterLink, RescheduleBookingModalComponent, TransactionHistoryTimelineComponent, SubmitCancellationComponent]
 })
 export class CustomerViewBookingDetailsComponent implements OnInit, OnDestroy {
     private readonly _toastr = inject(ToastNotificationService);
@@ -32,6 +33,7 @@ export class CustomerViewBookingDetailsComponent implements OnInit, OnDestroy {
 
     bookingDetails$: Observable<IBookingDetailCustomer | null> = this.bookingDetailsSource.asObservable();
     showRescheduleModal = signal(false);
+    isCancellationModalOpen = false;
 
     ngOnInit(): void {
         this._route.paramMap.pipe(
@@ -54,6 +56,58 @@ export class CustomerViewBookingDetailsComponent implements OnInit, OnDestroy {
     canBeRescheduled(bookingStatus: BookingStatus): boolean {
         return bookingStatus !== BookingStatus.COMPLETED &&
             bookingStatus !== BookingStatus.CANCELLED;
+    }
+
+    canBeCancelled(booking: IBookingDetailCustomer): boolean {
+        const bookingDate = new Date(booking.createdAt);
+        if (isNaN(bookingDate.getTime())) {
+            return false;
+        }
+
+        const elapsedMs = Date.now() - bookingDate.getTime();
+        const withinCancellationWindow = elapsedMs < 24 * 60 * 60 * 1000;
+        const isClosed =
+            booking.bookingStatus === BookingStatus.CANCELLED ||
+            booking.paymentStatus === PaymentStatus.REFUNDED ||
+            booking.bookingStatus === BookingStatus.COMPLETED ||
+            !!booking.cancelStatus;
+
+        return withinCancellationWindow && !isClosed;
+    }
+
+    handleCancellation(reason: string): void {
+        const booking = this.bookingDetailsSource.getValue();
+        if (!booking) {
+            this._toastr.error('Booking details are unavailable. Please try again.');
+            return;
+        }
+
+        this._bookingService.markBookingCancelledByCustomer(booking.bookingId, reason)
+            .pipe(takeUntil(this._destroy$))
+            .subscribe({
+                next: (res) => {
+                    if (!res.success || !res.data) {
+                        this._toastr.error(res.message || 'Failed to submit cancellation.');
+                        return;
+                    }
+
+                    this.bookingDetailsSource.next({
+                        ...booking,
+                        bookingStatus: res.data.bookingStatus,
+                        paymentStatus: res.data.paymentStatus,
+                        cancelStatus: res.data.cancelStatus,
+                        cancelReason: reason,
+                        cancelledAt: res.data.cancelStatus === CancelStatus.CANCELLED
+                            ? new Date()
+                            : booking.cancelledAt,
+                    });
+                    this.isCancellationModalOpen = false;
+                    this._toastr.success(res.message || 'Cancellation request submitted.');
+                },
+                error: () => {
+                    this._toastr.error('Failed to submit cancellation. Please try again.');
+                }
+            });
     }
 
     totalEstimatedTime(services: IOrderedServiceUI[]): number {

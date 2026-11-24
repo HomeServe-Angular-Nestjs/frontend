@@ -51,11 +51,9 @@
                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Cancel
                 </th>
-                <ng-container *ngIf="actionable">
-                  <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </ng-container>
+                <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -146,27 +144,29 @@
                   </td>
 
                   <!-- Actions -->
-                  <ng-container *ngIf="actionable">
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <div class="flex justify-center items-center gap-3">
-                        <a [routerLink]="[booking.bookingId]"
-                          class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View Details">
-                          <i class="fas fa-eye"></i>
-                        </a>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="flex justify-center items-center gap-2">
+                      <a [routerLink]="[booking.bookingId]"
+                        class="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700 transition-all hover:bg-blue-50"
+                        title="View Details">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                        Details
+                      </a>
 
+                      <ng-container *ngIf="actionable">
                         <button (click)="goToChat(booking.customer.id)"
                           class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all"
-                          title="Message Customer">
+                          title="Message Customer" aria-label="Message Customer">
                           <i class="fas fa-comment"></i>
                         </button>
 
                         <button class="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-all"
-                          title="More Options">
+                          title="More Options" aria-label="More Options">
                           <i class="fas fa-ellipsis-v"></i>
                         </button>
-                      </div>
-                    </td>
-                  </ng-container>
+                      </ng-container>
+                    </div>
+                  </td>
                 </tr>
               </ng-container>
             </tbody>
@@ -221,11 +221,9 @@
                   <th class="px-6 py-4 text-left">
                     <div class="w-16 h-4 bg-gray-200 rounded"></div>
                   </th>
-                  <ng-container *ngIf="actionable">
-                    <th class="px-6 py-4 text-center">
-                      <div class="w-16 h-4 bg-gray-200 rounded"></div>
-                    </th>
-                  </ng-container>
+                  <th class="px-6 py-4 text-center">
+                    <div class="w-16 h-4 bg-gray-200 rounded"></div>
+                  </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -260,15 +258,13 @@
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="w-16 h-5 bg-gray-200 rounded-full"></div>
                   </td>
-                  <ng-container *ngIf="actionable">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex justify-center gap-3">
-                        <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
-                        <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
-                        <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
-                      </div>
-                    </td>
-                  </ng-container>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex justify-center gap-3">
+                      <div class="h-9 w-20 rounded-lg bg-gray-200"></div>
+                      <div *ngIf="actionable" class="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                      <div *ngIf="actionable" class="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>

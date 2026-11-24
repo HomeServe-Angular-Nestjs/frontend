@@ -16,7 +16,6 @@ import { ITransaction } from "../../../../../../core/models/transaction.model";
 import { ButtonComponent } from "../../../../../../UI/button/button.component";
 import { CustomerLeaveAReviewComponent } from "../leave-a-review/leave-a-review.component";
 import { ISubmitReview } from "../../../../../../core/models/reviews.model";
-import { SubmitCancellationComponent } from "../../../../partials/shared/submit-cancellation/submit-cancellation.component";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { chatActions } from "../../../../../../store/chat/chat.action";
 import { Store } from "@ngrx/store";
@@ -24,7 +23,7 @@ import { Store } from "@ngrx/store";
 @Component({
   selector: 'app-customer-booking-lists',
   templateUrl: './booking-lists.component.html',
-  imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, ButtonComponent, CustomerLeaveAReviewComponent, SubmitCancellationComponent],
+  imports: [CommonModule, FormsModule, FullDateWithTimePipe, CustomerPaginationComponent, RouterLink, ButtonComponent, CustomerLeaveAReviewComponent],
   providers: [PaymentService, RazorpayWrapperService]
 })
 export class CustomerBookingListsComponent implements OnInit, OnDestroy {
@@ -37,14 +36,12 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   private readonly _router = inject(Router);
 
   private _destroy$ = new Subject<void>();
-  private _bookingsData$ = new BehaviorSubject<IBookingResponse[]>([]);
+  private _bookingsData$ = new BehaviorSubject<IBookingResponse[] | null>(null);
 
   bookingData$ = this._bookingsData$.asObservable();
   isReviewModalOpen = false;
-  cancellationReasonModal = false;
   selectedBookingIdForReview = '';
   selectedBookingProviderName = '';
-  bookingSelectedForCancellation = '';
   prevReview: IReview | null = null;
   pagination: IPagination = {
     limit: 0,
@@ -62,6 +59,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   }
 
   private _fetchBookings(page: number) {
+    this._bookingsData$.next(null);
     this._bookingService.fetchBookings(page)
       .pipe(
         takeUntil(this._destroy$),
@@ -74,7 +72,7 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
   }
 
   private _updateCancelledBookingData(cancelledBookingId: string, updatedData: IBookingResponse) {
-    const bookingData = this._bookingsData$.getValue();
+    const bookingData = this._bookingsData$.getValue() ?? [];
     const updatedBookingData = bookingData.map(booking =>
       booking.bookingId === cancelledBookingId
         ? { ...booking, ...updatedData }
@@ -144,49 +142,6 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this._paymentService.unlockPayment().pipe(takeUntil(this._destroy$)).subscribe();
-        }
-      });
-  }
-
-  canBeCancelled(booking: IBookingResponse): boolean {
-    const bookingDate = new Date(booking.createdAt);
-    if (isNaN(bookingDate.getTime())) {
-      this._toastr.warning(`Invalid scheduled date: , ${booking.createdAt}`);
-      return false;
-    }
-
-    const now = new Date();
-    const timeDiff = now.getTime() - bookingDate.getTime()
-    const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
-
-    const isWithinCancellableWindow = timeDiff < twentyFourHoursInMs;
-    const isAlreadyCancelled =
-      booking.bookingStatus === 'cancelled' ||
-      booking.paymentStatus === 'refunded' ||
-      booking.bookingStatus === 'completed' ||
-      booking.cancelStatus;
-
-    return isWithinCancellableWindow && !isAlreadyCancelled;
-  }
-
-  handleCancellation(reason: string) {
-    this._bookingService.markBookingCancelledByCustomer(this.bookingSelectedForCancellation, reason)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe({
-        next: (res) => {
-          if (!res || !res.data) {
-            this._toastr.error(res.message);
-            return;
-          }
-
-          this._updateCancelledBookingData(this.bookingSelectedForCancellation, res.data);
-          this.bookingSelectedForCancellation = '';
-          this.cancellationReasonModal = false;
-          this._toastr.success(res.message);
-        },
-        error: () => {
-          this.bookingSelectedForCancellation = '';
-          this.cancellationReasonModal = false;
         }
       });
   }
@@ -295,16 +250,6 @@ export class CustomerBookingListsComponent implements OnInit, OnDestroy {
           }
         });
     }
-  }
-
-  openModal(bookingId: string) {
-    this.bookingSelectedForCancellation = bookingId;
-    this.cancellationReasonModal = true;
-  }
-
-  closeModal() {
-    this.bookingSelectedForCancellation = '';
-    this.cancellationReasonModal = false;
   }
 
   shouldShowCompletePayment(paymentStatus: PaymentStatus, cancelStatus: CancelStatus | null) {

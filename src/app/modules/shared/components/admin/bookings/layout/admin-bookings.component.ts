@@ -7,7 +7,6 @@ import { map, Observable, of, shareReplay } from "rxjs";
 import { AdminBookingFilterComponent } from "../booking-filter/booking-filter.component";
 import { IAdminOverViewCard, OverviewCardComponent } from "../../../../partials/sections/admin/overview-card/admin-overview-card.component";
 import { AdminPaginationComponent } from "../../../../partials/sections/admin/pagination/pagination.component";
-import { LoadingCircleAnimationComponent } from "../../../../partials/shared/loading-Animations/loading-circle/loading-circle.component";
 import { SharedDataService } from "../../../../../../core/services/public/shared-data.service";
 
 @Component({
@@ -17,8 +16,7 @@ import { SharedDataService } from "../../../../../../core/services/public/shared
     AdminBookingTableComponent, 
     AdminBookingFilterComponent, 
     OverviewCardComponent, 
-    AdminPaginationComponent, 
-    LoadingCircleAnimationComponent]
+    AdminPaginationComponent]
 })
 export class AdminBookingManagementComponent implements OnInit {
     private readonly _adminService = inject(AdminService);
@@ -27,7 +25,7 @@ export class AdminBookingManagementComponent implements OnInit {
     @ViewChild(AdminBookingFilterComponent)
     private _filterComponent!: AdminBookingFilterComponent
 
-    bookings$: Observable<IAdminBookingForTable[]> = of([]);
+    bookings$: Observable<IAdminBookingForTable[] | null> = of(null);
     stats!: IAdminOverViewCard[];
     pagination!: IPagination;
 

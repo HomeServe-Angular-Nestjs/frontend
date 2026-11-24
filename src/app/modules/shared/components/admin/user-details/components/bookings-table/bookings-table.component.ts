@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IBookingOverview, UserBookingStatus } from '../../../../../../../core/models/user-details.model';
 
 @Component({
     selector: 'app-user-bookings-table',
     standalone: true,
     host: { class: 'block' },
-    imports: [CommonModule],
+    imports: [CommonModule, RouterLink],
     templateUrl: './bookings-table.component.html'
 })
 export class UserBookingsTableComponent {

@@ -54,8 +54,23 @@
 </div>
 
 <ng-template #loading>
-    <div class="flex flex-col items-center justify-center p-20">
-        <app-loading-circle-animation></app-loading-circle-animation>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-4 animate-pulse">Syncing data...</p>
+    <div class="animate-pulse overflow-x-auto" aria-busy="true">
+        <table class="min-w-full text-sm text-left">
+            <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-600">
+                <tr>
+                    <th *ngFor="let width of ['w-20', 'w-24', 'w-24', 'w-16', 'w-16', 'w-16', 'w-16']"
+                        class="px-5 py-3">
+                        <div class="h-3 rounded bg-gray-200" [ngClass]="width"></div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 bg-white">
+                <tr *ngFor="let row of [0,1,2,3,4]">
+                    <td *ngFor="let column of [0,1,2,3,4,5,6]" class="px-5 py-4">
+                        <div class="h-4 w-20 rounded bg-gray-200"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </ng-template>

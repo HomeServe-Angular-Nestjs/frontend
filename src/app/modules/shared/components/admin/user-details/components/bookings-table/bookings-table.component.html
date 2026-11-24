@@ -11,6 +11,7 @@
                     <th class="px-6 py-4">Amount</th>
                     <th class="px-6 py-4">Date</th>
                     <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4 text-center">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -25,6 +26,14 @@
                         <span class="px-3 py-1 rounded-full text-xs font-medium" [ngClass]="statusPillClass(booking.status)">
                             {{ formatStatus(booking.status) }}
                         </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <a [routerLink]="['/admin/booking_details', booking.bookingId]"
+                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100 hover:text-blue-800"
+                            aria-label="View booking details">
+                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                            Details
+                        </a>
                     </td>
                 </tr>
             </tbody>
