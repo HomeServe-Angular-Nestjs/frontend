@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnDestroy, OnInit, signal, ViewChild } from "@angular/core";
 import { ChatSocketService } from "../../../../../../core/services/socket-service/chat.service";
 import { FormsModule } from "@angular/forms";
 import { distinctUntilChanged, filter, map, Observable, Subject, take, takeUntil } from "rxjs";
@@ -15,6 +15,8 @@ import { ToastNotificationService } from "../../../../../../core/services/public
 import { ChatPaneService } from "../../../../../../core/services/public/chat-pane.service";
 
 const MESSAGE_PAGE_SIZE = 20;
+const MESSAGE_PREFETCH_MIN_PX = 600;
+const MESSAGE_PREFETCH_VIEWPORTS = 1.5;
 
 @Component({
   selector: 'app-chat-message-area',
@@ -54,6 +56,7 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
   currentUserId!: string;
   receiverId!: string;
   receiverType: UserType = 'customer';
+  readonly receiverOnline = signal<boolean | null>(null);
   textMessage: string = '';
 
   ngOnInit(): void {
@@ -64,6 +67,14 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
       map(messages => (messages ?? []).filter(msg => !!msg)),
       takeUntil(this._destroy$),
     );
+
+    this._chatSocketService.presenceUpdates$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(({ userId, isOnline }) => {
+        if (userId === this.receiverId) {
+          this.receiverOnline.set(isOnline);
+        }
+      });
 
     this.messages$.subscribe((messages) => {
       this._afterDOMPaint(() => {
@@ -102,6 +113,10 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
       if (receiver) {
         this.receiverId = receiver.id;
         this.receiverType = receiver.type;
+        this.receiverOnline.set(null);
+        if (receiver.type === 'customer' || receiver.type === 'provider') {
+          this._chatSocketService.checkPresence(receiver.id, receiver.type);
+        }
       }
     });
 
@@ -123,6 +138,8 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
       distinctUntilChanged((a, b) => a.chatId === b.chatId && a.receiverId === b.receiverId),
       takeUntil(this._destroy$)
     ).subscribe(({ chatId, receiverId }) => {
+      this._isFetching = false;
+      this._preserveScroll = false;
       this._store.dispatch(chatActions.fetchMessages({ chatId, receiverId, limit: MESSAGE_PAGE_SIZE }));
     });
   }
@@ -180,8 +197,8 @@ export class ChatMessageComponent implements OnInit, AfterViewInit, OnDestroy {
     const el = this.messageScrollBox?.nativeElement;
     if (!el || this._isFetching || !this.hasMoreMessages || !this.nextCursor) return;
 
-    const pixelThreshold = 60;
-    if (el.scrollTop <= pixelThreshold) {
+    const prefetchThreshold = Math.max(MESSAGE_PREFETCH_MIN_PX, el.clientHeight * MESSAGE_PREFETCH_VIEWPORTS);
+    if (el.scrollTop <= prefetchThreshold) {
       this._isFetching = true;
       this._preserveScroll = true;
       this._prevScrollTop = el.scrollTop;

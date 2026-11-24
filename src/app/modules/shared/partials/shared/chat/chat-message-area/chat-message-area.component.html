@@ -1,10 +1,10 @@
 <ng-container *ngIf="(chat$ | async) as chat; else noChatSelected">
 
     <!-- ================= LOADING STATE (SKELETON) ================= -->
-    <ng-container *ngIf="(isLoadingMessages$ | async); else errorCheck">
-        <div class="flex flex-col flex-1 min-h-0 overflow-hidden bg-white">
+    <ng-container *ngIf="(isLoadingMessages$ | async) && !(messages$ | async)?.length; else errorCheck">
+        <div class="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
             <!-- Header skeleton -->
-            <div class="px-4 py-2 border-b bg-white flex items-center justify-between shrink-0">
+            <div class="flex shrink-0 items-center justify-between border-b bg-white px-3 py-2 sm:px-4">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-full bg-gray-200 animate-pulse"></div>
                     <div class="space-y-1.5">
@@ -16,7 +16,7 @@
             </div>
 
             <!-- Message bubbles skeleton -->
-            <div class="flex-1 px-6 py-4 space-y-4 bg-white">
+            <div class="min-h-0 flex-1 space-y-4 overflow-hidden bg-white px-3 py-3 sm:px-6 sm:py-4">
                 <div class="flex justify-start">
                     <div class="h-10 w-2/3 bg-gray-200 animate-pulse rounded-lg rounded-bl-none"></div>
                 </div>
@@ -36,22 +36,24 @@
     <!-- ================= ERROR STATE ================= -->
     <ng-template #errorCheck>
         <ng-container *ngIf="(messagesError$ | async) as error; else chatSuccess">
-            <div class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white">
-                <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-4">
-                    <i class="fas fa-exclamation-circle text-2xl"></i>
+            <ng-container *ngIf="!(messages$ | async)?.length; else chatSuccess">
+                <div class="flex min-h-0 flex-1 flex-col items-center justify-center bg-white p-5 text-center sm:p-8">
+                    <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-exclamation-circle text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                        {{ (error.code === 'NO_ACTIVE_BOOKINGS') ? 'Access Restricted' : 'Connection Error' }}
+                    </h3>
+                    <p class="text-sm text-gray-500 max-w-xs mx-auto mb-6">
+                        {{ error?.message || 'We encountered an issue while loading your messages.' }}
+                    </p>
+                    <button
+                        (click)="tryAgain()"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
+                        Try Again
+                    </button>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                    {{ (error.code === 'NO_ACTIVE_BOOKINGS') ? 'Access Restricted' : 'Connection Error' }}
-                </h3>
-                <p class="text-sm text-gray-500 max-w-xs mx-auto mb-6">
-                    {{ error?.message || 'We encountered an issue while loading your messages.' }}
-                </p>
-                <button
-                    (click)="tryAgain()"
-                    class="px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
-                    Try Again
-                </button>
-            </div>
+            </ng-container>
         </ng-container>
     </ng-template>
 
@@ -59,20 +61,20 @@
         <div class="flex flex-col flex-1 min-h-0 overflow-hidden bg-white">
 
             <!-- ================= CHAT HEADER ================= -->
-            <div class="px-4 py-2 border-b bg-white flex items-center justify-between shrink-0">
+            <div class="flex shrink-0 items-center justify-between border-b bg-white px-3 py-2 sm:px-4">
                 <ng-container *ngIf="chat.receiver as receiver">
 
                     <!-- User Info -->
-                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                    <div class="flex min-w-0 flex-1 items-center gap-2">
                         <!-- Back (mobile) -->
                         <button aria-label="Back to chats" (click)="goBackToList()"
-                            class="lg:hidden text-gray-500 hover:text-gray-800 transition shrink-0">
+                            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-800 lg:hidden">
                             <i class="fas fa-arrow-left"></i>
                         </button>
 
                         <!-- Toggle chat list (desktop) -->
                         <button aria-label="Toggle chat list" (click)="toggleChatList()"
-                            class="hidden lg:flex text-gray-500 hover:text-gray-800 transition shrink-0">
+                            class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-800 lg:flex">
                             <i class="fas fa-bars"></i>
                         </button>
 
@@ -84,16 +86,19 @@
                             <h2 class="text-sm font-semibold text-gray-800 leading-tight truncate">
                                 {{ receiver.name }}
                             </h2>
-                            <p class="text-[11px] text-green-500 leading-tight">
-                                Online
+                            <p class="mt-0.5 flex items-center gap-1.5 text-[11px] leading-tight"
+                                [ngClass]="receiverOnline() ? 'text-emerald-600' : 'text-gray-500'">
+                                <span class="h-1.5 w-1.5 rounded-full"
+                                    [ngClass]="receiverOnline() ? 'bg-emerald-500' : 'bg-gray-400'"></span>
+                                {{ receiverOnline() === null ? 'Checking status...' : (receiverOnline() ? 'Online' : 'Offline') }}
                             </p>
                         </div>
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex items-center gap-4 text-gray-400 shrink-0">
-                        <button aria-label="Video Call" (click)="startVideoCall()"
-                            class="hover:text-blue-600 transition">
+                    <div class="flex shrink-0 items-center gap-2 text-gray-400 sm:gap-4">
+                        <button type="button" aria-label="Video Call" (click)="startVideoCall()"
+                            class="inline-flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-blue-50 hover:text-blue-600">
                             <i class="fas fa-video text-sm"></i>
                         </button>
                     </div>
@@ -102,9 +107,17 @@
             </div>
 
             <!-- ================= MESSAGES SCROLL AREA ================= -->
-            <div #messageScrollBox class="flex-1 overflow-y-scroll px-6 py-4 space-y-4 bg-white min-h-0"
+            <div #messageScrollBox
+                class="relative min-h-0 flex-1 space-y-4 overflow-y-auto bg-white px-3 py-3 sm:px-6 sm:py-4"
                 (scroll)="onScroll()">
                 <ng-container *ngIf="(messages$ | async) as messages">
+                    <div *ngIf="(isLoadingMessages$ | async) && messages.length > 0"
+                        class="sticky top-0 z-10 flex justify-center" role="status" aria-live="polite">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-1 text-xs text-gray-500 shadow-sm">
+                            <i class="fas fa-spinner fa-spin text-indigo-500" aria-hidden="true"></i>
+                            Loading earlier messages
+                        </span>
+                    </div>
 
                     <!-- ================= MESSAGE LIST ================= -->
                     <ng-container *ngFor="let message of messages">
@@ -113,7 +126,7 @@
                             'justify-end': message.senderId === currentUserId,
                             'justify-start': message.senderId !== currentUserId
                           }">
-                            <div class="rounded-lg p-3 text-sm max-w-[70%]" [ngClass]="{
+                            <div class="max-w-[85%] break-words rounded-lg p-3 text-sm sm:max-w-[70%]" [ngClass]="{
                               'bg-blue-600 text-white rounded-br-none':
                                 message.senderId === currentUserId,
                               'bg-gray-100 text-gray-900 rounded-bl-none':
@@ -132,7 +145,7 @@
 
                     <!-- ================= NO MESSAGES CONTENT ================= -->
                     <div *ngIf="messages.length === 0"
-                        class="min-h-[450px] flex flex-col items-center justify-center h-full bg-white text-gray-400">
+                        class="flex min-h-full flex-col items-center justify-center bg-white px-3 text-center text-gray-400">
                         <i class="fas fa-envelope-open-text text-5xl mb-4"></i>
                         <p class="text-lg font-medium">No messages yet</p>
                         <p class="text-sm text-gray-500 mt-2">
@@ -144,12 +157,13 @@
             </div>
 
             <!-- ================= MESSAGE INPUT ================= -->
-            <div class="px-4 py-3 border-t bg-white flex items-center gap-3 shrink-0">
+            <div class="flex shrink-0 items-center gap-2 border-t bg-white px-3 py-2 sm:gap-3 sm:px-4 sm:py-3">
                 <input type="text" placeholder="Type a message..." [(ngModel)]="textMessage"
                     (keydown.enter)="sendMessage()"
-                    class="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring" />
+                    class="min-w-0 flex-1 rounded-full border border-gray-200 px-4 py-2 text-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100" />
 
-                <button (click)="sendMessage()" class="text-blue-600 text-xl">
+                <button type="button" aria-label="Send message" (click)="sendMessage()"
+                    class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-indigo-600 transition hover:bg-indigo-50">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>

@@ -35,6 +35,11 @@ export interface IReceiver {
     name: string;
 }
 
+export interface IPresenceUpdate {
+    userId: string;
+    isOnline: boolean;
+}
+
 
 export interface IChat extends IBase {
     receiver: IReceiver;

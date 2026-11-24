@@ -9,6 +9,7 @@ import { Subject, takeUntil } from "rxjs";
 import { Store } from "@ngrx/store";
 import { chatActions } from "../../../../store/chat/chat.action";
 import { CustomerHeaderComponent } from "../../../shared/partials/sections/customer/header/header.component";
+import { CustomerMobileNavigationComponent } from "../../../shared/partials/sections/customer/mobile-navigation/customer-mobile-navigation.component";
 import { selectCheckStatus } from "../../../../store/auth/auth.selector";
 import { selectSelectedChatId } from "../../../../store/chat/chat.selector";
 import { VideoCallSocketService } from "../../../../core/services/socket-service/video-socket.service";
@@ -16,7 +17,7 @@ import { VideoCallSocketService } from "../../../../core/services/socket-service
 @Component({
   selector: 'app-customer-chat',
   templateUrl: './customer-chat.component.html',
-  imports: [CommonModule, ChatListComponent, ChatMessageComponent, CustomerHeaderComponent]
+  imports: [CommonModule, ChatListComponent, ChatMessageComponent, CustomerHeaderComponent, CustomerMobileNavigationComponent]
 })
 export class CustomerChatComponent implements OnInit, OnDestroy {
   private readonly _store = inject(Store);

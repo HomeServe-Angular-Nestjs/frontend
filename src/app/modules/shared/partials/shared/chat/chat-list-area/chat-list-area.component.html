@@ -1,15 +1,15 @@
-<div class="flex flex-col h-full bg-white border-r">
+<div class="flex h-full min-h-0 flex-col border-r bg-white">
 
     <!-- ================= SEARCH ================= -->
-    <div class="px-3 py-2 border-b">
+    <div class="shrink-0 border-b px-3 py-2">
         <input type="text" placeholder="Search chats" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)"
-            class="w-full px-3 py-1.5 text-sm border rounded-full focus:outline-none focus:ring focus:border-blue-400" />
+            class="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100" />
     </div>
 
     <!-- ================= CHAT LIST ================= -->
     <ng-container *ngIf="(isFetchingChats$ | async) && !(chats$ | async)?.length; else loaded">
         <!-- ================= LOADING SKELETON ================= -->
-        <div class="flex-1 px-3 py-2 space-y-2">
+        <div class="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 py-2">
             <div *ngFor="let i of [0,1,2,3,4]" class="flex items-center gap-3 py-2">
                 <div class="w-10 h-10 rounded-full bg-gray-200 animate-pulse shrink-0"></div>
                 <div class="flex-1 min-w-0 space-y-2">
@@ -22,11 +22,11 @@
 
     <ng-template #loaded>
         <ng-container *ngIf="(chats$ | async) as chats">
-            <div *ngIf="chats.length > 0; else noChats" class="overflow-y-auto flex-1">
+            <div *ngIf="chats.length > 0; else noChats" class="min-h-0 flex-1 overflow-y-auto">
 
             <ul>
-                <li *ngFor="let chat of chats" (click)="viewMessages(chat.id)" class="px-3 py-2.5 flex items-center gap-3 cursor-pointer
-                 border-b hover:bg-gray-100 transition">
+                <li *ngFor="let chat of chats" (click)="viewMessages(chat.id)"
+                    class="flex cursor-pointer items-center gap-3 border-b px-3 py-3 transition hover:bg-gray-50">
 
                     <!-- Avatar -->
                     <img [src]="imageHandler(chat.receiver.avatar)" alt="avatar" (error)="onImgError($event)"

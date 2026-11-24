@@ -1,9 +1,9 @@
 import { inject, Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Store } from "@ngrx/store";
-import { lastValueFrom, Observable } from "rxjs";
+import { lastValueFrom, Observable, Subject } from "rxjs";
 import { BaseSocketService, ISocketError } from "./base-socket.service";
-import { IChat, IMessage, IMessagePage, IParticipant, ISendMessage } from "../../models/chat.model";
+import { IChat, IMessage, IMessagePage, IParticipant, IPresenceUpdate, ISendMessage } from "../../models/chat.model";
 import { IResponse } from "../../../modules/shared/models/response.model";
 import { API_ENV } from "../../../../environments/env";
 import { chatActions } from "../../../store/chat/chat.action";
@@ -12,9 +12,11 @@ import { authActions } from "../../../store/auth/auth.actions";
 @Injectable({ providedIn: 'root' })
 export class ChatSocketService extends BaseSocketService {
     private readonly _store = inject(Store);
+    private readonly _presenceUpdates = new Subject<IPresenceUpdate>();
 
     private readonly _chatApi = API_ENV.chat;
     private readonly _messageApi = API_ENV.message;
+    readonly presenceUpdates$ = this._presenceUpdates.asObservable();
 
     protected override namespace: string = '/chat';
 
@@ -35,11 +37,18 @@ export class ChatSocketService extends BaseSocketService {
                 lastSeenAt: message.createdAt,
             }));
         });
+
+        this.removeListener('presence:status');
+        this.removeListener('presence:update');
+        this.listen<IPresenceUpdate>('presence:status', (status) => this._presenceUpdates.next(status));
+        this.listen<IPresenceUpdate>('presence:update', (status) => this._presenceUpdates.next(status));
     }
 
     protected override onDisconnect(reason: string): void {
         console.log('[ChatSocket] Disconnected:', reason);
         this.removeListener('newMessage');
+        this.removeListener('presence:status');
+        this.removeListener('presence:update');
     }
 
     private async _refreshTokensAndReconnect(): Promise<void> {
@@ -77,6 +86,10 @@ export class ChatSocketService extends BaseSocketService {
 
     markMessagesRead(chatId: string): void {
         this.emit('markMessagesRead', { chatId });
+    }
+
+    checkPresence(receiverId: string, receiverType: 'customer' | 'provider'): void {
+        this.emit('presence:check', { receiverId, receiverType });
     }
 
     private _refreshAccessToken(): Observable<void> {
